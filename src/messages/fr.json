@@ -1,0 +1,130 @@
+{
+  "app": {
+    "name": "Grinta",
+    "tagline": ""
+  },
+  "nav": {
+    "dashboard": "",
+    "teams": "",
+    "exercises": "",
+    "planner": "",
+    "logout": ""
+  },
+  "auth": {
+    "tabLogin": "",
+    "tabSignup": "",
+    "loginTitle": "",
+    "loginSubtitle": "",
+    "signupTitle": "",
+    "signupSubtitle": "",
+    "fullName": "",
+    "fullNameHelp": "",
+    "email": "",
+    "emailHelp": "",
+    "password": "",
+    "passwordHelpSignup": "",
+    "passwordHelpLogin": "",
+    "showPassword": "",
+    "hidePassword": "",
+    "submitLogin": "",
+    "submittingLogin": "",
+    "submitSignup": "",
+    "submittingSignup": "",
+    "noAccount": "",
+    "haveAccount": "",
+    "switchToSignup": "",
+    "switchToLogin": "",
+    "checkEmailTitle": "",
+    "checkEmail": "",
+    "invalidCredentials": "",
+    "genericError": ""
+  },
+  "dashboard": {
+    "title": "",
+    "welcome": "",
+    "teamsCard": "",
+    "exercisesCard": "",
+    "nextSession": "",
+    "noNextSession": ""
+  },
+  "teams": {
+    "title": "",
+    "new": "",
+    "empty": "",
+    "form": {
+      "name": "",
+      "season": "",
+      "ageGroup": "",
+      "submit": ""
+    },
+    "players": {
+      "title": "",
+      "new": "",
+      "empty": "",
+      "firstName": "",
+      "lastName": "",
+      "birthDate": "",
+      "position": "",
+      "jersey": "",
+      "notes": "",
+      "submit": ""
+    }
+  },
+  "exercises": {
+    "title": "",
+    "new": "",
+    "empty": "",
+    "categoryAll": "",
+    "form": {
+      "name": "",
+      "description": "",
+      "category": "",
+      "duration": "",
+      "intensity": "",
+      "equipment": "",
+      "submit": ""
+    },
+    "categories": {
+      "warmup": "",
+      "technical": "",
+      "tactical": "",
+      "physical": "",
+      "cooldown": ""
+    },
+    "intensities": {
+      "low": "",
+      "medium": "",
+      "high": ""
+    }
+  },
+  "planner": {
+    "title": "",
+    "pickTeam": "",
+    "noTeams": "",
+    "view": {
+      "year": "",
+      "month": "",
+      "week": "",
+      "day": ""
+    },
+    "session": {
+      "newTitle": "",
+      "editTitle": "",
+      "date": "",
+      "startTime": "",
+      "duration": "",
+      "theme": "",
+      "notes": "",
+      "exercises": "",
+      "addExercise": "",
+      "noExercises": "",
+      "submit": "",
+      "delete": ""
+    }
+  },
+  "common": {
+    "cancel": "",
+    "save": "",
+    "loading": ""
+  }
+}

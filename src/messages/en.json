@@ -1,0 +1,130 @@
+{
+  "app": {
+    "name": "Grinta",
+    "tagline": "Plan your football season."
+  },
+  "nav": {
+    "dashboard": "Dashboard",
+    "teams": "Teams",
+    "exercises": "Exercises",
+    "planner": "Planner",
+    "logout": "Log out"
+  },
+  "auth": {
+    "tabLogin": "Log in",
+    "tabSignup": "Sign up",
+    "loginTitle": "Welcome back",
+    "loginSubtitle": "Log in to plan your team's training.",
+    "signupTitle": "Create your trainer account",
+    "signupSubtitle": "Set up your account in 30 seconds.",
+    "fullName": "Full name",
+    "fullNameHelp": "Shown in the app and on your team pages.",
+    "email": "Email",
+    "emailHelp": "We'll use this to log you in.",
+    "password": "Password",
+    "passwordHelpSignup": "At least 6 characters.",
+    "passwordHelpLogin": "The password you chose at signup.",
+    "showPassword": "Show password",
+    "hidePassword": "Hide password",
+    "submitLogin": "Log in",
+    "submittingLogin": "Logging in…",
+    "submitSignup": "Create account",
+    "submittingSignup": "Creating account…",
+    "noAccount": "No account yet?",
+    "haveAccount": "Already have an account?",
+    "switchToSignup": "Create one",
+    "switchToLogin": "Log in instead",
+    "checkEmailTitle": "Check your inbox",
+    "checkEmail": "We sent a confirmation link to your email. Click it to activate your account.",
+    "invalidCredentials": "Invalid email or password.",
+    "genericError": "Something went wrong. Try again."
+  },
+  "dashboard": {
+    "title": "Dashboard",
+    "welcome": "Welcome back, {name}.",
+    "teamsCard": "Teams",
+    "exercisesCard": "Exercises",
+    "nextSession": "Next session",
+    "noNextSession": "No upcoming session."
+  },
+  "teams": {
+    "title": "Teams",
+    "new": "New team",
+    "empty": "No teams yet. Create your first one.",
+    "form": {
+      "name": "Team name",
+      "season": "Season",
+      "ageGroup": "Age group",
+      "submit": "Create team"
+    },
+    "players": {
+      "title": "Players",
+      "new": "Add player",
+      "empty": "No players in this team yet.",
+      "firstName": "First name",
+      "lastName": "Last name",
+      "birthDate": "Birth date",
+      "position": "Position",
+      "jersey": "Jersey #",
+      "notes": "Notes",
+      "submit": "Add player"
+    }
+  },
+  "exercises": {
+    "title": "Exercise library",
+    "new": "New exercise",
+    "empty": "Your library is empty. Add your first exercise.",
+    "categoryAll": "All categories",
+    "form": {
+      "name": "Name",
+      "description": "Description",
+      "category": "Category",
+      "duration": "Duration (minutes)",
+      "intensity": "Intensity",
+      "equipment": "Equipment (comma-separated)",
+      "submit": "Save exercise"
+    },
+    "categories": {
+      "warmup": "Warmup",
+      "technical": "Technical",
+      "tactical": "Tactical",
+      "physical": "Physical",
+      "cooldown": "Cooldown"
+    },
+    "intensities": {
+      "low": "Low",
+      "medium": "Medium",
+      "high": "High"
+    }
+  },
+  "planner": {
+    "title": "Season planner",
+    "pickTeam": "Pick a team to plan",
+    "noTeams": "Create a team first.",
+    "view": {
+      "year": "Year",
+      "month": "Month",
+      "week": "Week",
+      "day": "Day"
+    },
+    "session": {
+      "newTitle": "New session",
+      "editTitle": "Edit session",
+      "date": "Date",
+      "startTime": "Start time",
+      "duration": "Duration (minutes)",
+      "theme": "Theme",
+      "notes": "Notes",
+      "exercises": "Exercises",
+      "addExercise": "Add exercise",
+      "noExercises": "No exercises attached. Add some from your library.",
+      "submit": "Save session",
+      "delete": "Delete session"
+    }
+  },
+  "common": {
+    "cancel": "Cancel",
+    "save": "Save",
+    "loading": "Loading…"
+  }
+}
