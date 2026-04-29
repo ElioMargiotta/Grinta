@@ -1,0 +1,23 @@
+Grinta uses Lucide React (lucide-react v1.12) for all iconography.
+
+Icon style: stroke, 1.5px weight, 24×24 viewBox, used at h-4 w-4 (16px) in nav and buttons.
+
+In design system previews, icons are loaded from:
+  https://unpkg.com/lucide@latest/dist/umd/lucide.min.js
+
+Core icons:
+  - layout-dashboard  → Dashboard nav item
+  - users             → Teams nav item
+  - dumbbell          → Exercises nav item
+  - calendar-days     → Planner nav item
+  - log-out           → Topbar logout button
+  - plus              → New item CTAs
+  - trash-2           → Delete actions
+  - eye               → Show/hide password
+  - search            → Exercise search
+  - chevron-right/left → Navigation arrows, list items
+
+No brand logo SVG was found in the repository public/ folder.
+The wordmark "Grinta" is rendered as text only (font-size: 18px, font-weight: 600).
+
+Please provide an SVG logo if one exists.

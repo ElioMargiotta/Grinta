@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Geist', sans-serif; background: #fafafa; padding: 20px; display: flex; gap: 16px; flex-wrap: wrap; align-items: flex-start; }
+  .card { border-radius: 8px; border: 1px solid #e4e4e7; background: #fff; padding: 16px; }
+  .card-title { font-size: 14px; font-weight: 600; color: #18181b; margin-bottom: 4px; }
+  .card-sub   { font-size: 13px; color: #71717a; }
+  .card-value { font-size: 24px; font-weight: 600; color: #18181b; margin-top: 8px; }
+  .dashboard-card { width: 160px; }
+  .session-card { width: 260px; }
+  .session-date { font-size: 12px; color: #a1a1aa; margin-bottom: 6px; }
+  .tag { display: inline-flex; align-items: center; border-radius: 4px; padding: 2px 8px; font-size: 11px; font-weight: 500; }
+  .tag-technical { background: #f4f4f5; color: #52525b; }
+  .tag-warmup    { background: #f4f4f5; color: #71717a; }
+  .exercise-row  { display: flex; justify-content: space-between; align-items: center; padding: 6px 0; border-bottom: 1px solid #f4f4f5; font-size: 13px; }
+  .exercise-name { color: #18181b; }
+  .exercise-meta { color: #a1a1aa; font-size: 12px; }
+</style>
+</head>
+<body>
+  <!-- Dashboard stat cards -->
+  <div class="card dashboard-card">
+    <div class="card-sub">Teams</div>
+    <div class="card-value">3</div>
+  </div>
+  <div class="card dashboard-card">
+    <div class="card-sub">Exercises</div>
+    <div class="card-value">24</div>
+  </div>
+
+  <!-- Session card -->
+  <div class="card session-card">
+    <div class="session-date">Thu 15 Aug · 10:00</div>
+    <div class="card-title">Tactical pressing</div>
+    <div style="display:flex; gap:6px; margin-top:6px">
+      <span class="tag tag-technical">Tactical</span>
+      <span style="font-size:12px; color:#71717a; align-self:center">90 min</span>
+    </div>
+    <div style="margin-top:12px">
+      <div class="exercise-row"><span class="exercise-name">Rondo 4v2</span><span class="exercise-meta">15 min · High</span></div>
+      <div class="exercise-row"><span class="exercise-name">Positional game</span><span class="exercise-meta">20 min · High</span></div>
+      <div class="exercise-row"><span class="exercise-name">Cooldown stretch</span><span class="exercise-meta">10 min · Low</span></div>
+    </div>
+  </div>
+
+  <!-- Exercise library card -->
+  <div class="card" style="width:220px">
+    <div class="card-title">Rondo 4v2</div>
+    <div class="card-sub" style="margin-top:4px">Possession drill in small space, 4 attackers vs 2 defenders.</div>
+    <div style="display:flex; gap:6px; margin-top:10px; flex-wrap:wrap">
+      <span class="tag tag-technical">Technical</span>
+      <span class="tag tag-warmup">15 min</span>
+      <span class="tag tag-technical">High</span>
+    </div>
+  </div>
+</body>
+</html>

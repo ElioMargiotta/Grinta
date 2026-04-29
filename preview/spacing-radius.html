@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Geist', sans-serif; background: #fff; padding: 20px; }
+  .grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; }
+  .group { display: flex; flex-direction: column; gap: 8px; }
+  .group-title { font-size: 11px; font-weight: 500; color: #71717a; text-transform: uppercase; letter-spacing: .05em; }
+  .items { display: flex; gap: 10px; align-items: flex-end; }
+  .chip { background: #e4e4e7; border: 1px solid #d4d4d8; display: flex; align-items: center; justify-content: center; }
+  .label { font-size: 10px; color: #71717a; text-align: center; }
+  /* Shadows */
+  .shadow-none { box-shadow: none; width: 48px; height: 32px; border-radius: 6px; background: #fff; border: 1px solid #e4e4e7; }
+  .shadow-border { width: 48px; height: 32px; border-radius: 8px; background: #fff; border: 1px solid #e4e4e7; }
+  /* Radii demo */
+  .r-md  { width: 48px; height: 32px; border-radius: 6px;  background: #18181b; }
+  .r-lg  { width: 48px; height: 32px; border-radius: 8px;  background: #18181b; }
+  .r-full { width: 32px; height: 32px; border-radius: 9999px; background: #18181b; }
+</style>
+</head>
+<body>
+<div class="grid">
+  <div class="group">
+    <div class="group-title">Border Radius</div>
+    <div class="items">
+      <div style="display:flex; flex-direction:column; align-items:center; gap:4px">
+        <div class="r-md"></div><div class="label">md / 6px<br>buttons · inputs</div>
+      </div>
+      <div style="display:flex; flex-direction:column; align-items:center; gap:4px">
+        <div class="r-lg"></div><div class="label">lg / 8px<br>cards</div>
+      </div>
+      <div style="display:flex; flex-direction:column; align-items:center; gap:4px">
+        <div class="r-full"></div><div class="label">full<br>avatars</div>
+      </div>
+    </div>
+  </div>
+  <div class="group">
+    <div class="group-title">Elevation / Shadow</div>
+    <div class="items">
+      <div style="display:flex; flex-direction:column; align-items:center; gap:4px">
+        <div class="shadow-none"></div><div class="label">none<br>default</div>
+      </div>
+      <div style="display:flex; flex-direction:column; align-items:center; gap:4px">
+        <div class="shadow-border"></div><div class="label">border only<br>cards</div>
+      </div>
+    </div>
+    <div style="font-size:11px; color:#a1a1aa; margin-top:4px">No box-shadow used — elevation via border only.</div>
+  </div>
+</div>
+</body>
+</html>

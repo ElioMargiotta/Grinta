@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600&family=Geist+Mono:wght@400&display=swap" rel="stylesheet">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Geist', sans-serif; background: #fff; padding: 20px; display: flex; flex-direction: column; gap: 10px; }
+  .specimen { display: flex; align-items: baseline; justify-content: space-between; }
+  .tag { font-size: 10px; color: #a1a1aa; font-family: 'Geist Mono', monospace; }
+  .h3    { font-size: 18px; font-weight: 600; color: #18181b; }
+  .label { font-size: 14px; font-weight: 500; color: #3f3f46; }
+  .body  { font-size: 14px; font-weight: 400; color: #18181b; }
+  .muted { font-size: 14px; font-weight: 400; color: #71717a; }
+  .caption { font-size: 12px; color: #71717a; }
+  .mono  { font-size: 13px; font-family: 'Geist Mono', monospace; color: #18181b; }
+  .danger { font-size: 14px; color: #dc2626; }
+  hr { border: none; border-top: 1px solid #f4f4f5; }
+</style>
+</head>
+<body>
+  <div class="specimen"><span class="h3">Teams</span><span class="tag">h3 — 18px semibold</span></div>
+  <hr>
+  <div class="specimen"><span class="label">Team name</span><span class="tag">label — 14px medium</span></div>
+  <hr>
+  <div class="specimen"><span class="body">Welcome back, Alex.</span><span class="tag">body — 14px regular</span></div>
+  <hr>
+  <div class="specimen"><span class="muted">No upcoming session.</span><span class="tag">muted — 14px zinc-500</span></div>
+  <hr>
+  <div class="specimen"><span class="caption">At least 6 characters.</span><span class="tag">caption — 12px</span></div>
+  <hr>
+  <div class="specimen"><span class="mono">2024-08-15 · 90 min</span><span class="tag">mono — Geist Mono</span></div>
+  <hr>
+  <div class="specimen"><span class="danger">Invalid email or password.</span><span class="tag">danger — red-600</span></div>
+</body>
+</html>

@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Geist', sans-serif; background: #fff; padding: 20px; }
+  .grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+  .item { display: flex; flex-direction: column; gap: 5px; }
+  .chip { height: 36px; border-radius: 6px; border: 1px solid rgba(0,0,0,0.07); }
+  .name { font-size: 11px; font-weight: 500; color: #18181b; }
+  .desc { font-size: 10px; color: #71717a; }
+</style>
+</head>
+<body>
+<div class="grid">
+  <div class="item"><div class="chip" style="background:#ffffff;border-color:#e4e4e7"></div><div class="name">bg</div><div class="desc">Page background</div></div>
+  <div class="item"><div class="chip" style="background:#fafafa"></div><div class="name">bg-subtle</div><div class="desc">Subtle bg — zinc-50</div></div>
+  <div class="item"><div class="chip" style="background:#f4f4f5"></div><div class="name">bg-muted</div><div class="desc">Muted / hover — zinc-100</div></div>
+  <div class="item"><div class="chip" style="background:#e4e4e7"></div><div class="name">bg-overlay</div><div class="desc">Overlay — zinc-200</div></div>
+
+  <div class="item"><div class="chip" style="background:#18181b"></div><div class="name">fg</div><div class="desc">Primary text — zinc-900</div></div>
+  <div class="item"><div class="chip" style="background:#71717a"></div><div class="name">fg-muted</div><div class="desc">Secondary — zinc-500</div></div>
+  <div class="item"><div class="chip" style="background:#a1a1aa"></div><div class="name">fg-subtle</div><div class="desc">Placeholder — zinc-400</div></div>
+  <div class="item"><div class="chip" style="background:#d4d4d8"></div><div class="name">fg-disabled</div><div class="desc">Disabled — zinc-300</div></div>
+
+  <div class="item"><div class="chip" style="background:#e4e4e7"></div><div class="name">border</div><div class="desc">Surface — zinc-200</div></div>
+  <div class="item"><div class="chip" style="background:#d4d4d8"></div><div class="name">border-input</div><div class="desc">Input — zinc-300</div></div>
+
+  <div class="item"><div class="chip" style="background:#0ECECE;outline:2px solid #0ECECE;outline-offset:2px"></div><div class="name" style="color:#056868">primary</div><div class="desc">Brand turquoise-400</div></div>
+  <div class="item"><div class="chip" style="background:#0aacac"></div><div class="name">primary-hover</div><div class="desc">turquoise-500</div></div>
+  <div class="item"><div class="chip" style="background:#ecfffe;border-color:#c4fffe"></div><div class="name">primary-subtle</div><div class="desc">Tinted bg — turquoise-50</div></div>
+  <div class="item"><div class="chip" style="background:#dc2626"></div><div class="name">danger</div><div class="desc">Destructive — red-600</div></div>
+</div>
+</body>
+</html>

@@ -1,0 +1,10 @@
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 40" fill="none">
+  
+  <circle cx="18" cy="20" r="14" fill="#0ECECE" opacity="0.15"></circle>
+  <circle cx="18" cy="20" r="9" fill="#0ECECE"></circle>
+  
+  <path d="M18 12 L18 28 M12 16 L24 16 M12 24 L24 24" stroke="white" stroke-width="1.2" stroke-linecap="round" opacity="0.7"></path>
+  
+  <text x="36" y="26" font-family="&#39;Geist&#39;, ui-sans-serif, sans-serif" font-size="20" font-weight="700" letter-spacing="-0.5" fill="#0A0A0A">Grinta</text>
+</svg>

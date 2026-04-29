@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Geist', sans-serif; background: #fff; padding: 20px; }
+  .section { display: flex; flex-direction: column; gap: 10px; margin-bottom: 16px; }
+  .section-label { font-size: 11px; color: #a1a1aa; text-transform: uppercase; letter-spacing: .05em; }
+  .row { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+  button {
+    display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+    border-radius: 6px; font-family: 'Geist', sans-serif; font-size: 14px;
+    font-weight: 500; cursor: pointer; border: none; transition: background 0.15s;
+  }
+  .btn-md { height: 40px; padding: 0 16px; }
+  .btn-sm { height: 32px; padding: 0 12px; font-size: 13px; }
+  .primary   { background: #0ECECE; color: #0A1A1A; }
+  .primary:hover { background: #0aacac; color: #fff; }
+  .secondary { background: #f4f4f5; color: #18181b; }
+  .secondary:hover { background: #e4e4e7; }
+  .ghost     { background: transparent; color: #52525b; }
+  .ghost:hover { background: #f4f4f5; }
+  .danger    { background: #dc2626; color: #fff; }
+  .danger:hover { background: #b91c1c; }
+  .disabled  { opacity: 0.5; pointer-events: none; }
+  svg { width: 16px; height: 16px; }
+</style>
+</head>
+<body>
+<div class="section">
+  <div class="section-label">Variants — md</div>
+  <div class="row">
+    <button class="primary btn-md">Primary</button>
+    <button class="secondary btn-md">Secondary</button>
+    <button class="ghost btn-md">Ghost</button>
+    <button class="danger btn-md">Danger</button>
+  </div>
+</div>
+<div class="section">
+  <div class="section-label">Small</div>
+  <div class="row">
+    <button class="primary btn-sm">Save session</button>
+    <button class="secondary btn-sm">Cancel</button>
+    <button class="ghost btn-sm"><i data-lucide="log-out"></i> Log out</button>
+  </div>
+</div>
+<div class="section">
+  <div class="section-label">With icon / Disabled</div>
+  <div class="row">
+    <button class="primary btn-md"><i data-lucide="plus"></i> New team</button>
+    <button class="primary btn-md disabled">Saving…</button>
+    <button class="danger btn-sm"><i data-lucide="trash-2"></i> Delete</button>
+  </div>
+</div>
+<script>lucide.createIcons();</script>
+</body>
+</html>

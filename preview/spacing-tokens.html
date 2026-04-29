@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Geist', sans-serif; background: #fff; padding: 20px; }
+  .grid { display: flex; flex-direction: column; gap: 8px; }
+  .row  { display: flex; align-items: center; gap: 12px; }
+  .bar  { background: #18181b; border-radius: 2px; height: 16px; }
+  .meta { font-size: 11px; color: #71717a; min-width: 120px; display: flex; gap: 6px; }
+  .name { font-weight: 500; color: #18181b; min-width: 36px; }
+  .px   { font-family: monospace; color: #a1a1aa; }
+</style>
+</head>
+<body>
+<div class="grid">
+  <div class="row"><div class="bar" style="width:4px"></div><div class="meta"><span class="name">1</span><span class="px">4px</span></div></div>
+  <div class="row"><div class="bar" style="width:8px"></div><div class="meta"><span class="name">2</span><span class="px">8px</span></div></div>
+  <div class="row"><div class="bar" style="width:12px"></div><div class="meta"><span class="name">3</span><span class="px">12px</span></div></div>
+  <div class="row"><div class="bar" style="width:16px"></div><div class="meta"><span class="name">4</span><span class="px">16px</span></div></div>
+  <div class="row"><div class="bar" style="width:20px"></div><div class="meta"><span class="name">5</span><span class="px">20px</span></div></div>
+  <div class="row"><div class="bar" style="width:24px"></div><div class="meta"><span class="name">6</span><span class="px">24px</span></div></div>
+  <div class="row"><div class="bar" style="width:32px"></div><div class="meta"><span class="name">8</span><span class="px">32px — card padding</span></div></div>
+  <div class="row"><div class="bar" style="width:40px"></div><div class="meta"><span class="name">10</span><span class="px">40px</span></div></div>
+  <div class="row"><div class="bar" style="width:48px"></div><div class="meta"><span class="name">12</span><span class="px">48px</span></div></div>
+  <div class="row"><div class="bar" style="width:56px"></div><div class="meta"><span class="name">14</span><span class="px">56px — sidebar logo</span></div></div>
+  <div class="row"><div class="bar" style="width:224px"></div><div class="meta"><span class="name">56</span><span class="px">224px — sidebar width</span></div></div>
+</div>
+</body>
+</html>

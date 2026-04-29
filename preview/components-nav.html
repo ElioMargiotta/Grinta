@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600&display=swap" rel="stylesheet">
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Geist', sans-serif; background: #fff; display: flex; }
+  aside {
+    width: 224px; border-right: 1px solid #e4e4e7; background: #fff;
+    display: flex; flex-direction: column; padding-top: 0;
+  }
+  .logo-area { padding: 20px 16px; font-size: 18px; font-weight: 600; color: #18181b; }
+  nav { display: flex; flex-direction: column; gap: 2px; padding: 0 8px; }
+  .nav-item {
+    display: flex; align-items: center; gap: 8px;
+    border-radius: 6px; padding: 8px 12px; font-size: 14px;
+    color: #52525b; text-decoration: none; transition: background 0.12s;
+    cursor: pointer;
+  }
+  .nav-item.active { background: #f4f4f5; color: #18181b; }
+  .nav-item:hover:not(.active) { background: #fafafa; color: #18181b; }
+  svg { width: 16px; height: 16px; }
+  .content { flex: 1; }
+  header {
+    height: 56px; border-bottom: 1px solid #e4e4e7; background: #fff;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0 16px; font-size: 14px; color: #52525b;
+  }
+  .logout-btn {
+    display: inline-flex; align-items: center; gap: 6px;
+    border-radius: 6px; padding: 6px 10px; font-family: 'Geist', sans-serif;
+    font-size: 13px; font-weight: 500; color: #52525b; background: transparent;
+    border: none; cursor: pointer;
+  }
+  .logout-btn:hover { background: #f4f4f5; }
+</style>
+</head>
+<body>
+<aside>
+  <div class="logo-area">Grinta</div>
+  <nav>
+    <div class="nav-item"><i data-lucide="layout-dashboard"></i> Dashboard</div>
+    <div class="nav-item active"><i data-lucide="users"></i> Teams</div>
+    <div class="nav-item"><i data-lucide="dumbbell"></i> Exercises</div>
+    <div class="nav-item"><i data-lucide="calendar-days"></i> Planner</div>
+  </nav>
+</aside>
+<div class="content">
+  <header>
+    <span>Alex Martin</span>
+    <button class="logout-btn"><i data-lucide="log-out"></i> Log out</button>
+  </header>
+</div>
+<script>lucide.createIcons();</script>
+</body>
+</html>

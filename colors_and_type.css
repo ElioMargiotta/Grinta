@@ -1,0 +1,229 @@
+/* ============================================================
+   Grinta Design System — Colors & Typography
+   Source: ElioMargiotta/Grinta (Next.js + Tailwind v4)
+   ============================================================ */
+
+@import url('https://fonts.googleapis.com/css2?family=Geist:wght@100..900&family=Geist+Mono:wght@100..900&display=swap');
+
+/* ─── Color Tokens ─────────────────────────────────────────── */
+
+:root {
+  /* ── Brand — Turquoise ────────────────────────────────── */
+  --brand-50:   #ecfffe;
+  --brand-100:  #c4fffe;
+  --brand-200:  #80f8f5;
+  --brand-300:  #32edea;
+  --brand-400:  #0ECECE;  /* ★ primary */
+  --brand-500:  #0aacac;
+  --brand-600:  #068a8a;
+  --brand-700:  #056868;
+  --brand-800:  #034545;
+  --brand-900:  #022929;
+  --brand-950:  #0A1A1A;  /* dark mode bg */
+
+  /* Zinc scale (neutral palette) */
+  --zinc-50:  #fafafa;
+  --zinc-100: #f4f4f5;
+  --zinc-200: #e4e4e7;
+  --zinc-300: #d4d4d8;
+  --zinc-400: #a1a1aa;
+  --zinc-500: #71717a;
+  --zinc-600: #52525b;
+  --zinc-700: #3f3f46;
+  --zinc-800: #27272a;
+  --zinc-900: #18181b;
+  --zinc-950: #09090b;
+
+  /* Danger */
+  --red-500: #ef4444;
+  --red-600: #dc2626;
+  --red-700: #b91c1c;
+
+  /* Base */
+  --white:  #ffffff;
+  --black:  #000000;
+
+  /* ── Semantic color tokens ─────────────────────────────── */
+
+  /* Backgrounds */
+  --color-bg:           var(--white);
+  --color-bg-subtle:    var(--zinc-50);
+  --color-bg-muted:     var(--zinc-100);
+  --color-bg-overlay:   var(--zinc-200);
+
+  /* Foregrounds */
+  --color-fg:           var(--zinc-900);
+  --color-fg-muted:     var(--zinc-500);
+  --color-fg-subtle:    var(--zinc-400);
+  --color-fg-disabled:  var(--zinc-300);
+
+  /* Borders */
+  --color-border:       var(--zinc-200);
+  --color-border-input: var(--zinc-300);
+  --color-border-focus: var(--zinc-900);
+
+  /* Interactive */
+  --color-primary:          var(--brand-400);
+  --color-primary-hover:    var(--brand-500);
+  --color-primary-fg:       #ffffff;          /* text on primary */
+  --color-primary-subtle:   var(--brand-50);  /* tinted bg */
+  --color-secondary:        var(--zinc-100);
+  --color-secondary-hover:  var(--zinc-200);
+
+  /* Danger */
+  --color-danger:       var(--red-600);
+  --color-danger-hover: var(--red-700);
+  --color-danger-text:  var(--red-600);
+
+  /* Sidebar */
+  --color-sidebar-bg:       var(--white);
+  --color-sidebar-border:   var(--zinc-200);
+  --color-nav-active-bg:    var(--zinc-100);
+  --color-nav-active-fg:    var(--zinc-900);
+  --color-nav-hover-bg:     var(--zinc-50);
+  --color-nav-fg:           var(--zinc-600);
+}
+
+/* ─── Typography Tokens ────────────────────────────────────── */
+
+:root {
+  /* Font families */
+  --font-sans: 'Geist', 'Geist Sans', ui-sans-serif, system-ui, sans-serif;
+  --font-mono: 'Geist Mono', ui-monospace, 'Cascadia Code', monospace;
+
+  /* Font sizes */
+  --text-xs:   0.75rem;   /* 12px */
+  --text-sm:   0.875rem;  /* 14px — primary UI size */
+  --text-base: 1rem;      /* 16px */
+  --text-lg:   1.125rem;  /* 18px */
+  --text-xl:   1.25rem;   /* 20px */
+  --text-2xl:  1.5rem;    /* 24px */
+
+  /* Font weights */
+  --weight-normal:   400;
+  --weight-medium:   500;
+  --weight-semibold: 600;
+  --weight-bold:     700;
+
+  /* Line heights */
+  --leading-none:   1;
+  --leading-tight:  1.25;
+  --leading-normal: 1.5;
+
+  /* Letter spacing */
+  --tracking-tight:  -0.015em;
+  --tracking-normal: 0em;
+}
+
+/* ─── Semantic Typography Classes ──────────────────────────── */
+
+body {
+  font-family: var(--font-sans);
+  font-size: var(--text-sm);
+  line-height: var(--leading-normal);
+  color: var(--color-fg);
+  background: var(--color-bg);
+}
+
+h1, .h1 {
+  font-family: var(--font-sans);
+  font-size: var(--text-2xl);
+  font-weight: var(--weight-semibold);
+  line-height: var(--leading-tight);
+  letter-spacing: var(--tracking-tight);
+  color: var(--color-fg);
+}
+
+h2, .h2 {
+  font-family: var(--font-sans);
+  font-size: var(--text-xl);
+  font-weight: var(--weight-semibold);
+  line-height: var(--leading-tight);
+  color: var(--color-fg);
+}
+
+h3, .h3 {
+  font-family: var(--font-sans);
+  font-size: var(--text-lg);
+  font-weight: var(--weight-semibold);
+  line-height: var(--leading-tight);
+  color: var(--color-fg);
+}
+
+p, .body {
+  font-family: var(--font-sans);
+  font-size: var(--text-sm);
+  font-weight: var(--weight-normal);
+  line-height: var(--leading-normal);
+  color: var(--color-fg);
+}
+
+.label {
+  font-family: var(--font-sans);
+  font-size: var(--text-sm);
+  font-weight: var(--weight-medium);
+  color: var(--zinc-700);
+}
+
+.caption {
+  font-family: var(--font-sans);
+  font-size: var(--text-xs);
+  font-weight: var(--weight-normal);
+  color: var(--color-fg-muted);
+}
+
+code, .mono {
+  font-family: var(--font-mono);
+  font-size: var(--text-sm);
+}
+
+/* ─── Component Base Styles ────────────────────────────────── */
+
+/* Button base */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  border-radius: 0.375rem; /* rounded-md */
+  font-family: var(--font-sans);
+  font-size: var(--text-sm);
+  font-weight: var(--weight-medium);
+  height: 2.5rem;
+  padding: 0 1rem;
+  transition: background-color 0.15s, color 0.15s;
+  cursor: pointer;
+  border: none;
+  outline: none;
+}
+
+.btn-primary   { background: var(--color-primary); color: var(--white); }
+.btn-secondary { background: var(--color-secondary); color: var(--color-fg); }
+.btn-ghost     { background: transparent; color: var(--zinc-700); }
+.btn-danger    { background: var(--color-danger); color: var(--white); }
+.btn-sm        { height: 2rem; padding: 0 0.75rem; font-size: var(--text-sm); }
+
+/* Input */
+.input {
+  height: 2.5rem;
+  border-radius: 0.375rem;
+  border: 1px solid var(--color-border-input);
+  background: var(--white);
+  padding: 0 0.75rem;
+  font-family: var(--font-sans);
+  font-size: var(--text-sm);
+  color: var(--color-fg);
+  outline: none;
+  transition: border-color 0.15s;
+  width: 100%;
+}
+.input:focus { border-color: var(--color-border-focus); }
+.input::placeholder { color: var(--color-fg-subtle); }
+
+/* Card */
+.card {
+  border-radius: 0.5rem; /* rounded-lg */
+  border: 1px solid var(--color-border);
+  background: var(--white);
+  padding: 1rem;
+}

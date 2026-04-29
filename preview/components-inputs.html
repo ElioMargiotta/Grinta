@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Geist', sans-serif; background: #fff; padding: 20px; display: flex; flex-direction: column; gap: 12px; }
+  .field { display: flex; flex-direction: column; gap: 4px; }
+  label { font-size: 14px; font-weight: 500; color: #3f3f46; }
+  input, select, textarea {
+    font-family: 'Geist', sans-serif; font-size: 14px; color: #18181b;
+    border: 1px solid #d4d4d8; border-radius: 6px; background: #fff;
+    padding: 0 12px; outline: none;
+    transition: border-color 0.15s;
+  }
+  input, select { height: 40px; }
+  input::placeholder { color: #a1a1aa; }
+  input:focus, select:focus, textarea:focus { border-color: #0ECECE; }
+  textarea { padding: 10px 12px; resize: vertical; min-height: 72px; }
+  .row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .helper { font-size: 12px; color: #71717a; }
+  .error-input { border-color: #dc2626; }
+  .error-msg { font-size: 12px; color: #dc2626; }
+</style>
+</head>
+<body>
+  <div class="row">
+    <div class="field">
+      <label for="name">Team name</label>
+      <input id="name" type="text" placeholder="e.g. U17 Phoenix">
+    </div>
+    <div class="field">
+      <label for="season">Season</label>
+      <select id="season"><option>2024–2025</option><option>2025–2026</option></select>
+    </div>
+  </div>
+  <div class="row">
+    <div class="field">
+      <label for="date">Date</label>
+      <input id="date" type="date" value="2025-08-15">
+    </div>
+    <div class="field">
+      <label for="dur">Duration (minutes)</label>
+      <input id="dur" type="number" placeholder="90">
+    </div>
+  </div>
+  <div class="field">
+    <label for="notes">Notes</label>
+    <textarea id="notes" placeholder="Session notes…"></textarea>
+  </div>
+  <div class="field">
+    <label for="err">Password</label>
+    <input id="err" type="password" class="error-input" value="abc">
+    <span class="error-msg">At least 6 characters.</span>
+  </div>
+</body>
+</html>
