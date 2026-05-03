@@ -16,7 +16,8 @@ import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
 import { savePreparationAction } from "@/app/[locale]/(app)/planner/[teamId]/sessions/[sessionId]/preparation/actions";
 import { exampleSheet } from "./example";
-import { type PreparationData } from "./types";
+import { SchemaEditor, SchemaView } from "./SchemaEditor";
+import { type PreparationData, type SchemaData } from "./types";
 
 /* ============================================================
  * PDF EXPORT VIEW
@@ -47,6 +48,14 @@ function ExportText({ value, area }: { value: string; area: Box }) {
   return (
     <div style={box(area)} className={exportFieldClass}>
       {value}
+    </div>
+  );
+}
+
+function ExportSchema({ data, area }: { data: SchemaData; area: Box }) {
+  return (
+    <div style={box(area)} className="pointer-events-none overflow-hidden">
+      <SchemaView data={data} />
     </div>
   );
 }
@@ -113,6 +122,7 @@ const Z_GLOBAL = {
 // re-calibrated as we build each web section.
 const Z_INITIAL = {
   duration: { x: 149.5, y: 86, w: 39, h: 6 },
+  phase1Schema: { x: 18, y: 101, w: 51, h: 37 },
   phase1Description: { x: 75, y: 99, w: 60, h: 33 },
   phase1Coaching: { x: 137, y: 99, w: 60, h: 33 },
   ankleDescription: { x: 96, y: 140, w: 45, h: 9 },
@@ -123,6 +133,7 @@ const Z_INITIAL = {
   hipCoaching: { x: 137, y: 164, w: 60, h: 9 },
   hamstringDescription: { x: 96, y: 176, w: 45, h: 9 },
   hamstringCoaching: { x: 137, y: 176, w: 60, h: 9 },
+  phase2Schema: { x: 18, y: 200, w: 51, h: 37 },
   phase2Description: { x: 75, y: 200, w: 60, h: 33 },
   phase2Coaching: { x: 137, y: 200, w: 60, h: 33 },
   phase3Description: { x: 75, y: 245, w: 60, h: 33 },
@@ -131,6 +142,7 @@ const Z_INITIAL = {
 
 const Z_MAIN_1 = {
   duration: { x: 161, y: 20, w: 39, h: 6 },
+  schema: { x: 8, y: 32, w: 66, h: 70 },
   description: { x: 78, y: 32, w: 60, h: 41 },
   coaching: { x: 138, y: 32, w: 62, h: 41 },
   organisation: { x: 78, y: 80, w: 60, h: 22 },
@@ -141,6 +153,7 @@ const Z_MAIN_1 = {
 
 const Z_MAIN_2 = {
   duration: { x: 161, y: 106, w: 39, h: 6 },
+  schema: { x: 8, y: 119, w: 66, h: 70 },
   description: { x: 78, y: 119, w: 60, h: 40 },
   coaching: { x: 138, y: 119, w: 62, h: 40 },
   organisation: { x: 78, y: 165, w: 60, h: 22 },
@@ -196,6 +209,10 @@ function PdfExport({ data }: { data: PreparationData }) {
 
         {/* Initial part */}
         <ExportText value={data.initial.duration} area={Z_INITIAL.duration} />
+        <ExportSchema
+          data={data.initial.phase1.schema}
+          area={Z_INITIAL.phase1Schema}
+        />
         <ExportText
           value={data.initial.phase1.description}
           area={Z_INITIAL.phase1Description}
@@ -236,6 +253,10 @@ function PdfExport({ data }: { data: PreparationData }) {
           value={data.initial.phase1.prevention.hamstring.coaching}
           area={Z_INITIAL.hamstringCoaching}
         />
+        <ExportSchema
+          data={data.initial.phase2.schema}
+          area={Z_INITIAL.phase2Schema}
+        />
         <ExportText
           value={data.initial.phase2.description}
           area={Z_INITIAL.phase2Description}
@@ -265,6 +286,7 @@ function PdfExport({ data }: { data: PreparationData }) {
           area={Z_MAIN_1.exercise}
         />
         <ExportText value={data.main[0].duration} area={Z_MAIN_1.duration} />
+        <ExportSchema data={data.main[0].schema} area={Z_MAIN_1.schema} />
         <ExportText
           value={data.main[0].description}
           area={Z_MAIN_1.description}
@@ -289,6 +311,7 @@ function PdfExport({ data }: { data: PreparationData }) {
           area={Z_MAIN_2.exercise}
         />
         <ExportText value={data.main[1].duration} area={Z_MAIN_2.duration} />
+        <ExportSchema data={data.main[1].schema} area={Z_MAIN_2.schema} />
         <ExportText
           value={data.main[1].description}
           area={Z_MAIN_2.description}
@@ -674,6 +697,19 @@ function InitialSection({
     }));
   }
 
+  function setPhase2<K extends keyof PreparationData["initial"]["phase2"]>(
+    key: K,
+    value: PreparationData["initial"]["phase2"][K],
+  ) {
+    patch((d) => ({
+      ...d,
+      initial: {
+        ...d.initial,
+        phase2: { ...d.initial.phase2, [key]: value },
+      },
+    }));
+  }
+
   function setPrevention(
     key: keyof PreparationData["initial"]["phase1"]["prevention"],
     field: "description" | "coaching",
@@ -730,7 +766,17 @@ function InitialSection({
           title="Phase 1 — Échauffement"
           hint="Loose warmup. Mobility, ball touches."
         />
-        <div className="mt-2 grid grid-cols-1 gap-3 md:grid-cols-2">
+        <div className="mt-2">
+          <FieldLabel
+            title="Schéma sur le terrain"
+            hint="Pose les joueurs, ballon et plots — clique-glisse pour tracer une course, une passe ou une conduite."
+          />
+          <SchemaEditor
+            value={data.initial.phase1.schema}
+            onChange={(v) => setPhase1("schema", v)}
+          />
+        </div>
+        <div className="mt-3 grid grid-cols-1 gap-3 md:grid-cols-2">
           <div>
             <FieldLabel title="Description" hint="What players do" />
             <FitTextarea
@@ -815,35 +861,46 @@ function InitialSection({
           title="Phase 2 — Échauffement (TE/TA/PE)"
           hint="Technical / tactical / physical warmup that builds toward the main session."
         />
-        <div className="mt-2 grid grid-cols-1 gap-3 md:grid-cols-2">
+        <div className="mt-2">
+          <FieldLabel
+            title="Schéma sur le terrain"
+            hint="Pose les joueurs, ballon et plots — clique-glisse pour tracer une course, une passe ou une conduite."
+          />
+          <SchemaEditor
+            value={data.initial.phase2.schema}
+            onChange={(v) => setPhase2("schema", v)}
+          />
+        </div>
+        <div className="mt-3 grid grid-cols-1 gap-3 md:grid-cols-2">
           <div>
-            <FieldLabel title="Description" />
-            <textarea
+            <FieldLabel title="Description" hint="What players do" />
+            <FitTextarea
               rows={5}
+              maxChars={420}
+              area={{
+                w: Z_INITIAL.phase2Description.w,
+                h: Z_INITIAL.phase2Description.h,
+              }}
               value={data.initial.phase2.description}
-              onChange={(e) =>
-                setInitial("phase2", {
-                  ...data.initial.phase2,
-                  description: e.target.value,
-                })
-              }
+              onChange={(v) => setPhase2("description", v)}
               placeholder="e.g., Rondo 4v2 in 8 m square, two-touch limit. 3 × 4 min."
-              className={inputClass("resize-none")}
             />
           </div>
           <div>
-            <FieldLabel title="Organisation / Coaching" />
-            <textarea
+            <FieldLabel
+              title="Organisation / Coaching"
+              hint="Setup + cues"
+            />
+            <FitTextarea
               rows={5}
+              maxChars={420}
+              area={{
+                w: Z_INITIAL.phase2Coaching.w,
+                h: Z_INITIAL.phase2Coaching.h,
+              }}
               value={data.initial.phase2.coaching}
-              onChange={(e) =>
-                setInitial("phase2", {
-                  ...data.initial.phase2,
-                  coaching: e.target.value,
-                })
-              }
+              onChange={(v) => setPhase2("coaching", v)}
               placeholder="e.g., Defenders rotate after winning the ball. Cue: scan before receiving."
-              className={inputClass("resize-none")}
             />
           </div>
         </div>
@@ -886,6 +943,172 @@ function InitialSection({
               className={inputClass("resize-none")}
             />
           </div>
+        </div>
+      </div>
+    </Card>
+  );
+}
+
+type MainZones = {
+  duration: Box;
+  schema: Box;
+  description: Box;
+  coaching: Box;
+  organisation: Box;
+  variations: Box;
+  playForm: Box;
+  exercise: Box;
+};
+
+function MainExerciseSection({
+  slot,
+  sectionNumber,
+  data,
+  patch,
+  zones,
+}: {
+  slot: 0 | 1;
+  sectionNumber: number;
+  data: PreparationData;
+  patch: (updater: (d: PreparationData) => PreparationData) => void;
+  zones: MainZones;
+}) {
+  const exercise = data.main[slot];
+
+  function setExercise<K extends keyof PreparationData["main"][number]>(
+    key: K,
+    value: PreparationData["main"][number][K],
+  ) {
+    patch((d) => ({
+      ...d,
+      main: d.main.map((m, i) =>
+        i === slot ? { ...m, [key]: value } : m,
+      ) as PreparationData["main"],
+    }));
+  }
+
+  const typeOptions = [
+    { value: "playForm" as const, label: "Forme jouée", en: "Play form" },
+    { value: "exercise" as const, label: "Exercice", en: "Exercise" },
+  ];
+
+  return (
+    <Card>
+      <div className="mb-4 flex flex-wrap items-baseline justify-between gap-3">
+        <div className="flex items-baseline gap-2">
+          <h2 className="text-lg font-bold text-zinc-900">
+            {sectionNumber}. Exercice {slot + 1}
+          </h2>
+          <span className="text-xs text-zinc-500">
+            Forme jouée or exercice — main session block.
+          </span>
+        </div>
+        <div className="flex items-center gap-2">
+          <span className="text-sm font-medium text-zinc-700">Durée</span>
+          <input
+            type="text"
+            value={exercise.duration}
+            onChange={(e) => setExercise("duration", e.target.value)}
+            placeholder="20 min"
+            className={inputClass("h-9 w-28")}
+          />
+        </div>
+      </div>
+
+      <FieldLabel
+        title="Type"
+        hint="Forme jouée = game-like situation. Exercice = analytic drill."
+      />
+      <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
+        {typeOptions.map(({ value, label, en }) => (
+          <label
+            key={value}
+            className={`flex cursor-pointer items-start gap-2 rounded-md border px-3 py-2 text-sm ${
+              exercise.type === value
+                ? "border-zinc-900 bg-zinc-50 text-zinc-900"
+                : "border-zinc-200 bg-white text-zinc-800 hover:bg-zinc-50"
+            }`}
+          >
+            <input
+              type="radio"
+              name={`main-${slot}-type`}
+              className="mt-0.5 h-4 w-4 accent-zinc-900"
+              checked={exercise.type === value}
+              onChange={() => setExercise("type", value)}
+            />
+            <span>
+              {label}
+              <span className="ml-1 text-xs text-zinc-500">({en})</span>
+            </span>
+          </label>
+        ))}
+      </div>
+
+      <div className="mt-4">
+        <FieldLabel
+          title="Schéma sur le terrain"
+          hint="Terrain complet — pose les joueurs, ballon et plots, puis trace courses, passes et conduites."
+        />
+        <SchemaEditor
+          pitch="full-vertical"
+          value={exercise.schema}
+          onChange={(v) => setExercise("schema", v)}
+        />
+      </div>
+
+      <div className="mt-4 grid grid-cols-1 gap-3 md:grid-cols-2">
+        <div>
+          <FieldLabel title="Description" hint="What players do" />
+          <FitTextarea
+            rows={6}
+            maxChars={520}
+            area={{ w: zones.description.w, h: zones.description.h }}
+            value={exercise.description}
+            onChange={(v) => setExercise("description", v)}
+            placeholder="e.g., Build-up exercise: GK + back four + #6 vs 3 high-pressing strikers. Score by playing through the half-line gate."
+          />
+        </div>
+        <div>
+          <FieldLabel title="Coaching" hint="Cues and corrections" />
+          <FitTextarea
+            rows={6}
+            maxChars={520}
+            area={{ w: zones.coaching.w, h: zones.coaching.h }}
+            value={exercise.coaching}
+            onChange={(v) => setExercise("coaching", v)}
+            placeholder="e.g., Trigger = back-pass to GK. Cue body shape on first touch. Reward forward passes through the gate."
+          />
+        </div>
+      </div>
+
+      <div className="mt-3 grid grid-cols-1 gap-3 md:grid-cols-2">
+        <div>
+          <FieldLabel
+            title="Organisation"
+            hint="Setup, dimensions, equipment."
+          />
+          <FitTextarea
+            rows={4}
+            maxChars={300}
+            area={{ w: zones.organisation.w, h: zones.organisation.h }}
+            value={exercise.organisation}
+            onChange={(v) => setExercise("organisation", v)}
+            placeholder="e.g., Half-pitch. 3 yellow gates on the half-line. 3 mannequins as outlet markers behind."
+          />
+        </div>
+        <div>
+          <FieldLabel
+            title="Variations"
+            hint="Make it harder (+) or easier (−)."
+          />
+          <FitTextarea
+            rows={4}
+            maxChars={300}
+            area={{ w: zones.variations.w, h: zones.variations.h }}
+            value={exercise.variations}
+            onChange={(v) => setExercise("variations", v)}
+            placeholder="e.g., + add a #10 between the lines. − reduce gate count to 2; longer rest."
+          />
         </div>
       </div>
     </Card>
@@ -1042,15 +1265,19 @@ export function PreparationSheet({
 
         <InitialSection data={data} patch={patch} />
 
-        <PlaceholderSection
-          index={3}
-          title="Exercice 1"
-          note="First main exercise: forme jouée or exercice, with description, coaching, organisation and variations."
+        <MainExerciseSection
+          slot={0}
+          sectionNumber={3}
+          data={data}
+          patch={patch}
+          zones={Z_MAIN_1}
         />
-        <PlaceholderSection
-          index={4}
-          title="Exercice 2"
-          note="Second main exercise (same structure as Exercice 1)."
+        <MainExerciseSection
+          slot={1}
+          sectionNumber={4}
+          data={data}
+          patch={patch}
+          zones={Z_MAIN_2}
         />
         <PlaceholderSection
           index={5}
