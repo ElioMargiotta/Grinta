@@ -2,13 +2,14 @@
 
 import { ChevronDown, ChevronUp, FileText, Printer, Save } from "lucide-react";
 import { useLocale } from "next-intl";
+import Image from "next/image";
 import {
   type ChangeEvent,
   type CSSProperties,
   type ReactNode,
-  useEffect,
-  useMemo,
+  useCallback,
   useState,
+  useSyncExternalStore,
   useTransition,
 } from "react";
 import { Button } from "@/components/ui/Button";
@@ -73,11 +74,14 @@ function ExportPage({
       className="prep-page relative bg-white"
       style={{ width: `${PAGE_W}mm`, height: `${PAGE_H}mm` }}
     >
-      <img
+      <Image
         src={bg}
         alt=""
         aria-hidden
-        className="pointer-events-none absolute inset-0 h-full w-full select-none"
+        fill
+        priority
+        sizes="210mm"
+        className="pointer-events-none select-none object-contain"
       />
       {children}
     </div>
@@ -109,20 +113,20 @@ const Z_GLOBAL = {
 // re-calibrated as we build each web section.
 const Z_INITIAL = {
   duration: { x: 149.5, y: 86, w: 39, h: 6 },
-  phase1Description: { x: 75, y: 99, w: 60, h: 39 },
-  phase1Coaching: { x: 137, y: 99, w: 60, h: 39 },
+  phase1Description: { x: 75, y: 99, w: 60, h: 33 },
+  phase1Coaching: { x: 137, y: 99, w: 60, h: 33 },
   ankleDescription: { x: 96, y: 140, w: 45, h: 9 },
   ankleCoaching: { x: 137, y: 140, w: 60, h: 9 },
   kneeDescription: { x: 96, y: 152, w: 45, h: 9 },
   kneeCoaching: { x: 137, y: 152, w: 60, h: 9 },
-  hipDescription: { x: 96, y: 162, w: 45, h: 8 },
-  hipCoaching: { x: 137, y: 162, w: 62, h: 8 },
-  hamstringDescription: { x: 96, y: 171, w: 45, h: 14 },
-  hamstringCoaching: { x: 137, y: 171, w: 62, h: 14 },
-  phase2Description: { x: 65, y: 200, w: 70, h: 35 },
-  phase2Coaching: { x: 138, y: 200, w: 62, h: 35 },
-  phase3Description: { x: 65, y: 248, w: 70, h: 36 },
-  phase3Coaching: { x: 138, y: 248, w: 62, h: 36 },
+  hipDescription: { x: 96, y: 164, w: 45, h: 9 },
+  hipCoaching: { x: 137, y: 164, w: 60, h: 9 },
+  hamstringDescription: { x: 96, y: 176, w: 45, h: 9 },
+  hamstringCoaching: { x: 137, y: 176, w: 60, h: 9 },
+  phase2Description: { x: 75, y: 200, w: 60, h: 33 },
+  phase2Coaching: { x: 137, y: 200, w: 60, h: 33 },
+  phase3Description: { x: 75, y: 245, w: 60, h: 33 },
+  phase3Coaching: { x: 138, y: 245, w: 60, h: 33 },
 } as const;
 
 const Z_MAIN_1 = {
@@ -374,15 +378,15 @@ function fitsInExportBox(
   return px <= heightMm * mm2px + 1;
 }
 
+const NOOP_SUBSCRIBE = () => () => {};
+const SERVER_FITS = () => true;
+
 function useFits(text: string, widthMm: number, heightMm: number) {
-  const [mounted, setMounted] = useState(false);
-  useEffect(() => {
-    setMounted(true);
-  }, []);
-  return useMemo(
-    () => (mounted ? fitsInExportBox(text, widthMm, heightMm) : true),
-    [mounted, text, widthMm, heightMm],
+  const getSnapshot = useCallback(
+    () => fitsInExportBox(text, widthMm, heightMm),
+    [text, widthMm, heightMm],
   );
+  return useSyncExternalStore(NOOP_SUBSCRIBE, getSnapshot, SERVER_FITS);
 }
 
 function FitTextarea({
