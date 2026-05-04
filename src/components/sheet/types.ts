@@ -64,7 +64,7 @@ export type PreparationData = {
     variations: string;
     schema: SchemaData;
   }>;
-  game: { duration: string; notes: string };
+  game: { duration: string; notes: string; schema: SchemaData };
   end: { duration: string; notes: string };
   reflection: string;
 };
@@ -122,7 +122,7 @@ export function makeEmptyPreparation(): PreparationData {
         schema: { shapes: [] },
       },
     ],
-    game: { duration: "", notes: "" },
+    game: { duration: "", notes: "", schema: { shapes: [] } },
     end: { duration: "", notes: "" },
     reflection: "",
   };
@@ -175,7 +175,14 @@ export function mergePreparation(
                 : base.main[i].schema,
           })) as PreparationData["main"])
         : base.main,
-    game: { ...base.game, ...(saved.game ?? {}) },
+    game: {
+      ...base.game,
+      ...(saved.game ?? {}),
+      schema:
+        saved.game?.schema && Array.isArray(saved.game.schema.shapes)
+          ? saved.game.schema
+          : base.game.schema,
+    },
     end: { ...base.end, ...(saved.end ?? {}) },
   };
 }

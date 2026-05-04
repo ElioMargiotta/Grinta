@@ -17,7 +17,7 @@ import type { SchemaData, SchemaShape } from "./types";
 export const VB_W = 147;
 export const VB_H = 105;
 
-export type PitchKind = "half" | "full-vertical";
+export type PitchKind = "half" | "full-vertical" | "full-horizontal";
 
 export type Pitch = {
   src: string;
@@ -35,6 +35,12 @@ const PITCHES: Record<PitchKind, Pitch> = {
     vbW: 142.5,
     vbH: 201,
     maxWidth: 320,
+  },
+  "full-horizontal": {
+    src: "/terrain-horizontale.svg",
+    vbW: 126.75,
+    vbH: 90,
+    maxWidth: 520,
   },
 };
 

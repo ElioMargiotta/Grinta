@@ -141,33 +141,34 @@ const Z_INITIAL = {
 } as const;
 
 const Z_MAIN_1 = {
-  duration: { x: 161, y: 20, w: 39, h: 6 },
-  schema: { x: 8, y: 32, w: 66, h: 70 },
-  description: { x: 78, y: 32, w: 60, h: 41 },
-  coaching: { x: 138, y: 32, w: 62, h: 41 },
-  organisation: { x: 78, y: 80, w: 60, h: 22 },
-  variations: { x: 138, y: 80, w: 62, h: 22 },
-  playForm: { x: 8, y: 21, w: 4, h: 4 },
-  exercise: { x: 38, y: 21, w: 4, h: 4 },
+  duration: { x: 151.5, y: 21.5, w: 39, h: 6 },
+  schema: { x: 19.2, y: -1, w: 51, h: 100 },
+  description: { x: 76, y: 33, w: 60, h: 41 },
+  coaching: { x: 137.5, y: 33, w: 60, h: 41 },
+  organisation: { x: 76, y: 85, w: 60, h: 20 },
+  variations: { x: 137.5, y: 85, w: 60, h: 20 },
+  playForm: { x: 14, y: 19.5, w: 4, h: 4 },
+  exercise: { x: 41, y: 19.5, w: 4, h: 4 },
 } as const;
 
 const Z_MAIN_2 = {
-  duration: { x: 161, y: 106, w: 39, h: 6 },
-  schema: { x: 8, y: 119, w: 66, h: 70 },
-  description: { x: 78, y: 119, w: 60, h: 40 },
-  coaching: { x: 138, y: 119, w: 62, h: 40 },
-  organisation: { x: 78, y: 165, w: 60, h: 22 },
-  variations: { x: 138, y: 165, w: 62, h: 22 },
-  playForm: { x: 8, y: 107, w: 4, h: 4 },
-  exercise: { x: 38, y: 107, w: 4, h: 4 },
+  duration: { x: 151.5, y: 106.5, w: 39, h: 6 },
+  schema: { x: 19.2, y: 84, w: 51, h: 100 },
+  description: { x: 76, y: 119, w: 60, h: 41 },
+  coaching: { x: 137.5, y: 119, w: 60, h: 41 },
+  organisation: { x: 76, y: 170, w: 60, h: 20 },
+  variations: { x: 137.5, y: 170, w: 60, h: 20 },
+  playForm: { x: 14, y: 104.5, w: 4, h: 4 },
+  exercise: { x: 41, y: 104.5, w: 4, h: 4 },
 } as const;
 
 const Z_END = {
-  gameDuration: { x: 161, y: 191, w: 39, h: 6 },
-  gameNotes: { x: 78, y: 200, w: 122, h: 26 },
-  endDuration: { x: 161, y: 232, w: 39, h: 6 },
-  endNotes: { x: 12, y: 240, w: 188, h: 22 },
-  reflection: { x: 12, y: 269, w: 188, h: 18 },
+  gameDuration: { x: 151.5, y: 191, w: 39, h: 6 },
+  gameSchema: { x: 14.5, y: 198, w: 66, h: 37 },
+  gameNotes: { x: 76, y: 196.5, w: 60, h: 35 },
+  endDuration: { x: 151.5, y: 232, w: 39, h: 6 },
+  endNotes: { x: 76, y: 238, w: 60, h: 18 },
+  reflection: { x: 14, y: 268, w: 183, h: 18 },
 } as const;
 
 function PdfExport({ data }: { data: PreparationData }) {
@@ -328,6 +329,7 @@ function PdfExport({ data }: { data: PreparationData }) {
 
         {/* Jeu / Fin / Réflexion */}
         <ExportText value={data.game.duration} area={Z_END.gameDuration} />
+        <ExportSchema data={data.game.schema} area={Z_END.gameSchema} />
         <ExportText value={data.game.notes} area={Z_END.gameNotes} />
         <ExportText value={data.end.duration} area={Z_END.endDuration} />
         <ExportText value={data.end.notes} area={Z_END.endNotes} />
@@ -1115,24 +1117,131 @@ function MainExerciseSection({
   );
 }
 
-function PlaceholderSection({
-  index,
-  title,
-  note,
+function EndSection({
+  data,
+  patch,
 }: {
-  index: number;
-  title: string;
-  note: string;
+  data: PreparationData;
+  patch: (updater: (d: PreparationData) => PreparationData) => void;
 }) {
+  function setGame<K extends keyof PreparationData["game"]>(
+    key: K,
+    value: PreparationData["game"][K],
+  ) {
+    patch((d) => ({ ...d, game: { ...d.game, [key]: value } }));
+  }
+  function setEnd<K extends keyof PreparationData["end"]>(
+    key: K,
+    value: PreparationData["end"][K],
+  ) {
+    patch((d) => ({ ...d, end: { ...d.end, [key]: value } }));
+  }
+
   return (
     <Card>
-      <div className="flex items-baseline gap-2">
-        <h2 className="text-lg font-bold text-zinc-400">
-          {index}. {title}
-        </h2>
-        <span className="text-xs text-zinc-400">(coming next)</span>
+      <div className="mb-4 flex items-baseline gap-2">
+        <h2 className="text-lg font-bold text-zinc-900">5. Jeu final &amp; Fin</h2>
+        <span className="text-xs text-zinc-500">
+          Match-style game, cooldown and post-session reflection.
+        </span>
       </div>
-      <p className="mt-2 text-sm text-zinc-500">{note}</p>
+
+      {/* Jeu final */}
+      <div className="rounded-md border border-zinc-200 p-3">
+        <div className="flex flex-wrap items-baseline justify-between gap-3">
+          <SubsectionHeader
+            title="Jeu final"
+            hint="Free or themed match — apply what was worked on."
+          />
+          <div className="flex items-center gap-2">
+            <span className="text-sm font-medium text-zinc-700">Durée</span>
+            <input
+              type="text"
+              value={data.game.duration}
+              onChange={(e) => setGame("duration", e.target.value)}
+              placeholder="15 min"
+              className={inputClass("h-9 w-28")}
+            />
+          </div>
+        </div>
+
+        <div className="mt-3">
+          <FieldLabel
+            title="Schéma sur le terrain"
+            hint="Terrain complet horizontal — pose les équipes et trace le scénario."
+          />
+          <SchemaEditor
+            pitch="full-horizontal"
+            value={data.game.schema}
+            onChange={(v) => setGame("schema", v)}
+          />
+        </div>
+
+        <div className="mt-3">
+          <FieldLabel
+            title="Notes"
+            hint="Format, contraintes, points de coaching."
+          />
+          <FitTextarea
+            rows={4}
+            maxChars={360}
+            area={{ w: Z_END.gameNotes.w, h: Z_END.gameNotes.h }}
+            value={data.game.notes}
+            onChange={(v) => setGame("notes", v)}
+            placeholder="e.g., 11v11 free play on full pitch. Last 15 minutes. Normal rules."
+          />
+        </div>
+      </div>
+
+      {/* Fin */}
+      <div className="mt-3 rounded-md border border-zinc-200 p-3">
+        <div className="flex flex-wrap items-baseline justify-between gap-3">
+          <SubsectionHeader
+            title="Fin de séance"
+            hint="Cooldown, breathing, quick verbal debrief."
+          />
+          <div className="flex items-center gap-2">
+            <span className="text-sm font-medium text-zinc-700">Durée</span>
+            <input
+              type="text"
+              value={data.end.duration}
+              onChange={(e) => setEnd("duration", e.target.value)}
+              placeholder="5 min"
+              className={inputClass("h-9 w-28")}
+            />
+          </div>
+        </div>
+
+        <div className="mt-3">
+          <FieldLabel title="Notes" />
+          <FitTextarea
+            rows={3}
+            maxChars={360}
+            area={{ w: Z_END.endNotes.w, h: Z_END.endNotes.h }}
+            value={data.end.notes}
+            onChange={(v) => setEnd("notes", v)}
+            placeholder="e.g., Walk to center circle. 60s breathing. Quick verbal debrief."
+          />
+        </div>
+      </div>
+
+      {/* Réflexion */}
+      <div className="mt-3 rounded-md border border-zinc-200 p-3">
+        <SubsectionHeader
+          title="Réflexion"
+          hint="Personal notes after the session — what worked, what didn't."
+        />
+        <div className="mt-3">
+          <FitTextarea
+            rows={3}
+            maxChars={360}
+            area={{ w: Z_END.reflection.w, h: Z_END.reflection.h }}
+            value={data.reflection}
+            onChange={(v) => patch((d) => ({ ...d, reflection: v }))}
+            placeholder="What worked, what didn't, who needs more individual work next week."
+          />
+        </div>
+      </div>
     </Card>
   );
 }
@@ -1279,11 +1388,7 @@ export function PreparationSheet({
           patch={patch}
           zones={Z_MAIN_2}
         />
-        <PlaceholderSection
-          index={5}
-          title="Jeu final &amp; Fin"
-          note="Match-style game, cooldown and post-session reflection."
-        />
+        <EndSection data={data} patch={patch} />
       </div>
 
       {/* PDF output (hidden on screen, shown only on print) */}

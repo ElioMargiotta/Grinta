@@ -168,6 +168,19 @@ export function exampleSheet(): PreparationData {
     game: {
       duration: "15 min",
       notes: "11v11 free play on full pitch. Last 15 minutes. Normal rules.",
+      schema: {
+        shapes: [
+          { id: "g-gkh", kind: "player", team: "gk", label: "G", x: 8, y: 45 },
+          { id: "g-gka", kind: "player", team: "gk", label: "G", x: 118, y: 45 },
+          { id: "g-h1", kind: "player", team: "home", label: "1", x: 28, y: 25 },
+          { id: "g-h2", kind: "player", team: "home", label: "2", x: 28, y: 65 },
+          { id: "g-h3", kind: "player", team: "home", label: "3", x: 50, y: 45 },
+          { id: "g-a1", kind: "player", team: "away", label: "1", x: 95, y: 25 },
+          { id: "g-a2", kind: "player", team: "away", label: "2", x: 95, y: 65 },
+          { id: "g-a3", kind: "player", team: "away", label: "3", x: 75, y: 45 },
+          { id: "g-ball", kind: "ball", x: 63, y: 45 },
+        ],
+      },
     },
     end: {
       duration: "5 min",
