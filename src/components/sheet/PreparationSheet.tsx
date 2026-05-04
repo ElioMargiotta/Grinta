@@ -1,6 +1,21 @@
 "use client";
 
-import { ChevronDown, ChevronUp, FileText, Printer, Save } from "lucide-react";
+import {
+  ArrowLeft,
+  ArrowRight,
+  Check,
+  ClipboardList,
+  Eye,
+  FileText,
+  Flag,
+  Info,
+  Layers,
+  Printer,
+  Save,
+  Sparkles,
+  Target,
+  Trophy,
+} from "lucide-react";
 import { useLocale } from "next-intl";
 import Image from "next/image";
 import {
@@ -8,22 +23,26 @@ import {
   type CSSProperties,
   type ReactNode,
   useCallback,
+  useMemo,
   useState,
   useSyncExternalStore,
   useTransition,
 } from "react";
 import { Button } from "@/components/ui/Button";
-import { Card } from "@/components/ui/Card";
 import { savePreparationAction } from "@/app/[locale]/(app)/planner/[teamId]/sessions/[sessionId]/preparation/actions";
 import { exampleSheet } from "./example";
 import { SchemaEditor, SchemaView } from "./SchemaEditor";
 import { type PreparationData, type SchemaData } from "./types";
 
 /* ============================================================
- * PDF EXPORT VIEW
+ * PDF EXPORT VIEW   ⚠️  DO NOT MODIFY  ⚠️
  *   Two A4 pages with the SVG as fixed background, form text
  *   absolutely-positioned in mm. Hidden on screen, only visible
  *   when printing (see globals.css `.prep-export` rules).
+ *   The export pipeline below — including all zone coordinates,
+ *   helper components, and the PdfExport tree — is the contract
+ *   the printed sheet depends on. Visual UX changes happen only
+ *   in the WEB FORM section below.
  * ============================================================ */
 
 const PAGE_W = 210; // mm
@@ -340,10 +359,14 @@ function PdfExport({ data }: { data: PreparationData }) {
 }
 
 /* ============================================================
- * WEB FORM
- *   Five clean cards. Section 1 (Global) is fully built;
- *   the rest are placeholders we'll replace step by step.
+ * WEB FORM — premium wizard UI
+ *   The five business sections are unchanged; only their
+ *   presentation changed. Each step renders independently and
+ *   reads/writes the same `PreparationData` shape consumed by
+ *   `PdfExport` above.
  * ============================================================ */
+
+/* ----- Form atoms ------------------------------------------- */
 
 function FieldLabel({
   title,
@@ -353,15 +376,15 @@ function FieldLabel({
   hint?: string;
 }) {
   return (
-    <div className="mb-1">
-      <div className="text-sm font-semibold text-zinc-900">{title}</div>
-      {hint && <div className="text-xs text-zinc-500">{hint}</div>}
+    <div className="mb-1.5">
+      <div className="text-sm font-medium text-zinc-900">{title}</div>
+      {hint && <div className="mt-0.5 text-xs leading-relaxed text-zinc-500">{hint}</div>}
     </div>
   );
 }
 
 function inputClass(extra = "") {
-  return `w-full rounded-md border border-zinc-300 bg-white px-2 py-1.5 text-sm text-zinc-900 placeholder:text-zinc-400 focus:border-zinc-900 focus:outline-none focus:ring-1 focus:ring-zinc-900/20 ${extra}`;
+  return `w-full rounded-lg border border-zinc-200 bg-white px-3 py-2 text-sm text-zinc-900 shadow-sm transition placeholder:text-zinc-400 hover:border-zinc-300 focus:border-zinc-900 focus:outline-none focus:ring-2 focus:ring-zinc-900/10 ${extra}`;
 }
 
 /* Mirror the export box's text-rendering rules to measure whether
@@ -433,7 +456,6 @@ function FitTextarea({
 
   function handleChange(e: ChangeEvent<HTMLTextAreaElement>) {
     const next = e.target.value;
-    // Always allow shrinking (backspace, delete, paste-shorter).
     if (next.length < value.length) {
       onChange(next);
       return;
@@ -451,15 +473,15 @@ function FitTextarea({
         onChange={handleChange}
         placeholder={placeholder}
         className={inputClass(
-          `resize-none ${fits ? "" : "border-red-400 focus:border-red-500 focus:ring-red-500/20"}`,
+          `resize-none ${fits ? "" : "border-red-300 focus:border-red-500 focus:ring-red-500/20"}`,
         )}
       />
-      <div className="mt-1 flex items-center justify-between text-xs text-zinc-400">
+      <div className="mt-1.5 flex items-center justify-between text-xs">
         <span className={fits ? "text-zinc-400" : "text-red-600"}>
-          {fits ? "Fits the PDF box" : "Too tall — will be clipped on PDF"}
+          {fits ? "Fits the printed page" : "Too long — will be clipped on the PDF"}
         </span>
         {maxChars !== undefined && (
-          <span>
+          <span className="tabular-nums text-zinc-400">
             {value.length}/{maxChars}
           </span>
         )}
@@ -467,6 +489,93 @@ function FitTextarea({
     </div>
   );
 }
+
+/* ----- Step layout primitives ------------------------------- */
+
+function StepHeader({
+  eyebrow,
+  title,
+  description,
+  durationField,
+}: {
+  eyebrow: string;
+  title: string;
+  description: string;
+  durationField?: ReactNode;
+}) {
+  return (
+    <div className="flex flex-wrap items-end justify-between gap-4 border-b border-zinc-100 pb-4">
+      <div className="min-w-0">
+        <div className="text-xs font-medium uppercase tracking-wider text-zinc-400">
+          {eyebrow}
+        </div>
+        <h2 className="mt-1 text-2xl font-semibold tracking-tight text-zinc-900">
+          {title}
+        </h2>
+        <p className="mt-1 max-w-2xl text-sm text-zinc-500">{description}</p>
+      </div>
+      {durationField}
+    </div>
+  );
+}
+
+function DurationField({
+  value,
+  onChange,
+  placeholder,
+}: {
+  value: string;
+  onChange: (v: string) => void;
+  placeholder: string;
+}) {
+  return (
+    <label className="flex items-center gap-2 rounded-lg border border-zinc-200 bg-white px-3 py-2 shadow-sm">
+      <span className="text-xs font-medium uppercase tracking-wider text-zinc-500">
+        Durée
+      </span>
+      <input
+        type="text"
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        placeholder={placeholder}
+        className="w-24 border-0 bg-transparent p-0 text-sm font-semibold text-zinc-900 focus:outline-none"
+      />
+    </label>
+  );
+}
+
+function SubCard({
+  icon,
+  title,
+  hint,
+  children,
+}: {
+  icon?: ReactNode;
+  title: string;
+  hint?: string;
+  children: ReactNode;
+}) {
+  return (
+    <div className="rounded-xl border border-zinc-200 bg-white p-5 shadow-sm">
+      <div className="mb-4 flex items-start gap-3">
+        {icon && (
+          <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-zinc-900 text-white">
+            {icon}
+          </div>
+        )}
+        <div className="min-w-0">
+          <div className="text-sm font-semibold text-zinc-900">{title}</div>
+          {hint && (
+            <div className="mt-0.5 text-xs leading-relaxed text-zinc-500">{hint}</div>
+          )}
+        </div>
+      </div>
+      {children}
+    </div>
+  );
+}
+
+/* ----- Section: Global -------------------------------------- */
 
 function GlobalSection({
   data,
@@ -499,16 +608,15 @@ function GlobalSection({
   ];
 
   return (
-    <Card>
-      <div className="mb-4 flex items-baseline gap-2">
-        <h2 className="text-lg font-bold text-zinc-900">1. Global</h2>
-        <span className="text-xs text-zinc-500">
-          Session metadata, game moments, and overall focus.
-        </span>
-      </div>
+    <div className="flex flex-col gap-6">
+      <StepHeader
+        eyebrow="Step 1 of 5"
+        title="Session brief"
+        description="Set the date, team and the game moment(s) this session is built around."
+      />
 
       {/* Date / Équipe / Entraîneur */}
-      <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
         <div>
           <FieldLabel title="Date" />
           <input
@@ -547,46 +655,62 @@ function GlobalSection({
       </div>
 
       {/* Game moments */}
-      <div className="mt-5">
-        <FieldLabel
-          title="Moments du jeu"
-          hint="Tick the moment(s) of the game this session focuses on."
-        />
+      <SubCard
+        icon={<Flag className="h-4 w-4" />}
+        title="Moments du jeu"
+        hint="Tick the moment(s) of the game this session focuses on."
+      >
         <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
-          {phaseOptions.map(({ key, label, en }) => (
-            <label
-              key={key}
-              className="flex cursor-pointer items-start gap-2 rounded-md border border-zinc-200 bg-white px-3 py-2 text-sm text-zinc-800 hover:bg-zinc-50"
-            >
-              <input
-                type="checkbox"
-                className="mt-0.5 h-4 w-4 accent-zinc-900"
-                checked={data.phases[key]}
-                onChange={(e) =>
-                  patch((d) => ({
-                    ...d,
-                    phases: { ...d.phases, [key]: e.target.checked },
-                  }))
-                }
-              />
-              <span>
-                {label}
-                <span className="ml-1 text-xs text-zinc-500">({en})</span>
-              </span>
-            </label>
-          ))}
+          {phaseOptions.map(({ key, label, en }) => {
+            const checked = data.phases[key];
+            return (
+              <label
+                key={key}
+                className={`group flex cursor-pointer items-start gap-3 rounded-lg border px-4 py-3 text-sm transition ${
+                  checked
+                    ? "border-zinc-900 bg-zinc-900/[0.03] text-zinc-900 shadow-sm"
+                    : "border-zinc-200 bg-white text-zinc-700 hover:border-zinc-300 hover:bg-zinc-50"
+                }`}
+              >
+                <span
+                  className={`mt-0.5 flex h-4 w-4 shrink-0 items-center justify-center rounded border ${
+                    checked
+                      ? "border-zinc-900 bg-zinc-900 text-white"
+                      : "border-zinc-300 bg-white"
+                  }`}
+                >
+                  {checked && <Check className="h-3 w-3" strokeWidth={3} />}
+                </span>
+                <input
+                  type="checkbox"
+                  className="sr-only"
+                  checked={checked}
+                  onChange={(e) =>
+                    patch((d) => ({
+                      ...d,
+                      phases: { ...d.phases, [key]: e.target.checked },
+                    }))
+                  }
+                />
+                <span className="min-w-0">
+                  <span className="block font-medium leading-snug">{label}</span>
+                  <span className="mt-0.5 block text-xs text-zinc-500">{en}</span>
+                </span>
+              </label>
+            );
+          })}
         </div>
-      </div>
+      </SubCard>
 
       {/* Long text fields */}
-      <div className="mt-5 grid grid-cols-1 gap-4">
+      <div className="grid grid-cols-1 gap-5 lg:grid-cols-2">
         <div>
           <FieldLabel
             title="Forme caractéristique"
             hint="Situation de jeu — the real game situation this session is built around."
           />
           <textarea
-            rows={2}
+            rows={3}
             maxLength={230}
             value={data.characteristicForm}
             onChange={(e) =>
@@ -595,7 +719,7 @@ function GlobalSection({
             placeholder="e.g., Build-up from goalkeeper under high press"
             className={inputClass("resize-none")}
           />
-          <div className="mt-1 text-right text-xs text-zinc-400">
+          <div className="mt-1 text-right text-xs text-zinc-400 tabular-nums">
             {data.characteristicForm.length}/230
           </div>
         </div>
@@ -605,7 +729,7 @@ function GlobalSection({
             hint="TE = Technique · TA = Tactique · PE = Physique · AT = Attitude"
           />
           <textarea
-            rows={2}
+            rows={3}
             maxLength={115}
             value={data.focus}
             onChange={(e) =>
@@ -614,7 +738,7 @@ function GlobalSection({
             placeholder="e.g., TA — pressing triggers"
             className={inputClass("resize-none")}
           />
-          <div className="mt-1 text-right text-xs text-zinc-400">
+          <div className="mt-1 text-right text-xs text-zinc-400 tabular-nums">
             {data.focus.length}/115
           </div>
         </div>
@@ -624,7 +748,7 @@ function GlobalSection({
             hint="What players should be able to do by the end. Start with an action verb."
           />
           <textarea
-            rows={2}
+            rows={3}
             maxLength={230}
             value={data.objectives}
             onChange={(e) =>
@@ -633,7 +757,7 @@ function GlobalSection({
             placeholder="e.g., Recognize the press trigger and play forward in 1–2 touches."
             className={inputClass("resize-none")}
           />
-          <div className="mt-1 text-right text-xs text-zinc-400">
+          <div className="mt-1 text-right text-xs text-zinc-400 tabular-nums">
             {data.objectives.length}/230
           </div>
         </div>
@@ -643,7 +767,7 @@ function GlobalSection({
             hint="Open questions you'll ask players to spark reflection."
           />
           <textarea
-            rows={2}
+            rows={3}
             value={data.developmentQuestions}
             onChange={(e) =>
               patch((d) => ({ ...d, developmentQuestions: e.target.value }))
@@ -653,24 +777,11 @@ function GlobalSection({
           />
         </div>
       </div>
-    </Card>
-  );
-}
-
-function SubsectionHeader({
-  title,
-  hint,
-}: {
-  title: string;
-  hint?: string;
-}) {
-  return (
-    <div>
-      <div className="text-sm font-bold text-zinc-900">{title}</div>
-      {hint && <div className="text-xs text-zinc-500">{hint}</div>}
     </div>
   );
 }
+
+/* ----- Section: Initial ------------------------------------- */
 
 function InitialSection({
   data,
@@ -740,35 +851,25 @@ function InitialSection({
   ];
 
   return (
-    <Card>
-      <div className="mb-4 flex flex-wrap items-baseline justify-between gap-3">
-        <div className="flex items-baseline gap-2">
-          <h2 className="text-lg font-bold text-zinc-900">
-            2. Partie Initiale
-          </h2>
-          <span className="text-xs text-zinc-500">
-            Warmup → technical/tactical work → short explosive block.
-          </span>
-        </div>
-        <div className="flex items-center gap-2">
-          <span className="text-sm font-medium text-zinc-700">Durée</span>
-          <input
-            type="text"
+    <div className="flex flex-col gap-6">
+      <StepHeader
+        eyebrow="Step 2 of 5"
+        title="Warm-up & preparation"
+        description="Mobility, technical/tactical work, then a short explosive block."
+        durationField={
+          <DurationField
             value={data.initial.duration}
-            onChange={(e) => setInitial("duration", e.target.value)}
+            onChange={(v) => setInitial("duration", v)}
             placeholder="25 min"
-            className={inputClass("h-9 w-28")}
           />
-        </div>
-      </div>
+        }
+      />
 
-      {/* Phase 1 */}
-      <div className="mt-2 rounded-md border border-zinc-200 p-3">
-        <SubsectionHeader
-          title="Phase 1 — Échauffement"
-          hint="Loose warmup. Mobility, ball touches."
-        />
-        <div className="mt-2">
+      <SubCard
+        title="Phase 1 — Échauffement"
+        hint="Loose warmup. Mobility, ball touches."
+      >
+        <div>
           <FieldLabel
             title="Schéma sur le terrain"
             hint="Pose les joueurs, ballon et plots — clique-glisse pour tracer une course, une passe ou une conduite."
@@ -778,7 +879,7 @@ function InitialSection({
             onChange={(v) => setPhase1("schema", v)}
           />
         </div>
-        <div className="mt-3 grid grid-cols-1 gap-3 md:grid-cols-2">
+        <div className="mt-5 grid grid-cols-1 gap-4 md:grid-cols-2">
           <div>
             <FieldLabel title="Description" hint="What players do" />
             <FitTextarea
@@ -812,19 +913,28 @@ function InitialSection({
           </div>
         </div>
 
-        {/* Stabilité corporelle (Prévention) */}
-        <div className="mt-4 rounded-md bg-zinc-50 p-3">
-          <SubsectionHeader
-            title="Stabilité corporelle (Prévention)"
-            hint="Optional injury-prevention block. ~25 s per body part."
-          />
-          <div className="mt-2 flex flex-col gap-3">
+        {/* Prévention */}
+        <div className="mt-5 rounded-lg bg-zinc-50 p-4">
+          <div className="flex items-baseline justify-between gap-3">
+            <div>
+              <div className="text-sm font-semibold text-zinc-900">
+                Stabilité corporelle (Prévention)
+              </div>
+              <div className="mt-0.5 text-xs text-zinc-500">
+                Optional injury-prevention block. ~25 s per body part.
+              </div>
+            </div>
+            <span className="rounded-full bg-white px-2.5 py-0.5 text-xs font-medium text-zinc-600 shadow-sm ring-1 ring-zinc-200">
+              25″ / rep
+            </span>
+          </div>
+          <div className="mt-3 flex flex-col gap-2.5">
             {preventionRows.map(({ key, label, en }) => (
               <div
                 key={key}
                 className="grid grid-cols-1 gap-2 md:grid-cols-[140px_1fr_1fr] md:items-start"
               >
-                <div className="pt-1 text-sm font-semibold text-zinc-800">
+                <div className="pt-1.5 text-sm font-semibold text-zinc-800">
                   {label}
                   <span className="ml-1 text-xs font-normal text-zinc-500">
                     ({en})
@@ -851,19 +961,14 @@ function InitialSection({
               </div>
             ))}
           </div>
-          <div className="mt-2 text-right text-xs text-zinc-500">
-            Durée par répétition de chaque exercice : 25&apos;&apos;
-          </div>
         </div>
-      </div>
+      </SubCard>
 
-      {/* Phase 2 */}
-      <div className="mt-3 rounded-md border border-zinc-200 p-3">
-        <SubsectionHeader
-          title="Phase 2 — Échauffement (TE/TA/PE)"
-          hint="Technical / tactical / physical warmup that builds toward the main session."
-        />
-        <div className="mt-2">
+      <SubCard
+        title="Phase 2 — Échauffement (TE/TA/PE)"
+        hint="Technical / tactical / physical warmup that builds toward the main session."
+      >
+        <div>
           <FieldLabel
             title="Schéma sur le terrain"
             hint="Pose les joueurs, ballon et plots — clique-glisse pour tracer une course, une passe ou une conduite."
@@ -873,7 +978,7 @@ function InitialSection({
             onChange={(v) => setPhase2("schema", v)}
           />
         </div>
-        <div className="mt-3 grid grid-cols-1 gap-3 md:grid-cols-2">
+        <div className="mt-5 grid grid-cols-1 gap-4 md:grid-cols-2">
           <div>
             <FieldLabel title="Description" hint="What players do" />
             <FitTextarea
@@ -906,15 +1011,13 @@ function InitialSection({
             />
           </div>
         </div>
-      </div>
+      </SubCard>
 
-      {/* Phase 3 */}
-      <div className="mt-3 rounded-md border border-zinc-200 p-3">
-        <SubsectionHeader
-          title="Phase 3 — Explosivité"
-          hint="Short bursts. Sprints, jumps, change of direction."
-        />
-        <div className="mt-2 grid grid-cols-1 gap-3 md:grid-cols-2">
+      <SubCard
+        title="Phase 3 — Explosivité"
+        hint="Short bursts. Sprints, jumps, change of direction."
+      >
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
           <div>
             <FieldLabel title="Description" />
             <textarea
@@ -946,10 +1049,12 @@ function InitialSection({
             />
           </div>
         </div>
-      </div>
-    </Card>
+      </SubCard>
+    </div>
   );
 }
+
+/* ----- Section: Main exercise ------------------------------- */
 
 type MainZones = {
   duration: Box;
@@ -964,13 +1069,13 @@ type MainZones = {
 
 function MainExerciseSection({
   slot,
-  sectionNumber,
+  stepLabel,
   data,
   patch,
   zones,
 }: {
   slot: 0 | 1;
-  sectionNumber: number;
+  stepLabel: string;
   data: PreparationData;
   patch: (updater: (d: PreparationData) => PreparationData) => void;
   zones: MainZones;
@@ -995,72 +1100,79 @@ function MainExerciseSection({
   ];
 
   return (
-    <Card>
-      <div className="mb-4 flex flex-wrap items-baseline justify-between gap-3">
-        <div className="flex items-baseline gap-2">
-          <h2 className="text-lg font-bold text-zinc-900">
-            {sectionNumber}. Exercice {slot + 1}
-          </h2>
-          <span className="text-xs text-zinc-500">
-            Forme jouée or exercice — main session block.
-          </span>
-        </div>
-        <div className="flex items-center gap-2">
-          <span className="text-sm font-medium text-zinc-700">Durée</span>
-          <input
-            type="text"
+    <div className="flex flex-col gap-6">
+      <StepHeader
+        eyebrow={stepLabel}
+        title={`Main block ${slot + 1}`}
+        description="Forme jouée or exercice — your central training block."
+        durationField={
+          <DurationField
             value={exercise.duration}
-            onChange={(e) => setExercise("duration", e.target.value)}
+            onChange={(v) => setExercise("duration", v)}
             placeholder="20 min"
-            className={inputClass("h-9 w-28")}
           />
-        </div>
-      </div>
+        }
+      />
 
-      <FieldLabel
+      <SubCard
         title="Type"
         hint="Forme jouée = game-like situation. Exercice = analytic drill."
-      />
-      <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
-        {typeOptions.map(({ value, label, en }) => (
-          <label
-            key={value}
-            className={`flex cursor-pointer items-start gap-2 rounded-md border px-3 py-2 text-sm ${
-              exercise.type === value
-                ? "border-zinc-900 bg-zinc-50 text-zinc-900"
-                : "border-zinc-200 bg-white text-zinc-800 hover:bg-zinc-50"
-            }`}
-          >
-            <input
-              type="radio"
-              name={`main-${slot}-type`}
-              className="mt-0.5 h-4 w-4 accent-zinc-900"
-              checked={exercise.type === value}
-              onChange={() => setExercise("type", value)}
-            />
-            <span>
-              {label}
-              <span className="ml-1 text-xs text-zinc-500">({en})</span>
-            </span>
-          </label>
-        ))}
-      </div>
+      >
+        <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
+          {typeOptions.map(({ value, label, en }) => {
+            const active = exercise.type === value;
+            return (
+              <label
+                key={value}
+                className={`flex cursor-pointer items-start gap-3 rounded-lg border px-4 py-3 text-sm transition ${
+                  active
+                    ? "border-zinc-900 bg-zinc-900/[0.03] text-zinc-900 shadow-sm"
+                    : "border-zinc-200 bg-white text-zinc-700 hover:border-zinc-300 hover:bg-zinc-50"
+                }`}
+              >
+                <span
+                  className={`mt-0.5 flex h-4 w-4 shrink-0 items-center justify-center rounded-full border ${
+                    active
+                      ? "border-zinc-900"
+                      : "border-zinc-300"
+                  }`}
+                >
+                  <span
+                    className={`h-2 w-2 rounded-full transition ${
+                      active ? "bg-zinc-900" : "bg-transparent"
+                    }`}
+                  />
+                </span>
+                <input
+                  type="radio"
+                  name={`main-${slot}-type`}
+                  className="sr-only"
+                  checked={active}
+                  onChange={() => setExercise("type", value)}
+                />
+                <span className="min-w-0">
+                  <span className="block font-medium leading-snug">{label}</span>
+                  <span className="mt-0.5 block text-xs text-zinc-500">{en}</span>
+                </span>
+              </label>
+            );
+          })}
+        </div>
+      </SubCard>
 
-      <div className="mt-4">
-        <FieldLabel
-          title="Schéma sur le terrain"
-          hint="Terrain complet — pose les joueurs, ballon et plots, puis trace courses, passes et conduites."
-        />
+      <SubCard
+        title="Schéma sur le terrain"
+        hint="Terrain complet — pose les joueurs, ballon et plots, puis trace courses, passes et conduites."
+      >
         <SchemaEditor
           pitch="full-vertical"
           value={exercise.schema}
           onChange={(v) => setExercise("schema", v)}
         />
-      </div>
+      </SubCard>
 
-      <div className="mt-4 grid grid-cols-1 gap-3 md:grid-cols-2">
-        <div>
-          <FieldLabel title="Description" hint="What players do" />
+      <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+        <SubCard title="Description" hint="What players do">
           <FitTextarea
             rows={6}
             maxChars={520}
@@ -1069,9 +1181,8 @@ function MainExerciseSection({
             onChange={(v) => setExercise("description", v)}
             placeholder="e.g., Build-up exercise: GK + back four + #6 vs 3 high-pressing strikers. Score by playing through the half-line gate."
           />
-        </div>
-        <div>
-          <FieldLabel title="Coaching" hint="Cues and corrections" />
+        </SubCard>
+        <SubCard title="Coaching" hint="Cues and corrections">
           <FitTextarea
             rows={6}
             maxChars={520}
@@ -1080,15 +1191,11 @@ function MainExerciseSection({
             onChange={(v) => setExercise("coaching", v)}
             placeholder="e.g., Trigger = back-pass to GK. Cue body shape on first touch. Reward forward passes through the gate."
           />
-        </div>
+        </SubCard>
       </div>
 
-      <div className="mt-3 grid grid-cols-1 gap-3 md:grid-cols-2">
-        <div>
-          <FieldLabel
-            title="Organisation"
-            hint="Setup, dimensions, equipment."
-          />
+      <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+        <SubCard title="Organisation" hint="Setup, dimensions, equipment.">
           <FitTextarea
             rows={4}
             maxChars={300}
@@ -1097,12 +1204,8 @@ function MainExerciseSection({
             onChange={(v) => setExercise("organisation", v)}
             placeholder="e.g., Half-pitch. 3 yellow gates on the half-line. 3 mannequins as outlet markers behind."
           />
-        </div>
-        <div>
-          <FieldLabel
-            title="Variations"
-            hint="Make it harder (+) or easier (−)."
-          />
+        </SubCard>
+        <SubCard title="Variations" hint="Make it harder (+) or easier (−).">
           <FitTextarea
             rows={4}
             maxChars={300}
@@ -1111,11 +1214,13 @@ function MainExerciseSection({
             onChange={(v) => setExercise("variations", v)}
             placeholder="e.g., + add a #10 between the lines. − reduce gate count to 2; longer rest."
           />
-        </div>
+        </SubCard>
       </div>
-    </Card>
+    </div>
   );
 }
+
+/* ----- Section: Final game / End ---------------------------- */
 
 function EndSection({
   data,
@@ -1138,34 +1243,25 @@ function EndSection({
   }
 
   return (
-    <Card>
-      <div className="mb-4 flex items-baseline gap-2">
-        <h2 className="text-lg font-bold text-zinc-900">5. Jeu final &amp; Fin</h2>
-        <span className="text-xs text-zinc-500">
-          Match-style game, cooldown and post-session reflection.
-        </span>
-      </div>
+    <div className="flex flex-col gap-6">
+      <StepHeader
+        eyebrow="Step 5 of 5"
+        title="Final game & wrap-up"
+        description="Match-style game, cool-down and a short post-session reflection."
+      />
 
-      {/* Jeu final */}
-      <div className="rounded-md border border-zinc-200 p-3">
-        <div className="flex flex-wrap items-baseline justify-between gap-3">
-          <SubsectionHeader
-            title="Jeu final"
-            hint="Free or themed match — apply what was worked on."
+      <SubCard
+        title="Jeu final"
+        hint="Free or themed match — apply what was worked on."
+      >
+        <div className="mb-4 flex flex-wrap items-center justify-end gap-2">
+          <DurationField
+            value={data.game.duration}
+            onChange={(v) => setGame("duration", v)}
+            placeholder="15 min"
           />
-          <div className="flex items-center gap-2">
-            <span className="text-sm font-medium text-zinc-700">Durée</span>
-            <input
-              type="text"
-              value={data.game.duration}
-              onChange={(e) => setGame("duration", e.target.value)}
-              placeholder="15 min"
-              className={inputClass("h-9 w-28")}
-            />
-          </div>
         </div>
-
-        <div className="mt-3">
+        <div>
           <FieldLabel
             title="Schéma sur le terrain"
             hint="Terrain complet horizontal — pose les équipes et trace le scénario."
@@ -1176,8 +1272,7 @@ function EndSection({
             onChange={(v) => setGame("schema", v)}
           />
         </div>
-
-        <div className="mt-3">
+        <div className="mt-5">
           <FieldLabel
             title="Notes"
             hint="Format, contraintes, points de coaching."
@@ -1191,96 +1286,451 @@ function EndSection({
             placeholder="e.g., 11v11 free play on full pitch. Last 15 minutes. Normal rules."
           />
         </div>
-      </div>
+      </SubCard>
 
-      {/* Fin */}
-      <div className="mt-3 rounded-md border border-zinc-200 p-3">
-        <div className="flex flex-wrap items-baseline justify-between gap-3">
-          <SubsectionHeader
-            title="Fin de séance"
-            hint="Cooldown, breathing, quick verbal debrief."
-          />
-          <div className="flex items-center gap-2">
-            <span className="text-sm font-medium text-zinc-700">Durée</span>
-            <input
-              type="text"
-              value={data.end.duration}
-              onChange={(e) => setEnd("duration", e.target.value)}
-              placeholder="5 min"
-              className={inputClass("h-9 w-28")}
-            />
-          </div>
-        </div>
-
-        <div className="mt-3">
-          <FieldLabel title="Notes" />
-          <FitTextarea
-            rows={3}
-            maxChars={360}
-            area={{ w: Z_END.endNotes.w, h: Z_END.endNotes.h }}
-            value={data.end.notes}
-            onChange={(v) => setEnd("notes", v)}
-            placeholder="e.g., Walk to center circle. 60s breathing. Quick verbal debrief."
+      <SubCard
+        title="Fin de séance"
+        hint="Cooldown, breathing, quick verbal debrief."
+      >
+        <div className="mb-4 flex flex-wrap items-center justify-end gap-2">
+          <DurationField
+            value={data.end.duration}
+            onChange={(v) => setEnd("duration", v)}
+            placeholder="5 min"
           />
         </div>
-      </div>
-
-      {/* Réflexion */}
-      <div className="mt-3 rounded-md border border-zinc-200 p-3">
-        <SubsectionHeader
-          title="Réflexion"
-          hint="Personal notes after the session — what worked, what didn't."
+        <FieldLabel title="Notes" />
+        <FitTextarea
+          rows={3}
+          maxChars={360}
+          area={{ w: Z_END.endNotes.w, h: Z_END.endNotes.h }}
+          value={data.end.notes}
+          onChange={(v) => setEnd("notes", v)}
+          placeholder="e.g., Walk to center circle. 60s breathing. Quick verbal debrief."
         />
-        <div className="mt-3">
-          <FitTextarea
-            rows={3}
-            maxChars={360}
-            area={{ w: Z_END.reflection.w, h: Z_END.reflection.h }}
-            value={data.reflection}
-            onChange={(v) => patch((d) => ({ ...d, reflection: v }))}
-            placeholder="What worked, what didn't, who needs more individual work next week."
-          />
+      </SubCard>
+
+      <SubCard
+        title="Réflexion"
+        hint="Personal notes after the session — what worked, what didn't."
+      >
+        <FitTextarea
+          rows={3}
+          maxChars={360}
+          area={{ w: Z_END.reflection.w, h: Z_END.reflection.h }}
+          value={data.reflection}
+          onChange={(v) => patch((d) => ({ ...d, reflection: v }))}
+          placeholder="What worked, what didn't, who needs more individual work next week."
+        />
+      </SubCard>
+    </div>
+  );
+}
+
+/* ----- Step: Review ----------------------------------------- */
+
+function ReviewRow({ label, value }: { label: string; value: string }) {
+  const empty = !value || value.trim() === "";
+  return (
+    <div className="flex items-baseline justify-between gap-4 border-b border-zinc-100 py-2.5 last:border-b-0">
+      <div className="text-xs font-medium uppercase tracking-wider text-zinc-500">
+        {label}
+      </div>
+      <div
+        className={`max-w-[60%] truncate text-right text-sm ${
+          empty ? "text-zinc-400" : "text-zinc-900"
+        }`}
+      >
+        {empty ? "—" : value}
+      </div>
+    </div>
+  );
+}
+
+function ReviewSection({
+  title,
+  status,
+  onEdit,
+  children,
+}: {
+  title: string;
+  status: SectionStatus;
+  onEdit: () => void;
+  children: ReactNode;
+}) {
+  return (
+    <div className="rounded-xl border border-zinc-200 bg-white shadow-sm">
+      <div className="flex items-center justify-between border-b border-zinc-100 px-5 py-3">
+        <div className="flex items-center gap-3">
+          <StatusBadge status={status} />
+          <div className="text-sm font-semibold text-zinc-900">{title}</div>
+        </div>
+        <button
+          type="button"
+          onClick={onEdit}
+          className="text-xs font-medium text-zinc-600 underline-offset-2 hover:text-zinc-900 hover:underline"
+        >
+          Edit
+        </button>
+      </div>
+      <div className="px-5 py-2">{children}</div>
+    </div>
+  );
+}
+
+function StatusBadge({ status }: { status: SectionStatus }) {
+  if (status === "complete") {
+    return (
+      <span className="flex h-6 w-6 items-center justify-center rounded-full bg-emerald-500 text-white">
+        <Check className="h-3.5 w-3.5" strokeWidth={3} />
+      </span>
+    );
+  }
+  if (status === "partial") {
+    return (
+      <span className="flex h-6 w-6 items-center justify-center rounded-full bg-amber-500/15 text-amber-700 ring-1 ring-amber-500/30">
+        <span className="h-1.5 w-1.5 rounded-full bg-amber-500" />
+      </span>
+    );
+  }
+  return (
+    <span className="flex h-6 w-6 items-center justify-center rounded-full bg-zinc-100 text-zinc-400 ring-1 ring-zinc-200">
+      <span className="h-1.5 w-1.5 rounded-full bg-zinc-300" />
+    </span>
+  );
+}
+
+function ReviewStep({
+  data,
+  statuses,
+  onJumpTo,
+  onExport,
+}: {
+  data: PreparationData;
+  statuses: SectionStatus[];
+  onJumpTo: (index: number) => void;
+  onExport: () => void;
+}) {
+  const phaseLabels: Array<[keyof PreparationData["phases"], string]> = [
+    ["possession", "Possession"],
+    ["losing", "Losing"],
+    ["noPossession", "Out of possession"],
+    ["recovering", "Recovering"],
+  ];
+  const activePhases = phaseLabels
+    .filter(([k]) => data.phases[k])
+    .map(([, l]) => l)
+    .join(", ");
+
+  return (
+    <div className="flex flex-col gap-6">
+      <StepHeader
+        eyebrow="Final review"
+        title="Review & export"
+        description="Quick check of every section before generating the printed sheet."
+      />
+
+      <div className="rounded-xl border border-zinc-900 bg-zinc-900 p-5 text-white shadow-sm">
+        <div className="flex flex-wrap items-center justify-between gap-4">
+          <div>
+            <div className="flex items-center gap-2 text-xs font-medium uppercase tracking-wider text-zinc-400">
+              <Sparkles className="h-3.5 w-3.5" /> Ready to print
+            </div>
+            <div className="mt-1 text-lg font-semibold">
+              ASF preparation sheet — {data.team || "your team"}
+            </div>
+            <div className="mt-0.5 text-sm text-zinc-300">
+              {data.date || "No date"} · Coach {data.coach || "—"}
+            </div>
+          </div>
+          <Button variant="secondary" onClick={onExport}>
+            <Printer className="h-4 w-4" />
+            Export PDF
+          </Button>
         </div>
       </div>
-    </Card>
+
+      <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
+        <ReviewSection
+          title="1 · Session brief"
+          status={statuses[0]}
+          onEdit={() => onJumpTo(0)}
+        >
+          <ReviewRow label="Date" value={data.date} />
+          <ReviewRow label="Team" value={data.team} />
+          <ReviewRow label="Coach" value={data.coach} />
+          <ReviewRow label="Game moments" value={activePhases} />
+          <ReviewRow label="Forme caractéristique" value={data.characteristicForm} />
+          <ReviewRow label="Focus" value={data.focus} />
+          <ReviewRow label="Objectifs" value={data.objectives} />
+        </ReviewSection>
+
+        <ReviewSection
+          title="2 · Warm-up & preparation"
+          status={statuses[1]}
+          onEdit={() => onJumpTo(1)}
+        >
+          <ReviewRow label="Durée" value={data.initial.duration} />
+          <ReviewRow label="Phase 1" value={data.initial.phase1.description} />
+          <ReviewRow label="Phase 2" value={data.initial.phase2.description} />
+          <ReviewRow label="Phase 3" value={data.initial.phase3.description} />
+        </ReviewSection>
+
+        <ReviewSection
+          title="3 · Main block 1"
+          status={statuses[2]}
+          onEdit={() => onJumpTo(2)}
+        >
+          <ReviewRow
+            label="Type"
+            value={data.main[0].type === "playForm" ? "Forme jouée" : "Exercice"}
+          />
+          <ReviewRow label="Durée" value={data.main[0].duration} />
+          <ReviewRow label="Description" value={data.main[0].description} />
+        </ReviewSection>
+
+        <ReviewSection
+          title="4 · Main block 2"
+          status={statuses[3]}
+          onEdit={() => onJumpTo(3)}
+        >
+          <ReviewRow
+            label="Type"
+            value={data.main[1].type === "playForm" ? "Forme jouée" : "Exercice"}
+          />
+          <ReviewRow label="Durée" value={data.main[1].duration} />
+          <ReviewRow label="Description" value={data.main[1].description} />
+        </ReviewSection>
+
+        <ReviewSection
+          title="5 · Final game & wrap-up"
+          status={statuses[4]}
+          onEdit={() => onJumpTo(4)}
+        >
+          <ReviewRow label="Game · Durée" value={data.game.duration} />
+          <ReviewRow label="Game · Notes" value={data.game.notes} />
+          <ReviewRow label="End · Durée" value={data.end.duration} />
+          <ReviewRow label="End · Notes" value={data.end.notes} />
+          <ReviewRow label="Réflexion" value={data.reflection} />
+        </ReviewSection>
+      </div>
+    </div>
+  );
+}
+
+/* ============================================================
+ * Wizard shell
+ * ============================================================ */
+
+type SectionStatus = "empty" | "partial" | "complete";
+
+const STEP_DEFS = [
+  { key: "global", label: "Session brief", icon: Info },
+  { key: "initial", label: "Warm-up & prep", icon: Layers },
+  { key: "main1", label: "Main block 1", icon: Target },
+  { key: "main2", label: "Main block 2", icon: Target },
+  { key: "end", label: "Final game & wrap-up", icon: Trophy },
+  { key: "review", label: "Review & export", icon: Eye },
+] as const;
+
+function computeStatuses(data: PreparationData): SectionStatus[] {
+  const phasesAny =
+    data.phases.possession ||
+    data.phases.losing ||
+    data.phases.noPossession ||
+    data.phases.recovering;
+
+  const globalFields = [
+    data.date.trim(),
+    data.team.trim(),
+    data.coach.trim(),
+    phasesAny ? "1" : "",
+    data.characteristicForm.trim(),
+    data.focus.trim(),
+    data.objectives.trim(),
+  ];
+  const globalFilled = globalFields.filter(Boolean).length;
+  const globalStatus: SectionStatus =
+    globalFilled === 0 ? "empty" : globalFilled === globalFields.length ? "complete" : "partial";
+
+  const initialFields = [
+    data.initial.duration.trim(),
+    data.initial.phase1.description.trim(),
+    data.initial.phase1.coaching.trim(),
+    data.initial.phase2.description.trim(),
+    data.initial.phase2.coaching.trim(),
+    data.initial.phase3.description.trim(),
+  ];
+  const initialFilled = initialFields.filter(Boolean).length;
+  const initialStatus: SectionStatus =
+    initialFilled === 0 ? "empty" : initialFilled >= 4 ? "complete" : "partial";
+
+  function mainStatus(slot: 0 | 1): SectionStatus {
+    const m = data.main[slot];
+    const fields = [
+      m.duration.trim(),
+      m.description.trim(),
+      m.coaching.trim(),
+      m.organisation.trim(),
+    ];
+    const filled = fields.filter(Boolean).length;
+    return filled === 0 ? "empty" : filled >= 3 ? "complete" : "partial";
+  }
+
+  const endFields = [
+    data.game.duration.trim(),
+    data.game.notes.trim(),
+    data.end.duration.trim(),
+    data.end.notes.trim(),
+  ];
+  const endFilled = endFields.filter(Boolean).length;
+  const endStatus: SectionStatus =
+    endFilled === 0 ? "empty" : endFilled >= 3 ? "complete" : "partial";
+
+  return [globalStatus, initialStatus, mainStatus(0), mainStatus(1), endStatus];
+}
+
+function StepperNav({
+  currentIndex,
+  onSelect,
+  statuses,
+}: {
+  currentIndex: number;
+  onSelect: (index: number) => void;
+  statuses: SectionStatus[];
+}) {
+  return (
+    <nav className="flex flex-col gap-1" aria-label="Preparation steps">
+      {STEP_DEFS.map((step, index) => {
+        const Icon = step.icon;
+        const active = index === currentIndex;
+        const isReview = step.key === "review";
+        const status: SectionStatus = isReview ? "empty" : statuses[index];
+
+        return (
+          <button
+            key={step.key}
+            type="button"
+            onClick={() => onSelect(index)}
+            className={`group flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-left transition ${
+              active
+                ? "bg-zinc-900 text-white shadow-sm"
+                : "text-zinc-700 hover:bg-zinc-100"
+            }`}
+          >
+            <span
+              className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-md text-xs font-semibold tabular-nums ${
+                active
+                  ? "bg-white/15 text-white"
+                  : status === "complete"
+                    ? "bg-emerald-500 text-white"
+                    : status === "partial"
+                      ? "bg-amber-100 text-amber-700"
+                      : "bg-zinc-100 text-zinc-500 group-hover:bg-zinc-200"
+              }`}
+            >
+              {!active && status === "complete" ? (
+                <Check className="h-4 w-4" strokeWidth={3} />
+              ) : (
+                <Icon className="h-3.5 w-3.5" />
+              )}
+            </span>
+            <span className="min-w-0 flex-1">
+              <span
+                className={`block text-[10px] font-medium uppercase tracking-wider ${
+                  active ? "text-zinc-300" : "text-zinc-400"
+                }`}
+              >
+                {isReview ? "Final" : `Step ${index + 1}`}
+              </span>
+              <span className="block truncate text-sm font-medium">
+                {step.label}
+              </span>
+            </span>
+          </button>
+        );
+      })}
+    </nav>
+  );
+}
+
+function MobileStepBar({
+  currentIndex,
+  onSelect,
+  statuses,
+}: {
+  currentIndex: number;
+  onSelect: (index: number) => void;
+  statuses: SectionStatus[];
+}) {
+  return (
+    <div className="lg:hidden">
+      <div className="flex gap-2 overflow-x-auto pb-2">
+        {STEP_DEFS.map((step, index) => {
+          const active = index === currentIndex;
+          const isReview = step.key === "review";
+          const status: SectionStatus = isReview ? "empty" : statuses[index];
+          return (
+            <button
+              key={step.key}
+              type="button"
+              onClick={() => onSelect(index)}
+              className={`flex shrink-0 items-center gap-2 rounded-full border px-3 py-1.5 text-xs font-medium transition ${
+                active
+                  ? "border-zinc-900 bg-zinc-900 text-white"
+                  : "border-zinc-200 bg-white text-zinc-700 hover:border-zinc-300"
+              }`}
+            >
+              <span
+                className={`flex h-4 w-4 items-center justify-center rounded-full text-[10px] font-semibold ${
+                  active
+                    ? "bg-white/15 text-white"
+                    : status === "complete"
+                      ? "bg-emerald-500 text-white"
+                      : status === "partial"
+                        ? "bg-amber-200 text-amber-800"
+                        : "bg-zinc-100 text-zinc-500"
+                }`}
+              >
+                {!active && status === "complete" ? (
+                  <Check className="h-3 w-3" strokeWidth={3} />
+                ) : (
+                  index + 1
+                )}
+              </span>
+              {isReview ? "Review" : step.label}
+            </button>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
+function ProgressBar({ statuses }: { statuses: SectionStatus[] }) {
+  const score = statuses.reduce(
+    (s, st) => s + (st === "complete" ? 1 : st === "partial" ? 0.5 : 0),
+    0,
+  );
+  const pct = Math.round((score / statuses.length) * 100);
+  return (
+    <div className="flex items-center gap-3">
+      <div className="relative h-1.5 w-32 overflow-hidden rounded-full bg-zinc-200">
+        <div
+          className="absolute inset-y-0 left-0 rounded-full bg-emerald-500 transition-all duration-500"
+          style={{ width: `${pct}%` }}
+        />
+      </div>
+      <span className="text-xs font-medium tabular-nums text-zinc-600">
+        {pct}% complete
+      </span>
+    </div>
   );
 }
 
 /* ============================================================
  * Container
  * ============================================================ */
-
-function HowToUse() {
-  const [open, setOpen] = useState(false);
-  return (
-    <div className="prep-no-print rounded-md border border-blue-200 bg-blue-50">
-      <button
-        type="button"
-        onClick={() => setOpen((v) => !v)}
-        className="flex w-full items-center justify-between gap-2 px-3 py-2 text-sm font-medium text-blue-900"
-      >
-        <span className="flex items-center gap-2">
-          <FileText className="h-4 w-4" />
-          How this works
-        </span>
-        {open ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
-      </button>
-      {open && (
-        <div className="border-t border-blue-200 px-3 py-3 text-sm text-blue-900">
-          <p>
-            Fill out the five sections below. When you click{" "}
-            <strong>Export PDF</strong>, your text is laid into the official
-            ASF preparation sheet — the layout, labels and pitches stay fixed.
-          </p>
-          <p className="mt-2 text-xs text-blue-800">
-            Tip: use <strong>Load example</strong> to see a fully filled
-            sheet first.
-          </p>
-        </div>
-      )}
-    </div>
-  );
-}
 
 export function PreparationSheet({
   teamId,
@@ -1296,6 +1746,7 @@ export function PreparationSheet({
   const [savedAt, setSavedAt] = useState<string | null>(null);
   const [dirty, setDirty] = useState(false);
   const [isPending, startTransition] = useTransition();
+  const [stepIndex, setStepIndex] = useState(0);
   const locale = useLocale();
 
   function patch(updater: (d: PreparationData) => PreparationData) {
@@ -1332,63 +1783,205 @@ export function PreparationSheet({
     patch(() => exampleSheet());
   }
 
-  const status = dirty
-    ? savedAt
-      ? `Unsaved changes (last saved ${savedAt})`
-      : "Unsaved changes"
-    : savedAt
-      ? `Saved at ${savedAt}`
-      : "Not saved yet";
+  function handlePrint() {
+    if (typeof window !== "undefined") window.print();
+  }
 
-  return (
-    <>
-      {/* Web form (hidden when printing) */}
-      <div className="prep-no-print flex flex-col gap-4">
-        <HowToUse />
+  const statuses = useMemo(() => computeStatuses(data), [data]);
+  const isReview = stepIndex === STEP_DEFS.length - 1;
 
-        <div className="sticky top-0 z-10 flex flex-wrap items-center justify-between gap-3 rounded-md border border-zinc-200 bg-white p-3 shadow-sm">
-          <div className="text-sm text-zinc-600">{status}</div>
-          <div className="flex flex-wrap gap-2">
-            <Button variant="ghost" size="sm" onClick={loadExample}>
-              <FileText className="h-4 w-4" />
-              Load example
-            </Button>
-            <Button variant="secondary" size="sm" onClick={() => window.print()}>
-              <Printer className="h-4 w-4" />
-              Export PDF
-            </Button>
-            <Button size="sm" disabled={isPending} onClick={save}>
-              <Save className="h-4 w-4" />
-              {isPending ? "Saving…" : "Save"}
-            </Button>
-          </div>
-        </div>
+  function goPrev() {
+    setStepIndex((i) => Math.max(0, i - 1));
+    if (typeof window !== "undefined") window.scrollTo({ top: 0, behavior: "smooth" });
+  }
 
-        {error && (
-          <div className="rounded-md border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700">
-            {error}
-          </div>
-        )}
+  function goNext() {
+    setStepIndex((i) => Math.min(STEP_DEFS.length - 1, i + 1));
+    if (typeof window !== "undefined") window.scrollTo({ top: 0, behavior: "smooth" });
+  }
 
-        <GlobalSection data={data} patch={patch} />
+  function jumpTo(i: number) {
+    setStepIndex(i);
+    if (typeof window !== "undefined") window.scrollTo({ top: 0, behavior: "smooth" });
+  }
 
-        <InitialSection data={data} patch={patch} />
-
+  let stepBody: ReactNode;
+  switch (stepIndex) {
+    case 0:
+      stepBody = <GlobalSection data={data} patch={patch} />;
+      break;
+    case 1:
+      stepBody = <InitialSection data={data} patch={patch} />;
+      break;
+    case 2:
+      stepBody = (
         <MainExerciseSection
           slot={0}
-          sectionNumber={3}
+          stepLabel="Step 3 of 5"
           data={data}
           patch={patch}
           zones={Z_MAIN_1}
         />
+      );
+      break;
+    case 3:
+      stepBody = (
         <MainExerciseSection
           slot={1}
-          sectionNumber={4}
+          stepLabel="Step 4 of 5"
           data={data}
           patch={patch}
           zones={Z_MAIN_2}
         />
-        <EndSection data={data} patch={patch} />
+      );
+      break;
+    case 4:
+      stepBody = <EndSection data={data} patch={patch} />;
+      break;
+    default:
+      stepBody = (
+        <ReviewStep
+          data={data}
+          statuses={statuses}
+          onJumpTo={jumpTo}
+          onExport={handlePrint}
+        />
+      );
+  }
+
+  const statusLine = dirty
+    ? savedAt
+      ? `Unsaved changes · last saved ${savedAt}`
+      : "Unsaved changes"
+    : savedAt
+      ? `All changes saved at ${savedAt}`
+      : "Not saved yet";
+
+  return (
+    <>
+      <div className="prep-no-print">
+        {/* Sticky toolbar */}
+        <div className="sticky top-0 z-20 -mx-4 mb-6 border-b border-zinc-200 bg-white/80 px-4 py-3 backdrop-blur-md md:-mx-6 md:px-6">
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <div className="flex flex-wrap items-center gap-4">
+              <div className="flex items-center gap-2">
+                <span
+                  className={`h-2 w-2 rounded-full ${
+                    dirty
+                      ? "bg-amber-500"
+                      : savedAt
+                        ? "bg-emerald-500"
+                        : "bg-zinc-300"
+                  }`}
+                />
+                <span className="text-sm text-zinc-600">{statusLine}</span>
+              </div>
+              <div className="hidden md:block">
+                <ProgressBar statuses={statuses} />
+              </div>
+            </div>
+            <div className="flex flex-wrap gap-2">
+              <Button variant="ghost" size="sm" onClick={loadExample}>
+                <FileText className="h-4 w-4" />
+                Load example
+              </Button>
+              <Button variant="secondary" size="sm" onClick={handlePrint}>
+                <Printer className="h-4 w-4" />
+                Export PDF
+              </Button>
+              <Button size="sm" disabled={isPending} onClick={save}>
+                <Save className="h-4 w-4" />
+                {isPending ? "Saving…" : "Save"}
+              </Button>
+            </div>
+          </div>
+          <div className="mt-3 md:hidden">
+            <ProgressBar statuses={statuses} />
+          </div>
+        </div>
+
+        {error && (
+          <div className="mb-4 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+            {error}
+          </div>
+        )}
+
+        {/* Mobile stepper */}
+        <div className="mb-4 lg:hidden">
+          <MobileStepBar
+            currentIndex={stepIndex}
+            onSelect={jumpTo}
+            statuses={statuses}
+          />
+        </div>
+
+        <div className="flex flex-col gap-6 lg:flex-row lg:items-start lg:gap-8">
+          {/* Sidebar stepper (desktop) */}
+          <aside className="hidden w-72 shrink-0 lg:block">
+            <div className="sticky top-24">
+              <div className="rounded-xl border border-zinc-200 bg-white p-3 shadow-sm">
+                <div className="px-2 pb-2 pt-1">
+                  <div className="flex items-center gap-2 text-xs font-medium uppercase tracking-wider text-zinc-500">
+                    <ClipboardList className="h-3.5 w-3.5" />
+                    Preparation flow
+                  </div>
+                </div>
+                <StepperNav
+                  currentIndex={stepIndex}
+                  onSelect={jumpTo}
+                  statuses={statuses}
+                />
+              </div>
+              <div className="mt-3 rounded-xl border border-zinc-200 bg-zinc-50 p-3 text-xs leading-relaxed text-zinc-600">
+                Fill out each step. When you click <strong>Export PDF</strong>,
+                your text is laid into the official ASF preparation sheet —
+                layout, labels and pitches stay fixed.
+              </div>
+            </div>
+          </aside>
+
+          {/* Step content */}
+          <div className="min-w-0 flex-1">
+            <div
+              key={stepIndex}
+              className="rounded-2xl border border-zinc-200 bg-white p-6 shadow-sm motion-safe:animate-[prep-step-in_180ms_ease-out] sm:p-8"
+            >
+              {stepBody}
+            </div>
+
+            {/* Step footer */}
+            <div className="mt-6 flex flex-wrap items-center justify-between gap-3">
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={goPrev}
+                disabled={stepIndex === 0}
+              >
+                <ArrowLeft className="h-4 w-4" />
+                Previous
+              </Button>
+              <div className="flex items-center gap-2">
+                {!isReview ? (
+                  <Button size="sm" onClick={goNext}>
+                    Next
+                    <ArrowRight className="h-4 w-4" />
+                  </Button>
+                ) : (
+                  <>
+                    <Button variant="ghost" size="sm" disabled={isPending} onClick={save}>
+                      <Save className="h-4 w-4" />
+                      {isPending ? "Saving…" : "Save draft"}
+                    </Button>
+                    <Button size="sm" onClick={handlePrint}>
+                      <Printer className="h-4 w-4" />
+                      Generate PDF
+                    </Button>
+                  </>
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
 
       {/* PDF output (hidden on screen, shown only on print) */}
@@ -1396,4 +1989,3 @@ export function PreparationSheet({
     </>
   );
 }
-

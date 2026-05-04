@@ -39,24 +39,27 @@ export default async function PreparationPage({
   if (!initial.team) initial.team = team.name;
 
   return (
-    <div className="flex flex-col gap-4">
+    <div className="mx-auto flex w-full max-w-7xl flex-col gap-4">
       <div className="flex items-center justify-between print:hidden">
         <div>
           <Link
             href={`/planner/${teamId}/sessions/${sessionId}`}
-            className="text-sm text-zinc-600 underline"
+            className="inline-flex items-center gap-1 text-xs font-medium text-zinc-500 transition hover:text-zinc-900"
           >
             ← Back to session
           </Link>
-          <h1 className="mt-1 text-2xl font-semibold text-zinc-900">
+          <h1 className="mt-2 text-3xl font-semibold tracking-tight text-zinc-900">
             Training preparation
           </h1>
+          <p className="mt-1 text-sm text-zinc-500">
+            Build the session step by step. The official ASF sheet is generated on export.
+          </p>
         </div>
       </div>
-        <PreparationSheet
-      teamId={teamId}
-      sessionId={sessionId}
-      initial={initial}
+      <PreparationSheet
+        teamId={teamId}
+        sessionId={sessionId}
+        initial={initial}
       />
     </div>
   );

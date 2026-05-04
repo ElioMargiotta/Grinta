@@ -21,6 +21,11 @@ body {
   color: var(--color-foreground);
 }
 
+@keyframes prep-step-in {
+  from { opacity: 0; transform: translateY(4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
 @page {
   size: 210mm 297mm;
   margin: 0;
