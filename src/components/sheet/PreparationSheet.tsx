@@ -1,34 +1,29 @@
 "use client";
 
 import {
-  ArrowLeft,
-  ArrowRight,
   Check,
-  ClipboardList,
-  Eye,
+  ChevronLeft,
+  ChevronRight,
   FileText,
   Flag,
-  Info,
-  Layers,
+  Loader2,
   Printer,
   Save,
-  Sparkles,
-  Target,
-  Trophy,
 } from "lucide-react";
 import { useLocale } from "next-intl";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
 import {
   type ChangeEvent,
   type CSSProperties,
   type ReactNode,
   useCallback,
+  useEffect,
   useMemo,
   useState,
   useSyncExternalStore,
   useTransition,
 } from "react";
-import { Button } from "@/components/ui/Button";
 import { savePreparationAction } from "@/app/[locale]/(app)/planner/[teamId]/sessions/[sessionId]/preparation/actions";
 import { exampleSheet } from "./example";
 import { SchemaEditor, SchemaView } from "./SchemaEditor";
@@ -359,32 +354,198 @@ function PdfExport({ data }: { data: PreparationData }) {
 }
 
 /* ============================================================
- * WEB FORM — premium wizard UI
- *   The five business sections are unchanged; only their
- *   presentation changed. Each step renders independently and
+ * WEB FORM — premium full-screen wizard
+ *   Dark sidebar + frosted topbar + light content panel.
+ *   The whole shell is viewport-locked: the page itself never
+ *   scrolls, only the active step's body does. The five business
+ *   sections are unchanged; only their presentation. Each step
  *   reads/writes the same `PreparationData` shape consumed by
  *   `PdfExport` above.
  * ============================================================ */
 
 /* ----- Form atoms ------------------------------------------- */
 
-function FieldLabel({
-  title,
+function Field({
+  label,
   hint,
+  charMax,
+  charVal,
+  children,
 }: {
-  title: string;
+  label: string;
   hint?: string;
+  charMax?: number;
+  charVal?: number;
+  children: ReactNode;
 }) {
   return (
-    <div className="mb-1.5">
-      <div className="text-sm font-medium text-zinc-900">{title}</div>
-      {hint && <div className="mt-0.5 text-xs leading-relaxed text-zinc-500">{hint}</div>}
+    <div className="flex flex-col gap-1.5">
+      <div className="text-[12px] font-medium text-zinc-700">{label}</div>
+      {hint && (
+        <div className="-mt-0.5 text-[11px] leading-snug text-zinc-400">
+          {hint}
+        </div>
+      )}
+      {children}
+      {charMax !== undefined && (
+        <div className="text-right text-[10px] tabular-nums text-zinc-400">
+          {charVal ?? 0}/{charMax}
+        </div>
+      )}
     </div>
   );
 }
 
-function inputClass(extra = "") {
-  return `w-full rounded-lg border border-zinc-200 bg-white px-3 py-2 text-sm text-zinc-900 shadow-sm transition placeholder:text-zinc-400 hover:border-zinc-300 focus:border-zinc-900 focus:outline-none focus:ring-2 focus:ring-zinc-900/10 ${extra}`;
+const inpClass =
+  "h-9 w-full rounded-[9px] border-[1.5px] border-zinc-200 bg-white px-3 text-[13px] text-zinc-900 shadow-[0_1px_2px_rgb(0_0_0/0.04)] outline-none transition placeholder:text-zinc-400 hover:border-zinc-300 focus:border-zinc-900 focus:shadow-[0_0_0_3px_rgb(12_12_13/0.07)]";
+const txtaClass =
+  "w-full resize-none rounded-[9px] border-[1.5px] border-zinc-200 bg-white px-3 py-2.5 text-[13px] leading-[1.55] text-zinc-900 shadow-[0_1px_2px_rgb(0_0_0/0.04)] outline-none transition placeholder:text-zinc-400 hover:border-zinc-300 focus:border-zinc-900 focus:shadow-[0_0_0_3px_rgb(12_12_13/0.07)]";
+
+function DurPill({
+  value,
+  onChange,
+  placeholder,
+}: {
+  value: string;
+  onChange: (v: string) => void;
+  placeholder?: string;
+}) {
+  return (
+    <label className="inline-flex items-center gap-2 rounded-[9px] border-[1.5px] border-zinc-200 bg-white px-3 py-1.5 shadow-[0_1px_2px_rgb(0_0_0/0.04)]">
+      <span className="whitespace-nowrap text-[10px] font-semibold uppercase tracking-[0.06em] text-zinc-400">
+        Durée
+      </span>
+      <input
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        placeholder={placeholder ?? "— min"}
+        className="w-16 border-0 bg-transparent p-0 text-[13px] font-semibold text-zinc-900 outline-none"
+      />
+    </label>
+  );
+}
+
+function CheckCard({
+  label,
+  hint,
+  checked,
+  onChange,
+}: {
+  label: string;
+  hint?: string;
+  checked: boolean;
+  onChange: (next: boolean) => void;
+}) {
+  return (
+    <button
+      type="button"
+      onClick={() => onChange(!checked)}
+      className={`flex w-full select-none items-start gap-2.5 rounded-[10px] border-[1.5px] px-3 py-2.5 text-left transition ${
+        checked
+          ? "border-zinc-900 bg-[#0c0c0d]/[0.025]"
+          : "border-zinc-200 bg-white hover:border-zinc-300 hover:bg-zinc-50"
+      }`}
+    >
+      <span
+        className={`mt-0.5 flex h-[17px] w-[17px] shrink-0 items-center justify-center rounded-[5px] border-[1.5px] transition ${
+          checked
+            ? "border-zinc-900 bg-zinc-900 text-white"
+            : "border-zinc-300 bg-white"
+        }`}
+      >
+        {checked && <Check className="h-3 w-3" strokeWidth={3} />}
+      </span>
+      <span className="min-w-0">
+        <span className="block text-[12px] font-medium leading-snug text-zinc-900">
+          {label}
+        </span>
+        {hint && (
+          <span className="mt-0.5 block text-[11px] text-zinc-400">{hint}</span>
+        )}
+      </span>
+    </button>
+  );
+}
+
+function RadioCard({
+  label,
+  hint,
+  active,
+  onClick,
+}: {
+  label: string;
+  hint?: string;
+  active: boolean;
+  onClick: () => void;
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className={`flex flex-1 items-center gap-2.5 rounded-[10px] border-[1.5px] px-3 py-2.5 text-left transition ${
+        active
+          ? "border-zinc-900 bg-[#0c0c0d]/[0.025]"
+          : "border-zinc-200 bg-white hover:border-zinc-300"
+      }`}
+    >
+      <span
+        className={`flex h-4 w-4 shrink-0 items-center justify-center rounded-full border-[1.5px] transition ${
+          active ? "border-zinc-900" : "border-zinc-300"
+        }`}
+      >
+        {active && <span className="h-2 w-2 rounded-full bg-zinc-900" />}
+      </span>
+      <span className="min-w-0">
+        <span className="block text-[12px] font-medium text-zinc-900">
+          {label}
+        </span>
+        {hint && (
+          <span className="block text-[11px] text-zinc-400">{hint}</span>
+        )}
+      </span>
+    </button>
+  );
+}
+
+function Card({
+  icon,
+  title,
+  hint,
+  rightAction,
+  children,
+}: {
+  icon?: ReactNode;
+  title?: string;
+  hint?: string;
+  rightAction?: ReactNode;
+  children: ReactNode;
+}) {
+  const hasHeader = !!(icon || title || hint || rightAction);
+  return (
+    <div className="overflow-hidden rounded-[12px] border border-zinc-200 bg-white shadow-[0_1px_3px_rgb(0_0_0/0.05),0_1px_2px_rgb(0_0_0/0.04)]">
+      {hasHeader && (
+        <div className="flex items-center gap-2.5 border-b border-zinc-100 px-4 py-3">
+          {icon && (
+            <div className="flex h-[26px] w-[26px] shrink-0 items-center justify-center rounded-[7px] bg-[#0c0c0d] text-white">
+              {icon}
+            </div>
+          )}
+          <div className="min-w-0 flex-1">
+            {title && (
+              <div className="text-[12px] font-semibold text-zinc-900">
+                {title}
+              </div>
+            )}
+            {hint && (
+              <div className="mt-0.5 text-[11px] text-zinc-400">{hint}</div>
+            )}
+          </div>
+          {rightAction}
+        </div>
+      )}
+      <div className="p-4">{children}</div>
+    </div>
+  );
 }
 
 /* Mirror the export box's text-rendering rules to measure whether
@@ -441,7 +602,7 @@ function FitTextarea({
   value,
   onChange,
   area,
-  rows = 5,
+  rows = 4,
   placeholder,
   maxChars,
 }: {
@@ -466,17 +627,15 @@ function FitTextarea({
   }
 
   return (
-    <div>
+    <div className="flex flex-col gap-1">
       <textarea
         rows={rows}
         value={value}
         onChange={handleChange}
         placeholder={placeholder}
-        className={inputClass(
-          `resize-none ${fits ? "" : "border-red-300 focus:border-red-500 focus:ring-red-500/20"}`,
-        )}
+        className={`${txtaClass} ${fits ? "" : "border-red-300 focus:border-red-500 focus:shadow-[0_0_0_3px_rgb(239_68_68/0.12)]"}`}
       />
-      <div className="mt-1.5 flex items-center justify-between text-xs">
+      <div className="flex items-center justify-between text-[10px]">
         <span className={fits ? "text-zinc-400" : "text-red-600"}>
           {fits ? "Fits the printed page" : "Too long — will be clipped on the PDF"}
         </span>
@@ -490,1048 +649,32 @@ function FitTextarea({
   );
 }
 
-/* ----- Step layout primitives ------------------------------- */
-
-function StepHeader({
-  eyebrow,
-  title,
-  description,
-  durationField,
-}: {
-  eyebrow: string;
-  title: string;
-  description: string;
-  durationField?: ReactNode;
-}) {
-  return (
-    <div className="flex flex-wrap items-end justify-between gap-4 border-b border-zinc-100 pb-4">
-      <div className="min-w-0">
-        <div className="text-xs font-medium uppercase tracking-wider text-zinc-400">
-          {eyebrow}
-        </div>
-        <h2 className="mt-1 text-2xl font-semibold tracking-tight text-zinc-900">
-          {title}
-        </h2>
-        <p className="mt-1 max-w-2xl text-sm text-zinc-500">{description}</p>
-      </div>
-      {durationField}
-    </div>
-  );
-}
-
-function DurationField({
-  value,
-  onChange,
-  placeholder,
-}: {
-  value: string;
-  onChange: (v: string) => void;
-  placeholder: string;
-}) {
-  return (
-    <label className="flex items-center gap-2 rounded-lg border border-zinc-200 bg-white px-3 py-2 shadow-sm">
-      <span className="text-xs font-medium uppercase tracking-wider text-zinc-500">
-        Durée
-      </span>
-      <input
-        type="text"
-        value={value}
-        onChange={(e) => onChange(e.target.value)}
-        placeholder={placeholder}
-        className="w-24 border-0 bg-transparent p-0 text-sm font-semibold text-zinc-900 focus:outline-none"
-      />
-    </label>
-  );
-}
-
-function SubCard({
-  icon,
-  title,
-  hint,
-  children,
-}: {
-  icon?: ReactNode;
-  title: string;
-  hint?: string;
-  children: ReactNode;
-}) {
-  return (
-    <div className="rounded-xl border border-zinc-200 bg-white p-5 shadow-sm">
-      <div className="mb-4 flex items-start gap-3">
-        {icon && (
-          <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-zinc-900 text-white">
-            {icon}
-          </div>
-        )}
-        <div className="min-w-0">
-          <div className="text-sm font-semibold text-zinc-900">{title}</div>
-          {hint && (
-            <div className="mt-0.5 text-xs leading-relaxed text-zinc-500">{hint}</div>
-          )}
-        </div>
-      </div>
-      {children}
-    </div>
-  );
-}
-
-/* ----- Section: Global -------------------------------------- */
-
-function GlobalSection({
-  data,
-  patch,
-}: {
-  data: PreparationData;
-  patch: (updater: (d: PreparationData) => PreparationData) => void;
-}) {
-  const phaseOptions = [
-    {
-      key: "possession" as const,
-      label: "Mon équipe possède le ballon",
-      en: "We have the ball",
-    },
-    {
-      key: "losing" as const,
-      label: "Mon équipe perd le ballon",
-      en: "We just lost it",
-    },
-    {
-      key: "noPossession" as const,
-      label: "Mon équipe ne possède pas le ballon",
-      en: "They have it",
-    },
-    {
-      key: "recovering" as const,
-      label: "Mon équipe récupère le ballon",
-      en: "We just won it back",
-    },
-  ];
-
-  return (
-    <div className="flex flex-col gap-6">
-      <StepHeader
-        eyebrow="Step 1 of 5"
-        title="Session brief"
-        description="Set the date, team and the game moment(s) this session is built around."
-      />
-
-      {/* Date / Équipe / Entraîneur */}
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
-        <div>
-          <FieldLabel title="Date" />
-          <input
-            type="date"
-            value={data.date}
-            onChange={(e) =>
-              patch((d) => ({ ...d, date: e.target.value }))
-            }
-            className={inputClass()}
-          />
-        </div>
-        <div>
-          <FieldLabel title="Équipe" hint="Team" />
-          <input
-            type="text"
-            value={data.team}
-            onChange={(e) =>
-              patch((d) => ({ ...d, team: e.target.value }))
-            }
-            placeholder="U15 Élite"
-            className={inputClass()}
-          />
-        </div>
-        <div>
-          <FieldLabel title="Entraîneur" hint="Coach" />
-          <input
-            type="text"
-            value={data.coach}
-            onChange={(e) =>
-              patch((d) => ({ ...d, coach: e.target.value }))
-            }
-            placeholder="Your name"
-            className={inputClass()}
-          />
-        </div>
-      </div>
-
-      {/* Game moments */}
-      <SubCard
-        icon={<Flag className="h-4 w-4" />}
-        title="Moments du jeu"
-        hint="Tick the moment(s) of the game this session focuses on."
-      >
-        <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
-          {phaseOptions.map(({ key, label, en }) => {
-            const checked = data.phases[key];
-            return (
-              <label
-                key={key}
-                className={`group flex cursor-pointer items-start gap-3 rounded-lg border px-4 py-3 text-sm transition ${
-                  checked
-                    ? "border-zinc-900 bg-zinc-900/[0.03] text-zinc-900 shadow-sm"
-                    : "border-zinc-200 bg-white text-zinc-700 hover:border-zinc-300 hover:bg-zinc-50"
-                }`}
-              >
-                <span
-                  className={`mt-0.5 flex h-4 w-4 shrink-0 items-center justify-center rounded border ${
-                    checked
-                      ? "border-zinc-900 bg-zinc-900 text-white"
-                      : "border-zinc-300 bg-white"
-                  }`}
-                >
-                  {checked && <Check className="h-3 w-3" strokeWidth={3} />}
-                </span>
-                <input
-                  type="checkbox"
-                  className="sr-only"
-                  checked={checked}
-                  onChange={(e) =>
-                    patch((d) => ({
-                      ...d,
-                      phases: { ...d.phases, [key]: e.target.checked },
-                    }))
-                  }
-                />
-                <span className="min-w-0">
-                  <span className="block font-medium leading-snug">{label}</span>
-                  <span className="mt-0.5 block text-xs text-zinc-500">{en}</span>
-                </span>
-              </label>
-            );
-          })}
-        </div>
-      </SubCard>
-
-      {/* Long text fields */}
-      <div className="grid grid-cols-1 gap-5 lg:grid-cols-2">
-        <div>
-          <FieldLabel
-            title="Forme caractéristique"
-            hint="Situation de jeu — the real game situation this session is built around."
-          />
-          <textarea
-            rows={3}
-            maxLength={230}
-            value={data.characteristicForm}
-            onChange={(e) =>
-              patch((d) => ({ ...d, characteristicForm: e.target.value }))
-            }
-            placeholder="e.g., Build-up from goalkeeper under high press"
-            className={inputClass("resize-none")}
-          />
-          <div className="mt-1 text-right text-xs text-zinc-400 tabular-nums">
-            {data.characteristicForm.length}/230
-          </div>
-        </div>
-        <div>
-          <FieldLabel
-            title="Focus"
-            hint="TE = Technique · TA = Tactique · PE = Physique · AT = Attitude"
-          />
-          <textarea
-            rows={3}
-            maxLength={115}
-            value={data.focus}
-            onChange={(e) =>
-              patch((d) => ({ ...d, focus: e.target.value }))
-            }
-            placeholder="e.g., TA — pressing triggers"
-            className={inputClass("resize-none")}
-          />
-          <div className="mt-1 text-right text-xs text-zinc-400 tabular-nums">
-            {data.focus.length}/115
-          </div>
-        </div>
-        <div>
-          <FieldLabel
-            title="Objectifs"
-            hint="What players should be able to do by the end. Start with an action verb."
-          />
-          <textarea
-            rows={3}
-            maxLength={230}
-            value={data.objectives}
-            onChange={(e) =>
-              patch((d) => ({ ...d, objectives: e.target.value }))
-            }
-            placeholder="e.g., Recognize the press trigger and play forward in 1–2 touches."
-            className={inputClass("resize-none")}
-          />
-          <div className="mt-1 text-right text-xs text-zinc-400 tabular-nums">
-            {data.objectives.length}/230
-          </div>
-        </div>
-        <div>
-          <FieldLabel
-            title="Questions de développement"
-            hint="Open questions you'll ask players to spark reflection."
-          />
-          <textarea
-            rows={3}
-            value={data.developmentQuestions}
-            onChange={(e) =>
-              patch((d) => ({ ...d, developmentQuestions: e.target.value }))
-            }
-            placeholder="e.g., When does the #6 drop between the center backs?"
-            className={inputClass("resize-none")}
-          />
-        </div>
-      </div>
-    </div>
-  );
-}
-
-/* ----- Section: Initial ------------------------------------- */
-
-function InitialSection({
-  data,
-  patch,
-}: {
-  data: PreparationData;
-  patch: (updater: (d: PreparationData) => PreparationData) => void;
-}) {
-  function setInitial<K extends keyof PreparationData["initial"]>(
-    key: K,
-    value: PreparationData["initial"][K],
-  ) {
-    patch((d) => ({ ...d, initial: { ...d.initial, [key]: value } }));
-  }
-
-  function setPhase1<K extends keyof PreparationData["initial"]["phase1"]>(
-    key: K,
-    value: PreparationData["initial"]["phase1"][K],
-  ) {
-    patch((d) => ({
-      ...d,
-      initial: {
-        ...d.initial,
-        phase1: { ...d.initial.phase1, [key]: value },
-      },
-    }));
-  }
-
-  function setPhase2<K extends keyof PreparationData["initial"]["phase2"]>(
-    key: K,
-    value: PreparationData["initial"]["phase2"][K],
-  ) {
-    patch((d) => ({
-      ...d,
-      initial: {
-        ...d.initial,
-        phase2: { ...d.initial.phase2, [key]: value },
-      },
-    }));
-  }
-
-  function setPrevention(
-    key: keyof PreparationData["initial"]["phase1"]["prevention"],
-    field: "description" | "coaching",
-    value: string,
-  ) {
-    patch((d) => ({
-      ...d,
-      initial: {
-        ...d.initial,
-        phase1: {
-          ...d.initial.phase1,
-          prevention: {
-            ...d.initial.phase1.prevention,
-            [key]: { ...d.initial.phase1.prevention[key], [field]: value },
-          },
-        },
-      },
-    }));
-  }
-
-  const preventionRows = [
-    { key: "ankle" as const, label: "Cheville", en: "Ankle" },
-    { key: "knee" as const, label: "Genou", en: "Knee" },
-    { key: "hip" as const, label: "Hanche", en: "Hip" },
-    { key: "hamstring" as const, label: "Ischio-jambiers", en: "Hamstrings" },
-  ];
-
-  return (
-    <div className="flex flex-col gap-6">
-      <StepHeader
-        eyebrow="Step 2 of 5"
-        title="Warm-up & preparation"
-        description="Mobility, technical/tactical work, then a short explosive block."
-        durationField={
-          <DurationField
-            value={data.initial.duration}
-            onChange={(v) => setInitial("duration", v)}
-            placeholder="25 min"
-          />
-        }
-      />
-
-      <SubCard
-        title="Phase 1 — Échauffement"
-        hint="Loose warmup. Mobility, ball touches."
-      >
-        <div>
-          <FieldLabel
-            title="Schéma sur le terrain"
-            hint="Pose les joueurs, ballon et plots — clique-glisse pour tracer une course, une passe ou une conduite."
-          />
-          <SchemaEditor
-            value={data.initial.phase1.schema}
-            onChange={(v) => setPhase1("schema", v)}
-          />
-        </div>
-        <div className="mt-5 grid grid-cols-1 gap-4 md:grid-cols-2">
-          <div>
-            <FieldLabel title="Description" hint="What players do" />
-            <FitTextarea
-              rows={5}
-              maxChars={420}
-              area={{
-                w: Z_INITIAL.phase1Description.w,
-                h: Z_INITIAL.phase1Description.h,
-              }}
-              value={data.initial.phase1.description}
-              onChange={(v) => setPhase1("description", v)}
-              placeholder="e.g., Pairs jog around half-pitch, ball rolling between them. 4 min."
-            />
-          </div>
-          <div>
-            <FieldLabel
-              title="Organisation / Coaching"
-              hint="Setup + cues"
-            />
-            <FitTextarea
-              rows={5}
-              maxChars={420}
-              area={{
-                w: Z_INITIAL.phase1Coaching.w,
-                h: Z_INITIAL.phase1Coaching.h,
-              }}
-              value={data.initial.phase1.coaching}
-              onChange={(v) => setPhase1("coaching", v)}
-              placeholder="e.g., Cones at corners. Cues: high-quality first touch, head up before passing."
-            />
-          </div>
-        </div>
-
-        {/* Prévention */}
-        <div className="mt-5 rounded-lg bg-zinc-50 p-4">
-          <div className="flex items-baseline justify-between gap-3">
-            <div>
-              <div className="text-sm font-semibold text-zinc-900">
-                Stabilité corporelle (Prévention)
-              </div>
-              <div className="mt-0.5 text-xs text-zinc-500">
-                Optional injury-prevention block. ~25 s per body part.
-              </div>
-            </div>
-            <span className="rounded-full bg-white px-2.5 py-0.5 text-xs font-medium text-zinc-600 shadow-sm ring-1 ring-zinc-200">
-              25″ / rep
-            </span>
-          </div>
-          <div className="mt-3 flex flex-col gap-2.5">
-            {preventionRows.map(({ key, label, en }) => (
-              <div
-                key={key}
-                className="grid grid-cols-1 gap-2 md:grid-cols-[140px_1fr_1fr] md:items-start"
-              >
-                <div className="pt-1.5 text-sm font-semibold text-zinc-800">
-                  {label}
-                  <span className="ml-1 text-xs font-normal text-zinc-500">
-                    ({en})
-                  </span>
-                </div>
-                <textarea
-                  rows={2}
-                  value={data.initial.phase1.prevention[key].description}
-                  onChange={(e) =>
-                    setPrevention(key, "description", e.target.value)
-                  }
-                  placeholder="Description"
-                  className={inputClass("resize-none")}
-                />
-                <textarea
-                  rows={2}
-                  value={data.initial.phase1.prevention[key].coaching}
-                  onChange={(e) =>
-                    setPrevention(key, "coaching", e.target.value)
-                  }
-                  placeholder="Coaching cue"
-                  className={inputClass("resize-none")}
-                />
-              </div>
-            ))}
-          </div>
-        </div>
-      </SubCard>
-
-      <SubCard
-        title="Phase 2 — Échauffement (TE/TA/PE)"
-        hint="Technical / tactical / physical warmup that builds toward the main session."
-      >
-        <div>
-          <FieldLabel
-            title="Schéma sur le terrain"
-            hint="Pose les joueurs, ballon et plots — clique-glisse pour tracer une course, une passe ou une conduite."
-          />
-          <SchemaEditor
-            value={data.initial.phase2.schema}
-            onChange={(v) => setPhase2("schema", v)}
-          />
-        </div>
-        <div className="mt-5 grid grid-cols-1 gap-4 md:grid-cols-2">
-          <div>
-            <FieldLabel title="Description" hint="What players do" />
-            <FitTextarea
-              rows={5}
-              maxChars={420}
-              area={{
-                w: Z_INITIAL.phase2Description.w,
-                h: Z_INITIAL.phase2Description.h,
-              }}
-              value={data.initial.phase2.description}
-              onChange={(v) => setPhase2("description", v)}
-              placeholder="e.g., Rondo 4v2 in 8 m square, two-touch limit. 3 × 4 min."
-            />
-          </div>
-          <div>
-            <FieldLabel
-              title="Organisation / Coaching"
-              hint="Setup + cues"
-            />
-            <FitTextarea
-              rows={5}
-              maxChars={420}
-              area={{
-                w: Z_INITIAL.phase2Coaching.w,
-                h: Z_INITIAL.phase2Coaching.h,
-              }}
-              value={data.initial.phase2.coaching}
-              onChange={(v) => setPhase2("coaching", v)}
-              placeholder="e.g., Defenders rotate after winning the ball. Cue: scan before receiving."
-            />
-          </div>
-        </div>
-      </SubCard>
-
-      <SubCard
-        title="Phase 3 — Explosivité"
-        hint="Short bursts. Sprints, jumps, change of direction."
-      >
-        <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-          <div>
-            <FieldLabel title="Description" />
-            <textarea
-              rows={5}
-              value={data.initial.phase3.description}
-              onChange={(e) =>
-                setInitial("phase3", {
-                  ...data.initial.phase3,
-                  description: e.target.value,
-                })
-              }
-              placeholder="e.g., 4 × 10 m sprint with change of direction at the cone, 30 s rest. 3 sets."
-              className={inputClass("resize-none")}
-            />
-          </div>
-          <div>
-            <FieldLabel title="Organisation / Coaching" />
-            <textarea
-              rows={5}
-              value={data.initial.phase3.coaching}
-              onChange={(e) =>
-                setInitial("phase3", {
-                  ...data.initial.phase3,
-                  coaching: e.target.value,
-                })
-              }
-              placeholder="e.g., Full intensity. Walk back recovery. Stay low through the change of direction."
-              className={inputClass("resize-none")}
-            />
-          </div>
-        </div>
-      </SubCard>
-    </div>
-  );
-}
-
-/* ----- Section: Main exercise ------------------------------- */
-
-type MainZones = {
-  duration: Box;
-  schema: Box;
-  description: Box;
-  coaching: Box;
-  organisation: Box;
-  variations: Box;
-  playForm: Box;
-  exercise: Box;
-};
-
-function MainExerciseSection({
-  slot,
-  stepLabel,
-  data,
-  patch,
-  zones,
-}: {
-  slot: 0 | 1;
-  stepLabel: string;
-  data: PreparationData;
-  patch: (updater: (d: PreparationData) => PreparationData) => void;
-  zones: MainZones;
-}) {
-  const exercise = data.main[slot];
-
-  function setExercise<K extends keyof PreparationData["main"][number]>(
-    key: K,
-    value: PreparationData["main"][number][K],
-  ) {
-    patch((d) => ({
-      ...d,
-      main: d.main.map((m, i) =>
-        i === slot ? { ...m, [key]: value } : m,
-      ) as PreparationData["main"],
-    }));
-  }
-
-  const typeOptions = [
-    { value: "playForm" as const, label: "Forme jouée", en: "Play form" },
-    { value: "exercise" as const, label: "Exercice", en: "Exercise" },
-  ];
-
-  return (
-    <div className="flex flex-col gap-6">
-      <StepHeader
-        eyebrow={stepLabel}
-        title={`Main block ${slot + 1}`}
-        description="Forme jouée or exercice — your central training block."
-        durationField={
-          <DurationField
-            value={exercise.duration}
-            onChange={(v) => setExercise("duration", v)}
-            placeholder="20 min"
-          />
-        }
-      />
-
-      <SubCard
-        title="Type"
-        hint="Forme jouée = game-like situation. Exercice = analytic drill."
-      >
-        <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
-          {typeOptions.map(({ value, label, en }) => {
-            const active = exercise.type === value;
-            return (
-              <label
-                key={value}
-                className={`flex cursor-pointer items-start gap-3 rounded-lg border px-4 py-3 text-sm transition ${
-                  active
-                    ? "border-zinc-900 bg-zinc-900/[0.03] text-zinc-900 shadow-sm"
-                    : "border-zinc-200 bg-white text-zinc-700 hover:border-zinc-300 hover:bg-zinc-50"
-                }`}
-              >
-                <span
-                  className={`mt-0.5 flex h-4 w-4 shrink-0 items-center justify-center rounded-full border ${
-                    active
-                      ? "border-zinc-900"
-                      : "border-zinc-300"
-                  }`}
-                >
-                  <span
-                    className={`h-2 w-2 rounded-full transition ${
-                      active ? "bg-zinc-900" : "bg-transparent"
-                    }`}
-                  />
-                </span>
-                <input
-                  type="radio"
-                  name={`main-${slot}-type`}
-                  className="sr-only"
-                  checked={active}
-                  onChange={() => setExercise("type", value)}
-                />
-                <span className="min-w-0">
-                  <span className="block font-medium leading-snug">{label}</span>
-                  <span className="mt-0.5 block text-xs text-zinc-500">{en}</span>
-                </span>
-              </label>
-            );
-          })}
-        </div>
-      </SubCard>
-
-      <SubCard
-        title="Schéma sur le terrain"
-        hint="Terrain complet — pose les joueurs, ballon et plots, puis trace courses, passes et conduites."
-      >
-        <SchemaEditor
-          pitch="full-vertical"
-          value={exercise.schema}
-          onChange={(v) => setExercise("schema", v)}
-        />
-      </SubCard>
-
-      <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-        <SubCard title="Description" hint="What players do">
-          <FitTextarea
-            rows={6}
-            maxChars={520}
-            area={{ w: zones.description.w, h: zones.description.h }}
-            value={exercise.description}
-            onChange={(v) => setExercise("description", v)}
-            placeholder="e.g., Build-up exercise: GK + back four + #6 vs 3 high-pressing strikers. Score by playing through the half-line gate."
-          />
-        </SubCard>
-        <SubCard title="Coaching" hint="Cues and corrections">
-          <FitTextarea
-            rows={6}
-            maxChars={520}
-            area={{ w: zones.coaching.w, h: zones.coaching.h }}
-            value={exercise.coaching}
-            onChange={(v) => setExercise("coaching", v)}
-            placeholder="e.g., Trigger = back-pass to GK. Cue body shape on first touch. Reward forward passes through the gate."
-          />
-        </SubCard>
-      </div>
-
-      <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-        <SubCard title="Organisation" hint="Setup, dimensions, equipment.">
-          <FitTextarea
-            rows={4}
-            maxChars={300}
-            area={{ w: zones.organisation.w, h: zones.organisation.h }}
-            value={exercise.organisation}
-            onChange={(v) => setExercise("organisation", v)}
-            placeholder="e.g., Half-pitch. 3 yellow gates on the half-line. 3 mannequins as outlet markers behind."
-          />
-        </SubCard>
-        <SubCard title="Variations" hint="Make it harder (+) or easier (−).">
-          <FitTextarea
-            rows={4}
-            maxChars={300}
-            area={{ w: zones.variations.w, h: zones.variations.h }}
-            value={exercise.variations}
-            onChange={(v) => setExercise("variations", v)}
-            placeholder="e.g., + add a #10 between the lines. − reduce gate count to 2; longer rest."
-          />
-        </SubCard>
-      </div>
-    </div>
-  );
-}
-
-/* ----- Section: Final game / End ---------------------------- */
-
-function EndSection({
-  data,
-  patch,
-}: {
-  data: PreparationData;
-  patch: (updater: (d: PreparationData) => PreparationData) => void;
-}) {
-  function setGame<K extends keyof PreparationData["game"]>(
-    key: K,
-    value: PreparationData["game"][K],
-  ) {
-    patch((d) => ({ ...d, game: { ...d.game, [key]: value } }));
-  }
-  function setEnd<K extends keyof PreparationData["end"]>(
-    key: K,
-    value: PreparationData["end"][K],
-  ) {
-    patch((d) => ({ ...d, end: { ...d.end, [key]: value } }));
-  }
-
-  return (
-    <div className="flex flex-col gap-6">
-      <StepHeader
-        eyebrow="Step 5 of 5"
-        title="Final game & wrap-up"
-        description="Match-style game, cool-down and a short post-session reflection."
-      />
-
-      <SubCard
-        title="Jeu final"
-        hint="Free or themed match — apply what was worked on."
-      >
-        <div className="mb-4 flex flex-wrap items-center justify-end gap-2">
-          <DurationField
-            value={data.game.duration}
-            onChange={(v) => setGame("duration", v)}
-            placeholder="15 min"
-          />
-        </div>
-        <div>
-          <FieldLabel
-            title="Schéma sur le terrain"
-            hint="Terrain complet horizontal — pose les équipes et trace le scénario."
-          />
-          <SchemaEditor
-            pitch="full-horizontal"
-            value={data.game.schema}
-            onChange={(v) => setGame("schema", v)}
-          />
-        </div>
-        <div className="mt-5">
-          <FieldLabel
-            title="Notes"
-            hint="Format, contraintes, points de coaching."
-          />
-          <FitTextarea
-            rows={4}
-            maxChars={360}
-            area={{ w: Z_END.gameNotes.w, h: Z_END.gameNotes.h }}
-            value={data.game.notes}
-            onChange={(v) => setGame("notes", v)}
-            placeholder="e.g., 11v11 free play on full pitch. Last 15 minutes. Normal rules."
-          />
-        </div>
-      </SubCard>
-
-      <SubCard
-        title="Fin de séance"
-        hint="Cooldown, breathing, quick verbal debrief."
-      >
-        <div className="mb-4 flex flex-wrap items-center justify-end gap-2">
-          <DurationField
-            value={data.end.duration}
-            onChange={(v) => setEnd("duration", v)}
-            placeholder="5 min"
-          />
-        </div>
-        <FieldLabel title="Notes" />
-        <FitTextarea
-          rows={3}
-          maxChars={360}
-          area={{ w: Z_END.endNotes.w, h: Z_END.endNotes.h }}
-          value={data.end.notes}
-          onChange={(v) => setEnd("notes", v)}
-          placeholder="e.g., Walk to center circle. 60s breathing. Quick verbal debrief."
-        />
-      </SubCard>
-
-      <SubCard
-        title="Réflexion"
-        hint="Personal notes after the session — what worked, what didn't."
-      >
-        <FitTextarea
-          rows={3}
-          maxChars={360}
-          area={{ w: Z_END.reflection.w, h: Z_END.reflection.h }}
-          value={data.reflection}
-          onChange={(v) => patch((d) => ({ ...d, reflection: v }))}
-          placeholder="What worked, what didn't, who needs more individual work next week."
-        />
-      </SubCard>
-    </div>
-  );
-}
-
-/* ----- Step: Review ----------------------------------------- */
-
-function ReviewRow({ label, value }: { label: string; value: string }) {
-  const empty = !value || value.trim() === "";
-  return (
-    <div className="flex items-baseline justify-between gap-4 border-b border-zinc-100 py-2.5 last:border-b-0">
-      <div className="text-xs font-medium uppercase tracking-wider text-zinc-500">
-        {label}
-      </div>
-      <div
-        className={`max-w-[60%] truncate text-right text-sm ${
-          empty ? "text-zinc-400" : "text-zinc-900"
-        }`}
-      >
-        {empty ? "—" : value}
-      </div>
-    </div>
-  );
-}
-
-function ReviewSection({
-  title,
-  status,
-  onEdit,
-  children,
-}: {
-  title: string;
-  status: SectionStatus;
-  onEdit: () => void;
-  children: ReactNode;
-}) {
-  return (
-    <div className="rounded-xl border border-zinc-200 bg-white shadow-sm">
-      <div className="flex items-center justify-between border-b border-zinc-100 px-5 py-3">
-        <div className="flex items-center gap-3">
-          <StatusBadge status={status} />
-          <div className="text-sm font-semibold text-zinc-900">{title}</div>
-        </div>
-        <button
-          type="button"
-          onClick={onEdit}
-          className="text-xs font-medium text-zinc-600 underline-offset-2 hover:text-zinc-900 hover:underline"
-        >
-          Edit
-        </button>
-      </div>
-      <div className="px-5 py-2">{children}</div>
-    </div>
-  );
-}
-
-function StatusBadge({ status }: { status: SectionStatus }) {
-  if (status === "complete") {
-    return (
-      <span className="flex h-6 w-6 items-center justify-center rounded-full bg-emerald-500 text-white">
-        <Check className="h-3.5 w-3.5" strokeWidth={3} />
-      </span>
-    );
-  }
-  if (status === "partial") {
-    return (
-      <span className="flex h-6 w-6 items-center justify-center rounded-full bg-amber-500/15 text-amber-700 ring-1 ring-amber-500/30">
-        <span className="h-1.5 w-1.5 rounded-full bg-amber-500" />
-      </span>
-    );
-  }
-  return (
-    <span className="flex h-6 w-6 items-center justify-center rounded-full bg-zinc-100 text-zinc-400 ring-1 ring-zinc-200">
-      <span className="h-1.5 w-1.5 rounded-full bg-zinc-300" />
-    </span>
-  );
-}
-
-function ReviewStep({
-  data,
-  statuses,
-  onJumpTo,
-  onExport,
-}: {
-  data: PreparationData;
-  statuses: SectionStatus[];
-  onJumpTo: (index: number) => void;
-  onExport: () => void;
-}) {
-  const phaseLabels: Array<[keyof PreparationData["phases"], string]> = [
-    ["possession", "Possession"],
-    ["losing", "Losing"],
-    ["noPossession", "Out of possession"],
-    ["recovering", "Recovering"],
-  ];
-  const activePhases = phaseLabels
-    .filter(([k]) => data.phases[k])
-    .map(([, l]) => l)
-    .join(", ");
-
-  return (
-    <div className="flex flex-col gap-6">
-      <StepHeader
-        eyebrow="Final review"
-        title="Review & export"
-        description="Quick check of every section before generating the printed sheet."
-      />
-
-      <div className="rounded-xl border border-zinc-900 bg-zinc-900 p-5 text-white shadow-sm">
-        <div className="flex flex-wrap items-center justify-between gap-4">
-          <div>
-            <div className="flex items-center gap-2 text-xs font-medium uppercase tracking-wider text-zinc-400">
-              <Sparkles className="h-3.5 w-3.5" /> Ready to print
-            </div>
-            <div className="mt-1 text-lg font-semibold">
-              ASF preparation sheet — {data.team || "your team"}
-            </div>
-            <div className="mt-0.5 text-sm text-zinc-300">
-              {data.date || "No date"} · Coach {data.coach || "—"}
-            </div>
-          </div>
-          <Button variant="secondary" onClick={onExport}>
-            <Printer className="h-4 w-4" />
-            Export PDF
-          </Button>
-        </div>
-      </div>
-
-      <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
-        <ReviewSection
-          title="1 · Session brief"
-          status={statuses[0]}
-          onEdit={() => onJumpTo(0)}
-        >
-          <ReviewRow label="Date" value={data.date} />
-          <ReviewRow label="Team" value={data.team} />
-          <ReviewRow label="Coach" value={data.coach} />
-          <ReviewRow label="Game moments" value={activePhases} />
-          <ReviewRow label="Forme caractéristique" value={data.characteristicForm} />
-          <ReviewRow label="Focus" value={data.focus} />
-          <ReviewRow label="Objectifs" value={data.objectives} />
-        </ReviewSection>
-
-        <ReviewSection
-          title="2 · Warm-up & preparation"
-          status={statuses[1]}
-          onEdit={() => onJumpTo(1)}
-        >
-          <ReviewRow label="Durée" value={data.initial.duration} />
-          <ReviewRow label="Phase 1" value={data.initial.phase1.description} />
-          <ReviewRow label="Phase 2" value={data.initial.phase2.description} />
-          <ReviewRow label="Phase 3" value={data.initial.phase3.description} />
-        </ReviewSection>
-
-        <ReviewSection
-          title="3 · Main block 1"
-          status={statuses[2]}
-          onEdit={() => onJumpTo(2)}
-        >
-          <ReviewRow
-            label="Type"
-            value={data.main[0].type === "playForm" ? "Forme jouée" : "Exercice"}
-          />
-          <ReviewRow label="Durée" value={data.main[0].duration} />
-          <ReviewRow label="Description" value={data.main[0].description} />
-        </ReviewSection>
-
-        <ReviewSection
-          title="4 · Main block 2"
-          status={statuses[3]}
-          onEdit={() => onJumpTo(3)}
-        >
-          <ReviewRow
-            label="Type"
-            value={data.main[1].type === "playForm" ? "Forme jouée" : "Exercice"}
-          />
-          <ReviewRow label="Durée" value={data.main[1].duration} />
-          <ReviewRow label="Description" value={data.main[1].description} />
-        </ReviewSection>
-
-        <ReviewSection
-          title="5 · Final game & wrap-up"
-          status={statuses[4]}
-          onEdit={() => onJumpTo(4)}
-        >
-          <ReviewRow label="Game · Durée" value={data.game.duration} />
-          <ReviewRow label="Game · Notes" value={data.game.notes} />
-          <ReviewRow label="End · Durée" value={data.end.duration} />
-          <ReviewRow label="End · Notes" value={data.end.notes} />
-          <ReviewRow label="Réflexion" value={data.reflection} />
-        </ReviewSection>
-      </div>
-    </div>
-  );
-}
-
-/* ============================================================
- * Wizard shell
- * ============================================================ */
+/* ----- Status helpers -------------------------------------- */
 
 type SectionStatus = "empty" | "partial" | "complete";
 
-const STEP_DEFS = [
-  { key: "global", label: "Session brief", icon: Info },
-  { key: "initial", label: "Warm-up & prep", icon: Layers },
-  { key: "main1", label: "Main block 1", icon: Target },
-  { key: "main2", label: "Main block 2", icon: Target },
-  { key: "end", label: "Final game & wrap-up", icon: Trophy },
-  { key: "review", label: "Review & export", icon: Eye },
-] as const;
+function StatusDot({
+  status,
+  dark,
+}: {
+  status: SectionStatus;
+  dark?: boolean;
+}) {
+  const c =
+    status === "complete"
+      ? "#22c55e"
+      : status === "partial"
+        ? "#f59e0b"
+        : dark
+          ? "rgba(255,255,255,0.2)"
+          : "#e5e7eb";
+  return (
+    <span
+      className="block h-[7px] w-[7px] shrink-0 rounded-full"
+      style={{ background: c }}
+    />
+  );
+}
 
 function computeStatuses(data: PreparationData): SectionStatus[] {
   const phasesAny =
@@ -1551,7 +694,11 @@ function computeStatuses(data: PreparationData): SectionStatus[] {
   ];
   const globalFilled = globalFields.filter(Boolean).length;
   const globalStatus: SectionStatus =
-    globalFilled === 0 ? "empty" : globalFilled === globalFields.length ? "complete" : "partial";
+    globalFilled === 0
+      ? "empty"
+      : globalFilled === globalFields.length
+        ? "complete"
+        : "partial";
 
   const initialFields = [
     data.initial.duration.trim(),
@@ -1563,7 +710,11 @@ function computeStatuses(data: PreparationData): SectionStatus[] {
   ];
   const initialFilled = initialFields.filter(Boolean).length;
   const initialStatus: SectionStatus =
-    initialFilled === 0 ? "empty" : initialFilled >= 4 ? "complete" : "partial";
+    initialFilled === 0
+      ? "empty"
+      : initialFilled >= 4
+        ? "complete"
+        : "partial";
 
   function mainStatus(slot: 0 | 1): SectionStatus {
     const m = data.main[slot];
@@ -1590,116 +741,668 @@ function computeStatuses(data: PreparationData): SectionStatus[] {
   return [globalStatus, initialStatus, mainStatus(0), mainStatus(1), endStatus];
 }
 
-function StepperNav({
-  currentIndex,
-  onSelect,
-  statuses,
-}: {
-  currentIndex: number;
-  onSelect: (index: number) => void;
-  statuses: SectionStatus[];
-}) {
-  return (
-    <nav className="flex flex-col gap-1" aria-label="Preparation steps">
-      {STEP_DEFS.map((step, index) => {
-        const Icon = step.icon;
-        const active = index === currentIndex;
-        const isReview = step.key === "review";
-        const status: SectionStatus = isReview ? "empty" : statuses[index];
+/* ============================================================
+ * STEPS
+ * ============================================================ */
 
-        return (
-          <button
-            key={step.key}
-            type="button"
-            onClick={() => onSelect(index)}
-            className={`group flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-left transition ${
-              active
-                ? "bg-zinc-900 text-white shadow-sm"
-                : "text-zinc-700 hover:bg-zinc-100"
-            }`}
-          >
-            <span
-              className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-md text-xs font-semibold tabular-nums ${
-                active
-                  ? "bg-white/15 text-white"
-                  : status === "complete"
-                    ? "bg-emerald-500 text-white"
-                    : status === "partial"
-                      ? "bg-amber-100 text-amber-700"
-                      : "bg-zinc-100 text-zinc-500 group-hover:bg-zinc-200"
-              }`}
-            >
-              {!active && status === "complete" ? (
-                <Check className="h-4 w-4" strokeWidth={3} />
-              ) : (
-                <Icon className="h-3.5 w-3.5" />
-              )}
-            </span>
-            <span className="min-w-0 flex-1">
-              <span
-                className={`block text-[10px] font-medium uppercase tracking-wider ${
-                  active ? "text-zinc-300" : "text-zinc-400"
-                }`}
-              >
-                {isReview ? "Final" : `Step ${index + 1}`}
-              </span>
-              <span className="block truncate text-sm font-medium">
-                {step.label}
-              </span>
-            </span>
-          </button>
-        );
-      })}
-    </nav>
+type Patcher = (updater: (d: PreparationData) => PreparationData) => void;
+
+/* Step 1 — Session brief */
+function Step1({ data, patch }: { data: PreparationData; patch: Patcher }) {
+  const phaseOptions = [
+    { key: "possession" as const, label: "We have the ball", fr: "Mon équipe possède" },
+    { key: "losing" as const, label: "We just lost the ball", fr: "Mon équipe perd" },
+    { key: "noPossession" as const, label: "They have the ball", fr: "Sans possession" },
+    { key: "recovering" as const, label: "We win the ball back", fr: "Récupération" },
+  ];
+
+  return (
+    <div className="flex flex-col gap-3.5">
+      <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
+        <Field label="Date">
+          <input
+            type="date"
+            className={inpClass}
+            value={data.date}
+            onChange={(e) => patch((d) => ({ ...d, date: e.target.value }))}
+          />
+        </Field>
+        <Field label="Équipe" hint="Team">
+          <input
+            className={inpClass}
+            placeholder="U15 Élite"
+            value={data.team}
+            onChange={(e) => patch((d) => ({ ...d, team: e.target.value }))}
+          />
+        </Field>
+        <Field label="Entraîneur" hint="Coach">
+          <input
+            className={inpClass}
+            placeholder="Your name"
+            value={data.coach}
+            onChange={(e) => patch((d) => ({ ...d, coach: e.target.value }))}
+          />
+        </Field>
+      </div>
+
+      <Card
+        icon={<Flag className="h-3.5 w-3.5" strokeWidth={2} />}
+        title="Moments du jeu"
+        hint="Tick the game moment(s) this session is built around"
+      >
+        <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
+          {phaseOptions.map((ph) => (
+            <CheckCard
+              key={ph.key}
+              label={ph.label}
+              hint={ph.fr}
+              checked={data.phases[ph.key]}
+              onChange={(v) =>
+                patch((d) => ({
+                  ...d,
+                  phases: { ...d.phases, [ph.key]: v },
+                }))
+              }
+            />
+          ))}
+        </div>
+      </Card>
+
+      <div className="grid grid-cols-1 gap-3 lg:grid-cols-2">
+        <Field
+          label="Forme caractéristique"
+          hint="The game situation this session is built around"
+          charMax={230}
+          charVal={data.characteristicForm.length}
+        >
+          <textarea
+            rows={3}
+            maxLength={230}
+            className={txtaClass}
+            placeholder="e.g., Build-up from GK under high press"
+            value={data.characteristicForm}
+            onChange={(e) =>
+              patch((d) => ({ ...d, characteristicForm: e.target.value }))
+            }
+          />
+        </Field>
+        <Field
+          label="Focus"
+          hint="TE · TA · PE · AT"
+          charMax={115}
+          charVal={data.focus.length}
+        >
+          <textarea
+            rows={3}
+            maxLength={115}
+            className={txtaClass}
+            placeholder="e.g., TA — pressing triggers"
+            value={data.focus}
+            onChange={(e) => patch((d) => ({ ...d, focus: e.target.value }))}
+          />
+        </Field>
+        <Field
+          label="Objectifs"
+          hint="What players should do by the end"
+          charMax={230}
+          charVal={data.objectives.length}
+        >
+          <textarea
+            rows={3}
+            maxLength={230}
+            className={txtaClass}
+            placeholder="e.g., Recognize press trigger, play forward in 1–2 touches"
+            value={data.objectives}
+            onChange={(e) =>
+              patch((d) => ({ ...d, objectives: e.target.value }))
+            }
+          />
+        </Field>
+        <Field
+          label="Questions de développement"
+          hint="Open questions to spark player reflection"
+        >
+          <textarea
+            rows={3}
+            className={txtaClass}
+            placeholder="e.g., When does the #6 drop between the center backs?"
+            value={data.developmentQuestions}
+            onChange={(e) =>
+              patch((d) => ({ ...d, developmentQuestions: e.target.value }))
+            }
+          />
+        </Field>
+      </div>
+    </div>
   );
 }
 
-function MobileStepBar({
-  currentIndex,
-  onSelect,
-  statuses,
-}: {
-  currentIndex: number;
-  onSelect: (index: number) => void;
-  statuses: SectionStatus[];
-}) {
+/* Step 2 — Warm-up & prep (tabbed phases) */
+function Step2({ data, patch }: { data: PreparationData; patch: Patcher }) {
+  const [tab, setTab] = useState<"p1" | "p2" | "p3">("p1");
+  const pv = data.initial.phase1.prevention;
+  const prevRows = [
+    { k: "ankle" as const, l: "Ankle / Cheville" },
+    { k: "knee" as const, l: "Knee / Genou" },
+    { k: "hip" as const, l: "Hip / Hanche" },
+    { k: "hamstring" as const, l: "Hamstrings" },
+  ];
+  const tabs: Array<["p1" | "p2" | "p3", string]> = [
+    ["p1", "Phase 1 — Warmup"],
+    ["p2", "Phase 2 — TE/TA/PE"],
+    ["p3", "Phase 3 — Explosivité"],
+  ];
+
   return (
-    <div className="lg:hidden">
-      <div className="flex gap-2 overflow-x-auto pb-2">
-        {STEP_DEFS.map((step, index) => {
-          const active = index === currentIndex;
-          const isReview = step.key === "review";
-          const status: SectionStatus = isReview ? "empty" : statuses[index];
-          return (
+    <div className="flex flex-col gap-3.5">
+      <div className="flex flex-wrap items-center gap-3.5">
+        <DurPill
+          value={data.initial.duration}
+          onChange={(v) =>
+            patch((d) => ({ ...d, initial: { ...d.initial, duration: v } }))
+          }
+          placeholder="25 min"
+        />
+        <div className="flex gap-1 rounded-[9px] bg-zinc-100 p-[3px]">
+          {tabs.map(([id, label]) => (
             <button
-              key={step.key}
+              key={id}
               type="button"
-              onClick={() => onSelect(index)}
-              className={`flex shrink-0 items-center gap-2 rounded-full border px-3 py-1.5 text-xs font-medium transition ${
-                active
-                  ? "border-zinc-900 bg-zinc-900 text-white"
-                  : "border-zinc-200 bg-white text-zinc-700 hover:border-zinc-300"
+              onClick={() => setTab(id)}
+              className={`flex h-7 items-center whitespace-nowrap rounded-[7px] px-3 text-[12px] font-medium transition ${
+                tab === id
+                  ? "bg-white text-zinc-900 shadow-[0_1px_3px_rgb(0_0_0/0.1)]"
+                  : "text-zinc-500 hover:text-zinc-700"
               }`}
             >
-              <span
-                className={`flex h-4 w-4 items-center justify-center rounded-full text-[10px] font-semibold ${
-                  active
-                    ? "bg-white/15 text-white"
-                    : status === "complete"
-                      ? "bg-emerald-500 text-white"
-                      : status === "partial"
-                        ? "bg-amber-200 text-amber-800"
-                        : "bg-zinc-100 text-zinc-500"
-                }`}
-              >
-                {!active && status === "complete" ? (
-                  <Check className="h-3 w-3" strokeWidth={3} />
-                ) : (
-                  index + 1
-                )}
-              </span>
-              {isReview ? "Review" : step.label}
+              {label}
             </button>
+          ))}
+        </div>
+      </div>
+
+      {tab === "p1" && (
+        <div className="grid grid-cols-1 gap-3.5 lg:grid-cols-[2fr_3fr]">
+          <Field label="Schéma terrain">
+            <SchemaEditor
+              value={data.initial.phase1.schema}
+              onChange={(v) =>
+                patch((d) => ({
+                  ...d,
+                  initial: {
+                    ...d.initial,
+                    phase1: { ...d.initial.phase1, schema: v },
+                  },
+                }))
+              }
+            />
+          </Field>
+          <div className="flex flex-col gap-2.5">
+            <Field label="Description">
+              <FitTextarea
+                rows={3}
+                maxChars={420}
+                area={{
+                  w: Z_INITIAL.phase1Description.w,
+                  h: Z_INITIAL.phase1Description.h,
+                }}
+                value={data.initial.phase1.description}
+                onChange={(v) =>
+                  patch((d) => ({
+                    ...d,
+                    initial: {
+                      ...d.initial,
+                      phase1: { ...d.initial.phase1, description: v },
+                    },
+                  }))
+                }
+                placeholder="e.g., Pairs jog around half-pitch, ball rolling between them. 4 min."
+              />
+            </Field>
+            <Field label="Coaching">
+              <FitTextarea
+                rows={3}
+                maxChars={420}
+                area={{
+                  w: Z_INITIAL.phase1Coaching.w,
+                  h: Z_INITIAL.phase1Coaching.h,
+                }}
+                value={data.initial.phase1.coaching}
+                onChange={(v) =>
+                  patch((d) => ({
+                    ...d,
+                    initial: {
+                      ...d.initial,
+                      phase1: { ...d.initial.phase1, coaching: v },
+                    },
+                  }))
+                }
+                placeholder="e.g., High-quality first touch, head up before passing."
+              />
+            </Field>
+            <div className="rounded-[10px] border border-zinc-100 bg-zinc-50/80 p-3">
+              <div className="mb-2.5 flex items-center justify-between text-[10px] font-semibold uppercase tracking-[0.08em] text-zinc-400">
+                <span>Prévention — stabilité corporelle</span>
+                <span>25″ / rep</span>
+              </div>
+              <div className="flex flex-col gap-1.5">
+                {prevRows.map(({ k, l }) => (
+                  <div
+                    key={k}
+                    className="grid grid-cols-1 items-start gap-1.5 md:grid-cols-[88px_1fr_1fr]"
+                  >
+                    <div className="pt-2 text-[11px] font-semibold leading-tight text-zinc-700">
+                      {l}
+                    </div>
+                    <textarea
+                      rows={2}
+                      className={txtaClass}
+                      placeholder="Description"
+                      value={pv[k].description}
+                      onChange={(e) =>
+                        patch((d) => ({
+                          ...d,
+                          initial: {
+                            ...d.initial,
+                            phase1: {
+                              ...d.initial.phase1,
+                              prevention: {
+                                ...d.initial.phase1.prevention,
+                                [k]: {
+                                  ...d.initial.phase1.prevention[k],
+                                  description: e.target.value,
+                                },
+                              },
+                            },
+                          },
+                        }))
+                      }
+                    />
+                    <textarea
+                      rows={2}
+                      className={txtaClass}
+                      placeholder="Coaching cue"
+                      value={pv[k].coaching}
+                      onChange={(e) =>
+                        patch((d) => ({
+                          ...d,
+                          initial: {
+                            ...d.initial,
+                            phase1: {
+                              ...d.initial.phase1,
+                              prevention: {
+                                ...d.initial.phase1.prevention,
+                                [k]: {
+                                  ...d.initial.phase1.prevention[k],
+                                  coaching: e.target.value,
+                                },
+                              },
+                            },
+                          },
+                        }))
+                      }
+                    />
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {tab === "p2" && (
+        <div className="grid grid-cols-1 gap-3.5 lg:grid-cols-[2fr_3fr]">
+          <Field label="Schéma terrain">
+            <SchemaEditor
+              value={data.initial.phase2.schema}
+              onChange={(v) =>
+                patch((d) => ({
+                  ...d,
+                  initial: {
+                    ...d.initial,
+                    phase2: { ...d.initial.phase2, schema: v },
+                  },
+                }))
+              }
+            />
+          </Field>
+          <div className="flex flex-col gap-2.5">
+            <Field label="Description">
+              <FitTextarea
+                rows={5}
+                maxChars={420}
+                area={{
+                  w: Z_INITIAL.phase2Description.w,
+                  h: Z_INITIAL.phase2Description.h,
+                }}
+                value={data.initial.phase2.description}
+                onChange={(v) =>
+                  patch((d) => ({
+                    ...d,
+                    initial: {
+                      ...d.initial,
+                      phase2: { ...d.initial.phase2, description: v },
+                    },
+                  }))
+                }
+                placeholder="e.g., Rondo 4v2 in 8m square, two-touch. 3×4 min."
+              />
+            </Field>
+            <Field label="Coaching">
+              <FitTextarea
+                rows={5}
+                maxChars={420}
+                area={{
+                  w: Z_INITIAL.phase2Coaching.w,
+                  h: Z_INITIAL.phase2Coaching.h,
+                }}
+                value={data.initial.phase2.coaching}
+                onChange={(v) =>
+                  patch((d) => ({
+                    ...d,
+                    initial: {
+                      ...d.initial,
+                      phase2: { ...d.initial.phase2, coaching: v },
+                    },
+                  }))
+                }
+                placeholder="e.g., Rotate defenders after winning. Cue: scan before receiving."
+              />
+            </Field>
+          </div>
+        </div>
+      )}
+
+      {tab === "p3" && (
+        <div className="grid grid-cols-1 gap-3 lg:grid-cols-2">
+          <Field label="Description">
+            <textarea
+              rows={7}
+              className={txtaClass}
+              placeholder="e.g., 4×10m sprint with change of direction at cone, 30s rest. 3 sets."
+              value={data.initial.phase3.description}
+              onChange={(e) =>
+                patch((d) => ({
+                  ...d,
+                  initial: {
+                    ...d.initial,
+                    phase3: {
+                      ...d.initial.phase3,
+                      description: e.target.value,
+                    },
+                  },
+                }))
+              }
+            />
+          </Field>
+          <Field label="Coaching">
+            <textarea
+              rows={7}
+              className={txtaClass}
+              placeholder="e.g., Full intensity. Walk back recovery. Stay low through the change of direction."
+              value={data.initial.phase3.coaching}
+              onChange={(e) =>
+                patch((d) => ({
+                  ...d,
+                  initial: {
+                    ...d.initial,
+                    phase3: {
+                      ...d.initial.phase3,
+                      coaching: e.target.value,
+                    },
+                  },
+                }))
+              }
+            />
+          </Field>
+        </div>
+      )}
+    </div>
+  );
+}
+
+type MainZones = {
+  duration: Box;
+  schema: Box;
+  description: Box;
+  coaching: Box;
+  organisation: Box;
+  variations: Box;
+  playForm: Box;
+  exercise: Box;
+};
+
+/* Step 3 / 4 — Main block */
+function StepMain({
+  slot,
+  data,
+  patch,
+  zones,
+}: {
+  slot: 0 | 1;
+  data: PreparationData;
+  patch: Patcher;
+  zones: MainZones;
+}) {
+  const ex = data.main[slot];
+  function upd<K extends keyof PreparationData["main"][number]>(
+    key: K,
+    value: PreparationData["main"][number][K],
+  ) {
+    patch((d) => ({
+      ...d,
+      main: d.main.map((m, i) =>
+        i === slot ? { ...m, [key]: value } : m,
+      ) as PreparationData["main"],
+    }));
+  }
+
+  return (
+    <div className="flex flex-col gap-3.5">
+      <div className="flex flex-wrap items-center gap-3">
+        <DurPill
+          value={ex.duration}
+          onChange={(v) => upd("duration", v)}
+          placeholder="20 min"
+        />
+        <div className="flex flex-1 gap-2">
+          <RadioCard
+            label="Forme jouée"
+            hint="Game-like"
+            active={ex.type === "playForm"}
+            onClick={() => upd("type", "playForm")}
+          />
+          <RadioCard
+            label="Exercice"
+            hint="Analytic drill"
+            active={ex.type === "exercise"}
+            onClick={() => upd("type", "exercise")}
+          />
+        </div>
+      </div>
+      <div className="grid grid-cols-1 gap-3.5 lg:grid-cols-2">
+        <Field label="Schéma terrain">
+          <SchemaEditor
+            pitch="full-vertical"
+            value={ex.schema}
+            onChange={(v) => upd("schema", v)}
+          />
+        </Field>
+        <div className="flex flex-col gap-2.5">
+          <Field label="Description">
+            <FitTextarea
+              rows={4}
+              maxChars={520}
+              area={{ w: zones.description.w, h: zones.description.h }}
+              value={ex.description}
+              onChange={(v) => upd("description", v)}
+              placeholder="e.g., Build-up: GK + back four + #6 vs 3 high-pressing strikers."
+            />
+          </Field>
+          <Field label="Coaching">
+            <FitTextarea
+              rows={3}
+              maxChars={520}
+              area={{ w: zones.coaching.w, h: zones.coaching.h }}
+              value={ex.coaching}
+              onChange={(v) => upd("coaching", v)}
+              placeholder="e.g., Trigger = back-pass to GK. Reward forward passes through the gate."
+            />
+          </Field>
+          <div className="grid grid-cols-1 gap-2 md:grid-cols-2">
+            <Field label="Organisation">
+              <FitTextarea
+                rows={3}
+                maxChars={300}
+                area={{ w: zones.organisation.w, h: zones.organisation.h }}
+                value={ex.organisation}
+                onChange={(v) => upd("organisation", v)}
+                placeholder="e.g., Half-pitch. 3 yellow gates on the half-line."
+              />
+            </Field>
+            <Field label="Variations">
+              <FitTextarea
+                rows={3}
+                maxChars={300}
+                area={{ w: zones.variations.w, h: zones.variations.h }}
+                value={ex.variations}
+                onChange={(v) => upd("variations", v)}
+                placeholder="+ harder  − easier"
+              />
+            </Field>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* Step 5 — Final game & wrap-up */
+function Step5({ data, patch }: { data: PreparationData; patch: Patcher }) {
+  return (
+    <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
+      <div className="flex flex-col gap-3">
+        <div className="flex items-center justify-between">
+          <div className="text-[13px] font-semibold text-zinc-900">
+            Jeu final
+          </div>
+          <DurPill
+            value={data.game.duration}
+            onChange={(v) =>
+              patch((d) => ({ ...d, game: { ...d.game, duration: v } }))
+            }
+            placeholder="15 min"
+          />
+        </div>
+        <Field label="Schéma terrain">
+          <SchemaEditor
+            pitch="full-horizontal"
+            value={data.game.schema}
+            onChange={(v) =>
+              patch((d) => ({ ...d, game: { ...d.game, schema: v } }))
+            }
+          />
+        </Field>
+        <Field label="Notes — format, contraintes, coaching">
+          <FitTextarea
+            rows={4}
+            maxChars={360}
+            area={{ w: Z_END.gameNotes.w, h: Z_END.gameNotes.h }}
+            value={data.game.notes}
+            onChange={(v) =>
+              patch((d) => ({ ...d, game: { ...d.game, notes: v } }))
+            }
+            placeholder="e.g., 11v11 full pitch. Normal rules. Last 15 min."
+          />
+        </Field>
+      </div>
+
+      <div className="flex flex-col gap-3.5">
+        <Card
+          title="Fin de séance"
+          rightAction={
+            <DurPill
+              value={data.end.duration}
+              onChange={(v) =>
+                patch((d) => ({ ...d, end: { ...d.end, duration: v } }))
+              }
+              placeholder="5 min"
+            />
+          }
+        >
+          <Field label="Notes">
+            <FitTextarea
+              rows={4}
+              maxChars={360}
+              area={{ w: Z_END.endNotes.w, h: Z_END.endNotes.h }}
+              value={data.end.notes}
+              onChange={(v) =>
+                patch((d) => ({ ...d, end: { ...d.end, notes: v } }))
+              }
+              placeholder="e.g., Walk to center circle. 60s breathing. Quick verbal debrief."
+            />
+          </Field>
+        </Card>
+        <Card title="Réflexion post-séance">
+          <Field label="Notes personnelles après la séance">
+            <FitTextarea
+              rows={6}
+              maxChars={360}
+              area={{ w: Z_END.reflection.w, h: Z_END.reflection.h }}
+              value={data.reflection}
+              onChange={(v) => patch((d) => ({ ...d, reflection: v }))}
+              placeholder="What worked, what didn't, who needs individual work next week."
+            />
+          </Field>
+        </Card>
+      </div>
+    </div>
+  );
+}
+
+function ReviewCard({
+  title,
+  status,
+  onEdit,
+  rows,
+}: {
+  title: string;
+  status: SectionStatus;
+  onEdit: () => void;
+  rows: Array<[string, string]>;
+}) {
+  return (
+    <div className="overflow-hidden rounded-[12px] border border-zinc-200 bg-white shadow-[0_1px_3px_rgb(0_0_0/0.05)]">
+      <div className="flex items-center justify-between border-b border-zinc-100 bg-zinc-50 px-3.5 py-2.5">
+        <div className="flex items-center gap-2 text-[12px] font-semibold text-zinc-900">
+          <StatusDot status={status} />
+          {title}
+        </div>
+        <button
+          type="button"
+          className="rounded-[6px] px-2.5 py-1 text-[11px] font-medium text-zinc-500 transition hover:bg-zinc-100 hover:text-zinc-900"
+          onClick={onEdit}
+        >
+          Edit
+        </button>
+      </div>
+      <div className="px-3.5 py-1">
+        {rows.map(([k, v], i) => {
+          const empty = !v || !v.trim();
+          return (
+            <div
+              key={i}
+              className="flex items-baseline justify-between gap-2.5 border-b border-zinc-50 py-1.5 last:border-b-0"
+            >
+              <span className="shrink-0 whitespace-nowrap text-[10px] font-medium uppercase tracking-[0.06em] text-zinc-400">
+                {k}
+              </span>
+              <span
+                className={`max-w-[58%] truncate text-right text-[12px] ${empty ? "text-zinc-300" : "text-zinc-900"}`}
+              >
+                {empty ? "—" : v}
+              </span>
+            </div>
           );
         })}
       </div>
@@ -1707,30 +1410,157 @@ function MobileStepBar({
   );
 }
 
-function ProgressBar({ statuses }: { statuses: SectionStatus[] }) {
-  const score = statuses.reduce(
-    (s, st) => s + (st === "complete" ? 1 : st === "partial" ? 0.5 : 0),
-    0,
-  );
-  const pct = Math.round((score / statuses.length) * 100);
+/* Step 6 — Review & export */
+function Step6({
+  data,
+  statuses,
+  onJumpTo,
+  onExport,
+}: {
+  data: PreparationData;
+  statuses: SectionStatus[];
+  onJumpTo: (i: number) => void;
+  onExport: () => void;
+}) {
+  const phaseLabels: Array<[keyof PreparationData["phases"], string]> = [
+    ["possession", "Possession"],
+    ["losing", "Losing"],
+    ["noPossession", "No possession"],
+    ["recovering", "Recovering"],
+  ];
+  const activePhases = phaseLabels
+    .filter(([k]) => data.phases[k])
+    .map(([, l]) => l)
+    .join(", ");
+
   return (
-    <div className="flex items-center gap-3">
-      <div className="relative h-1.5 w-32 overflow-hidden rounded-full bg-zinc-200">
-        <div
-          className="absolute inset-y-0 left-0 rounded-full bg-emerald-500 transition-all duration-500"
-          style={{ width: `${pct}%` }}
+    <div className="flex flex-col gap-3.5">
+      <div className="flex flex-wrap items-center justify-between gap-3 rounded-[12px] bg-gradient-to-br from-[#0c0c0d] to-zinc-800 p-5 shadow-[0_4px_24px_rgb(0_0_0/0.18)]">
+        <div>
+          <div className="mb-0.5 text-[9px] font-semibold uppercase tracking-[0.1em] text-white/40">
+            Ready to print
+          </div>
+          <div className="text-[15px] font-semibold text-white">
+            {data.team || "Your team"} — Preparation sheet
+          </div>
+          <div className="mt-0.5 text-[12px] text-white/50">
+            {data.date || "No date"} · Coach {data.coach || "—"}
+          </div>
+        </div>
+        <button
+          type="button"
+          onClick={onExport}
+          className="inline-flex h-9 items-center gap-1.5 rounded-[9px] border border-zinc-200 bg-white px-4 text-[13px] font-medium text-zinc-900 shadow-[0_1px_2px_rgb(0_0_0/0.05)] transition hover:bg-zinc-50 active:scale-[0.98]"
+        >
+          <Printer className="h-3.5 w-3.5" strokeWidth={2} />
+          Export PDF
+        </button>
+      </div>
+      <div className="grid grid-cols-1 gap-2.5 lg:grid-cols-2">
+        <ReviewCard
+          title="1 · Session brief"
+          status={statuses[0]}
+          onEdit={() => onJumpTo(0)}
+          rows={[
+            ["Date", data.date],
+            ["Team", data.team],
+            ["Coach", data.coach],
+            ["Game moments", activePhases],
+            ["Forme", data.characteristicForm],
+            ["Objectifs", data.objectives],
+          ]}
+        />
+        <ReviewCard
+          title="2 · Warm-up & prep"
+          status={statuses[1]}
+          onEdit={() => onJumpTo(1)}
+          rows={[
+            ["Duration", data.initial.duration],
+            ["Phase 1", data.initial.phase1.description],
+            ["Phase 2", data.initial.phase2.description],
+            ["Phase 3", data.initial.phase3.description],
+          ]}
+        />
+        <ReviewCard
+          title="3 · Main block 1"
+          status={statuses[2]}
+          onEdit={() => onJumpTo(2)}
+          rows={[
+            [
+              "Type",
+              data.main[0].type === "playForm" ? "Forme jouée" : "Exercice",
+            ],
+            ["Duration", data.main[0].duration],
+            ["Description", data.main[0].description],
+            ["Organisation", data.main[0].organisation],
+          ]}
+        />
+        <ReviewCard
+          title="4 · Main block 2"
+          status={statuses[3]}
+          onEdit={() => onJumpTo(3)}
+          rows={[
+            [
+              "Type",
+              data.main[1].type === "playForm" ? "Forme jouée" : "Exercice",
+            ],
+            ["Duration", data.main[1].duration],
+            ["Description", data.main[1].description],
+            ["Organisation", data.main[1].organisation],
+          ]}
+        />
+        <ReviewCard
+          title="5 · Final game & wrap-up"
+          status={statuses[4]}
+          onEdit={() => onJumpTo(4)}
+          rows={[
+            ["Game duration", data.game.duration],
+            ["Game notes", data.game.notes],
+            ["End duration", data.end.duration],
+            ["Reflection", data.reflection],
+          ]}
         />
       </div>
-      <span className="text-xs font-medium tabular-nums text-zinc-600">
-        {pct}% complete
-      </span>
     </div>
   );
 }
 
 /* ============================================================
- * Container
+ * APP SHELL
  * ============================================================ */
+
+const STEPS = [
+  {
+    label: "Session brief",
+    eyebrow: "Step 1 of 5",
+    desc: "Set the date, team and game moment(s) this session is built around.",
+  },
+  {
+    label: "Warm-up & prep",
+    eyebrow: "Step 2 of 5",
+    desc: "Mobility, technical / tactical warmup, then a short explosive block.",
+  },
+  {
+    label: "Main block 1",
+    eyebrow: "Step 3 of 5",
+    desc: "Your first central training block — forme jouée or exercise.",
+  },
+  {
+    label: "Main block 2",
+    eyebrow: "Step 4 of 5",
+    desc: "Second central training block.",
+  },
+  {
+    label: "Final game & wrap-up",
+    eyebrow: "Step 5 of 5",
+    desc: "Match-style game, cool-down and post-session reflection.",
+  },
+  {
+    label: "Review & export",
+    eyebrow: "Final review",
+    desc: "Check each section, then export the official ASF preparation sheet.",
+  },
+] as const;
 
 export function PreparationSheet({
   teamId,
@@ -1743,16 +1573,22 @@ export function PreparationSheet({
 }) {
   const [data, setData] = useState<PreparationData>(initial);
   const [error, setError] = useState<string | null>(null);
-  const [savedAt, setSavedAt] = useState<string | null>(null);
+  const [justSaved, setJustSaved] = useState(false);
   const [dirty, setDirty] = useState(false);
   const [isPending, startTransition] = useTransition();
-  const [stepIndex, setStepIndex] = useState(0);
+  const [step, setStep] = useState(0);
+  const [stepKey, setStepKey] = useState(0);
   const locale = useLocale();
+  const router = useRouter();
 
-  function patch(updater: (d: PreparationData) => PreparationData) {
+  const patch = useCallback<Patcher>((updater) => {
     setDirty(true);
     setData(updater);
-  }
+  }, []);
+
+  const statuses = useMemo(() => computeStatuses(data), [data]);
+  const completeCount = statuses.filter((s) => s === "complete").length;
+  const pct = Math.round((completeCount / 5) * 100);
 
   function save() {
     setError(null);
@@ -1765,18 +1601,22 @@ export function PreparationSheet({
       });
       if (result?.error) setError(result.error);
       else {
-        setSavedAt(new Date().toLocaleTimeString());
         setDirty(false);
+        setJustSaved(true);
       }
     });
   }
 
+  useEffect(() => {
+    if (!justSaved) return;
+    const t = setTimeout(() => setJustSaved(false), 2000);
+    return () => clearTimeout(t);
+  }, [justSaved]);
+
   function loadExample() {
     if (
       dirty &&
-      !confirm(
-        "This will replace the current sheet with an example. Continue?",
-      )
+      !confirm("This will replace the current sheet with an example. Continue?")
     ) {
       return;
     }
@@ -1787,200 +1627,278 @@ export function PreparationSheet({
     if (typeof window !== "undefined") window.print();
   }
 
-  const statuses = useMemo(() => computeStatuses(data), [data]);
-  const isReview = stepIndex === STEP_DEFS.length - 1;
-
-  function goPrev() {
-    setStepIndex((i) => Math.max(0, i - 1));
-    if (typeof window !== "undefined") window.scrollTo({ top: 0, behavior: "smooth" });
+  function goTo(i: number) {
+    setStep(i);
+    setStepKey((k) => k + 1);
   }
 
-  function goNext() {
-    setStepIndex((i) => Math.min(STEP_DEFS.length - 1, i + 1));
-    if (typeof window !== "undefined") window.scrollTo({ top: 0, behavior: "smooth" });
-  }
-
-  function jumpTo(i: number) {
-    setStepIndex(i);
-    if (typeof window !== "undefined") window.scrollTo({ top: 0, behavior: "smooth" });
-  }
-
-  let stepBody: ReactNode;
-  switch (stepIndex) {
-    case 0:
-      stepBody = <GlobalSection data={data} patch={patch} />;
-      break;
-    case 1:
-      stepBody = <InitialSection data={data} patch={patch} />;
-      break;
-    case 2:
-      stepBody = (
-        <MainExerciseSection
-          slot={0}
-          stepLabel="Step 3 of 5"
-          data={data}
-          patch={patch}
-          zones={Z_MAIN_1}
-        />
-      );
-      break;
-    case 3:
-      stepBody = (
-        <MainExerciseSection
-          slot={1}
-          stepLabel="Step 4 of 5"
-          data={data}
-          patch={patch}
-          zones={Z_MAIN_2}
-        />
-      );
-      break;
-    case 4:
-      stepBody = <EndSection data={data} patch={patch} />;
-      break;
-    default:
-      stepBody = (
-        <ReviewStep
-          data={data}
-          statuses={statuses}
-          onJumpTo={jumpTo}
-          onExport={handlePrint}
-        />
-      );
-  }
-
-  const statusLine = dirty
-    ? savedAt
-      ? `Unsaved changes · last saved ${savedAt}`
-      : "Unsaved changes"
-    : savedAt
-      ? `All changes saved at ${savedAt}`
-      : "Not saved yet";
+  const stepBody: ReactNode = (() => {
+    switch (step) {
+      case 0:
+        return <Step1 data={data} patch={patch} />;
+      case 1:
+        return <Step2 data={data} patch={patch} />;
+      case 2:
+        return <StepMain slot={0} data={data} patch={patch} zones={Z_MAIN_1} />;
+      case 3:
+        return <StepMain slot={1} data={data} patch={patch} zones={Z_MAIN_2} />;
+      case 4:
+        return <Step5 data={data} patch={patch} />;
+      default:
+        return (
+          <Step6
+            data={data}
+            statuses={statuses}
+            onJumpTo={goTo}
+            onExport={handlePrint}
+          />
+        );
+    }
+  })();
 
   return (
     <>
-      <div className="prep-no-print">
-        {/* Sticky toolbar */}
-        <div className="sticky top-0 z-20 -mx-4 mb-6 border-b border-zinc-200 bg-white/80 px-4 py-3 backdrop-blur-md md:-mx-6 md:px-6">
-          <div className="flex flex-wrap items-center justify-between gap-3">
-            <div className="flex flex-wrap items-center gap-4">
-              <div className="flex items-center gap-2">
-                <span
-                  className={`h-2 w-2 rounded-full ${
-                    dirty
-                      ? "bg-amber-500"
-                      : savedAt
-                        ? "bg-emerald-500"
-                        : "bg-zinc-300"
-                  }`}
-                />
-                <span className="text-sm text-zinc-600">{statusLine}</span>
+      <div className="prep-no-print fixed inset-0 z-50 flex flex-col overflow-hidden bg-[#0c0c0d] text-zinc-900">
+        {/* Topbar */}
+        <header className="relative z-10 flex h-[52px] flex-shrink-0 items-center justify-between border-b border-white/10 bg-[#0c0c0d]/90 px-5 backdrop-blur-md">
+          <div className="flex min-w-0 items-center gap-2.5">
+            <button
+              type="button"
+              onClick={() => router.back()}
+              className="flex items-center gap-1 border-0 bg-transparent text-[12px] text-white/40 transition hover:text-white/80"
+            >
+              <ChevronLeft className="h-3.5 w-3.5" strokeWidth={2} />
+              Back
+            </button>
+            <span className="mx-3 h-[18px] w-px bg-white/10" />
+            <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-[7px] bg-white text-[14px] font-bold text-[#0c0c0d] shadow-[0_0_0_1px_rgb(255_255_255/0.15)]">
+              G
+            </div>
+            <div className="min-w-0 leading-none">
+              <div className="text-[13px] font-semibold text-white">
+                Training preparation
               </div>
-              <div className="hidden md:block">
-                <ProgressBar statuses={statuses} />
+              <div className="mt-0.5 truncate text-[10px] text-white/35">
+                {data.team || "No team set"} · {data.date || "No date"}
               </div>
             </div>
-            <div className="flex flex-wrap gap-2">
-              <Button variant="ghost" size="sm" onClick={loadExample}>
-                <FileText className="h-4 w-4" />
-                Load example
-              </Button>
-              <Button variant="secondary" size="sm" onClick={handlePrint}>
-                <Printer className="h-4 w-4" />
-                Export PDF
-              </Button>
-              <Button size="sm" disabled={isPending} onClick={save}>
-                <Save className="h-4 w-4" />
-                {isPending ? "Saving…" : "Save"}
-              </Button>
-            </div>
           </div>
-          <div className="mt-3 md:hidden">
-            <ProgressBar statuses={statuses} />
-          </div>
-        </div>
-
-        {error && (
-          <div className="mb-4 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
-            {error}
-          </div>
-        )}
-
-        {/* Mobile stepper */}
-        <div className="mb-4 lg:hidden">
-          <MobileStepBar
-            currentIndex={stepIndex}
-            onSelect={jumpTo}
-            statuses={statuses}
-          />
-        </div>
-
-        <div className="flex flex-col gap-6 lg:flex-row lg:items-start lg:gap-8">
-          {/* Sidebar stepper (desktop) */}
-          <aside className="hidden w-72 shrink-0 lg:block">
-            <div className="sticky top-24">
-              <div className="rounded-xl border border-zinc-200 bg-white p-3 shadow-sm">
-                <div className="px-2 pb-2 pt-1">
-                  <div className="flex items-center gap-2 text-xs font-medium uppercase tracking-wider text-zinc-500">
-                    <ClipboardList className="h-3.5 w-3.5" />
-                    Preparation flow
-                  </div>
-                </div>
-                <StepperNav
-                  currentIndex={stepIndex}
-                  onSelect={jumpTo}
-                  statuses={statuses}
+          <div className="flex items-center gap-2">
+            <div className="mr-1 flex items-center gap-2 rounded-lg bg-white/[0.06] px-3 py-[5px]">
+              <div className="h-[3px] w-20 overflow-hidden rounded-full bg-white/10">
+                <div
+                  className="h-full rounded-full bg-white transition-all duration-500 ease-[cubic-bezier(0.4,0,0.2,1)]"
+                  style={{ width: `${pct}%` }}
                 />
               </div>
-              <div className="mt-3 rounded-xl border border-zinc-200 bg-zinc-50 p-3 text-xs leading-relaxed text-zinc-600">
-                Fill out each step. When you click <strong>Export PDF</strong>,
-                your text is laid into the official ASF preparation sheet —
-                layout, labels and pitches stay fixed.
+              <span className="text-[11px] font-semibold text-white/50">
+                {pct}%
+              </span>
+            </div>
+            <button
+              type="button"
+              onClick={loadExample}
+              className="hidden h-8 items-center gap-1.5 rounded-[8px] px-3 text-[12px] font-medium text-white/60 transition hover:bg-white/5 hover:text-white sm:inline-flex"
+              title="Load example data"
+            >
+              <FileText className="h-3.5 w-3.5" strokeWidth={2} />
+              Example
+            </button>
+            <button
+              type="button"
+              onClick={save}
+              disabled={isPending}
+              className="inline-flex h-8 min-w-[88px] items-center justify-center gap-1.5 rounded-[8px] border border-zinc-200 bg-white px-3 text-[12px] font-medium text-zinc-900 shadow-[0_1px_2px_rgb(0_0_0/0.05)] transition hover:bg-zinc-50 active:scale-[0.98] disabled:opacity-60"
+            >
+              {isPending ? (
+                <>
+                  <Loader2
+                    className="h-3 w-3 animate-spin"
+                    strokeWidth={2.5}
+                  />
+                  Saving…
+                </>
+              ) : justSaved ? (
+                <>
+                  <Check
+                    className="h-3 w-3 text-emerald-500"
+                    strokeWidth={2.5}
+                  />
+                  Saved
+                </>
+              ) : (
+                <>
+                  <Save className="h-3 w-3" strokeWidth={2} />
+                  Save
+                </>
+              )}
+            </button>
+          </div>
+        </header>
+
+        {/* Shell */}
+        <div className="flex min-h-0 flex-1 overflow-hidden">
+          {/* Sidebar */}
+          <aside className="hidden w-[232px] shrink-0 flex-col overflow-hidden border-r border-white/[0.06] bg-[#111113] md:flex">
+            <div className="px-4 pb-2 pt-4 text-[9px] font-semibold uppercase tracking-[0.1em] text-white/25">
+              Preparation steps
+            </div>
+            <nav className="flex flex-1 flex-col gap-0.5 overflow-y-auto px-2 pb-2">
+              {STEPS.map((s, i) => {
+                const st: SectionStatus | null = i < 5 ? statuses[i] : null;
+                const isActive = step === i;
+                const numCls = isActive
+                  ? "bg-white text-[#111]"
+                  : st === "complete"
+                    ? "bg-emerald-500/10 text-emerald-500"
+                    : st === "partial"
+                      ? "bg-amber-500/10 text-amber-500"
+                      : "bg-white/[0.06] text-white/30";
+                return (
+                  <button
+                    key={i}
+                    type="button"
+                    onClick={() => goTo(i)}
+                    className={`relative flex w-full items-center gap-2.5 rounded-[9px] px-2.5 py-2 text-left transition ${
+                      isActive
+                        ? "bg-white/[0.09]"
+                        : "hover:bg-white/[0.05]"
+                    }`}
+                  >
+                    {isActive && (
+                      <span className="absolute left-0 top-1/2 h-5 w-[3px] -translate-y-1/2 rounded-r-[3px] bg-white" />
+                    )}
+                    <span
+                      className={`flex h-[26px] w-[26px] shrink-0 items-center justify-center rounded-[7px] text-[11px] font-semibold transition ${numCls}`}
+                    >
+                      {st === "complete" && !isActive ? (
+                        <Check className="h-[11px] w-[11px]" strokeWidth={3} />
+                      ) : (
+                        i + 1
+                      )}
+                    </span>
+                    <span className="min-w-0 flex-1">
+                      <span
+                        className={`block text-[12px] font-medium leading-tight transition ${
+                          isActive
+                            ? "text-white"
+                            : "text-white/50 group-hover:text-white/80"
+                        }`}
+                      >
+                        {s.label}
+                      </span>
+                    </span>
+                    {st && !isActive && <StatusDot status={st} dark />}
+                  </button>
+                );
+              })}
+            </nav>
+            <div className="border-t border-white/[0.06] px-4 py-3.5">
+              <div className="mb-1.5 flex justify-between">
+                <span className="text-[10px] text-white/30">Progress</span>
+                <span className="text-[10px] font-semibold text-white/60">
+                  {pct}%
+                </span>
+              </div>
+              <div className="h-[3px] overflow-hidden rounded-full bg-white/10">
+                <div
+                  className="h-full rounded-full bg-gradient-to-r from-white to-white/70 transition-all duration-500 ease-[cubic-bezier(0.4,0,0.2,1)]"
+                  style={{ width: `${pct}%` }}
+                />
               </div>
             </div>
           </aside>
 
-          {/* Step content */}
-          <div className="min-w-0 flex-1">
+          {/* Content panel */}
+          <section className="flex min-w-0 flex-1 flex-col overflow-hidden bg-[#f8f8f9]">
+            {/* Mobile step pills */}
+            <div className="flex shrink-0 gap-1.5 overflow-x-auto border-b border-zinc-200 bg-white px-4 py-2.5 md:hidden">
+              {STEPS.map((s, i) => {
+                const isActive = step === i;
+                const st: SectionStatus | null = i < 5 ? statuses[i] : null;
+                return (
+                  <button
+                    key={i}
+                    type="button"
+                    onClick={() => goTo(i)}
+                    className={`flex shrink-0 items-center gap-1.5 rounded-full border px-3 py-1 text-[11px] font-medium transition ${
+                      isActive
+                        ? "border-zinc-900 bg-zinc-900 text-white"
+                        : "border-zinc-200 bg-white text-zinc-700"
+                    }`}
+                  >
+                    <span
+                      className={`flex h-4 w-4 items-center justify-center rounded-full text-[9px] font-semibold ${
+                        isActive
+                          ? "bg-white/20 text-white"
+                          : st === "complete"
+                            ? "bg-emerald-500 text-white"
+                            : st === "partial"
+                              ? "bg-amber-200 text-amber-800"
+                              : "bg-zinc-100 text-zinc-500"
+                      }`}
+                    >
+                      {!isActive && st === "complete" ? (
+                        <Check className="h-2.5 w-2.5" strokeWidth={3} />
+                      ) : (
+                        i + 1
+                      )}
+                    </span>
+                    {s.label}
+                  </button>
+                );
+              })}
+            </div>
+
+            {/* Step header */}
+            <div className="flex shrink-0 items-start justify-between gap-4 border-b border-zinc-200 bg-white px-7 py-4">
+              <div className="min-w-0">
+                <div className="mb-1 text-[10px] font-semibold uppercase tracking-[0.1em] text-zinc-400">
+                  {STEPS[step].eyebrow}
+                </div>
+                <h2 className="text-[22px] font-semibold leading-tight tracking-[-0.02em] text-[#0c0c0d]">
+                  {STEPS[step].label}
+                </h2>
+                <p className="mt-1 text-[13px] text-zinc-500">
+                  {STEPS[step].desc}
+                </p>
+              </div>
+              <div className="flex shrink-0 items-center gap-2 pt-1">
+                <button
+                  type="button"
+                  onClick={() => goTo(Math.max(0, step - 1))}
+                  disabled={step === 0}
+                  className="inline-flex h-8 items-center gap-1.5 rounded-[9px] border border-zinc-200 bg-white px-3 text-[12px] font-medium text-zinc-900 shadow-[0_1px_2px_rgb(0_0_0/0.05)] transition hover:bg-zinc-50 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-40"
+                >
+                  <ChevronLeft className="h-3.5 w-3.5" strokeWidth={2} />
+                  Prev
+                </button>
+                <button
+                  type="button"
+                  onClick={() => goTo(Math.min(STEPS.length - 1, step + 1))}
+                  disabled={step === STEPS.length - 1}
+                  className="inline-flex h-8 items-center gap-1.5 rounded-[9px] bg-[#0c0c0d] px-3 text-[12px] font-medium text-white shadow-[0_1px_3px_rgb(0_0_0/0.15)] transition hover:bg-[#1a1a1d] active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-40"
+                >
+                  Next
+                  <ChevronRight className="h-3.5 w-3.5" strokeWidth={2} />
+                </button>
+              </div>
+            </div>
+
+            {error && (
+              <div className="shrink-0 border-b border-red-200 bg-red-50 px-7 py-2.5 text-[12px] text-red-700">
+                {error}
+              </div>
+            )}
+
+            {/* Step body */}
             <div
-              key={stepIndex}
-              className="rounded-2xl border border-zinc-200 bg-white p-6 shadow-sm motion-safe:animate-[prep-step-in_180ms_ease-out] sm:p-8"
+              key={stepKey}
+              className="min-h-0 flex-1 overflow-y-auto overflow-x-hidden px-7 py-5 motion-safe:animate-[prep-step-in_250ms_cubic-bezier(0.4,0,0.2,1)]"
             >
               {stepBody}
             </div>
-
-            {/* Step footer */}
-            <div className="mt-6 flex flex-wrap items-center justify-between gap-3">
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={goPrev}
-                disabled={stepIndex === 0}
-              >
-                <ArrowLeft className="h-4 w-4" />
-                Previous
-              </Button>
-              <div className="flex items-center gap-2">
-                {!isReview ? (
-                  <Button size="sm" onClick={goNext}>
-                    Next
-                    <ArrowRight className="h-4 w-4" />
-                  </Button>
-                ) : (
-                  <>
-                    <Button variant="ghost" size="sm" disabled={isPending} onClick={save}>
-                      <Save className="h-4 w-4" />
-                      {isPending ? "Saving…" : "Save draft"}
-                    </Button>
-                    <Button size="sm" onClick={handlePrint}>
-                      <Printer className="h-4 w-4" />
-                      Generate PDF
-                    </Button>
-                  </>
-                )}
-              </div>
-            </div>
-          </div>
+          </section>
         </div>
       </div>
 
