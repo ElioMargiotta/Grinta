@@ -1,5 +1,30 @@
 export type PreventionRow = { description: string; coaching: string };
 
+export type SchemaShape =
+  | {
+      id: string;
+      kind: "player";
+      team: "home" | "away" | "gk";
+      label?: string;
+      x: number;
+      y: number;
+    }
+  | { id: string; kind: "ball"; x: number; y: number }
+  | { id: string; kind: "cone"; x: number; y: number }
+  | {
+      id: string;
+      kind: "arrow";
+      style: "run" | "pass" | "dribble";
+      x1: number;
+      y1: number;
+      x2: number;
+      y2: number;
+    };
+
+export type SchemaData = { shapes: SchemaShape[] };
+
+export const emptySchema: SchemaData = { shapes: [] };
+
 export type PreparationData = {
   date: string;
   team: string;
@@ -19,6 +44,7 @@ export type PreparationData = {
     phase1: {
       description: string;
       coaching: string;
+      schema: SchemaData;
       prevention: {
         ankle: PreventionRow;
         knee: PreventionRow;
@@ -26,7 +52,7 @@ export type PreparationData = {
         hamstring: PreventionRow;
       };
     };
-    phase2: { description: string; coaching: string };
+    phase2: { description: string; coaching: string; schema: SchemaData };
     phase3: { description: string; coaching: string };
   };
   main: Array<{
@@ -36,8 +62,9 @@ export type PreparationData = {
     coaching: string;
     organisation: string;
     variations: string;
+    schema: SchemaData;
   }>;
-  game: { duration: string; notes: string };
+  game: { duration: string; notes: string; schema: SchemaData };
   end: { duration: string; notes: string };
   reflection: string;
 };
@@ -64,6 +91,7 @@ export function makeEmptyPreparation(): PreparationData {
       phase1: {
         description: "",
         coaching: "",
+        schema: { shapes: [] },
         prevention: {
           ankle: { ...emptyPrevention },
           knee: { ...emptyPrevention },
@@ -71,7 +99,7 @@ export function makeEmptyPreparation(): PreparationData {
           hamstring: { ...emptyPrevention },
         },
       },
-      phase2: { description: "", coaching: "" },
+      phase2: { description: "", coaching: "", schema: { shapes: [] } },
       phase3: { description: "", coaching: "" },
     },
     main: [
@@ -82,6 +110,7 @@ export function makeEmptyPreparation(): PreparationData {
         coaching: "",
         organisation: "",
         variations: "",
+        schema: { shapes: [] },
       },
       {
         type: "exercise",
@@ -90,9 +119,10 @@ export function makeEmptyPreparation(): PreparationData {
         coaching: "",
         organisation: "",
         variations: "",
+        schema: { shapes: [] },
       },
     ],
-    game: { duration: "", notes: "" },
+    game: { duration: "", notes: "", schema: { shapes: [] } },
     end: { duration: "", notes: "" },
     reflection: "",
   };
@@ -113,19 +143,46 @@ export function mergePreparation(
       phase1: {
         ...base.initial.phase1,
         ...(saved.initial?.phase1 ?? {}),
+        schema:
+          saved.initial?.phase1?.schema &&
+          Array.isArray(saved.initial.phase1.schema.shapes)
+            ? saved.initial.phase1.schema
+            : base.initial.phase1.schema,
         prevention: {
           ...base.initial.phase1.prevention,
           ...(saved.initial?.phase1?.prevention ?? {}),
         },
       },
-      phase2: { ...base.initial.phase2, ...(saved.initial?.phase2 ?? {}) },
+      phase2: {
+        ...base.initial.phase2,
+        ...(saved.initial?.phase2 ?? {}),
+        schema:
+          saved.initial?.phase2?.schema &&
+          Array.isArray(saved.initial.phase2.schema.shapes)
+            ? saved.initial.phase2.schema
+            : base.initial.phase2.schema,
+      },
       phase3: { ...base.initial.phase3, ...(saved.initial?.phase3 ?? {}) },
     },
     main:
       saved.main && saved.main.length === 2
-        ? (saved.main as PreparationData["main"])
+        ? (saved.main.map((m, i) => ({
+            ...base.main[i],
+            ...m,
+            schema:
+              m.schema && Array.isArray(m.schema.shapes)
+                ? m.schema
+                : base.main[i].schema,
+          })) as PreparationData["main"])
         : base.main,
-    game: { ...base.game, ...(saved.game ?? {}) },
+    game: {
+      ...base.game,
+      ...(saved.game ?? {}),
+      schema:
+        saved.game?.schema && Array.isArray(saved.game.schema.shapes)
+          ? saved.game.schema
+          : base.game.schema,
+    },
     end: { ...base.end, ...(saved.end ?? {}) },
   };
 }
