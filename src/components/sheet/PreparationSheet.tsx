@@ -1,6 +1,7 @@
 "use client";
 
 import {
+  BookOpen,
   Check,
   ChevronLeft,
   ChevronRight,
@@ -9,6 +10,7 @@ import {
   Loader2,
   Printer,
   Save,
+  X,
 } from "lucide-react";
 import { useLocale } from "next-intl";
 import Image from "next/image";
@@ -26,8 +28,18 @@ import {
 } from "react";
 import { savePreparationAction } from "@/app/[locale]/(app)/planner/[teamId]/sessions/[sessionId]/preparation/actions";
 import { exampleSheet } from "./example";
+import {
+  ExerciseLibraryPicker,
+  buildMainBlockFromLibrary,
+  type LibraryExercise,
+} from "./ExerciseLibraryPicker";
 import { SchemaEditor, SchemaView } from "./SchemaEditor";
-import { type PreparationData, type SchemaData } from "./types";
+import {
+  FOCUS_FAMILIES,
+  type FocusFamily,
+  type PreparationData,
+  type SchemaData,
+} from "./types";
 
 /* ============================================================
  * PDF EXPORT VIEW   ⚠️  DO NOT MODIFY  ⚠️
@@ -72,6 +84,37 @@ function ExportSchema({ data, area }: { data: SchemaData; area: Box }) {
       <SchemaView data={data} />
     </div>
   );
+}
+
+function ExportImage({ src, area }: { src: string; area: Box }) {
+  return (
+    <div
+      style={box(area)}
+      className="pointer-events-none flex items-center justify-center overflow-hidden"
+    >
+      {/* Plain <img> so the printed PDF embeds the bitmap directly without
+       * Next/Image's runtime layout (which doesn't run in the print view). */}
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img
+        src={src}
+        alt=""
+        className="h-full w-full object-contain"
+      />
+    </div>
+  );
+}
+
+function ExportMainSchema({
+  imageUrl,
+  schema,
+  area,
+}: {
+  imageUrl: string | undefined;
+  schema: SchemaData;
+  area: Box;
+}) {
+  if (imageUrl) return <ExportImage src={imageUrl} area={area} />;
+  return <ExportSchema data={schema} area={area} />;
 }
 
 function ExportCheck({ checked, area }: { checked: boolean; area: Box }) {
@@ -301,7 +344,11 @@ function PdfExport({ data }: { data: PreparationData }) {
           area={Z_MAIN_1.exercise}
         />
         <ExportText value={data.main[0].duration} area={Z_MAIN_1.duration} />
-        <ExportSchema data={data.main[0].schema} area={Z_MAIN_1.schema} />
+        <ExportMainSchema
+          imageUrl={data.main[0].imageUrl}
+          schema={data.main[0].schema}
+          area={Z_MAIN_1.schema}
+        />
         <ExportText
           value={data.main[0].description}
           area={Z_MAIN_1.description}
@@ -326,7 +373,11 @@ function PdfExport({ data }: { data: PreparationData }) {
           area={Z_MAIN_2.exercise}
         />
         <ExportText value={data.main[1].duration} area={Z_MAIN_2.duration} />
-        <ExportSchema data={data.main[1].schema} area={Z_MAIN_2.schema} />
+        <ExportMainSchema
+          imageUrl={data.main[1].imageUrl}
+          schema={data.main[1].schema}
+          area={Z_MAIN_2.schema}
+        />
         <ExportText
           value={data.main[1].description}
           area={Z_MAIN_2.description}
@@ -504,6 +555,50 @@ function RadioCard({
         )}
       </span>
     </button>
+  );
+}
+
+const FOCUS_FAMILY_LABELS: Record<FocusFamily, string> = {
+  TE: "Technique",
+  TA: "Tactique",
+  PE: "Forme physique",
+  AT: "Mentalité",
+};
+
+function FocusFamilyChips({
+  value,
+  onChange,
+}: {
+  value: FocusFamily[];
+  onChange: (next: FocusFamily[]) => void;
+}) {
+  function toggle(f: FocusFamily) {
+    if (value.includes(f)) onChange(value.filter((x) => x !== f));
+    else onChange([...value, f]);
+  }
+  return (
+    <div className="flex flex-wrap gap-1.5">
+      {FOCUS_FAMILIES.map((f) => {
+        const active = value.includes(f);
+        return (
+          <button
+            key={f}
+            type="button"
+            onClick={() => toggle(f)}
+            className={`inline-flex items-center gap-1.5 rounded-full border-[1.5px] px-2.5 py-1 text-[11px] font-medium transition ${
+              active
+                ? "border-zinc-900 bg-zinc-900 text-white"
+                : "border-zinc-200 bg-white text-zinc-700 hover:border-zinc-300"
+            }`}
+          >
+            <span className="font-mono text-[10px] tabular-nums opacity-70">
+              {f}
+            </span>
+            <span>{FOCUS_FAMILY_LABELS[f]}</span>
+          </button>
+        );
+      })}
+    </div>
   );
 }
 
@@ -828,18 +923,24 @@ function Step1({ data, patch }: { data: PreparationData; patch: Patcher }) {
         </Field>
         <Field
           label="Focus"
-          hint="TE · TA · PE · AT"
+          hint="Select coaching families · note details below"
           charMax={115}
           charVal={data.focus.length}
         >
-          <textarea
-            rows={3}
-            maxLength={115}
-            className={txtaClass}
-            placeholder="e.g., TA — pressing triggers"
-            value={data.focus}
-            onChange={(e) => patch((d) => ({ ...d, focus: e.target.value }))}
-          />
+          <div className="flex flex-col gap-2">
+            <FocusFamilyChips
+              value={data.focusFamilies}
+              onChange={(v) => patch((d) => ({ ...d, focusFamilies: v }))}
+            />
+            <textarea
+              rows={2}
+              maxLength={115}
+              className={txtaClass}
+              placeholder="e.g., TA — pressing triggers"
+              value={data.focus}
+              onChange={(e) => patch((d) => ({ ...d, focus: e.target.value }))}
+            />
+          </div>
         </Field>
         <Field
           label="Objectifs"
@@ -1178,12 +1279,15 @@ function StepMain({
   data,
   patch,
   zones,
+  library,
 }: {
   slot: 0 | 1;
   data: PreparationData;
   patch: Patcher;
   zones: MainZones;
+  library: LibraryExercise[];
 }) {
+  const [pickerOpen, setPickerOpen] = useState(false);
   const ex = data.main[slot];
   function upd<K extends keyof PreparationData["main"][number]>(
     key: K,
@@ -1193,6 +1297,38 @@ function StepMain({
       ...d,
       main: d.main.map((m, i) =>
         i === slot ? { ...m, [key]: value } : m,
+      ) as PreparationData["main"],
+    }));
+  }
+
+  function importFromLibrary(picked: LibraryExercise) {
+    const fill = buildMainBlockFromLibrary(picked, data.focusFamilies);
+    patch((d) => ({
+      ...d,
+      main: d.main.map((m, i) =>
+        i === slot
+          ? {
+              ...m,
+              type: "exercise",
+              duration: fill.duration || m.duration,
+              description: fill.description,
+              coaching: fill.coaching,
+              organisation: fill.organisation,
+              variations: fill.variations,
+              exerciseId: fill.exerciseId,
+              imageUrl: fill.imageUrl,
+            }
+          : m,
+      ) as PreparationData["main"],
+    }));
+    setPickerOpen(false);
+  }
+
+  function clearImport() {
+    patch((d) => ({
+      ...d,
+      main: d.main.map((m, i) =>
+        i === slot ? { ...m, exerciseId: undefined, imageUrl: undefined } : m,
       ) as PreparationData["main"],
     }));
   }
@@ -1219,14 +1355,45 @@ function StepMain({
             onClick={() => upd("type", "exercise")}
           />
         </div>
+        <button
+          type="button"
+          onClick={() => setPickerOpen(true)}
+          className="inline-flex items-center gap-1.5 rounded-[10px] border-[1.5px] border-zinc-900 bg-zinc-900 px-3 py-2 text-[12px] font-medium text-white transition hover:bg-zinc-800"
+        >
+          <BookOpen className="h-3.5 w-3.5" strokeWidth={2} />
+          Importer depuis bibliothèque
+        </button>
       </div>
       <div className="grid grid-cols-1 gap-3.5 lg:grid-cols-2">
         <Field label="Schéma terrain">
-          <SchemaEditor
-            pitch="full-vertical"
-            value={ex.schema}
-            onChange={(v) => upd("schema", v)}
-          />
+          {ex.imageUrl ? (
+            <div className="relative overflow-hidden rounded-[10px] border-[1.5px] border-zinc-200 bg-zinc-100">
+              <div className="relative aspect-[4/3] w-full">
+                <Image
+                  src={ex.imageUrl}
+                  alt="Imported exercise diagram"
+                  fill
+                  sizes="(max-width: 1024px) 100vw, 50vw"
+                  className="object-contain"
+                />
+              </div>
+              <button
+                type="button"
+                onClick={clearImport}
+                className="absolute right-2 top-2 inline-flex items-center gap-1 rounded-md bg-white/95 px-2 py-1 text-[11px] font-medium text-zinc-700 shadow-sm ring-1 ring-zinc-200 transition hover:bg-white hover:text-zinc-900"
+                title="Retirer l'image et revenir au schéma éditable"
+              >
+                <X className="h-3 w-3" strokeWidth={2.5} />
+                Retirer l&apos;image
+              </button>
+            </div>
+          ) : (
+            <SchemaEditor
+              pitch="full-vertical"
+              value={ex.schema}
+              onChange={(v) => upd("schema", v)}
+            />
+          )}
         </Field>
         <div className="flex flex-col gap-2.5">
           <Field label="Description">
@@ -1273,6 +1440,14 @@ function StepMain({
           </div>
         </div>
       </div>
+      <ExerciseLibraryPicker
+        open={pickerOpen}
+        onClose={() => setPickerOpen(false)}
+        exercises={library}
+        phases={data.phases}
+        focusFamilies={data.focusFamilies}
+        onPick={importFromLibrary}
+      />
     </div>
   );
 }
@@ -1566,10 +1741,12 @@ export function PreparationSheet({
   teamId,
   sessionId,
   initial,
+  libraryExercises,
 }: {
   teamId: string;
   sessionId: string;
   initial: PreparationData;
+  libraryExercises: LibraryExercise[];
 }) {
   const [data, setData] = useState<PreparationData>(initial);
   const [error, setError] = useState<string | null>(null);
@@ -1639,9 +1816,25 @@ export function PreparationSheet({
       case 1:
         return <Step2 data={data} patch={patch} />;
       case 2:
-        return <StepMain slot={0} data={data} patch={patch} zones={Z_MAIN_1} />;
+        return (
+          <StepMain
+            slot={0}
+            data={data}
+            patch={patch}
+            zones={Z_MAIN_1}
+            library={libraryExercises}
+          />
+        );
       case 3:
-        return <StepMain slot={1} data={data} patch={patch} zones={Z_MAIN_2} />;
+        return (
+          <StepMain
+            slot={1}
+            data={data}
+            patch={patch}
+            zones={Z_MAIN_2}
+            library={libraryExercises}
+          />
+        );
       case 4:
         return <Step5 data={data} patch={patch} />;
       default:

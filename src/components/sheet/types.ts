@@ -11,10 +11,19 @@ export type SchemaShape =
     }
   | { id: string; kind: "ball"; x: number; y: number }
   | { id: string; kind: "cone"; x: number; y: number }
+  | { id: string; kind: "goal"; orientation: "h" | "v"; x: number; y: number }
+  | {
+      id: string;
+      kind: "line";
+      x1: number;
+      y1: number;
+      x2: number;
+      y2: number;
+    }
   | {
       id: string;
       kind: "arrow";
-      style: "run" | "pass" | "dribble";
+      style: "run" | "pass" | "dribble" | "long-ball";
       x1: number;
       y1: number;
       x2: number;
@@ -24,6 +33,9 @@ export type SchemaShape =
 export type SchemaData = { shapes: SchemaShape[] };
 
 export const emptySchema: SchemaData = { shapes: [] };
+
+export type FocusFamily = "TE" | "TA" | "PE" | "AT";
+export const FOCUS_FAMILIES: FocusFamily[] = ["TE", "TA", "PE", "AT"];
 
 export type PreparationData = {
   date: string;
@@ -35,6 +47,10 @@ export type PreparationData = {
     noPossession: boolean;
     recovering: boolean;
   };
+  /** Coaching focus families targeted by this session — drives library
+   * filtering and which family's coaching points get pre-filled in the
+   * imported main blocks. */
+  focusFamilies: FocusFamily[];
   characteristicForm: string;
   focus: string;
   objectives: string;
@@ -63,6 +79,11 @@ export type PreparationData = {
     organisation: string;
     variations: string;
     schema: SchemaData;
+    /** When the user imports an exercise from the library, we keep its id
+     * (so we can re-link to the source) and its main_image (rendered in
+     * the schema slot, including in the PDF export). */
+    exerciseId?: string;
+    imageUrl?: string;
   }>;
   game: { duration: string; notes: string; schema: SchemaData };
   end: { duration: string; notes: string };
@@ -82,6 +103,7 @@ export function makeEmptyPreparation(): PreparationData {
       noPossession: false,
       recovering: false,
     },
+    focusFamilies: [],
     characteristicForm: "",
     focus: "",
     objectives: "",
@@ -137,6 +159,11 @@ export function mergePreparation(
     ...base,
     ...saved,
     phases: { ...base.phases, ...(saved.phases ?? {}) },
+    focusFamilies: Array.isArray(saved.focusFamilies)
+      ? (saved.focusFamilies.filter((f) =>
+          FOCUS_FAMILIES.includes(f as FocusFamily),
+        ) as FocusFamily[])
+      : base.focusFamilies,
     initial: {
       ...base.initial,
       ...(saved.initial ?? {}),
