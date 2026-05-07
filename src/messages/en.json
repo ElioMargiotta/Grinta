@@ -102,10 +102,134 @@
     "pickTeam": "Pick a team to plan",
     "noTeams": "Create a team first.",
     "view": {
-      "year": "Year",
-      "month": "Month",
+      "tour": "Season overview",
+      "weekly": "Weekly"
+    },
+    "setup": {
+      "title": "Set up your season",
+      "subtitle": "Anchor your macrocycle to real dates so weeks number correctly (-3, -2, -1, +1, +2…).",
+      "name": "Tour name",
+      "preseasonStart": "Preseason start",
+      "preseasonStartHint": "First Monday of week -N (snapped to Monday).",
+      "firstMatch": "First match",
+      "firstMatchHint": "Week containing this date becomes week +1.",
+      "endDate": "End date",
+      "endDateHint": "Last week of the macrocycle.",
+      "mesocycles": "Mesocycles",
+      "mesoName": "Name",
+      "mesoKind": "Kind",
+      "mesoWeeks": "Weeks",
+      "kind": {
+        "preparation": "Preparation",
+        "competition": "Competition",
+        "transition": "Transition",
+        "custom": "Custom"
+      },
+      "addMesocycle": "Add mesocycle",
+      "remove": "Remove",
+      "customMesoName": "New mesocycle",
+      "totalWeeksPending": "Pick dates to see total weeks.",
+      "totalWeeksCount": "{sum} of {total} weeks assigned",
+      "create": "Create season",
+      "creating": "Creating…",
+      "err": {
+        "nameRequired": "Tour name is required.",
+        "datesRequired": "All three dates are required.",
+        "invalidDates": "End date must be after preseason start.",
+        "weekMismatch": "Mesocycle weeks ({sum}) must equal total weeks ({total})."
+      }
+    },
+    "tour": {
+      "firstMatch": "first match",
+      "edit": "Edit",
+      "close": "Close",
+      "delete": "Delete tour",
+      "confirmDelete": "Delete this tour? All its weeks will be removed.",
+      "weeksCount": "{n} weeks",
+      "setTheme": "Set theme",
+      "season": "Season",
+      "seasonUnset": "No season set",
+      "newTour": "New tour",
+      "addCycle": "Add cycle",
+      "addCycleSubmit": "Add",
+      "adding": "Adding…",
+      "cycleName": "Cycle name",
+      "cycleKind": "Kind",
+      "cycleWeeks": "Weeks",
+      "removeCycle": "Remove last cycle",
+      "confirmRemoveCycle": "Remove this cycle? Its weeks and any sessions attached to them will be detached.",
+      "weekCountInvalid": "Weeks must be between 1 and 26.",
+      "mesoKind": {
+        "preparation": "Preparation",
+        "competition": "Competition",
+        "transition": "Transition",
+        "custom": "Custom"
+      }
+    },
+    "edit": {
+      "endDateHint": "Same total weeks required — to add or remove weeks, use Cycle view (coming soon).",
+      "mesoCountHint": "Adding or removing mesocycles is coming in Cycle view. For now you can only rename, recolor, and re-type them.",
+      "save": "Save changes",
+      "saving": "Saving…",
+      "cancel": "Cancel"
+    },
+    "theme": {
+      "quickFill": "Quick fill",
+      "format": "Format",
+      "notes": "Notes",
+      "notesPlaceholder": "Optional notes for this week…",
+      "clear": "Clear",
+      "save": "Save",
+      "saving": "Saving…",
+      "option": {
+        "possede_ballon": "We have the ball",
+        "ne_possede_pas": "We don't have the ball",
+        "recupere": "We recover the ball",
+        "perd": "We lose the ball",
+        "recupere_perd": "We recover and lose the ball",
+        "decharge": "Discharge",
+        "jeux_polysport": "Games + Polysport"
+      },
+      "formatOption": {
+        "1v1_2v2": "1v1 → 2v2",
+        "3v3_5v5": "3v3 → 5v5"
+      }
+    },
+    "weeks": {
       "week": "Week",
-      "day": "Day"
+      "weekN": "Week {n}",
+      "prev": "Previous",
+      "next": "Next",
+      "today": "Today",
+      "addSession": "Add session",
+      "summary": "Summary",
+      "sessions": "Sessions",
+      "totalTime": "Total time",
+      "avgPerWeek": "Avg / week",
+      "typeDistribution": "Type distribution",
+      "tag": {
+        "current": "Current",
+        "high": "High load",
+        "light": "Light",
+        "normal": "Normal"
+      },
+      "type": {
+        "tactical": "Tactical",
+        "physical": "Physical",
+        "technical": "Technical",
+        "recovery": "Recovery",
+        "setpiece": "Set pieces",
+        "match": "Match"
+      },
+      "day": {
+        "mon": "Mon",
+        "tue": "Tue",
+        "wed": "Wed",
+        "thu": "Thu",
+        "fri": "Fri",
+        "sat": "Sat",
+        "sun": "Sun"
+      }
     },
     "session": {
       "newTitle": "New session",
