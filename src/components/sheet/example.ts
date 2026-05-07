@@ -11,6 +11,7 @@ export function exampleSheet(): PreparationData {
       noPossession: true,
       recovering: false,
     },
+    focusFamilies: ["TA", "TE"],
     characteristicForm:
       "Build-up from the goalkeeper under high opposition press.",
     focus: "TA — pressing triggers and short build-up.",
