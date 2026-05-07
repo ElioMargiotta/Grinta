@@ -8,10 +8,19 @@ export type SchemaShape =
       label?: string;
       x: number;
       y: number;
+      /** Per-shape colour override — falls back to the team colour from settings. */
+      color?: string;
     }
-  | { id: string; kind: "ball"; x: number; y: number }
-  | { id: string; kind: "cone"; x: number; y: number }
-  | { id: string; kind: "goal"; orientation: "h" | "v"; x: number; y: number }
+  | { id: string; kind: "ball"; x: number; y: number; color?: string }
+  | { id: string; kind: "cone"; x: number; y: number; color?: string }
+  | {
+      id: string;
+      kind: "goal";
+      orientation: "h" | "v";
+      x: number;
+      y: number;
+      color?: string;
+    }
   | {
       id: string;
       kind: "line";
@@ -19,6 +28,9 @@ export type SchemaShape =
       y1: number;
       x2: number;
       y2: number;
+      color?: string;
+      /** Per-shape stroke width override (viewBox units). */
+      strokeWidth?: number;
     }
   | {
       id: string;
@@ -28,6 +40,8 @@ export type SchemaShape =
       y1: number;
       x2: number;
       y2: number;
+      color?: string;
+      strokeWidth?: number;
     };
 
 export type SchemaData = { shapes: SchemaShape[] };

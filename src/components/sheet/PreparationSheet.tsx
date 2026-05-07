@@ -78,10 +78,18 @@ function ExportText({ value, area }: { value: string; area: Box }) {
   );
 }
 
-function ExportSchema({ data, area }: { data: SchemaData; area: Box }) {
+function ExportSchema({
+  data,
+  area,
+  settingsKey,
+}: {
+  data: SchemaData;
+  area: Box;
+  settingsKey: "warmup" | "block" | "game";
+}) {
   return (
     <div style={box(area)} className="pointer-events-none overflow-hidden">
-      <SchemaView data={data} />
+      <SchemaView data={data} settingsKey={settingsKey} />
     </div>
   );
 }
@@ -114,7 +122,7 @@ function ExportMainSchema({
   area: Box;
 }) {
   if (imageUrl) return <ExportImage src={imageUrl} area={area} />;
-  return <ExportSchema data={schema} area={area} />;
+  return <ExportSchema data={schema} area={area} settingsKey="block" />;
 }
 
 function ExportCheck({ checked, area }: { checked: boolean; area: Box }) {
@@ -270,6 +278,7 @@ function PdfExport({ data }: { data: PreparationData }) {
         <ExportSchema
           data={data.initial.phase1.schema}
           area={Z_INITIAL.phase1Schema}
+          settingsKey="warmup"
         />
         <ExportText
           value={data.initial.phase1.description}
@@ -314,6 +323,7 @@ function PdfExport({ data }: { data: PreparationData }) {
         <ExportSchema
           data={data.initial.phase2.schema}
           area={Z_INITIAL.phase2Schema}
+          settingsKey="warmup"
         />
         <ExportText
           value={data.initial.phase2.description}
@@ -394,7 +404,11 @@ function PdfExport({ data }: { data: PreparationData }) {
 
         {/* Jeu / Fin / Réflexion */}
         <ExportText value={data.game.duration} area={Z_END.gameDuration} />
-        <ExportSchema data={data.game.schema} area={Z_END.gameSchema} />
+        <ExportSchema
+          data={data.game.schema}
+          area={Z_END.gameSchema}
+          settingsKey="game"
+        />
         <ExportText value={data.game.notes} area={Z_END.gameNotes} />
         <ExportText value={data.end.duration} area={Z_END.endDuration} />
         <ExportText value={data.end.notes} area={Z_END.endNotes} />
@@ -1026,6 +1040,7 @@ function Step2({ data, patch }: { data: PreparationData; patch: Patcher }) {
         <div className="grid grid-cols-1 gap-3.5 lg:grid-cols-[2fr_3fr]">
           <Field label="Schéma terrain">
             <SchemaEditor
+              settingsKey="warmup"
               value={data.initial.phase1.schema}
               onChange={(v) =>
                 patch((d) => ({
@@ -1155,6 +1170,7 @@ function Step2({ data, patch }: { data: PreparationData; patch: Patcher }) {
         <div className="grid grid-cols-1 gap-3.5 lg:grid-cols-[2fr_3fr]">
           <Field label="Schéma terrain">
             <SchemaEditor
+              settingsKey="warmup"
               value={data.initial.phase2.schema}
               onChange={(v) =>
                 patch((d) => ({
@@ -1390,6 +1406,7 @@ function StepMain({
           ) : (
             <SchemaEditor
               pitch="full-vertical"
+              settingsKey="block"
               value={ex.schema}
               onChange={(v) => upd("schema", v)}
             />
@@ -1472,6 +1489,7 @@ function Step5({ data, patch }: { data: PreparationData; patch: Patcher }) {
         <Field label="Schéma terrain">
           <SchemaEditor
             pitch="full-horizontal"
+            settingsKey="game"
             value={data.game.schema}
             onChange={(v) =>
               patch((d) => ({ ...d, game: { ...d.game, schema: v } }))

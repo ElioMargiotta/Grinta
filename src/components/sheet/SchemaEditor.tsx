@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import {
   DEFAULT_SCHEMA_SETTINGS,
   type SchemaSettings,
+  type SchemaSettingsKey,
   useSchemaSettings,
 } from "./schemaSettings";
 import type { SchemaData, SchemaShape } from "./types";
@@ -58,6 +59,13 @@ const CONE_R = 3;
 const GOAL_LONG = 14;
 const GOAL_SHORT = 3;
 
+const SETTINGS_LABELS: Record<SchemaSettingsKey, string> = {
+  warmup: "échauffement",
+  block: "bloc principal",
+  game: "jeu final",
+  default: "schémas",
+};
+
 type Tool =
   | "select"
   | "home"
@@ -82,9 +90,10 @@ function nextLabel(shapes: SchemaShape[], team: "home" | "away") {
   return String(n + 1);
 }
 
-/* Wavy path used for "dribble" arrows. Returns the SVG path data and the
- * tangent direction at the tip (so the arrow head sits flush with the
- * curve instead of pointing along the chord). */
+/* Wave path (used for "dribble" arrows). Goes from (x1,y1) to (x2,y2)
+ * with sinusoidal-like quadratic curves perpendicular to the chord.
+ * Endpoints sit on the chord, so the polygon arrow head meets the wave
+ * cleanly without a kink. */
 function buildWavePath(
   x1: number,
   y1: number,
@@ -95,9 +104,7 @@ function buildWavePath(
   const dx = x2 - x1;
   const dy = y2 - y1;
   const len = Math.hypot(dx, dy);
-  if (len < 0.5) {
-    return { d: `M ${x1} ${y1} L ${x2} ${y2}`, tx: dx, ty: dy, len };
-  }
+  if (len < 0.5) return `M ${x1} ${y1} L ${x2} ${y2}`;
   const ux = dx / len;
   const uy = dy / len;
   const px = -uy;
@@ -105,8 +112,6 @@ function buildWavePath(
   const wavelength = Math.max(6, amp * 4);
   const segments = Math.max(2, Math.round((len / wavelength) * 2));
   let d = `M ${x1.toFixed(2)} ${y1.toFixed(2)}`;
-  let lastCx = x1;
-  let lastCy = y1;
   for (let i = 1; i <= segments; i++) {
     const tCtrl = (i - 0.5) / segments;
     const tEnd = i / segments;
@@ -116,39 +121,69 @@ function buildWavePath(
     const ex = x1 + ux * len * tEnd;
     const ey = y1 + uy * len * tEnd;
     d += ` Q ${cx.toFixed(2)} ${cy.toFixed(2)} ${ex.toFixed(2)} ${ey.toFixed(2)}`;
-    lastCx = cx;
-    lastCy = cy;
   }
-  return { d, tx: x2 - lastCx, ty: y2 - lastCy, len };
+  return d;
 }
 
-/* Curved path used for "long ball" arrows — single quadratic bezier
- * bowing perpendicular to the chord. */
-function buildCurvedPath(
+/* Curved path split before the arrow head. Returns the path data, the
+ * point where the path stops (= arrow base midpoint), and the unit
+ * tangent direction at that point so the polygon head sits flush. */
+function buildSplitCurvedPath(
   x1: number,
   y1: number,
   x2: number,
   y2: number,
   arc: number,
+  headLen: number,
 ) {
   const dx = x2 - x1;
   const dy = y2 - y1;
   const len = Math.hypot(dx, dy);
   if (len < 0.5) {
-    return { d: `M ${x1} ${y1} L ${x2} ${y2}`, tx: dx, ty: dy, len };
+    return {
+      d: `M ${x1} ${y1} L ${x2} ${y2}`,
+      base: { x: x1, y: y1 },
+      tipUx: 1,
+      tipUy: 0,
+    };
   }
   const ux = dx / len;
   const uy = dy / len;
   const px = -uy;
   const py = ux;
   const a = Math.min(len * 0.35, arc);
-  const mx = (x1 + x2) / 2 + px * a;
-  const my = (y1 + y2) / 2 + py * a;
+  const cx = (x1 + x2) / 2 + px * a;
+  const cy = (y1 + y2) / 2 + py * a;
+
+  // Find t such that |B(t) - P2| ≈ headLen via binary search.
+  let lo = 0;
+  let hi = 1;
+  for (let i = 0; i < 18; i++) {
+    const t = (lo + hi) / 2;
+    const u = 1 - t;
+    const bx = u * u * x1 + 2 * u * t * cx + t * t * x2;
+    const by = u * u * y1 + 2 * u * t * cy + t * t * y2;
+    const d = Math.hypot(x2 - bx, y2 - by);
+    if (d > headLen) lo = t;
+    else hi = t;
+  }
+  const t = (lo + hi) / 2;
+  // de Casteljau split at t
+  const ax = x1 + (cx - x1) * t;
+  const ay = y1 + (cy - y1) * t;
+  const bx = cx + (x2 - cx) * t;
+  const by = cy + (y2 - cy) * t;
+  const mx = ax + (bx - ax) * t;
+  const my = ay + (by - ay) * t;
+
+  const tdx = x2 - mx;
+  const tdy = y2 - my;
+  const tlen = Math.hypot(tdx, tdy) || 1;
   return {
-    d: `M ${x1.toFixed(2)} ${y1.toFixed(2)} Q ${mx.toFixed(2)} ${my.toFixed(2)} ${x2.toFixed(2)} ${y2.toFixed(2)}`,
-    tx: x2 - mx,
-    ty: y2 - my,
-    len,
+    d: `M ${x1.toFixed(2)} ${y1.toFixed(2)} Q ${ax.toFixed(2)} ${ay.toFixed(2)} ${mx.toFixed(2)} ${my.toFixed(2)}`,
+    base: { x: mx, y: my },
+    tipUx: tdx / tlen,
+    tipUy: tdy / tlen,
   };
 }
 
@@ -156,11 +191,13 @@ function buildCurvedPath(
 export function SchemaView({
   data,
   pitch = DEFAULT_PITCH,
+  settingsKey = "default",
 }: {
   data: SchemaData;
   pitch?: PitchKind;
+  settingsKey?: SchemaSettingsKey;
 }) {
-  const [settings] = useSchemaSettings();
+  const [settings] = useSchemaSettings(settingsKey);
   const p = PITCHES[pitch];
   return (
     <svg
@@ -191,8 +228,6 @@ function SchemaShapes({
   const coneR = CONE_R * settings.symbolSize;
   const goalLong = GOAL_LONG * settings.symbolSize;
   const goalShort = GOAL_SHORT * settings.symbolSize;
-  const lineW = settings.lineWidth;
-  const arrowW = settings.arrowWidth;
 
   return (
     <>
@@ -203,12 +238,13 @@ function SchemaShapes({
         const ringWidth = selected ? 1.2 : 0.6;
 
         if (s.kind === "player") {
-          const fill =
+          const teamColor =
             s.team === "home"
               ? settings.colors.home
               : s.team === "away"
                 ? settings.colors.away
                 : settings.colors.gk;
+          const fill = s.color ?? teamColor;
           const textColor = s.team === "gk" ? "#111827" : "white";
           return (
             <g
@@ -252,7 +288,7 @@ function SchemaShapes({
                 cx={s.x}
                 cy={s.y}
                 r={ballR}
-                fill={settings.colors.ball}
+                fill={s.color ?? settings.colors.ball}
                 stroke={ringStroke}
                 strokeWidth={selected ? 0.9 : 0.4}
               />
@@ -265,7 +301,7 @@ function SchemaShapes({
             <path
               key={s.id}
               d={tri}
-              fill={settings.colors.cone}
+              fill={s.color ?? settings.colors.cone}
               stroke={selected ? "#0ea5e9" : "#7c2d12"}
               strokeWidth={selected ? 0.9 : 0.4}
               strokeLinejoin="round"
@@ -277,6 +313,7 @@ function SchemaShapes({
         if (s.kind === "goal") {
           const w = s.orientation === "h" ? goalLong : goalShort;
           const h = s.orientation === "h" ? goalShort : goalLong;
+          const stroke = selected ? "#0ea5e9" : (s.color ?? "#111827");
           return (
             <g
               key={s.id}
@@ -289,7 +326,7 @@ function SchemaShapes({
                 width={w}
                 height={h}
                 fill="white"
-                stroke={selected ? "#0ea5e9" : "#111827"}
+                stroke={stroke}
                 strokeWidth={selected ? 0.9 : 0.6}
               />
               {/* Posts: two short ticks at the goal-mouth ends to make the
@@ -301,7 +338,7 @@ function SchemaShapes({
                     y1={s.y - h / 2 - 0.6}
                     x2={s.x - w / 2}
                     y2={s.y - h / 2 + 0.6}
-                    stroke="#111827"
+                    stroke={stroke}
                     strokeWidth={0.8}
                   />
                   <line
@@ -309,7 +346,7 @@ function SchemaShapes({
                     y1={s.y - h / 2 - 0.6}
                     x2={s.x + w / 2}
                     y2={s.y - h / 2 + 0.6}
-                    stroke="#111827"
+                    stroke={stroke}
                     strokeWidth={0.8}
                   />
                 </>
@@ -320,7 +357,7 @@ function SchemaShapes({
                     y1={s.y - h / 2}
                     x2={s.x - w / 2 + 0.6}
                     y2={s.y - h / 2}
-                    stroke="#111827"
+                    stroke={stroke}
                     strokeWidth={0.8}
                   />
                   <line
@@ -328,7 +365,7 @@ function SchemaShapes({
                     y1={s.y + h / 2}
                     x2={s.x - w / 2 + 0.6}
                     y2={s.y + h / 2}
-                    stroke="#111827"
+                    stroke={stroke}
                     strokeWidth={0.8}
                   />
                 </>
@@ -337,7 +374,8 @@ function SchemaShapes({
           );
         }
         if (s.kind === "line") {
-          const color = selected ? "#0ea5e9" : settings.colors.line;
+          const lineW = s.strokeWidth ?? settings.lineWidth;
+          const color = selected ? "#0ea5e9" : (s.color ?? settings.colors.line);
           return (
             <g
               key={s.id}
@@ -367,58 +405,81 @@ function SchemaShapes({
             </g>
           );
         }
+
         // arrow — head drawn as an inline polygon so it survives PDF
         // rasterization (SVG <marker> elements get dropped by some print
-        // pipelines or rendered with the wrong color).
-        const color = selected ? "#0ea5e9" : settings.colors.arrow;
-        const stroke = arrowW;
+        // pipelines or rendered with the wrong color). The line is trimmed
+        // back so the polygon meets the path cleanly at the head base —
+        // straight & wave use chord back-off, curved splits the bezier.
+        const stroke = s.strokeWidth ?? settings.arrowWidth;
+        const arrowColor = s.color ?? settings.colors.arrow;
+        const color = selected ? "#0ea5e9" : arrowColor;
+
+        const dx = s.x2 - s.x1;
+        const dy = s.y2 - s.y1;
+        const chordLen = Math.hypot(dx, dy);
+        const headLen = Math.min(stroke * 3.5, Math.max(chordLen * 0.45, 0));
+        const headHalfW = headLen * 0.5;
+
+        let pathD: string;
+        let baseX: number;
+        let baseY: number;
+        let tipUx: number;
+        let tipUy: number;
+
+        if (chordLen < 0.5) {
+          pathD = `M ${s.x1} ${s.y1} L ${s.x2} ${s.y2}`;
+          baseX = s.x1;
+          baseY = s.y1;
+          tipUx = 1;
+          tipUy = 0;
+        } else {
+          const ux = dx / chordLen;
+          const uy = dy / chordLen;
+          if (s.style === "long-ball") {
+            const split = buildSplitCurvedPath(
+              s.x1,
+              s.y1,
+              s.x2,
+              s.y2,
+              14,
+              headLen,
+            );
+            pathD = split.d;
+            baseX = split.base.x;
+            baseY = split.base.y;
+            tipUx = split.tipUx;
+            tipUy = split.tipUy;
+          } else {
+            baseX = s.x2 - ux * headLen;
+            baseY = s.y2 - uy * headLen;
+            tipUx = ux;
+            tipUy = uy;
+            if (s.style === "dribble") {
+              pathD = buildWavePath(
+                s.x1,
+                s.y1,
+                baseX,
+                baseY,
+                1.6 * settings.symbolSize,
+              );
+            } else {
+              pathD = `M ${s.x1} ${s.y1} L ${baseX.toFixed(2)} ${baseY.toFixed(2)}`;
+            }
+          }
+        }
+
         const dasharray =
           s.style === "pass"
             ? `${(stroke * 2.4).toFixed(2)} ${(stroke * 1.6).toFixed(2)}`
             : undefined;
 
-        let pathD: string;
-        let tx: number;
-        let ty: number;
-        let len: number;
-        if (s.style === "dribble") {
-          const wave = buildWavePath(
-            s.x1,
-            s.y1,
-            s.x2,
-            s.y2,
-            1.6 * settings.symbolSize,
-          );
-          pathD = wave.d;
-          tx = wave.tx;
-          ty = wave.ty;
-          len = wave.len;
-        } else if (s.style === "long-ball") {
-          const c = buildCurvedPath(s.x1, s.y1, s.x2, s.y2, 14);
-          pathD = c.d;
-          tx = c.tx;
-          ty = c.ty;
-          len = c.len;
-        } else {
-          const dx = s.x2 - s.x1;
-          const dy = s.y2 - s.y1;
-          len = Math.hypot(dx, dy);
-          tx = dx;
-          ty = dy;
-          pathD = `M ${s.x1} ${s.y1} L ${s.x2} ${s.y2}`;
-        }
-
-        const tlen = Math.hypot(tx, ty) || 1;
-        const ux = tx / tlen;
-        const uy = ty / tlen;
-        const headLen = stroke * 3.2;
-        const headHalfW = stroke * 1.6;
-        const baseX = s.x2 - headLen * ux;
-        const baseY = s.y2 - headLen * uy;
-        const c1x = baseX + -uy * headHalfW;
-        const c1y = baseY + ux * headHalfW;
-        const c2x = baseX - -uy * headHalfW;
-        const c2y = baseY - ux * headHalfW;
+        const perpX = -tipUy;
+        const perpY = tipUx;
+        const c1x = baseX + perpX * headHalfW;
+        const c1y = baseY + perpY * headHalfW;
+        const c2x = baseX - perpX * headHalfW;
+        const c2y = baseY - perpY * headHalfW;
 
         return (
           <g
@@ -435,9 +496,9 @@ function SchemaShapes({
               strokeLinecap="round"
               strokeLinejoin="round"
             />
-            {len > 0.5 && (
+            {chordLen > 0.5 && headLen > 0 && (
               <polygon
-                points={`${s.x2},${s.y2} ${c1x},${c1y} ${c2x},${c2y}`}
+                points={`${s.x2.toFixed(2)},${s.y2.toFixed(2)} ${c1x.toFixed(2)},${c1y.toFixed(2)} ${c2x.toFixed(2)},${c2y.toFixed(2)}`}
                 fill="currentColor"
                 stroke="currentColor"
                 strokeWidth={stroke * 0.4}
@@ -445,13 +506,24 @@ function SchemaShapes({
               />
             )}
             {editable && (
-              <path
-                d={pathD}
-                fill="none"
-                stroke="transparent"
-                strokeWidth={Math.max(stroke * 5, 4)}
-                strokeLinecap="round"
-              />
+              <>
+                <path
+                  d={pathD}
+                  fill="none"
+                  stroke="transparent"
+                  strokeWidth={Math.max(stroke * 5, 4)}
+                  strokeLinecap="round"
+                />
+                <line
+                  x1={baseX}
+                  y1={baseY}
+                  x2={s.x2}
+                  y2={s.y2}
+                  stroke="transparent"
+                  strokeWidth={Math.max(stroke * 5, 4)}
+                  strokeLinecap="round"
+                />
+              </>
             )}
           </g>
         );
@@ -465,12 +537,14 @@ export function SchemaEditor({
   value,
   onChange,
   pitch = DEFAULT_PITCH,
+  settingsKey = "default",
 }: {
   value: SchemaData;
   onChange: (next: SchemaData) => void;
   pitch?: PitchKind;
+  settingsKey?: SchemaSettingsKey;
 }) {
-  const [settings, setSettings] = useSchemaSettings();
+  const [settings, setSettings] = useSchemaSettings(settingsKey);
   const pitchCfg = PITCHES[pitch];
   const [tool, setTool] = useState<Tool>("select");
   const [selectedId, setSelectedId] = useState<string | null>(null);
@@ -483,6 +557,11 @@ export function SchemaEditor({
     | { kind: "shape"; id: string; lastX: number; lastY: number }
     | null
   >(null);
+
+  const selectedShape =
+    selectedId != null
+      ? value.shapes.find((s) => s.id === selectedId) ?? null
+      : null;
 
   function commit(next: SchemaData, snapshot: SchemaData = value) {
     setHistory((h) => [...h.slice(-29), snapshot]);
@@ -674,6 +753,39 @@ export function SchemaEditor({
     setSelectedId(null);
   }
 
+  function setSelectedColor(color: string) {
+    if (!selectedId) return;
+    commit({
+      shapes: value.shapes.map((s) =>
+        s.id === selectedId ? withColor(s, color) : s,
+      ),
+    });
+  }
+
+  function setSelectedStrokeWidth(width: number) {
+    if (!selectedId) return;
+    commit({
+      shapes: value.shapes.map((s) =>
+        s.id === selectedId ? withStrokeWidth(s, width) : s,
+      ),
+    });
+  }
+
+  function clearSelectedOverrides() {
+    if (!selectedId) return;
+    commit({
+      shapes: value.shapes.map((s) => {
+        if (s.id !== selectedId) return s;
+        const next = { ...s };
+        delete (next as { color?: string }).color;
+        if (s.kind === "line" || s.kind === "arrow") {
+          delete (next as { strokeWidth?: number }).strokeWidth;
+        }
+        return next as SchemaShape;
+      }),
+    });
+  }
+
   useEffect(() => {
     function onKey(e: KeyboardEvent) {
       if ((e.key === "Delete" || e.key === "Backspace") && selectedId) {
@@ -711,8 +823,19 @@ export function SchemaEditor({
         showSettings={showSettings}
         onToggleSettings={() => setShowSettings((v) => !v)}
       />
+      {selectedShape && (
+        <SelectionPanel
+          shape={selectedShape}
+          settings={settings}
+          onColorChange={setSelectedColor}
+          onStrokeChange={setSelectedStrokeWidth}
+          onReset={clearSelectedOverrides}
+          onClose={() => setSelectedId(null)}
+        />
+      )}
       {showSettings && (
         <SettingsPanel
+          settingsKey={settingsKey}
           settings={settings}
           onChange={setSettings}
           onClose={() => setShowSettings(false)}
@@ -747,8 +870,8 @@ export function SchemaEditor({
       </div>
       <div className="border-t border-zinc-200 px-3 py-2 text-xs text-zinc-500">
         Astuce : choisis un outil, puis clique sur le terrain. Pour les flèches,
-        clique-glisse. Sélectionne (curseur) puis Suppr / Backspace pour
-        effacer.
+        clique-glisse. Sélectionne un objet pour changer sa couleur ou son
+        épaisseur sans toucher aux autres.
       </div>
     </div>
   );
@@ -884,11 +1007,165 @@ function Toolbar({
   );
 }
 
+/* ---------- Selection panel (per-shape colour / thickness override) ---------- */
+
+function withColor(s: SchemaShape, color: string): SchemaShape {
+  switch (s.kind) {
+    case "player":
+    case "ball":
+    case "cone":
+    case "goal":
+    case "line":
+    case "arrow":
+      return { ...s, color };
+  }
+}
+
+function withStrokeWidth(s: SchemaShape, strokeWidth: number): SchemaShape {
+  if (s.kind === "line" || s.kind === "arrow") {
+    return { ...s, strokeWidth };
+  }
+  return s;
+}
+
+function effectiveColor(s: SchemaShape, settings: SchemaSettings): string {
+  if (s.kind === "player") {
+    if (s.color) return s.color;
+    return s.team === "home"
+      ? settings.colors.home
+      : s.team === "away"
+        ? settings.colors.away
+        : settings.colors.gk;
+  }
+  if (s.kind === "ball") return s.color ?? settings.colors.ball;
+  if (s.kind === "cone") return s.color ?? settings.colors.cone;
+  if (s.kind === "goal") return s.color ?? "#111827";
+  if (s.kind === "line") return s.color ?? settings.colors.line;
+  return s.color ?? settings.colors.arrow;
+}
+
+function effectiveStrokeWidth(
+  s: SchemaShape,
+  settings: SchemaSettings,
+): number | null {
+  if (s.kind === "line") return s.strokeWidth ?? settings.lineWidth;
+  if (s.kind === "arrow") return s.strokeWidth ?? settings.arrowWidth;
+  return null;
+}
+
+function shapeKindLabel(s: SchemaShape): string {
+  switch (s.kind) {
+    case "player":
+      return s.team === "home"
+        ? "Attaquant"
+        : s.team === "away"
+          ? "Défenseur"
+          : "Gardien";
+    case "ball":
+      return "Ballon";
+    case "cone":
+      return "Plot";
+    case "goal":
+      return "But";
+    case "line":
+      return "Trait";
+    case "arrow":
+      return s.style === "run"
+        ? "Flèche course"
+        : s.style === "pass"
+          ? "Flèche passe"
+          : s.style === "dribble"
+            ? "Flèche conduite"
+            : "Flèche longue balle";
+  }
+}
+
+function SelectionPanel({
+  shape,
+  settings,
+  onColorChange,
+  onStrokeChange,
+  onReset,
+  onClose,
+}: {
+  shape: SchemaShape;
+  settings: SchemaSettings;
+  onColorChange: (color: string) => void;
+  onStrokeChange: (width: number) => void;
+  onReset: () => void;
+  onClose: () => void;
+}) {
+  const color = effectiveColor(shape, settings);
+  const strokeWidth = effectiveStrokeWidth(shape, settings);
+  const hasOverride =
+    "color" in shape ||
+    (shape.kind === "line" && shape.strokeWidth != null) ||
+    (shape.kind === "arrow" && shape.strokeWidth != null);
+
+  return (
+    <div className="border-b border-zinc-200 bg-sky-50/60 px-3 py-2 text-xs text-zinc-700">
+      <div className="flex flex-wrap items-center gap-3">
+        <span className="font-medium text-zinc-800">
+          {shapeKindLabel(shape)} sélectionné
+        </span>
+        <label className="flex items-center gap-1.5">
+          <span className="text-zinc-600">Couleur</span>
+          <input
+            type="color"
+            value={color}
+            onChange={(e) => onColorChange(e.target.value)}
+            className="h-5 w-7 cursor-pointer rounded border border-zinc-200 bg-white p-0"
+            aria-label="Couleur de l'élément"
+          />
+        </label>
+        {strokeWidth !== null && (
+          <label className="flex flex-1 items-center gap-1.5 sm:max-w-[260px]">
+            <span className="whitespace-nowrap text-zinc-600">Épaisseur</span>
+            <input
+              type="range"
+              min={0.2}
+              max={3}
+              step={0.1}
+              value={strokeWidth}
+              onChange={(e) => onStrokeChange(parseFloat(e.target.value))}
+              className="w-full accent-zinc-900"
+            />
+            <span className="font-mono text-[11px] text-zinc-500">
+              {strokeWidth.toFixed(1)}
+            </span>
+          </label>
+        )}
+        <button
+          type="button"
+          onClick={onReset}
+          disabled={!hasOverride}
+          className="rounded-md border border-zinc-200 bg-white px-2 py-1 text-[11px] text-zinc-600 hover:bg-zinc-50 disabled:cursor-not-allowed disabled:opacity-40"
+          title="Revenir aux réglages par défaut pour cet élément"
+        >
+          Réinitialiser
+        </button>
+        <button
+          type="button"
+          onClick={onClose}
+          className="rounded-md px-2 py-1 text-[11px] text-zinc-500 hover:bg-zinc-100"
+          aria-label="Désélectionner"
+        >
+          ✕
+        </button>
+      </div>
+    </div>
+  );
+}
+
+/* ---------- Default-settings panel (per-zone) ---------- */
+
 function SettingsPanel({
+  settingsKey,
   settings,
   onChange,
   onClose,
 }: {
+  settingsKey: SchemaSettingsKey;
   settings: SchemaSettings;
   onChange: (next: SchemaSettings) => void;
   onClose: () => void;
@@ -903,7 +1180,7 @@ function SettingsPanel({
     <div className="border-b border-zinc-200 bg-zinc-50 px-3 py-3 text-xs text-zinc-700">
       <div className="mb-2 flex items-center justify-between">
         <span className="font-medium text-zinc-800">
-          Réglages des symboles (appliqués à tous les schémas)
+          Réglages par défaut — {SETTINGS_LABELS[settingsKey]}
         </span>
         <div className="flex items-center gap-2">
           <button
@@ -1173,22 +1450,40 @@ function ArrowSwatch({
   variant: "run" | "pass" | "wave" | "curve";
   color: string;
 }) {
-  const dash =
-    variant === "pass" ? "5 3" : undefined;
+  const dash = variant === "pass" ? "5 3" : undefined;
 
-  let d: string;
+  // Path stops just inside the arrow head so the polygon meets the line
+  // cleanly — same trick we use in the actual canvas rendering.
+  let pathD: string;
+  let basePoint: [number, number];
+  let tip: [number, number];
+  let perp: [number, number];
   if (variant === "wave") {
-    d = "M2 7 Q5 3 8 7 T14 7 T20 7";
+    pathD = "M2 7 Q5 3 8 7 T14 7";
+    basePoint = [14, 7];
+    tip = [20, 7];
+    perp = [0, 1];
   } else if (variant === "curve") {
-    d = "M2 11 Q11 -1 20 11";
+    // Quadratic from (2,11) bowing up — split visually before the tip.
+    pathD = "M2 11 Q9 -1 16.5 9";
+    basePoint = [16.5, 9];
+    tip = [20, 11];
+    perp = [-2, 3.5]; // perpendicular to the chord (16.5,9)→(20,11)
   } else {
-    d = "M2 7 L20 7";
+    pathD = "M2 7 L15 7";
+    basePoint = [15, 7];
+    tip = [20, 7];
+    perp = [0, 1];
   }
+  const headHalfW = 2.4;
+  const plen = Math.hypot(perp[0], perp[1]) || 1;
+  const px = (perp[0] / plen) * headHalfW;
+  const py = (perp[1] / plen) * headHalfW;
 
   return (
     <svg viewBox="0 0 24 14" width="22" height="12">
       <path
-        d={d}
+        d={pathD}
         fill="none"
         stroke={color}
         strokeWidth="1.6"
@@ -1197,13 +1492,7 @@ function ArrowSwatch({
         strokeDasharray={dash}
       />
       <polygon
-        points={
-          variant === "curve"
-            ? `20,11 17,9 17,12.5`
-            : variant === "wave"
-              ? `20,7 17,5 17,9`
-              : `20,7 17,5 17,9`
-        }
+        points={`${tip[0]},${tip[1]} ${basePoint[0] + px},${basePoint[1] + py} ${basePoint[0] - px},${basePoint[1] - py}`}
         fill={color}
       />
     </svg>
