@@ -98,7 +98,7 @@ function ExportImage({ src, area }: { src: string; area: Box }) {
   return (
     <div
       style={box(area)}
-      className="pointer-events-none flex items-center justify-center overflow-hidden"
+      className="pointer-events-none flex items-center justify-center overflow-hidden bg-white"
     >
       {/* Plain <img> so the printed PDF embeds the bitmap directly without
        * Next/Image's runtime layout (which doesn't run in the print view). */}
@@ -116,12 +116,14 @@ function ExportMainSchema({
   imageUrl,
   schema,
   area,
+  imageArea,
 }: {
   imageUrl: string | undefined;
   schema: SchemaData;
   area: Box;
+  imageArea: Box;
 }) {
-  if (imageUrl) return <ExportImage src={imageUrl} area={area} />;
+  if (imageUrl) return <ExportImage src={imageUrl} area={imageArea} />;
   return <ExportSchema data={schema} area={area} settingsKey="block" />;
 }
 
@@ -208,6 +210,7 @@ const Z_INITIAL = {
 const Z_MAIN_1 = {
   duration: { x: 151.5, y: 21.5, w: 39, h: 6 },
   schema: { x: 19.2, y: -1, w: 51, h: 100 },
+  image: { x: 19.2, y: 30, w: 51, h: 73 },
   description: { x: 76, y: 33, w: 60, h: 41 },
   coaching: { x: 137.5, y: 33, w: 60, h: 41 },
   organisation: { x: 76, y: 85, w: 60, h: 20 },
@@ -219,6 +222,7 @@ const Z_MAIN_1 = {
 const Z_MAIN_2 = {
   duration: { x: 151.5, y: 106.5, w: 39, h: 6 },
   schema: { x: 19.2, y: 84, w: 51, h: 100 },
+  image: { x: 19.2, y: 115, w: 51, h: 73 },
   description: { x: 76, y: 119, w: 60, h: 41 },
   coaching: { x: 137.5, y: 119, w: 60, h: 41 },
   organisation: { x: 76, y: 170, w: 60, h: 20 },
@@ -358,6 +362,7 @@ function PdfExport({ data }: { data: PreparationData }) {
           imageUrl={data.main[0].imageUrl}
           schema={data.main[0].schema}
           area={Z_MAIN_1.schema}
+          imageArea={Z_MAIN_1.image}
         />
         <ExportText
           value={data.main[0].description}
@@ -387,6 +392,7 @@ function PdfExport({ data }: { data: PreparationData }) {
           imageUrl={data.main[1].imageUrl}
           schema={data.main[1].schema}
           area={Z_MAIN_2.schema}
+          imageArea={Z_MAIN_2.image}
         />
         <ExportText
           value={data.main[1].description}
