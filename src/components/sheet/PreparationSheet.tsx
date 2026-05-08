@@ -2,14 +2,21 @@
 
 import {
   BookOpen,
+  CalendarDays,
   Check,
   ChevronLeft,
   ChevronRight,
+  Clock,
   FileText,
   Flag,
   Loader2,
   Printer,
   Save,
+  Target,
+  Timer,
+  Trash2,
+  User,
+  Users,
   X,
 } from "lucide-react";
 import { useLocale } from "next-intl";
@@ -468,10 +475,78 @@ function Field({
   );
 }
 
-const inpClass =
-  "h-9 w-full rounded-[9px] border-[1.5px] border-zinc-200 bg-white px-3 text-[13px] text-zinc-900 shadow-[0_1px_2px_rgb(0_0_0/0.04)] outline-none transition placeholder:text-zinc-400 hover:border-zinc-300 focus:border-zinc-900 focus:shadow-[0_0_0_3px_rgb(12_12_13/0.07)]";
 const txtaClass =
   "w-full resize-none rounded-[9px] border-[1.5px] border-zinc-200 bg-white px-3 py-2.5 text-[13px] leading-[1.55] text-zinc-900 shadow-[0_1px_2px_rgb(0_0_0/0.04)] outline-none transition placeholder:text-zinc-400 hover:border-zinc-300 focus:border-zinc-900 focus:shadow-[0_0_0_3px_rgb(12_12_13/0.07)]";
+
+const GRINTA_GREEN = "#16a34a";
+
+const inpUlClass =
+  "w-full border-0 border-b border-zinc-200 bg-transparent px-0 pb-1.5 pt-0 text-[15px] font-medium text-zinc-900 outline-none transition placeholder:text-zinc-300 focus:border-[var(--g-green)]";
+const txtaUlClass =
+  "w-full resize-none border-0 border-b border-zinc-200 bg-transparent px-0 pb-1.5 pt-0 text-[14px] leading-[1.5] text-zinc-900 outline-none transition placeholder:text-zinc-300 focus:border-[var(--g-green)]";
+
+function SectionHead({
+  icon,
+  title,
+  hint,
+}: {
+  icon: ReactNode;
+  title: string;
+  hint?: string;
+}) {
+  return (
+    <div className="mb-4 flex items-baseline gap-2">
+      <span className="flex h-5 w-5 shrink-0 translate-y-[3px] items-center justify-center text-zinc-700">
+        {icon}
+      </span>
+      <h3 className="text-[15px] font-semibold tracking-tight text-zinc-900">
+        {title}
+      </h3>
+      {hint ? (
+        <span className="text-[12px] text-zinc-400">— {hint}</span>
+      ) : null}
+    </div>
+  );
+}
+
+function FieldUl({
+  label,
+  hint,
+  charMax,
+  charVal,
+  children,
+}: {
+  label?: string;
+  hint?: string;
+  charMax?: number;
+  charVal?: number;
+  children: ReactNode;
+}) {
+  return (
+    <div className="flex flex-col gap-1">
+      {label ? (
+        <div className="text-[11px] font-medium uppercase tracking-[0.05em] text-zinc-500">
+          {label}
+        </div>
+      ) : null}
+      {children}
+      {hint || charMax !== undefined ? (
+        <div className="flex items-center justify-between">
+          {hint ? (
+            <span className="text-[11px] text-zinc-400">{hint}</span>
+          ) : (
+            <span />
+          )}
+          {charMax !== undefined ? (
+            <span className="text-[10px] tabular-nums text-zinc-400">
+              {charVal ?? 0}/{charMax}
+            </span>
+          ) : null}
+        </div>
+      ) : null}
+    </div>
+  );
+}
 
 function DurPill({
   value,
@@ -494,48 +569,6 @@ function DurPill({
         className="w-16 border-0 bg-transparent p-0 text-[13px] font-semibold text-zinc-900 outline-none"
       />
     </label>
-  );
-}
-
-function CheckCard({
-  label,
-  hint,
-  checked,
-  onChange,
-}: {
-  label: string;
-  hint?: string;
-  checked: boolean;
-  onChange: (next: boolean) => void;
-}) {
-  return (
-    <button
-      type="button"
-      onClick={() => onChange(!checked)}
-      className={`flex w-full select-none items-start gap-2.5 rounded-[10px] border-[1.5px] px-3 py-2.5 text-left transition ${
-        checked
-          ? "border-zinc-900 bg-[#0c0c0d]/[0.025]"
-          : "border-zinc-200 bg-white hover:border-zinc-300 hover:bg-zinc-50"
-      }`}
-    >
-      <span
-        className={`mt-0.5 flex h-[17px] w-[17px] shrink-0 items-center justify-center rounded-[5px] border-[1.5px] transition ${
-          checked
-            ? "border-zinc-900 bg-zinc-900 text-white"
-            : "border-zinc-300 bg-white"
-        }`}
-      >
-        {checked && <Check className="h-3 w-3" strokeWidth={3} />}
-      </span>
-      <span className="min-w-0">
-        <span className="block text-[12px] font-medium leading-snug text-zinc-900">
-          {label}
-        </span>
-        {hint && (
-          <span className="mt-0.5 block text-[11px] text-zinc-400">{hint}</span>
-        )}
-      </span>
-    </button>
   );
 }
 
@@ -721,6 +754,7 @@ function FitTextarea({
   rows = 4,
   placeholder,
   maxChars,
+  className,
 }: {
   value: string;
   onChange: (v: string) => void;
@@ -728,6 +762,7 @@ function FitTextarea({
   rows?: number;
   placeholder?: string;
   maxChars?: number;
+  className?: string;
 }) {
   const fits = useFits(value, area.w, area.h);
 
@@ -742,6 +777,11 @@ function FitTextarea({
     onChange(next);
   }
 
+  const baseClass = className ?? txtaClass;
+  const overflowFlag = className
+    ? "border-red-400 focus:border-red-500"
+    : "border-red-300 focus:border-red-500 focus:shadow-[0_0_0_3px_rgb(239_68_68/0.12)]";
+
   return (
     <div className="flex flex-col gap-1">
       <textarea
@@ -749,7 +789,7 @@ function FitTextarea({
         value={value}
         onChange={handleChange}
         placeholder={placeholder}
-        className={`${txtaClass} ${fits ? "" : "border-red-300 focus:border-red-500 focus:shadow-[0_0_0_3px_rgb(239_68_68/0.12)]"}`}
+        className={`${baseClass} ${fits ? "" : overflowFlag}`}
       />
       <div className="flex items-center justify-between text-[10px]">
         <span className={fits ? "text-zinc-400" : "text-red-600"}>
@@ -926,187 +966,269 @@ function Step1({
   ];
 
   return (
-    <div className="flex flex-col gap-3.5">
-      <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
-        <div className="sm:col-span-3">
-          <Field label="Titre" hint="Session title">
+    <div className="flex flex-col gap-10">
+      {/* — Informations générales — */}
+      <section>
+        <SectionHead
+          icon={<Users className="h-4 w-4" strokeWidth={1.75} />}
+          title="Informations générales"
+        />
+
+        <div className="flex flex-col gap-6">
+          <FieldUl label="Titre de la séance">
             <input
-              className={inpClass}
+              className={inpUlClass}
               placeholder="e.g., Build-up under press"
               value={meta.title}
               onChange={(e) =>
                 patchMeta((m) => ({ ...m, title: e.target.value }))
               }
             />
-          </Field>
-        </div>
-        <Field
-          label="Heure de début"
-          hint={
-            slot === "morning"
-              ? "Morning · 07:00 → 12:00"
-              : "Afternoon · 12:00 → 22:00"
-          }
-        >
-          <input
-            type="time"
-            className={inpClass}
-            min={bounds.min}
-            max={bounds.max}
-            value={meta.startTime}
-            onChange={(e) =>
-              patchMeta((m) => ({
-                ...m,
-                startTime: clampToSlot(e.target.value, slot),
-              }))
-            }
-          />
-        </Field>
-        <Field label="Durée" hint="Default 90 min">
-          <input
-            type="number"
-            min={1}
-            className={inpClass}
-            placeholder="90"
-            value={meta.durationMinutes ?? ""}
-            onChange={(e) =>
-              patchMeta((m) => ({
-                ...m,
-                durationMinutes: e.target.value ? Number(e.target.value) : null,
-              }))
-            }
-          />
-        </Field>
-        <Field label="Date">
-          <input
-            type="date"
-            className={inpClass}
-            value={data.date}
-            onChange={(e) => patch((d) => ({ ...d, date: e.target.value }))}
-          />
-        </Field>
-        <Field label="Équipe" hint="Team">
-          <input
-            className={inpClass}
-            placeholder="U15 Élite"
-            value={data.team}
-            onChange={(e) => patch((d) => ({ ...d, team: e.target.value }))}
-          />
-        </Field>
-        <Field label="Entraîneur" hint="Coach">
-          <input
-            className={inpClass}
-            placeholder="Your name"
-            value={data.coach}
-            onChange={(e) => patch((d) => ({ ...d, coach: e.target.value }))}
-          />
-        </Field>
-      </div>
+          </FieldUl>
 
-      <Card
-        icon={<Flag className="h-3.5 w-3.5" strokeWidth={2} />}
-        title="Moments du jeu"
-        hint="Tick the game moment(s) this session is built around"
-      >
-        <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
-          {phaseOptions.map((ph) => (
-            <CheckCard
-              key={ph.key}
-              label={ph.label}
-              hint={ph.fr}
-              checked={data.phases[ph.key]}
-              onChange={(v) =>
-                patch((d) => ({
-                  ...d,
-                  phases: { ...d.phases, [ph.key]: v },
-                }))
+          <div className="grid grid-cols-1 gap-6 sm:grid-cols-3">
+            <FieldUl label="Date">
+              <div className="flex items-center gap-2">
+                <CalendarDays
+                  className="h-4 w-4 shrink-0 text-zinc-400"
+                  strokeWidth={1.75}
+                />
+                <input
+                  type="date"
+                  className={inpUlClass}
+                  value={data.date}
+                  onChange={(e) =>
+                    patch((d) => ({ ...d, date: e.target.value }))
+                  }
+                />
+              </div>
+            </FieldUl>
+            <FieldUl
+              label="Heure de début"
+              hint={
+                slot === "morning"
+                  ? "Matin · 07:00 → 12:00"
+                  : "Après-midi · 12:00 → 22:00"
               }
-            />
-          ))}
-        </div>
-      </Card>
+            >
+              <div className="flex items-center gap-2">
+                <Clock
+                  className="h-4 w-4 shrink-0 text-zinc-400"
+                  strokeWidth={1.75}
+                />
+                <input
+                  type="time"
+                  className={inpUlClass}
+                  min={bounds.min}
+                  max={bounds.max}
+                  value={meta.startTime}
+                  onChange={(e) =>
+                    patchMeta((m) => ({
+                      ...m,
+                      startTime: clampToSlot(e.target.value, slot),
+                    }))
+                  }
+                />
+              </div>
+            </FieldUl>
+            <FieldUl label="Durée" hint="Durée par défaut : 90 min">
+              <div className="flex items-center gap-2">
+                <Timer
+                  className="h-4 w-4 shrink-0 text-zinc-400"
+                  strokeWidth={1.75}
+                />
+                <input
+                  type="number"
+                  min={1}
+                  className={inpUlClass}
+                  placeholder="90"
+                  value={meta.durationMinutes ?? ""}
+                  onChange={(e) =>
+                    patchMeta((m) => ({
+                      ...m,
+                      durationMinutes: e.target.value
+                        ? Number(e.target.value)
+                        : null,
+                    }))
+                  }
+                />
+                <span className="text-[12px] text-zinc-400">min</span>
+              </div>
+            </FieldUl>
+          </div>
 
-      <div className="grid grid-cols-1 gap-3 lg:grid-cols-2">
-        <Field
-          label="Forme caractéristique"
-          hint="The game situation this session is built around"
-          charMax={230}
-          charVal={data.characteristicForm.length}
-        >
-          <textarea
-            rows={3}
-            maxLength={230}
-            className={txtaClass}
-            placeholder="e.g., Build-up from GK under high press"
-            value={data.characteristicForm}
-            onChange={(e) =>
-              patch((d) => ({ ...d, characteristicForm: e.target.value }))
-            }
+          <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
+            <FieldUl label="Équipe">
+              <div className="flex items-center gap-2">
+                <Users
+                  className="h-4 w-4 shrink-0 text-zinc-400"
+                  strokeWidth={1.75}
+                />
+                <input
+                  className={inpUlClass}
+                  placeholder="U15 Élite"
+                  value={data.team}
+                  onChange={(e) =>
+                    patch((d) => ({ ...d, team: e.target.value }))
+                  }
+                />
+              </div>
+            </FieldUl>
+            <FieldUl label="Entraîneur">
+              <div className="flex items-center gap-2">
+                <User
+                  className="h-4 w-4 shrink-0 text-zinc-400"
+                  strokeWidth={1.75}
+                />
+                <input
+                  className={inpUlClass}
+                  placeholder="Your name"
+                  value={data.coach}
+                  onChange={(e) =>
+                    patch((d) => ({ ...d, coach: e.target.value }))
+                  }
+                />
+              </div>
+            </FieldUl>
+          </div>
+        </div>
+      </section>
+
+      {/* — Moments du jeu — */}
+      <section>
+        <SectionHead
+          icon={<Flag className="h-4 w-4" strokeWidth={1.75} />}
+          title="Moments du jeu"
+          hint="moments clés sur lesquels construire la séance"
+        />
+        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-4">
+          {phaseOptions.map((ph) => {
+            const checked = data.phases[ph.key];
+            return (
+              <button
+                key={ph.key}
+                type="button"
+                onClick={() =>
+                  patch((d) => ({
+                    ...d,
+                    phases: { ...d.phases, [ph.key]: !checked },
+                  }))
+                }
+                className={`group flex items-center gap-3 border-b-[1.5px] px-1 py-3 text-left transition ${
+                  checked
+                    ? "border-[var(--g-green)]"
+                    : "border-zinc-200 hover:border-zinc-400"
+                }`}
+              >
+                <span
+                  className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-full transition ${
+                    checked
+                      ? "bg-[var(--g-green)] text-white"
+                      : "bg-zinc-100 text-zinc-400 group-hover:bg-zinc-200"
+                  }`}
+                >
+                  <span className="block h-2 w-2 rounded-full bg-current" />
+                </span>
+                <span className="min-w-0 leading-tight">
+                  <span className="block truncate text-[13px] font-semibold text-zinc-900">
+                    {ph.label}
+                  </span>
+                  <span className="mt-0.5 block truncate text-[11px] text-zinc-500">
+                    {ph.fr}
+                  </span>
+                </span>
+              </button>
+            );
+          })}
+        </div>
+      </section>
+
+      {/* — Forme caractéristique / Focus — */}
+      <section className="grid grid-cols-1 gap-10 lg:grid-cols-2">
+        <div>
+          <SectionHead
+            icon={<Target className="h-4 w-4" strokeWidth={1.75} />}
+            title="Forme caractéristique"
+            hint="situation de jeu travaillée"
           />
-        </Field>
-        <Field
-          label="Focus"
-          hint="Select coaching families · note details below"
-          charMax={115}
-          charVal={data.focus.length}
-        >
-          <div className="flex flex-col gap-2">
+          <FitTextarea
+            area={Z_GLOBAL.characteristicForm}
+            rows={2}
+            maxChars={230}
+            placeholder="ex. Build-up from GK under high press"
+            value={data.characteristicForm}
+            onChange={(v) =>
+              patch((d) => ({ ...d, characteristicForm: v }))
+            }
+            className={txtaUlClass}
+          />
+        </div>
+        <div>
+          <SectionHead
+            icon={<BookOpen className="h-4 w-4" strokeWidth={1.75} />}
+            title="Focus"
+            hint="jusqu'à 4 familles d'entraînement"
+          />
+          <div className="flex flex-col gap-3">
             <FocusFamilyChips
               value={data.focusFamilies}
               onChange={(v) => patch((d) => ({ ...d, focusFamilies: v }))}
             />
-            <textarea
+            <FitTextarea
+              area={Z_GLOBAL.focus}
               rows={2}
-              maxLength={115}
-              className={txtaClass}
-              placeholder="e.g., TA — pressing triggers"
+              maxChars={115}
+              placeholder="ex. TA — pressing triggers"
               value={data.focus}
-              onChange={(e) => patch((d) => ({ ...d, focus: e.target.value }))}
+              onChange={(v) => patch((d) => ({ ...d, focus: v }))}
+              className={txtaUlClass}
             />
           </div>
-        </Field>
-        <Field
-          label="Objectifs"
-          hint="What players should do by the end"
-          charMax={230}
-          charVal={data.objectives.length}
-        >
-          <textarea
-            rows={3}
-            maxLength={230}
-            className={txtaClass}
-            placeholder="e.g., Recognize press trigger, play forward in 1–2 touches"
+        </div>
+        <div>
+          <SectionHead
+            icon={<Flag className="h-4 w-4" strokeWidth={1.75} />}
+            title="Objectifs"
+            hint="ce que les joueurs doivent réussir"
+          />
+          <FitTextarea
+            area={Z_GLOBAL.objectives}
+            rows={2}
+            maxChars={230}
+            placeholder="ex. Reconnaître le déclencheur du pressing, jouer vers l'avant en 1–2 touches"
             value={data.objectives}
-            onChange={(e) =>
-              patch((d) => ({ ...d, objectives: e.target.value }))
-            }
+            onChange={(v) => patch((d) => ({ ...d, objectives: v }))}
+            className={txtaUlClass}
           />
-        </Field>
-        <Field
-          label="Questions de développement"
-          hint="Open questions to spark player reflection"
-        >
-          <textarea
-            rows={3}
-            className={txtaClass}
-            placeholder="e.g., When does the #6 drop between the center backs?"
+        </div>
+        <div>
+          <SectionHead
+            icon={<BookOpen className="h-4 w-4" strokeWidth={1.75} />}
+            title="Questions de développement"
+            hint="déclencher la réflexion"
+          />
+          <FitTextarea
+            area={Z_GLOBAL.developmentQuestions}
+            rows={2}
+            placeholder="ex. À quel moment le n°6 décroche entre les défenseurs centraux ?"
             value={data.developmentQuestions}
-            onChange={(e) =>
-              patch((d) => ({ ...d, developmentQuestions: e.target.value }))
+            onChange={(v) =>
+              patch((d) => ({ ...d, developmentQuestions: v }))
             }
+            className={txtaUlClass}
           />
-        </Field>
-      </div>
+        </div>
+      </section>
 
-      <div className="mt-2 flex justify-end border-t border-zinc-200 pt-3">
+      <div className="flex justify-end pt-2">
         <button
           type="button"
           onClick={onCancel}
           disabled={isCancelling}
-          className="inline-flex items-center gap-1.5 rounded-[9px] border-[1.5px] border-red-200 bg-white px-3 py-1.5 text-[12px] font-medium text-red-600 transition hover:border-red-300 hover:bg-red-50 disabled:opacity-60"
+          className="inline-flex items-center gap-1.5 rounded-md px-2 py-1.5 text-[12px] font-medium text-zinc-500 transition hover:text-red-600 disabled:opacity-60"
         >
-          <X className="h-3.5 w-3.5" strokeWidth={2} />
-          {isCancelling ? "Cancelling…" : "Cancel session"}
+          <Trash2 className="h-3.5 w-3.5" strokeWidth={1.75} />
+          {isCancelling ? "Annulation…" : "Annuler la séance"}
         </button>
       </div>
     </div>
@@ -2039,7 +2161,10 @@ export function PreparationSheet({
 
   return (
     <>
-      <div className="prep-no-print fixed inset-0 z-50 flex flex-col overflow-hidden bg-[#0c0c0d] text-zinc-900">
+      <div
+        className="prep-no-print fixed inset-0 z-50 flex flex-col overflow-hidden bg-[#0c0c0d] text-zinc-900"
+        style={{ ["--g-green" as string]: GRINTA_GREEN }}
+      >
         {/* Topbar */}
         <header className="relative z-10 flex h-[52px] flex-shrink-0 items-center justify-between border-b border-white/10 bg-[#0c0c0d]/90 px-5 backdrop-blur-md">
           <div className="flex min-w-0 items-center gap-2.5">
@@ -2052,12 +2177,17 @@ export function PreparationSheet({
               Back
             </button>
             <span className="mx-3 h-[18px] w-px bg-white/10" />
-            <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-[7px] bg-white text-[14px] font-bold text-[#0c0c0d] shadow-[0_0_0_1px_rgb(255_255_255/0.15)]">
-              G
-            </div>
+            <Image
+              src="/icon-grinta.svg"
+              alt=""
+              width={28}
+              height={28}
+              priority
+              className="h-7 w-7 shrink-0"
+            />
             <div className="min-w-0 leading-none">
               <div className="text-[13px] font-semibold text-white">
-                Training preparation
+                Préparation d&apos;entraînement
               </div>
               <div className="mt-0.5 truncate text-[10px] text-white/35">
                 {data.team || "No team set"} · {data.date || "No date"}
@@ -2121,8 +2251,24 @@ export function PreparationSheet({
         <div className="flex min-h-0 flex-1 overflow-hidden">
           {/* Sidebar */}
           <aside className="hidden w-[232px] shrink-0 flex-col overflow-hidden border-r border-white/[0.06] bg-[#111113] md:flex">
-            <div className="px-4 pb-2 pt-4 text-[9px] font-semibold uppercase tracking-[0.1em] text-white/25">
-              Preparation steps
+            <div className="flex items-center gap-2 px-4 pb-3 pt-4">
+              <Image
+                src="/icon-grinta.svg"
+                alt=""
+                width={20}
+                height={20}
+                className="h-5 w-5"
+              />
+              <Image
+                src="/text-grinta.svg"
+                alt="Grinta"
+                width={72}
+                height={20}
+                className="h-5 w-auto"
+              />
+            </div>
+            <div className="px-4 pb-2 pt-2 text-[9px] font-semibold uppercase tracking-[0.1em] text-white/25">
+              Étapes de préparation
             </div>
             <nav className="flex flex-1 flex-col gap-0.5 overflow-y-auto px-2 pb-2">
               {STEPS.map((s, i) => {
