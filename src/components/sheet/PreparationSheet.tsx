@@ -2,14 +2,19 @@
 
 import {
   BookOpen,
+  CalendarDays,
   Check,
   ChevronLeft,
   ChevronRight,
+  Clock,
   FileText,
-  Flag,
   Loader2,
   Printer,
   Save,
+  Timer,
+  Trash2,
+  User,
+  Users,
   X,
 } from "lucide-react";
 import { useLocale } from "next-intl";
@@ -468,10 +473,54 @@ function Field({
   );
 }
 
-const inpClass =
-  "h-9 w-full rounded-[9px] border-[1.5px] border-zinc-200 bg-white px-3 text-[13px] text-zinc-900 shadow-[0_1px_2px_rgb(0_0_0/0.04)] outline-none transition placeholder:text-zinc-400 hover:border-zinc-300 focus:border-zinc-900 focus:shadow-[0_0_0_3px_rgb(12_12_13/0.07)]";
 const txtaClass =
   "w-full resize-none rounded-[9px] border-[1.5px] border-zinc-200 bg-white px-3 py-2.5 text-[13px] leading-[1.55] text-zinc-900 shadow-[0_1px_2px_rgb(0_0_0/0.04)] outline-none transition placeholder:text-zinc-400 hover:border-zinc-300 focus:border-zinc-900 focus:shadow-[0_0_0_3px_rgb(12_12_13/0.07)]";
+
+const GRINTA_GREEN = "#16a34a";
+
+const inpUlClass =
+  "w-full border-0 border-b border-zinc-200 bg-transparent px-0 pb-1.5 pt-0 text-[15px] font-medium text-zinc-900 outline-none transition placeholder:text-zinc-300 focus:border-[var(--g-green)]";
+const txtaUlClass =
+  "w-full resize-none border-0 border-b border-zinc-200 bg-transparent px-0 pb-1.5 pt-0 text-[14px] leading-[1.5] text-zinc-900 outline-none transition placeholder:text-zinc-300 focus:border-[var(--g-green)]";
+
+function FieldUl({
+  label,
+  hint,
+  charMax,
+  charVal,
+  children,
+}: {
+  label?: string;
+  hint?: string;
+  charMax?: number;
+  charVal?: number;
+  children: ReactNode;
+}) {
+  return (
+    <div className="flex flex-col gap-1">
+      {label ? (
+        <div className="text-[11px] font-medium uppercase tracking-[0.05em] text-zinc-500">
+          {label}
+        </div>
+      ) : null}
+      {children}
+      {hint || charMax !== undefined ? (
+        <div className="flex items-center justify-between">
+          {hint ? (
+            <span className="text-[11px] text-zinc-400">{hint}</span>
+          ) : (
+            <span />
+          )}
+          {charMax !== undefined ? (
+            <span className="text-[10px] tabular-nums text-zinc-400">
+              {charVal ?? 0}/{charMax}
+            </span>
+          ) : null}
+        </div>
+      ) : null}
+    </div>
+  );
+}
 
 function DurPill({
   value,
@@ -494,48 +543,6 @@ function DurPill({
         className="w-16 border-0 bg-transparent p-0 text-[13px] font-semibold text-zinc-900 outline-none"
       />
     </label>
-  );
-}
-
-function CheckCard({
-  label,
-  hint,
-  checked,
-  onChange,
-}: {
-  label: string;
-  hint?: string;
-  checked: boolean;
-  onChange: (next: boolean) => void;
-}) {
-  return (
-    <button
-      type="button"
-      onClick={() => onChange(!checked)}
-      className={`flex w-full select-none items-start gap-2.5 rounded-[10px] border-[1.5px] px-3 py-2.5 text-left transition ${
-        checked
-          ? "border-zinc-900 bg-[#0c0c0d]/[0.025]"
-          : "border-zinc-200 bg-white hover:border-zinc-300 hover:bg-zinc-50"
-      }`}
-    >
-      <span
-        className={`mt-0.5 flex h-[17px] w-[17px] shrink-0 items-center justify-center rounded-[5px] border-[1.5px] transition ${
-          checked
-            ? "border-zinc-900 bg-zinc-900 text-white"
-            : "border-zinc-300 bg-white"
-        }`}
-      >
-        {checked && <Check className="h-3 w-3" strokeWidth={3} />}
-      </span>
-      <span className="min-w-0">
-        <span className="block text-[12px] font-medium leading-snug text-zinc-900">
-          {label}
-        </span>
-        {hint && (
-          <span className="mt-0.5 block text-[11px] text-zinc-400">{hint}</span>
-        )}
-      </span>
-    </button>
   );
 }
 
@@ -721,6 +728,7 @@ function FitTextarea({
   rows = 4,
   placeholder,
   maxChars,
+  className,
 }: {
   value: string;
   onChange: (v: string) => void;
@@ -728,6 +736,7 @@ function FitTextarea({
   rows?: number;
   placeholder?: string;
   maxChars?: number;
+  className?: string;
 }) {
   const fits = useFits(value, area.w, area.h);
 
@@ -742,6 +751,12 @@ function FitTextarea({
     onChange(next);
   }
 
+  const baseClass = className ?? txtaClass;
+  const overflowFlag = className
+    ? "border-red-400 focus:border-red-500"
+    : "border-red-300 focus:border-red-500 focus:shadow-[0_0_0_3px_rgb(239_68_68/0.12)]";
+  const showFooter = !fits || maxChars !== undefined;
+
   return (
     <div className="flex flex-col gap-1">
       <textarea
@@ -749,18 +764,24 @@ function FitTextarea({
         value={value}
         onChange={handleChange}
         placeholder={placeholder}
-        className={`${txtaClass} ${fits ? "" : "border-red-300 focus:border-red-500 focus:shadow-[0_0_0_3px_rgb(239_68_68/0.12)]"}`}
+        className={`${baseClass} ${fits ? "" : overflowFlag}`}
       />
-      <div className="flex items-center justify-between text-[10px]">
-        <span className={fits ? "text-zinc-400" : "text-red-600"}>
-          {fits ? "Fits the printed page" : "Too long — will be clipped on the PDF"}
-        </span>
-        {maxChars !== undefined && (
-          <span className="tabular-nums text-zinc-400">
-            {value.length}/{maxChars}
+      {showFooter ? (
+        <div className="flex items-center justify-between text-[10px]">
+          <span className={fits ? "text-transparent" : "text-red-600"}>
+            {fits ? "OK" : "Trop long pour le PDF"}
           </span>
-        )}
-      </div>
+          {maxChars !== undefined && (
+            <span
+              className={`tabular-nums ${
+                value.length >= maxChars ? "text-red-600" : "text-zinc-400"
+              }`}
+            >
+              {value.length}/{maxChars}
+            </span>
+          )}
+        </div>
+      ) : null}
     </div>
   );
 }
@@ -871,6 +892,28 @@ export type SessionMeta = {
 
 type SessionMetaPatcher = (updater: (m: SessionMeta) => SessionMeta) => void;
 
+type PhaseKey = "possession" | "losing" | "noPossession" | "recovering";
+
+const WEEK_THEME_ALLOWED: Record<string, PhaseKey[]> = {
+  possede_ballon: ["possession"],
+  ne_possede_pas: ["noPossession"],
+  recupere: ["recovering"],
+  perd: ["losing"],
+  recupere_perd: ["recovering", "losing"],
+  decharge: [],
+  jeux_polysport: [],
+};
+
+const WEEK_THEME_LABEL: Record<string, string> = {
+  possede_ballon: "Mon équipe possède",
+  ne_possede_pas: "Sans possession",
+  recupere: "Récupération",
+  perd: "Mon équipe perd",
+  recupere_perd: "Récupération + perd",
+  decharge: "Décharge",
+  jeux_polysport: "Jeux + polysport",
+};
+
 const SLOT_BOUNDS: Record<
   "morning" | "afternoon",
   { min: string; max: string }
@@ -908,6 +951,7 @@ function Step1({
   slot,
   onCancel,
   isCancelling,
+  weekTheme,
 }: {
   data: PreparationData;
   patch: Patcher;
@@ -916,197 +960,330 @@ function Step1({
   slot: "morning" | "afternoon";
   onCancel: () => void;
   isCancelling: boolean;
+  weekTheme: string | null;
 }) {
   const bounds = SLOT_BOUNDS[slot];
+
+  const allowedPhases =
+    weekTheme && weekTheme in WEEK_THEME_ALLOWED
+      ? WEEK_THEME_ALLOWED[weekTheme]
+      : null;
+  const weekLabel =
+    weekTheme && weekTheme in WEEK_THEME_LABEL
+      ? WEEK_THEME_LABEL[weekTheme]
+      : null;
+  const selectedPhases = (Object.keys(data.phases) as PhaseKey[]).filter(
+    (k) => data.phases[k],
+  );
+  const offThemeSelected =
+    allowedPhases !== null &&
+    selectedPhases.some((k) => !allowedPhases.includes(k));
   const phaseOptions = [
-    { key: "possession" as const, label: "We have the ball", fr: "Mon équipe possède" },
-    { key: "losing" as const, label: "We just lost the ball", fr: "Mon équipe perd" },
-    { key: "noPossession" as const, label: "They have the ball", fr: "Sans possession" },
-    { key: "recovering" as const, label: "We win the ball back", fr: "Récupération" },
+    {
+      key: "possession" as const,
+      label: "On a le ballon",
+      fr: "Mon équipe possède",
+      cue: "Installer, progresser, fixer.",
+    },
+    {
+      key: "losing" as const,
+      label: "On l'a perdu",
+      fr: "Transition défensive",
+      cue: "Réagir, cadrer, ralentir.",
+    },
+    {
+      key: "noPossession" as const,
+      label: "Ils ont le ballon",
+      fr: "Sans possession",
+      cue: "Orienter, fermer, presser.",
+    },
+    {
+      key: "recovering" as const,
+      label: "On le récupère",
+      fr: "Transition offensive",
+      cue: "Sortir, trouver l'avant, finir.",
+    },
   ];
+  const selectedPhase =
+    phaseOptions.find((ph) => data.phases[ph.key]) ?? null;
+
+  function selectPhase(key: PhaseKey) {
+    patch((d) => ({
+      ...d,
+      phases: {
+        possession: key === "possession",
+        losing: key === "losing",
+        noPossession: key === "noPossession",
+        recovering: key === "recovering",
+      },
+    }));
+  }
 
   return (
-    <div className="flex flex-col gap-3.5">
-      <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
-        <div className="sm:col-span-3">
-          <Field label="Titre" hint="Session title">
-            <input
-              className={inpClass}
-              placeholder="e.g., Build-up under press"
-              value={meta.title}
-              onChange={(e) =>
-                patchMeta((m) => ({ ...m, title: e.target.value }))
-              }
-            />
-          </Field>
-        </div>
-        <Field
-          label="Heure de début"
-          hint={
-            slot === "morning"
-              ? "Morning · 07:00 → 12:00"
-              : "Afternoon · 12:00 → 22:00"
-          }
-        >
-          <input
-            type="time"
-            className={inpClass}
-            min={bounds.min}
-            max={bounds.max}
-            value={meta.startTime}
-            onChange={(e) =>
-              patchMeta((m) => ({
-                ...m,
-                startTime: clampToSlot(e.target.value, slot),
-              }))
-            }
-          />
-        </Field>
-        <Field label="Durée" hint="Default 90 min">
-          <input
-            type="number"
-            min={1}
-            className={inpClass}
-            placeholder="90"
-            value={meta.durationMinutes ?? ""}
-            onChange={(e) =>
-              patchMeta((m) => ({
-                ...m,
-                durationMinutes: e.target.value ? Number(e.target.value) : null,
-              }))
-            }
-          />
-        </Field>
-        <Field label="Date">
-          <input
-            type="date"
-            className={inpClass}
-            value={data.date}
-            onChange={(e) => patch((d) => ({ ...d, date: e.target.value }))}
-          />
-        </Field>
-        <Field label="Équipe" hint="Team">
-          <input
-            className={inpClass}
-            placeholder="U15 Élite"
-            value={data.team}
-            onChange={(e) => patch((d) => ({ ...d, team: e.target.value }))}
-          />
-        </Field>
-        <Field label="Entraîneur" hint="Coach">
-          <input
-            className={inpClass}
-            placeholder="Your name"
-            value={data.coach}
-            onChange={(e) => patch((d) => ({ ...d, coach: e.target.value }))}
-          />
-        </Field>
-      </div>
-
-      <Card
-        icon={<Flag className="h-3.5 w-3.5" strokeWidth={2} />}
-        title="Moments du jeu"
-        hint="Tick the game moment(s) this session is built around"
-      >
-        <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
-          {phaseOptions.map((ph) => (
-            <CheckCard
-              key={ph.key}
-              label={ph.label}
-              hint={ph.fr}
-              checked={data.phases[ph.key]}
-              onChange={(v) =>
-                patch((d) => ({
-                  ...d,
-                  phases: { ...d.phases, [ph.key]: v },
-                }))
-              }
-            />
-          ))}
-        </div>
-      </Card>
-
-      <div className="grid grid-cols-1 gap-3 lg:grid-cols-2">
-        <Field
-          label="Forme caractéristique"
-          hint="The game situation this session is built around"
-          charMax={230}
-          charVal={data.characteristicForm.length}
-        >
-          <textarea
-            rows={3}
-            maxLength={230}
-            className={txtaClass}
-            placeholder="e.g., Build-up from GK under high press"
-            value={data.characteristicForm}
-            onChange={(e) =>
-              patch((d) => ({ ...d, characteristicForm: e.target.value }))
-            }
-          />
-        </Field>
-        <Field
-          label="Focus"
-          hint="Select coaching families · note details below"
-          charMax={115}
-          charVal={data.focus.length}
-        >
-          <div className="flex flex-col gap-2">
-            <FocusFamilyChips
-              value={data.focusFamilies}
-              onChange={(v) => patch((d) => ({ ...d, focusFamilies: v }))}
-            />
-            <textarea
-              rows={2}
-              maxLength={115}
-              className={txtaClass}
-              placeholder="e.g., TA — pressing triggers"
-              value={data.focus}
-              onChange={(e) => patch((d) => ({ ...d, focus: e.target.value }))}
+    <div className="mx-auto flex w-full max-w-[1120px] flex-col gap-4 py-2">
+      <section>
+        <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_360px] lg:items-end">
+          <div>
+            <div className="text-[10px] font-semibold uppercase tracking-[0.14em] text-red-600">
+              Brief guidé
+            </div>
+            <h2 className="mt-1.5 text-[23px] font-semibold tracking-[-0.02em] text-[#0c0c0d]">
+              Construire le fil conducteur
+            </h2>
+            <p className="mt-1 max-w-[640px] text-[12px] leading-4 text-zinc-500">
+              On garde la logique terrain : point de départ, situation exacte,
+              comportements attendus, puis questions qui guident les joueurs.
+            </p>
+          </div>
+          <div className="hidden justify-end lg:flex">
+            <Image
+              src="/icon-grinta.svg"
+              alt=""
+              width={48}
+              height={48}
+              className="h-11 w-11 opacity-90"
             />
           </div>
-        </Field>
-        <Field
-          label="Objectifs"
-          hint="What players should do by the end"
-          charMax={230}
-          charVal={data.objectives.length}
-        >
-          <textarea
-            rows={3}
-            maxLength={230}
-            className={txtaClass}
-            placeholder="e.g., Recognize press trigger, play forward in 1–2 touches"
-            value={data.objectives}
-            onChange={(e) =>
-              patch((d) => ({ ...d, objectives: e.target.value }))
-            }
-          />
-        </Field>
-        <Field
-          label="Questions de développement"
-          hint="Open questions to spark player reflection"
-        >
-          <textarea
-            rows={3}
-            className={txtaClass}
-            placeholder="e.g., When does the #6 drop between the center backs?"
-            value={data.developmentQuestions}
-            onChange={(e) =>
-              patch((d) => ({ ...d, developmentQuestions: e.target.value }))
-            }
-          />
-        </Field>
-      </div>
+        </div>
 
-      <div className="mt-2 flex justify-end border-t border-zinc-200 pt-3">
+        <div className="mt-3 border-t border-zinc-200 pt-2 text-[12px] text-zinc-500">
+          <div className="mb-1.5 text-[10px] font-semibold uppercase tracking-[0.12em] text-zinc-400">
+            Séance
+          </div>
+          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-[1fr_0.7fr_0.55fr_1fr_1fr]">
+            <label className="flex min-w-0 items-center gap-2">
+              <CalendarDays className="h-3.5 w-3.5 text-zinc-400" />
+              <input
+                type="date"
+                className={inpUlClass}
+                value={data.date}
+                onChange={(e) =>
+                  patch((d) => ({ ...d, date: e.target.value }))
+                }
+              />
+            </label>
+            <label className="flex min-w-0 items-center gap-2">
+              <Clock className="h-3.5 w-3.5 text-zinc-400" />
+              <input
+                type="time"
+                className={inpUlClass}
+                min={bounds.min}
+                max={bounds.max}
+                value={meta.startTime}
+                onChange={(e) =>
+                  patchMeta((m) => ({
+                    ...m,
+                    startTime: clampToSlot(e.target.value, slot),
+                  }))
+                }
+              />
+            </label>
+            <label className="flex min-w-0 items-center gap-2">
+              <Timer className="h-3.5 w-3.5 text-zinc-400" />
+              <input
+                type="number"
+                min={1}
+                className={inpUlClass}
+                placeholder="90"
+                value={meta.durationMinutes ?? ""}
+                onChange={(e) =>
+                  patchMeta((m) => ({
+                    ...m,
+                    durationMinutes: e.target.value
+                      ? Number(e.target.value)
+                      : null,
+                  }))
+                }
+              />
+            </label>
+            <label className="flex min-w-0 items-center gap-2">
+              <Users className="h-3.5 w-3.5 text-zinc-400" />
+              <input
+                className={inpUlClass}
+                placeholder="Équipe"
+                value={data.team}
+                onChange={(e) =>
+                  patch((d) => ({ ...d, team: e.target.value }))
+                }
+              />
+            </label>
+            <label className="flex min-w-0 items-center gap-2">
+              <User className="h-3.5 w-3.5 text-zinc-400" />
+              <input
+                className={inpUlClass}
+                placeholder="Entraîneur"
+                value={data.coach}
+                onChange={(e) =>
+                  patch((d) => ({ ...d, coach: e.target.value }))
+                }
+              />
+            </label>
+          </div>
+        </div>
+      </section>
+
+      <section className="grid gap-5 lg:grid-cols-[200px_minmax(0,1fr)]">
+        <div className="text-[12px] text-zinc-500">
+          <div className="mb-2 text-[10px] font-semibold uppercase tracking-[0.12em] text-zinc-400">
+            Moment du jeu
+          </div>
+          <div className="space-y-1">
+            {phaseOptions.map((ph) => {
+              const checked = data.phases[ph.key];
+              const isRecommended =
+                allowedPhases !== null && allowedPhases.includes(ph.key);
+              const isOffTheme =
+                checked && allowedPhases !== null && !isRecommended;
+              return (
+                <button
+                  key={ph.key}
+                  type="button"
+                  onClick={() => selectPhase(ph.key)}
+                  className={`flex w-full items-center justify-between border-b py-1.5 text-left transition ${
+                    checked
+                      ? "border-red-500 text-zinc-950"
+                      : isRecommended
+                        ? "border-emerald-200 text-zinc-600 hover:border-zinc-400 hover:text-zinc-900"
+                        : "border-zinc-200 text-zinc-500 hover:border-zinc-400 hover:text-zinc-900"
+                  }`}
+                >
+                  <span>
+                    <span className="block text-[13px] font-semibold">
+                      {ph.label}
+                    </span>
+                    <span className="mt-0.5 block text-[11px] text-zinc-400">
+                      {ph.fr}
+                    </span>
+                  </span>
+                  {checked ? (
+                    <Check
+                      className={isOffTheme ? "text-amber-500" : "text-red-600"}
+                      size={16}
+                      strokeWidth={2.4}
+                    />
+                  ) : null}
+                </button>
+              );
+            })}
+          </div>
+          {offThemeSelected ? (
+            <p className="mt-3 text-[11px] leading-4 text-amber-700">
+              Hors thème semaine{weekLabel ? ` : ${weekLabel}` : ""}.
+            </p>
+          ) : null}
+        </div>
+
+        <div className="relative pl-6">
+          <div className="absolute bottom-2 left-0 top-1 w-px bg-zinc-200" />
+          <div className="space-y-3">
+            <div className="relative">
+              <span className="absolute -left-[34px] top-1 flex h-4 w-4 items-center justify-center rounded-full bg-[#0c0c0d] text-[9px] font-semibold text-white">
+                1
+              </span>
+              <div className="text-[11px] font-semibold uppercase tracking-[0.1em] text-zinc-400">
+                Point de départ
+              </div>
+              <div className="mt-0.5 text-[17px] font-semibold tracking-[-0.015em] text-zinc-950">
+                Aujourd&apos;hui, on démarre quand{" "}
+                <span className="text-red-600">
+                  {selectedPhase?.label.toLowerCase() ?? "le moment est choisi"}
+                </span>
+                .
+              </div>
+            </div>
+
+            <div className="relative">
+              <span className="absolute -left-[34px] top-1 flex h-4 w-4 items-center justify-center rounded-full bg-white text-[9px] font-semibold text-zinc-500 ring-1 ring-zinc-200">
+                2
+              </span>
+              <FieldUl label="Forme caractéristique">
+                <FitTextarea
+                  area={Z_GLOBAL.characteristicForm}
+                  rows={2}
+                  maxChars={230}
+                  placeholder="Dans quelle situation exacte veut-on placer les joueurs ?"
+                  value={data.characteristicForm}
+                  onChange={(v) =>
+                    patch((d) => ({ ...d, characteristicForm: v }))
+                  }
+                  className={txtaUlClass}
+                />
+              </FieldUl>
+            </div>
+
+            <div className="relative">
+              <span className="absolute -left-[34px] top-1 flex h-4 w-4 items-center justify-center rounded-full bg-white text-[9px] font-semibold text-zinc-500 ring-1 ring-zinc-200">
+                3
+              </span>
+              <FieldUl label="Focus">
+                <div className="mb-2">
+                  <FocusFamilyChips
+                    value={data.focusFamilies}
+                    onChange={(v) =>
+                      patch((d) => ({ ...d, focusFamilies: v }))
+                    }
+                  />
+                </div>
+                <FitTextarea
+                  area={Z_GLOBAL.focus}
+                  rows={1}
+                  maxChars={115}
+                  placeholder="Quels comportements veut-on observer en priorité ?"
+                  value={data.focus}
+                  onChange={(v) => patch((d) => ({ ...d, focus: v }))}
+                  className={txtaUlClass}
+                />
+              </FieldUl>
+            </div>
+
+            <div className="relative">
+              <span className="absolute -left-[34px] top-1 flex h-4 w-4 items-center justify-center rounded-full bg-white text-[9px] font-semibold text-zinc-500 ring-1 ring-zinc-200">
+                4
+              </span>
+              <FieldUl label="Objectif">
+                <FitTextarea
+                  area={Z_GLOBAL.objectives}
+                  rows={2}
+                  maxChars={230}
+                  placeholder="À la fin, les joueurs doivent être capables de..."
+                  value={data.objectives}
+                  onChange={(v) => patch((d) => ({ ...d, objectives: v }))}
+                  className={txtaUlClass}
+                />
+              </FieldUl>
+            </div>
+
+            <div className="relative">
+              <span className="absolute -left-[34px] top-1 flex h-4 w-4 items-center justify-center rounded-full bg-white text-[9px] font-semibold text-zinc-500 ring-1 ring-zinc-200">
+                5
+              </span>
+              <FieldUl label="Questions coach">
+                <FitTextarea
+                  area={Z_GLOBAL.developmentQuestions}
+                  rows={2}
+                  maxChars={260}
+                  placeholder="Quelles questions vont guider l'apprentissage ?"
+                  value={data.developmentQuestions}
+                  onChange={(v) =>
+                    patch((d) => ({ ...d, developmentQuestions: v }))
+                  }
+                  className={txtaUlClass}
+                />
+              </FieldUl>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <div className="flex justify-end pt-1">
         <button
           type="button"
           onClick={onCancel}
           disabled={isCancelling}
-          className="inline-flex items-center gap-1.5 rounded-[9px] border-[1.5px] border-red-200 bg-white px-3 py-1.5 text-[12px] font-medium text-red-600 transition hover:border-red-300 hover:bg-red-50 disabled:opacity-60"
+          className="inline-flex items-center gap-1.5 rounded-md px-2 py-1 text-[12px] font-medium text-zinc-500 transition hover:text-red-600 disabled:opacity-60"
         >
-          <X className="h-3.5 w-3.5" strokeWidth={2} />
-          {isCancelling ? "Cancelling…" : "Cancel session"}
+          <Trash2 className="h-3.5 w-3.5" strokeWidth={1.75} />
+          {isCancelling ? "Annulation…" : "Annuler la séance"}
         </button>
       </div>
     </div>
@@ -1882,12 +2059,14 @@ export function PreparationSheet({
   initial,
   libraryExercises,
   sessionMeta,
+  weekTheme,
 }: {
   teamId: string;
   sessionId: string;
   initial: PreparationData;
   libraryExercises: LibraryExercise[];
   sessionMeta: SessionMeta;
+  weekTheme: string | null;
 }) {
   const [data, setData] = useState<PreparationData>(initial);
   const [meta, setMeta] = useState<SessionMeta>(sessionMeta);
@@ -1987,6 +2166,14 @@ export function PreparationSheet({
     setStepKey((k) => k + 1);
   }
 
+  function goPrev() {
+    goTo(Math.max(0, step - 1));
+  }
+
+  function goNext() {
+    goTo(Math.min(STEPS.length - 1, step + 1));
+  }
+
   const stepBody: ReactNode = (() => {
     switch (step) {
       case 0:
@@ -1999,6 +2186,7 @@ export function PreparationSheet({
             slot={slot}
             onCancel={cancelSession}
             isCancelling={isPending}
+            weekTheme={weekTheme}
           />
         );
       case 1:
@@ -2039,7 +2227,10 @@ export function PreparationSheet({
 
   return (
     <>
-      <div className="prep-no-print fixed inset-0 z-50 flex flex-col overflow-hidden bg-[#0c0c0d] text-zinc-900">
+      <div
+        className="prep-no-print fixed inset-0 z-50 flex flex-col overflow-hidden bg-[#0c0c0d] text-zinc-900"
+        style={{ ["--g-green" as string]: GRINTA_GREEN }}
+      >
         {/* Topbar */}
         <header className="relative z-10 flex h-[52px] flex-shrink-0 items-center justify-between border-b border-white/10 bg-[#0c0c0d]/90 px-5 backdrop-blur-md">
           <div className="flex min-w-0 items-center gap-2.5">
@@ -2052,12 +2243,17 @@ export function PreparationSheet({
               Back
             </button>
             <span className="mx-3 h-[18px] w-px bg-white/10" />
-            <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-[7px] bg-white text-[14px] font-bold text-[#0c0c0d] shadow-[0_0_0_1px_rgb(255_255_255/0.15)]">
-              G
-            </div>
+            <Image
+              src="/icon-grinta.svg"
+              alt=""
+              width={28}
+              height={28}
+              priority
+              className="h-7 w-7 shrink-0"
+            />
             <div className="min-w-0 leading-none">
               <div className="text-[13px] font-semibold text-white">
-                Training preparation
+                Préparation d&apos;entraînement
               </div>
               <div className="mt-0.5 truncate text-[10px] text-white/35">
                 {data.team || "No team set"} · {data.date || "No date"}
@@ -2121,8 +2317,24 @@ export function PreparationSheet({
         <div className="flex min-h-0 flex-1 overflow-hidden">
           {/* Sidebar */}
           <aside className="hidden w-[232px] shrink-0 flex-col overflow-hidden border-r border-white/[0.06] bg-[#111113] md:flex">
-            <div className="px-4 pb-2 pt-4 text-[9px] font-semibold uppercase tracking-[0.1em] text-white/25">
-              Preparation steps
+            <div className="flex items-center gap-2 px-4 pb-3 pt-4">
+              <Image
+                src="/icon-grinta.svg"
+                alt=""
+                width={20}
+                height={20}
+                className="h-5 w-5"
+              />
+              <Image
+                src="/text-grinta.svg"
+                alt="Grinta"
+                width={72}
+                height={20}
+                className="h-5 w-auto"
+              />
+            </div>
+            <div className="px-4 pb-2 pt-2 text-[9px] font-semibold uppercase tracking-[0.1em] text-white/25">
+              Étapes de préparation
             </div>
             <nav className="flex flex-1 flex-col gap-0.5 overflow-y-auto px-2 pb-2">
               {STEPS.map((s, i) => {
@@ -2232,35 +2444,35 @@ export function PreparationSheet({
             </div>
 
             {/* Step header */}
-            <div className="flex shrink-0 items-start justify-between gap-4 border-b border-zinc-200 bg-white px-7 py-4">
+            <div className="flex shrink-0 items-start justify-between gap-4 border-b border-zinc-200 bg-white px-7 py-2.5">
               <div className="min-w-0">
                 <div className="mb-1 text-[10px] font-semibold uppercase tracking-[0.1em] text-zinc-400">
                   {STEPS[step].eyebrow}
                 </div>
-                <h2 className="text-[22px] font-semibold leading-tight tracking-[-0.02em] text-[#0c0c0d]">
+                <h2 className="text-[16px] font-semibold leading-tight tracking-[-0.01em] text-[#0c0c0d]">
                   {STEPS[step].label}
                 </h2>
-                <p className="mt-1 text-[13px] text-zinc-500">
+                <p className="mt-0.5 text-[12px] leading-4 text-zinc-500">
                   {STEPS[step].desc}
                 </p>
               </div>
               <div className="flex shrink-0 items-center gap-2 pt-1">
                 <button
                   type="button"
-                  onClick={() => goTo(Math.max(0, step - 1))}
+                  onClick={goPrev}
                   disabled={step === 0}
                   className="inline-flex h-8 items-center gap-1.5 rounded-[9px] border border-zinc-200 bg-white px-3 text-[12px] font-medium text-zinc-900 shadow-[0_1px_2px_rgb(0_0_0/0.05)] transition hover:bg-zinc-50 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-40"
                 >
                   <ChevronLeft className="h-3.5 w-3.5" strokeWidth={2} />
-                  Prev
+                  Retour
                 </button>
                 <button
                   type="button"
-                  onClick={() => goTo(Math.min(STEPS.length - 1, step + 1))}
+                  onClick={goNext}
                   disabled={step === STEPS.length - 1}
                   className="inline-flex h-8 items-center gap-1.5 rounded-[9px] bg-[#0c0c0d] px-3 text-[12px] font-medium text-white shadow-[0_1px_3px_rgb(0_0_0/0.15)] transition hover:bg-[#1a1a1d] active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-40"
                 >
-                  Next
+                  Suivant
                   <ChevronRight className="h-3.5 w-3.5" strokeWidth={2} />
                 </button>
               </div>
@@ -2275,7 +2487,7 @@ export function PreparationSheet({
             {/* Step body */}
             <div
               key={stepKey}
-              className="min-h-0 flex-1 overflow-y-auto overflow-x-hidden px-7 py-5 motion-safe:animate-[prep-step-in_250ms_cubic-bezier(0.4,0,0.2,1)]"
+              className="min-h-0 flex-1 overflow-y-auto overflow-x-hidden px-7 py-2.5 motion-safe:animate-[prep-step-in_250ms_cubic-bezier(0.4,0,0.2,1)]"
             >
               {stepBody}
             </div>
