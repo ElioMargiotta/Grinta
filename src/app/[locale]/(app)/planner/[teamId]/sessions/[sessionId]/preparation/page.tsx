@@ -3,6 +3,7 @@ import { setRequestLocale } from "next-intl/server";
 import { PreparationSheet } from "@/components/sheet/PreparationSheet";
 import type { LibraryExercise } from "@/components/sheet/ExerciseLibraryPicker";
 import { mergePreparation, type PreparationData } from "@/components/sheet/types";
+import { resolveMicrocycleId } from "@/app/[locale]/(app)/planner/actions";
 import { requireUser } from "@/lib/auth/getUser";
 
 export default async function PreparationPage({
@@ -19,7 +20,7 @@ export default async function PreparationPage({
       supabase
         .from("sessions")
         .select(
-          "id, date, theme, start_time, duration_minutes, team_id, teams(name)",
+          "id, date, theme, start_time, duration_minutes, team_id, microcycle_id, teams(name), microcycles(theme)",
         )
         .eq("id", sessionId)
         .single(),
@@ -50,6 +51,38 @@ export default async function PreparationPage({
   if (!initial.date && session.date) initial.date = session.date;
   if (!initial.team) initial.team = team.name;
 
+  const microRel = (
+    session as unknown as {
+      microcycles?:
+        | { theme: string | null }
+        | { theme: string | null }[]
+        | null;
+    }
+  ).microcycles;
+  const microRow = Array.isArray(microRel) ? microRel[0] : microRel;
+  let weekTheme = microRow?.theme ?? null;
+
+  // Backfill microcycle_id + theme for legacy sessions without a join.
+  if (!microRow && session.date) {
+    const resolvedId = await resolveMicrocycleId(
+      supabase,
+      teamId,
+      session.date as string,
+    );
+    if (resolvedId) {
+      await supabase
+        .from("sessions")
+        .update({ microcycle_id: resolvedId })
+        .eq("id", sessionId);
+      const { data: micro } = await supabase
+        .from("microcycles")
+        .select("theme")
+        .eq("id", resolvedId)
+        .single();
+      weekTheme = (micro?.theme as string | null) ?? null;
+    }
+  }
+
   return (
     <PreparationSheet
       teamId={teamId}
@@ -61,6 +94,7 @@ export default async function PreparationPage({
         startTime: (session.start_time as string | null)?.slice(0, 5) ?? "",
         durationMinutes: session.duration_minutes ?? null,
       }}
+      weekTheme={weekTheme}
     />
   );
 }

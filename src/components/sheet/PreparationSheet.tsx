@@ -495,7 +495,7 @@ function SectionHead({
   hint?: string;
 }) {
   return (
-    <div className="mb-4 flex items-baseline gap-2">
+    <div className="mb-2.5 flex items-baseline gap-2">
       <span className="flex h-5 w-5 shrink-0 translate-y-[3px] items-center justify-center text-zinc-700">
         {icon}
       </span>
@@ -911,6 +911,28 @@ export type SessionMeta = {
 
 type SessionMetaPatcher = (updater: (m: SessionMeta) => SessionMeta) => void;
 
+type PhaseKey = "possession" | "losing" | "noPossession" | "recovering";
+
+const WEEK_THEME_ALLOWED: Record<string, PhaseKey[]> = {
+  possede_ballon: ["possession"],
+  ne_possede_pas: ["noPossession"],
+  recupere: ["recovering"],
+  perd: ["losing"],
+  recupere_perd: ["recovering", "losing"],
+  decharge: [],
+  jeux_polysport: [],
+};
+
+const WEEK_THEME_LABEL: Record<string, string> = {
+  possede_ballon: "Mon équipe possède",
+  ne_possede_pas: "Sans possession",
+  recupere: "Récupération",
+  perd: "Mon équipe perd",
+  recupere_perd: "Récupération + perd",
+  decharge: "Décharge",
+  jeux_polysport: "Jeux + polysport",
+};
+
 const SLOT_BOUNDS: Record<
   "morning" | "afternoon",
   { min: string; max: string }
@@ -948,6 +970,7 @@ function Step1({
   slot,
   onCancel,
   isCancelling,
+  weekTheme,
 }: {
   data: PreparationData;
   patch: Patcher;
@@ -956,8 +979,24 @@ function Step1({
   slot: "morning" | "afternoon";
   onCancel: () => void;
   isCancelling: boolean;
+  weekTheme: string | null;
 }) {
   const bounds = SLOT_BOUNDS[slot];
+
+  const allowedPhases =
+    weekTheme && weekTheme in WEEK_THEME_ALLOWED
+      ? WEEK_THEME_ALLOWED[weekTheme]
+      : null;
+  const weekLabel =
+    weekTheme && weekTheme in WEEK_THEME_LABEL
+      ? WEEK_THEME_LABEL[weekTheme]
+      : null;
+  const selectedPhases = (Object.keys(data.phases) as PhaseKey[]).filter(
+    (k) => data.phases[k],
+  );
+  const offThemeSelected =
+    allowedPhases !== null &&
+    selectedPhases.some((k) => !allowedPhases.includes(k));
   const phaseOptions = [
     { key: "possession" as const, label: "We have the ball", fr: "Mon équipe possède" },
     { key: "losing" as const, label: "We just lost the ball", fr: "Mon équipe perd" },
@@ -966,15 +1005,16 @@ function Step1({
   ];
 
   return (
-    <div className="flex flex-col gap-10">
-      {/* — Informations générales — */}
+    <div className="flex flex-col gap-4">
+      {/* — Informations générales (form on left, hero on right) — */}
       <section>
         <SectionHead
           icon={<Users className="h-4 w-4" strokeWidth={1.75} />}
           title="Informations générales"
         />
 
-        <div className="flex flex-col gap-6">
+        <div className="grid grid-cols-1 gap-5 lg:grid-cols-[minmax(0,1fr)_220px]">
+          <div className="flex flex-col gap-4">
           <FieldUl label="Titre de la séance">
             <input
               className={inpUlClass}
@@ -986,7 +1026,7 @@ function Step1({
             />
           </FieldUl>
 
-          <div className="grid grid-cols-1 gap-6 sm:grid-cols-3">
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
             <FieldUl label="Date">
               <div className="flex items-center gap-2">
                 <CalendarDays
@@ -1057,7 +1097,7 @@ function Step1({
             </FieldUl>
           </div>
 
-          <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <FieldUl label="Équipe">
               <div className="flex items-center gap-2">
                 <Users
@@ -1091,6 +1131,19 @@ function Step1({
               </div>
             </FieldUl>
           </div>
+          </div>
+
+          {/* Hero — placeholder big icon */}
+          <div className="hidden items-center justify-center lg:flex">
+            <Image
+              src="/icon-grinta.svg"
+              alt=""
+              width={140}
+              height={140}
+              priority
+              className="h-32 w-32"
+            />
+          </div>
         </div>
       </section>
 
@@ -1099,11 +1152,19 @@ function Step1({
         <SectionHead
           icon={<Flag className="h-4 w-4" strokeWidth={1.75} />}
           title="Moments du jeu"
-          hint="moments clés sur lesquels construire la séance"
+          hint={
+            weekLabel
+              ? `thème de la semaine : ${weekLabel}`
+              : "moments clés sur lesquels construire la séance"
+          }
         />
         <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-4">
           {phaseOptions.map((ph) => {
             const checked = data.phases[ph.key];
+            const isRecommended =
+              allowedPhases !== null && allowedPhases.includes(ph.key);
+            const isOffTheme =
+              checked && allowedPhases !== null && !isRecommended;
             return (
               <button
                 key={ph.key}
@@ -1114,17 +1175,25 @@ function Step1({
                     phases: { ...d.phases, [ph.key]: !checked },
                   }))
                 }
-                className={`group flex items-center gap-3 border-b-[1.5px] px-1 py-3 text-left transition ${
-                  checked
-                    ? "border-[var(--g-green)]"
-                    : "border-zinc-200 hover:border-zinc-400"
+                className={`group flex items-center gap-2.5 border-b-[1.5px] px-1 py-2 text-left transition ${
+                  isOffTheme
+                    ? "border-amber-400"
+                    : checked
+                      ? "border-[var(--g-green)]"
+                      : isRecommended
+                        ? "border-[var(--g-green)]/40 hover:border-[var(--g-green)]"
+                        : "border-zinc-200 hover:border-zinc-400"
                 }`}
               >
                 <span
-                  className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-full transition ${
-                    checked
-                      ? "bg-[var(--g-green)] text-white"
-                      : "bg-zinc-100 text-zinc-400 group-hover:bg-zinc-200"
+                  className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-full transition ${
+                    isOffTheme
+                      ? "bg-amber-100 text-amber-700"
+                      : checked
+                        ? "bg-[var(--g-green)] text-white"
+                        : isRecommended
+                          ? "bg-[var(--g-green)]/15 text-[var(--g-green)]"
+                          : "bg-zinc-100 text-zinc-400 group-hover:bg-zinc-200"
                   }`}
                 >
                   <span className="block h-2 w-2 rounded-full bg-current" />
@@ -1141,10 +1210,16 @@ function Step1({
             );
           })}
         </div>
+        {offThemeSelected ? (
+          <p className="mt-2 text-[11px] text-amber-700">
+            Un moment sélectionné ne correspond pas au thème de la semaine
+            {weekLabel ? ` (${weekLabel})` : ""}.
+          </p>
+        ) : null}
       </section>
 
       {/* — Forme caractéristique / Focus — */}
-      <section className="grid grid-cols-1 gap-10 lg:grid-cols-2">
+      <section className="grid grid-cols-1 gap-x-8 gap-y-5 lg:grid-cols-2">
         <div>
           <SectionHead
             icon={<Target className="h-4 w-4" strokeWidth={1.75} />}
@@ -1153,7 +1228,7 @@ function Step1({
           />
           <FitTextarea
             area={Z_GLOBAL.characteristicForm}
-            rows={2}
+            rows={1}
             maxChars={230}
             placeholder="ex. Build-up from GK under high press"
             value={data.characteristicForm}
@@ -1169,14 +1244,14 @@ function Step1({
             title="Focus"
             hint="jusqu'à 4 familles d'entraînement"
           />
-          <div className="flex flex-col gap-3">
+          <div className="flex flex-col gap-2">
             <FocusFamilyChips
               value={data.focusFamilies}
               onChange={(v) => patch((d) => ({ ...d, focusFamilies: v }))}
             />
             <FitTextarea
               area={Z_GLOBAL.focus}
-              rows={2}
+              rows={1}
               maxChars={115}
               placeholder="ex. TA — pressing triggers"
               value={data.focus}
@@ -1193,9 +1268,9 @@ function Step1({
           />
           <FitTextarea
             area={Z_GLOBAL.objectives}
-            rows={2}
+            rows={1}
             maxChars={230}
-            placeholder="ex. Reconnaître le déclencheur du pressing, jouer vers l'avant en 1–2 touches"
+            placeholder="ex. Reconnaître le déclencheur du pressing"
             value={data.objectives}
             onChange={(v) => patch((d) => ({ ...d, objectives: v }))}
             className={txtaUlClass}
@@ -1209,8 +1284,8 @@ function Step1({
           />
           <FitTextarea
             area={Z_GLOBAL.developmentQuestions}
-            rows={2}
-            placeholder="ex. À quel moment le n°6 décroche entre les défenseurs centraux ?"
+            rows={1}
+            placeholder="ex. À quel moment le n°6 décroche ?"
             value={data.developmentQuestions}
             onChange={(v) =>
               patch((d) => ({ ...d, developmentQuestions: v }))
@@ -1220,12 +1295,12 @@ function Step1({
         </div>
       </section>
 
-      <div className="flex justify-end pt-2">
+      <div className="flex justify-end pt-1">
         <button
           type="button"
           onClick={onCancel}
           disabled={isCancelling}
-          className="inline-flex items-center gap-1.5 rounded-md px-2 py-1.5 text-[12px] font-medium text-zinc-500 transition hover:text-red-600 disabled:opacity-60"
+          className="inline-flex items-center gap-1.5 rounded-md px-2 py-1 text-[12px] font-medium text-zinc-500 transition hover:text-red-600 disabled:opacity-60"
         >
           <Trash2 className="h-3.5 w-3.5" strokeWidth={1.75} />
           {isCancelling ? "Annulation…" : "Annuler la séance"}
@@ -2004,12 +2079,14 @@ export function PreparationSheet({
   initial,
   libraryExercises,
   sessionMeta,
+  weekTheme,
 }: {
   teamId: string;
   sessionId: string;
   initial: PreparationData;
   libraryExercises: LibraryExercise[];
   sessionMeta: SessionMeta;
+  weekTheme: string | null;
 }) {
   const [data, setData] = useState<PreparationData>(initial);
   const [meta, setMeta] = useState<SessionMeta>(sessionMeta);
@@ -2121,6 +2198,7 @@ export function PreparationSheet({
             slot={slot}
             onCancel={cancelSession}
             isCancelling={isPending}
+            weekTheme={weekTheme}
           />
         );
       case 1:
@@ -2383,10 +2461,10 @@ export function PreparationSheet({
                 <div className="mb-1 text-[10px] font-semibold uppercase tracking-[0.1em] text-zinc-400">
                   {STEPS[step].eyebrow}
                 </div>
-                <h2 className="text-[22px] font-semibold leading-tight tracking-[-0.02em] text-[#0c0c0d]">
+                <h2 className="text-[18px] font-semibold leading-tight tracking-[-0.01em] text-[#0c0c0d]">
                   {STEPS[step].label}
                 </h2>
-                <p className="mt-1 text-[13px] text-zinc-500">
+                <p className="mt-0.5 text-[12.5px] text-zinc-500">
                   {STEPS[step].desc}
                 </p>
               </div>
@@ -2421,7 +2499,7 @@ export function PreparationSheet({
             {/* Step body */}
             <div
               key={stepKey}
-              className="min-h-0 flex-1 overflow-y-auto overflow-x-hidden px-7 py-5 motion-safe:animate-[prep-step-in_250ms_cubic-bezier(0.4,0,0.2,1)]"
+              className="min-h-0 flex-1 overflow-y-auto overflow-x-hidden px-7 py-4 motion-safe:animate-[prep-step-in_250ms_cubic-bezier(0.4,0,0.2,1)]"
             >
               {stepBody}
             </div>

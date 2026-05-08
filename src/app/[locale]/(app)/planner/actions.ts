@@ -3,6 +3,47 @@
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
+import type { SupabaseClient } from "@supabase/supabase-js";
+
+export async function resolveMicrocycleId(
+  supabase: SupabaseClient,
+  teamId: string,
+  date: string,
+): Promise<string | null> {
+  const { data: macros } = await supabase
+    .from("macrocycles")
+    .select("id")
+    .eq("team_id", teamId);
+  const macroIds = (macros ?? []).map((m) => m.id as string);
+  if (!macroIds.length) return null;
+
+  const { data: mesos } = await supabase
+    .from("mesocycles")
+    .select("id")
+    .in("macrocycle_id", macroIds);
+  const mesoIds = (mesos ?? []).map((m) => m.id as string);
+  if (!mesoIds.length) return null;
+
+  const { data: micros } = await supabase
+    .from("microcycles")
+    .select("id, start_date")
+    .in("mesocycle_id", mesoIds)
+    .lte("start_date", date)
+    .order("start_date", { ascending: false })
+    .limit(1);
+
+  const candidate = (micros ?? [])[0] as
+    | { id: string; start_date: string }
+    | undefined;
+  if (!candidate) return null;
+
+  const start = new Date(candidate.start_date);
+  const target = new Date(date);
+  const diffDays = Math.floor(
+    (target.getTime() - start.getTime()) / (1000 * 60 * 60 * 24),
+  );
+  return diffDays >= 0 && diffDays < 7 ? candidate.id : null;
+}
 
 type SessionPayload = {
   teamId: string;
@@ -73,6 +114,8 @@ export async function createSessionForSlotAction({
     };
   }
 
+  const microcycleId = await resolveMicrocycleId(supabase, teamId, date);
+
   const { data, error } = await supabase
     .from("sessions")
     .insert({
@@ -83,6 +126,7 @@ export async function createSessionForSlotAction({
       duration_minutes: DEFAULT_SESSION_DURATION,
       theme: null,
       notes: null,
+      microcycle_id: microcycleId,
     })
     .select("id")
     .single();
