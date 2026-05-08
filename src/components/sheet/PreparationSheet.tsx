@@ -1320,6 +1320,12 @@ function Step2({ data, patch }: { data: PreparationData; patch: Patcher }) {
     ["p2", "Connecter", "TE / TA / PE"],
     ["p3", "Accélérer", "Explosivité"],
   ];
+  const activePhaseTitle =
+    tab === "p1"
+      ? "Phase 1 - Échauffement"
+      : tab === "p2"
+        ? "Phase 2 - Échauffement (TE/TA/PE)"
+        : "Phase 3 - Explosivité";
 
   return (
     <div className="mx-auto flex w-full max-w-[1120px] flex-col gap-4 py-1">
@@ -1381,12 +1387,17 @@ function Step2({ data, patch }: { data: PreparationData; patch: Patcher }) {
         </div>
       </section>
 
-      <section className="flex flex-col gap-5 pt-2">
+      <section className="flex flex-col gap-3 pt-2">
+        <div className="border-t border-zinc-200 pt-3">
+          <div className="text-[13px] font-semibold text-zinc-900">
+            {activePhaseTitle}
+          </div>
+        </div>
         <div className="min-w-0">
           {tab === "p1" && (
             <div className="grid grid-cols-1 items-start gap-5 lg:grid-cols-[minmax(300px,0.68fr)_minmax(0,1.32fr)]">
               <div>
-                <div className="overflow-hidden border-t border-zinc-200 pt-3 [&>div]:border-0 [&>div]:bg-transparent">
+                <div className="overflow-hidden [&>div]:border-0 [&>div]:bg-transparent">
                   <SchemaEditor
                     settingsKey="warmup"
                     value={data.initial.phase1.schema}
@@ -1403,7 +1414,7 @@ function Step2({ data, patch }: { data: PreparationData; patch: Patcher }) {
                 </div>
               </div>
 
-              <div className="flex min-w-0 flex-col gap-3 border-t border-zinc-200 pt-3">
+              <div className="flex min-w-0 flex-col gap-3">
                 <div className="grid gap-3 md:grid-cols-2">
                   <FieldUl label="Contenu">
                     <FitTextarea
@@ -1529,7 +1540,7 @@ function Step2({ data, patch }: { data: PreparationData; patch: Patcher }) {
           {tab === "p2" && (
             <div className="grid grid-cols-1 items-start gap-5 lg:grid-cols-[minmax(300px,0.68fr)_minmax(0,1.32fr)]">
               <div>
-                <div className="overflow-hidden border-t border-zinc-200 pt-3 [&>div]:border-0 [&>div]:bg-transparent">
+                <div className="overflow-hidden [&>div]:border-0 [&>div]:bg-transparent">
                   <SchemaEditor
                     settingsKey="warmup"
                     value={data.initial.phase2.schema}
@@ -1545,7 +1556,7 @@ function Step2({ data, patch }: { data: PreparationData; patch: Patcher }) {
                   />
                 </div>
               </div>
-              <div className="grid min-w-0 gap-4 border-t border-zinc-200 pt-3 md:grid-cols-2">
+              <div className="grid min-w-0 gap-4 md:grid-cols-2">
                 <FieldUl label="Contenu">
                   <FitTextarea
                     rows={9}
@@ -1590,7 +1601,7 @@ function Step2({ data, patch }: { data: PreparationData; patch: Patcher }) {
 
           {tab === "p3" && (
             <div className="grid grid-cols-1 gap-5">
-              <div className="grid min-w-0 gap-4 border-t border-zinc-200 pt-3 md:grid-cols-2">
+              <div className="grid min-w-0 gap-4 md:grid-cols-2">
                 <FieldUl label="Contenu">
                   <FitTextarea
                     rows={10}
