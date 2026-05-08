@@ -64,6 +64,7 @@ export function MicrocycleThemePicker({
   currentFormat,
   currentNotes,
   onClose,
+  placement = "popover",
 }: {
   microcycleId: string;
   teamId: string;
@@ -71,6 +72,7 @@ export function MicrocycleThemePicker({
   currentFormat: string | null;
   currentNotes: string | null;
   onClose: () => void;
+  placement?: "popover" | "inline";
 }) {
   const locale = useLocale();
   const t = useTranslations("planner.theme");
@@ -118,7 +120,11 @@ export function MicrocycleThemePicker({
     <div
       ref={containerRef}
       role="dialog"
-      className="absolute left-1/2 top-full z-30 mt-1 w-72 -translate-x-1/2 rounded-lg border border-zinc-200 bg-white p-3 shadow-xl dark:border-zinc-700 dark:bg-zinc-900"
+      className={
+        placement === "inline"
+          ? "z-10 mt-2 w-full rounded-lg border border-zinc-200 bg-white p-3 shadow-sm dark:border-zinc-700 dark:bg-zinc-900"
+          : "absolute left-1/2 top-full z-30 mt-1 w-72 -translate-x-1/2 rounded-lg border border-zinc-200 bg-white p-3 shadow-xl dark:border-zinc-700 dark:bg-zinc-900"
+      }
     >
       <div className="mb-2 text-[11px] font-semibold uppercase tracking-wide text-zinc-500 dark:text-zinc-400">
         {t("quickFill")}

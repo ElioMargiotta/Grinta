@@ -67,6 +67,7 @@ export function PlannerCalendar({
             id: e.id,
             title: e.title,
             date: e.date,
+            start: e.start,
             durationMinutes: e.durationMinutes,
           }))}
           macrocycles={macrocycles}

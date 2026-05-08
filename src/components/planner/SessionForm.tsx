@@ -23,10 +23,12 @@ export function SessionForm({
   teamId,
   initial,
   defaultDate,
+  defaultStartTime,
 }: {
   teamId: string;
   initial?: Initial;
   defaultDate?: string;
+  defaultStartTime?: string;
 }) {
   const t = useTranslations("planner.session");
   const locale = useLocale();
@@ -63,7 +65,9 @@ export function SessionForm({
           name="startTime"
           type="time"
           label={t("startTime")}
-          defaultValue={initial?.start_time?.slice(0, 5) ?? ""}
+          defaultValue={
+            initial?.start_time?.slice(0, 5) ?? defaultStartTime ?? ""
+          }
         />
         <Input
           id="duration"

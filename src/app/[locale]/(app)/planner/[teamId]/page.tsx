@@ -25,7 +25,7 @@ export default async function PlannerTeamPage({
 
   const view: PlannerView = (VALID_VIEWS as string[]).includes(viewParam ?? "")
     ? (viewParam as PlannerView)
-    : "tour";
+    : "weekly";
 
   const { data: team } = await supabase
     .from("teams")

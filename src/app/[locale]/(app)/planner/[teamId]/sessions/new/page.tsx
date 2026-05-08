@@ -9,10 +9,10 @@ export default async function NewSessionPage({
   searchParams,
 }: {
   params: Promise<{ locale: string; teamId: string }>;
-  searchParams: Promise<{ date?: string }>;
+  searchParams: Promise<{ date?: string; startTime?: string }>;
 }) {
   const { locale, teamId } = await params;
-  const { date } = await searchParams;
+  const { date, startTime } = await searchParams;
   setRequestLocale(locale);
   const { supabase } = await requireUser(locale);
   const t = await getTranslations("planner.session");
@@ -30,7 +30,11 @@ export default async function NewSessionPage({
         {team.name} — {t("newTitle")}
       </h1>
       <Card>
-        <SessionForm teamId={teamId} defaultDate={date} />
+        <SessionForm
+          teamId={teamId}
+          defaultDate={date}
+          defaultStartTime={startTime}
+        />
       </Card>
     </div>
   );

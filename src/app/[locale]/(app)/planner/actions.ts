@@ -24,6 +24,12 @@ function readSessionFields(formData: FormData): SessionPayload {
   };
 }
 
+function slotOf(time: string | null): "morning" | "afternoon" {
+  if (!time) return "morning";
+  const hh = Number(time.slice(0, 2));
+  return hh < 12 ? "morning" : "afternoon";
+}
+
 export async function createSessionAction(formData: FormData) {
   const fields = readSessionFields(formData);
   const locale = String(formData.get("locale") ?? "en");
@@ -35,6 +41,25 @@ export async function createSessionAction(formData: FormData) {
     data: { user },
   } = await supabase.auth.getUser();
   if (!user) redirect(`/${locale}/login`);
+
+  const slot = slotOf(fields.startTime);
+  const { data: sameDay } = await supabase
+    .from("sessions")
+    .select("id, start_time")
+    .eq("team_id", fields.teamId)
+    .eq("date", fields.date);
+  if (
+    (sameDay ?? []).some(
+      (s) => slotOf((s.start_time as string | null) ?? null) === slot,
+    )
+  ) {
+    return {
+      error:
+        slot === "morning"
+          ? "A morning session already exists for this day."
+          : "An afternoon session already exists for this day.",
+    };
+  }
 
   const { data, error } = await supabase
     .from("sessions")
@@ -63,6 +88,28 @@ export async function updateSessionAction(formData: FormData) {
   if (!id) return { error: "Missing id" };
 
   const supabase = await createClient();
+
+  const slot = slotOf(fields.startTime);
+  const { data: sameDay } = await supabase
+    .from("sessions")
+    .select("id, start_time")
+    .eq("team_id", fields.teamId)
+    .eq("date", fields.date);
+  if (
+    (sameDay ?? []).some(
+      (s) =>
+        s.id !== id &&
+        slotOf((s.start_time as string | null) ?? null) === slot,
+    )
+  ) {
+    return {
+      error:
+        slot === "morning"
+          ? "A morning session already exists for this day."
+          : "An afternoon session already exists for this day.",
+    };
+  }
+
   const { error } = await supabase
     .from("sessions")
     .update({

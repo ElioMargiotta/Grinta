@@ -207,6 +207,8 @@
       "totalTime": "Total time",
       "avgPerWeek": "Avg / week",
       "typeDistribution": "Type distribution",
+      "emptyMonth": "Nothing planned for these weeks yet — add a cycle or set up a season to start filling them in.",
+      "emptyMonthCta": "Open season overview",
       "tag": {
         "current": "Current",
         "high": "High load",
@@ -229,6 +231,10 @@
         "fri": "Fri",
         "sat": "Sat",
         "sun": "Sun"
+      },
+      "slot": {
+        "morning": "Morning",
+        "afternoon": "Afternoon"
       }
     },
     "session": {

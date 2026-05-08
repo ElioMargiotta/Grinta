@@ -4,7 +4,11 @@ import { useMemo, useState } from "react";
 import { useTranslations, useLocale } from "next-intl";
 import { useRouter } from "@/i18n/navigation";
 import type { Macrocycle, Mesocycle } from "./PlannerTourView";
-import { THEME_COLORS, type ThemeKey } from "./MicrocycleThemePicker";
+import {
+  MicrocycleThemePicker,
+  THEME_COLORS,
+  type ThemeKey,
+} from "./MicrocycleThemePicker";
 
 const KNOWN_THEMES: ThemeKey[] = [
   "possede_ballon",
@@ -28,7 +32,28 @@ type GridSession = {
   id: string;
   title: string;
   date: string;
+  start: string | null;
   durationMinutes: number | null;
+};
+
+type Slot = "morning" | "afternoon";
+
+function slotOf(start: string | null): Slot {
+  if (!start) return "morning";
+  const m = /T(\d{2}):/.exec(start);
+  if (!m) return "morning";
+  return Number(m[1]) < 12 ? "morning" : "afternoon";
+}
+
+function timeOf(start: string | null): string | null {
+  if (!start) return null;
+  const m = /T(\d{2}:\d{2})/.exec(start);
+  return m ? m[1] : null;
+}
+
+const DEFAULT_TIME: Record<Slot, string> = {
+  morning: "10:00",
+  afternoon: "16:00",
 };
 
 type MesoInfo = {
@@ -42,10 +67,12 @@ type MesoInfo = {
 };
 
 type MicroLookup = {
+  id: string;
   mesoId: string;
   weekNumber: number;
   theme: string | null;
   format: string | null;
+  notes: string | null;
 };
 
 type SessionType =
@@ -199,13 +226,7 @@ function ymd(d: Date): string {
   return `${y}-${m}-${dd}`;
 }
 
-function loadColor(pct: number): string {
-  if (pct > 85) return "#dc2626";
-  if (pct > 60) return "#f59e0b";
-  return "#22c55e";
-}
-
-type EnrichedSession = GridSession & { type: SessionType };
+type EnrichedSession = GridSession & { type: SessionType; slot: Slot };
 
 export function PlannerWeeksGrid({
   teamId,
@@ -240,10 +261,12 @@ export function PlannerWeeksGrid({
         });
         for (const micro of meso.microcycles) {
           microByStart.set(micro.start_date, {
+            id: micro.id,
             mesoId: meso.id,
             weekNumber: micro.week_number,
             theme: micro.theme,
             format: micro.format,
+            notes: micro.notes,
           });
         }
       }
@@ -277,9 +300,15 @@ export function PlannerWeeksGrid({
   const [activeTypes, setActiveTypes] = useState<Set<SessionType>>(
     () => new Set(TYPE_ORDER)
   );
+  const [openMicroId, setOpenMicroId] = useState<string | null>(null);
 
   const enriched = useMemo<EnrichedSession[]>(
-    () => sessions.map((s) => ({ ...s, type: inferType(s.title) })),
+    () =>
+      sessions.map((s) => ({
+        ...s,
+        type: inferType(s.title),
+        slot: slotOf(s.start),
+      })),
     [sessions]
   );
 
@@ -348,6 +377,8 @@ export function PlannerWeeksGrid({
   const avgPerWeekHours = Math.round((stats.totalMin / weeks.length / 60) * 10) / 10;
   const sortedByType = [...stats.byType.entries()].sort((a, b) => b[1] - a[1]);
 
+  const monthHasPeriodization = weeks.some((w) => microByStart.has(ymd(w)));
+
   const renderWeekRow = (
     weekStart: Date,
     _wi: number,
@@ -355,6 +386,7 @@ export function PlannerWeeksGrid({
   ): React.ReactNode => {
     const weekEnd = addDays(weekStart, 6);
     const isCurrentWeek = ymd(weekStart) <= today && today <= ymd(weekEnd);
+    const isPastWeek = ymd(weekEnd) < today;
 
     if (!micro) {
       return (
@@ -412,32 +444,38 @@ export function PlannerWeeksGrid({
       Math.round((weekTotal / WEEKLY_LOAD_TARGET_MIN) * 100)
     );
 
-    const tagText = isCurrentWeek
-      ? t("tag.current")
-      : loadPct > 85
-        ? t("tag.high")
-        : loadPct < 40
-          ? t("tag.light")
-          : t("tag.normal");
-    const tagClass = isCurrentWeek
-      ? "bg-emerald-100 text-emerald-800 border-emerald-300 dark:bg-emerald-950/60 dark:text-emerald-200 dark:border-emerald-800"
-      : loadPct > 85
-        ? "bg-red-100 text-red-800 border-red-300 dark:bg-red-950/60 dark:text-red-200 dark:border-red-800"
-        : "bg-zinc-100 text-zinc-600 border-zinc-200 dark:bg-zinc-800 dark:text-zinc-300 dark:border-zinc-700";
+    const isHighLoad = loadPct > 85;
+
+    const isPickerOpen = openMicroId === micro.id;
+    const themeDot = themeColors?.dot ?? "#cbd5e1";
+
+    const pastWeekClass = isPastWeek
+      ? "opacity-60 saturate-[0.65] [&_button]:pointer-events-auto"
+      : "";
 
     return (
       <div key={ymd(weekStart)} className="contents">
-        <div className="flex flex-col justify-between gap-2 border-b border-r border-zinc-200 bg-zinc-50/70 px-3.5 py-3 dark:border-zinc-800 dark:bg-zinc-950/50">
+        <div
+          className={`flex flex-col justify-between gap-2 border-b border-r border-l-[5px] border-zinc-200 px-3.5 py-3 dark:border-zinc-800 ${themeColors?.bg ?? "bg-zinc-50/70 dark:bg-zinc-950/50"} ${pastWeekClass}`}
+          style={{ borderLeftColor: themeDot }}
+        >
           <div>
-            <div className="flex items-baseline justify-between gap-2">
-              <span className="text-[13px] font-bold tracking-tight text-zinc-900 dark:text-zinc-100">
-                {weekLabelText}
-              </span>
-              <span
-                className={`inline-flex items-center rounded-full border px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wide ${tagClass}`}
-              >
-                {tagText}
-              </span>
+            <div className="flex items-center justify-between gap-2">
+              <div className="flex items-baseline gap-2">
+                <span className="text-[13px] font-bold tracking-tight text-zinc-900 dark:text-zinc-100">
+                  {weekLabelText}
+                </span>
+                {isCurrentWeek ? (
+                  <span className="text-[9px] font-semibold uppercase tracking-[0.12em] text-zinc-500 dark:text-zinc-400">
+                    {t("tag.current")}
+                  </span>
+                ) : null}
+              </div>
+              {isHighLoad ? (
+                <span className="inline-flex items-center rounded-full border border-red-300 bg-red-100 px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-red-800 dark:border-red-800 dark:bg-red-950/60 dark:text-red-200">
+                  {t("tag.high")}
+                </span>
+              ) : null}
             </div>
             <div className="mt-0.5 text-[11px] text-zinc-500 dark:text-zinc-400">
               {weekStart.toLocaleDateString(locale, {
@@ -450,34 +488,52 @@ export function PlannerWeeksGrid({
                 day: "numeric",
               })}
             </div>
-            {themeLabel ? (
-              <div
-                className="mt-1.5 inline-flex items-center gap-1.5 rounded-md border-l-2 bg-white/60 px-1.5 py-0.5 text-[10px] font-medium leading-tight text-zinc-700 dark:bg-zinc-900/60 dark:text-zinc-200"
-                style={{ borderLeftColor: themeColors?.dot ?? "#cbd5e1" }}
-                title={themeLabel}
+            <div className="relative mt-2">
+              <button
+                type="button"
+                onClick={() =>
+                  setOpenMicroId(isPickerOpen ? null : micro.id)
+                }
+                className={`flex w-full items-start gap-2 rounded-md border px-2 py-1.5 text-left transition-colors ${
+                  themeLabel
+                    ? "border-zinc-200/80 bg-white/80 hover:bg-white dark:border-zinc-700/70 dark:bg-zinc-900/70 dark:hover:bg-zinc-900"
+                    : "border-dashed border-zinc-300 bg-white/40 hover:bg-white/80 dark:border-zinc-700 dark:bg-zinc-900/40 dark:hover:bg-zinc-900/70"
+                }`}
+                title={themeLabel ?? tTour("setTheme")}
+                aria-haspopup="dialog"
+                aria-expanded={isPickerOpen}
               >
-                <span className="line-clamp-1">{themeLabel}</span>
-              </div>
-            ) : null}
+                <span
+                  className="mt-0.5 inline-block h-2.5 w-2.5 shrink-0 rounded-full"
+                  style={{ background: themeDot }}
+                />
+                <span className="flex-1 text-[11px] font-semibold leading-tight text-zinc-800 dark:text-zinc-100">
+                  {themeLabel ? (
+                    <span className="line-clamp-2">{themeLabel}</span>
+                  ) : (
+                    <span className="text-zinc-400 dark:text-zinc-500">
+                      + {tTour("setTheme")}
+                    </span>
+                  )}
+                </span>
+              </button>
+              {isPickerOpen ? (
+                <MicrocycleThemePicker
+                  microcycleId={micro.id}
+                  teamId={teamId}
+                  currentTheme={micro.theme}
+                  currentFormat={micro.format}
+                  currentNotes={micro.notes}
+                  onClose={() => setOpenMicroId(null)}
+                  placement="inline"
+                />
+              ) : null}
+            </div>
             {formatLabel ? (
               <div className="mt-1 text-[10px] text-zinc-400 dark:text-zinc-500">
                 {formatLabel}
               </div>
             ) : null}
-          </div>
-          <div className="flex items-center gap-2 text-[11px] text-zinc-500 dark:text-zinc-400">
-            <div className="relative h-1 flex-1 overflow-hidden rounded-full bg-zinc-200 dark:bg-zinc-800">
-              <div
-                className="absolute inset-y-0 left-0 rounded-full"
-                style={{
-                  width: `${loadPct}%`,
-                  background: loadColor(loadPct),
-                }}
-              />
-            </div>
-            <span className="min-w-[30px] text-right font-semibold tabular-nums text-zinc-700 dark:text-zinc-200">
-              {loadPct}%
-            </span>
           </div>
         </div>
 
@@ -487,66 +543,54 @@ export function PlannerWeeksGrid({
           const list = (byDate.get(dateStr) ?? []).filter((s) =>
             activeTypes.has(s.type)
           );
+          const morning = list.find((s) => s.slot === "morning") ?? null;
+          const afternoon = list.find((s) => s.slot === "afternoon") ?? null;
           const isToday = dateStr === today;
           const isWeekend = di >= 5;
 
-          return (
-            <div
-              key={dateStr}
-              role="button"
-              tabIndex={0}
-              onClick={() =>
-                router.push({
-                  pathname: `/planner/${teamId}/sessions/new`,
-                  query: { date: dateStr },
-                })
-              }
-              onKeyDown={(e) => {
-                if (e.key === "Enter" || e.key === " ") {
-                  e.preventDefault();
-                  router.push({
-                    pathname: `/planner/${teamId}/sessions/new`,
-                    query: { date: dateStr },
-                  });
-                }
-              }}
-              className={`group relative flex min-h-[96px] cursor-pointer flex-col gap-1 border-b border-r border-zinc-200 p-1.5 text-left transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-zinc-400 dark:border-zinc-800 ${
-                isToday
-                  ? "bg-amber-50/60 dark:bg-amber-950/20"
-                  : isWeekend
-                    ? "bg-zinc-50/70 dark:bg-zinc-950/40"
-                    : "bg-white dark:bg-zinc-900"
-              } hover:bg-zinc-50 dark:hover:bg-zinc-800/50`}
-            >
-              <div className="flex items-center justify-between">
-                <span
-                  className={`text-[10px] tabular-nums ${
-                    isToday
-                      ? "rounded bg-zinc-900 px-1 py-px font-semibold text-white dark:bg-zinc-100 dark:text-zinc-900"
-                      : "text-zinc-400 dark:text-zinc-500"
-                  }`}
-                >
-                  {cellDate.getDate()}
-                </span>
-              </div>
-              {list.map((s) => (
+          const goToNew = (slot: Slot) =>
+            router.push({
+              pathname: `/planner/${teamId}/sessions/new`,
+              query: { date: dateStr, startTime: DEFAULT_TIME[slot] },
+            });
+
+          const baseBg = isToday
+            ? "bg-amber-50/60 dark:bg-amber-950/20"
+            : isWeekend
+              ? "bg-zinc-50/70 dark:bg-zinc-950/40"
+              : "bg-white dark:bg-zinc-900";
+
+          const renderSlot = (
+            slot: Slot,
+            session: EnrichedSession | null,
+            label: string
+          ) => {
+            if (session) {
+              const t = timeOf(session.start);
+              return (
                 <button
-                  key={s.id}
                   type="button"
                   onClick={(e) => {
                     e.stopPropagation();
-                    router.push(`/planner/${teamId}/sessions/${s.id}`);
+                    router.push(
+                      `/planner/${teamId}/sessions/${session.id}`
+                    );
                   }}
-                  title={s.title}
+                  title={session.title}
                   className={`flex w-full flex-col gap-0.5 rounded border-l-[3px] px-1.5 py-1 text-left transition-transform hover:-translate-y-px hover:shadow-sm ${
-                    TYPE_BLOCK_CLASS[s.type]
+                    TYPE_BLOCK_CLASS[session.type]
                   }`}
                 >
+                  {t ? (
+                    <span className="text-[10px] font-semibold tabular-nums opacity-70">
+                      {t}
+                    </span>
+                  ) : null}
                   <span className="truncate text-[11px] font-semibold leading-tight">
-                    {s.type === "match" ? "⚽ " : ""}
-                    {s.title}
+                    {session.type === "match" ? "⚽ " : ""}
+                    {session.title}
                   </span>
-                  {s.durationMinutes ? (
+                  {session.durationMinutes ? (
                     <span className="flex items-center gap-1 text-[10px] tabular-nums opacity-75">
                       <svg
                         width="9"
@@ -559,21 +603,61 @@ export function PlannerWeeksGrid({
                         <circle cx="12" cy="12" r="10" />
                         <polyline points="12 6 12 12 16 14" />
                       </svg>
-                      {s.durationMinutes}m
+                      {session.durationMinutes}m
                     </span>
                   ) : null}
                 </button>
-              ))}
-              {list.length === 0 ? (
-                <span className="pointer-events-none mt-auto text-[11px] text-zinc-400 opacity-0 transition-opacity group-hover:opacity-100 dark:text-zinc-500">
-                  + {t("addSession")}
+              );
+            }
+            return (
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  goToNew(slot);
+                }}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" || e.key === " ") {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    goToNew(slot);
+                  }
+                }}
+                className="flex w-full items-center justify-between gap-1 rounded border border-dashed border-zinc-200 px-1.5 py-1 text-[10px] text-zinc-400 opacity-0 transition-opacity hover:bg-zinc-50 group-hover:opacity-100 dark:border-zinc-700 dark:text-zinc-500 dark:hover:bg-zinc-800/60"
+              >
+                <span className="font-semibold uppercase tracking-wide">
+                  {label}
                 </span>
-              ) : null}
+                <span>+</span>
+              </button>
+            );
+          };
+
+          return (
+            <div
+              key={dateStr}
+              className={`group relative flex min-h-[110px] flex-col gap-1 border-b border-r border-zinc-200 p-1.5 text-left transition-colors dark:border-zinc-800 ${baseBg} ${pastWeekClass}`}
+            >
+              <div className="flex items-center justify-between">
+                <span
+                  className={`text-[10px] tabular-nums ${
+                    isToday
+                      ? "rounded bg-zinc-900 px-1 py-px font-semibold text-white dark:bg-zinc-100 dark:text-zinc-900"
+                      : "text-zinc-400 dark:text-zinc-500"
+                  }`}
+                >
+                  {cellDate.getDate()}
+                </span>
+              </div>
+              {renderSlot("morning", morning, t("slot.morning"))}
+              {renderSlot("afternoon", afternoon, t("slot.afternoon"))}
             </div>
           );
         })}
 
-        <div className="flex flex-col gap-2 border-b border-l border-zinc-200 bg-zinc-50/60 px-3 py-3 text-[11px] dark:border-zinc-800 dark:bg-zinc-950/50">
+        <div
+          className={`flex flex-col gap-2 border-b border-l border-zinc-200 bg-zinc-50/60 px-3 py-3 text-[11px] dark:border-zinc-800 dark:bg-zinc-950/50 ${pastWeekClass}`}
+        >
           <div className="flex items-center justify-between text-zinc-500 dark:text-zinc-400">
             <span>{t("sessions")}</span>
             <strong className="font-semibold tabular-nums text-zinc-900 dark:text-zinc-100">
@@ -662,6 +746,24 @@ export function PlannerWeeksGrid({
           })}
         </div>
       </div>
+
+      {!monthHasPeriodization ? (
+        <div className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-dashed border-zinc-300 bg-zinc-50/60 px-4 py-3 text-sm text-zinc-600 dark:border-zinc-700 dark:bg-zinc-900/40 dark:text-zinc-300">
+          <span>{t("emptyMonth")}</span>
+          <button
+            type="button"
+            onClick={() =>
+              router.push({
+                pathname: `/planner/${teamId}`,
+                query: { view: "tour" },
+              })
+            }
+            className="rounded-md border border-zinc-200 bg-white px-2.5 py-1 text-xs font-semibold text-zinc-700 hover:bg-zinc-50 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-200 dark:hover:bg-zinc-800"
+          >
+            {t("emptyMonthCta")}
+          </button>
+        </div>
+      ) : null}
 
       <div className="overflow-x-auto rounded-xl border border-zinc-200 bg-white shadow-sm dark:border-zinc-800 dark:bg-zinc-900">
         <div className="grid min-w-[1080px] grid-cols-[200px_repeat(7,minmax(0,1fr))_200px]">
