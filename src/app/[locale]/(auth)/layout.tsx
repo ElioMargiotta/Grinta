@@ -1,4 +1,5 @@
 import { setRequestLocale, getTranslations } from "next-intl/server";
+import Image from "next/image";
 import { AuthTabs } from "@/components/auth/AuthTabs";
 
 export default async function AuthLayout({
@@ -16,9 +17,22 @@ export default async function AuthLayout({
     <div className="flex min-h-screen flex-1 items-start justify-center bg-zinc-50 px-4 py-10 sm:items-center sm:py-16">
       <div className="w-full max-w-md">
         <div className="mb-6 flex flex-col items-center text-center">
-          <div className="text-2xl font-bold tracking-tight text-zinc-900">
-            {t("name")}
-          </div>
+          <Image
+            src="/Icon-grinta.svg"
+            alt={t("name")}
+            width={64}
+            height={64}
+            priority
+            className="mb-3 h-16 w-16"
+          />
+          <Image
+            src="/text-grinta.svg"
+            alt={t("name")}
+            width={192}
+            height={192}
+            priority
+            className="h-12 w-auto"
+          />
           <p className="mt-1 text-sm text-zinc-600">{t("tagline")}</p>
         </div>
 

@@ -87,7 +87,7 @@ export default async function DashboardPage({
             </div>
             {nextSession && (
               <Link
-                href={`/planner/${nextSession.team_id}/sessions/${nextSession.id}`}
+                href={`/planner/${nextSession.team_id}/sessions/${nextSession.id}/preparation`}
                 className="text-xs font-medium text-white/80 underline-offset-2 hover:text-white hover:underline"
               >
                 Open

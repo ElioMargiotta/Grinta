@@ -24,6 +24,99 @@ function readSessionFields(formData: FormData): SessionPayload {
   };
 }
 
+function slotOf(time: string | null): "morning" | "afternoon" {
+  if (!time) return "morning";
+  const hh = Number(time.slice(0, 2));
+  return hh < 12 ? "morning" : "afternoon";
+}
+
+const SLOT_DEFAULT_TIME: Record<"morning" | "afternoon", string> = {
+  morning: "10:00",
+  afternoon: "16:00",
+};
+const DEFAULT_SESSION_DURATION = 90;
+
+export async function createSessionForSlotAction({
+  teamId,
+  date,
+  slot,
+  locale,
+}: {
+  teamId: string;
+  date: string;
+  slot: "morning" | "afternoon";
+  locale: string;
+}) {
+  if (!teamId || !date) return { error: "Missing fields" };
+
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) redirect(`/${locale}/login`);
+
+  const { data: sameDay } = await supabase
+    .from("sessions")
+    .select("id, start_time")
+    .eq("team_id", teamId)
+    .eq("date", date);
+  if (
+    (sameDay ?? []).some(
+      (s) => slotOf((s.start_time as string | null) ?? null) === slot,
+    )
+  ) {
+    return {
+      error:
+        slot === "morning"
+          ? "A morning session already exists for this day."
+          : "An afternoon session already exists for this day.",
+    };
+  }
+
+  const { data, error } = await supabase
+    .from("sessions")
+    .insert({
+      team_id: teamId,
+      trainer_id: user.id,
+      date,
+      start_time: SLOT_DEFAULT_TIME[slot],
+      duration_minutes: DEFAULT_SESSION_DURATION,
+      theme: null,
+      notes: null,
+    })
+    .select("id")
+    .single();
+
+  if (error) return { error: error.message };
+
+  revalidatePath(`/${locale}/planner/${teamId}`);
+  redirect(`/${locale}/planner/${teamId}/sessions/${data.id}/preparation`);
+}
+
+export async function cancelSessionAction({
+  teamId,
+  sessionId,
+  locale,
+}: {
+  teamId: string;
+  sessionId: string;
+  locale: string;
+}) {
+  if (!teamId || !sessionId) return { error: "Missing fields" };
+
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) redirect(`/${locale}/login`);
+
+  const { error } = await supabase.from("sessions").delete().eq("id", sessionId);
+  if (error) return { error: error.message };
+
+  revalidatePath(`/${locale}/planner/${teamId}`);
+  redirect(`/${locale}/planner/${teamId}`);
+}
+
 export async function createSessionAction(formData: FormData) {
   const fields = readSessionFields(formData);
   const locale = String(formData.get("locale") ?? "en");
@@ -35,6 +128,25 @@ export async function createSessionAction(formData: FormData) {
     data: { user },
   } = await supabase.auth.getUser();
   if (!user) redirect(`/${locale}/login`);
+
+  const slot = slotOf(fields.startTime);
+  const { data: sameDay } = await supabase
+    .from("sessions")
+    .select("id, start_time")
+    .eq("team_id", fields.teamId)
+    .eq("date", fields.date);
+  if (
+    (sameDay ?? []).some(
+      (s) => slotOf((s.start_time as string | null) ?? null) === slot,
+    )
+  ) {
+    return {
+      error:
+        slot === "morning"
+          ? "A morning session already exists for this day."
+          : "An afternoon session already exists for this day.",
+    };
+  }
 
   const { data, error } = await supabase
     .from("sessions")
@@ -63,6 +175,28 @@ export async function updateSessionAction(formData: FormData) {
   if (!id) return { error: "Missing id" };
 
   const supabase = await createClient();
+
+  const slot = slotOf(fields.startTime);
+  const { data: sameDay } = await supabase
+    .from("sessions")
+    .select("id, start_time")
+    .eq("team_id", fields.teamId)
+    .eq("date", fields.date);
+  if (
+    (sameDay ?? []).some(
+      (s) =>
+        s.id !== id &&
+        slotOf((s.start_time as string | null) ?? null) === slot,
+    )
+  ) {
+    return {
+      error:
+        slot === "morning"
+          ? "A morning session already exists for this day."
+          : "An afternoon session already exists for this day.",
+    };
+  }
+
   const { error } = await supabase
     .from("sessions")
     .update({
@@ -80,53 +214,3 @@ export async function updateSessionAction(formData: FormData) {
   revalidatePath(`/${locale}/planner/${fields.teamId}/sessions/${id}`);
 }
 
-export async function deleteSessionAction(formData: FormData) {
-  const id = String(formData.get("id") ?? "");
-  const teamId = String(formData.get("teamId") ?? "");
-  const locale = String(formData.get("locale") ?? "en");
-  if (!id) return { error: "Missing id" };
-
-  const supabase = await createClient();
-  const { error } = await supabase.from("sessions").delete().eq("id", id);
-  if (error) return { error: error.message };
-
-  revalidatePath(`/${locale}/planner/${teamId}`);
-  redirect(`/${locale}/planner/${teamId}`);
-}
-
-export async function attachExerciseAction(formData: FormData) {
-  const sessionId = String(formData.get("sessionId") ?? "");
-  const exerciseId = String(formData.get("exerciseId") ?? "");
-  const teamId = String(formData.get("teamId") ?? "");
-  const locale = String(formData.get("locale") ?? "en");
-  if (!sessionId || !exerciseId) return { error: "Missing fields" };
-
-  const supabase = await createClient();
-  const { count } = await supabase
-    .from("session_exercises")
-    .select("*", { count: "exact", head: true })
-    .eq("session_id", sessionId);
-
-  const { error } = await supabase.from("session_exercises").insert({
-    session_id: sessionId,
-    exercise_id: exerciseId,
-    order_index: count ?? 0,
-  });
-  if (error) return { error: error.message };
-
-  revalidatePath(`/${locale}/planner/${teamId}/sessions/${sessionId}`);
-}
-
-export async function detachExerciseAction(formData: FormData) {
-  const id = String(formData.get("id") ?? "");
-  const sessionId = String(formData.get("sessionId") ?? "");
-  const teamId = String(formData.get("teamId") ?? "");
-  const locale = String(formData.get("locale") ?? "en");
-  if (!id) return { error: "Missing id" };
-
-  const supabase = await createClient();
-  const { error } = await supabase.from("session_exercises").delete().eq("id", id);
-  if (error) return { error: error.message };
-
-  revalidatePath(`/${locale}/planner/${teamId}/sessions/${sessionId}`);
-}

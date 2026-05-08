@@ -2,6 +2,7 @@
 
 import { CalendarDays, Dumbbell, LayoutDashboard, Users } from "lucide-react";
 import { useTranslations } from "next-intl";
+import Image from "next/image";
 import { Link, usePathname } from "@/i18n/navigation";
 
 const items = [
@@ -19,12 +20,22 @@ export function Sidebar() {
     <aside className="hidden w-60 shrink-0 border-r border-zinc-200 bg-white md:flex md:flex-col dark:border-zinc-800 dark:bg-zinc-950">
       <div className="px-5 py-6">
         <Link href="/dashboard" className="flex items-center gap-2">
-          <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-zinc-900 text-sm font-bold text-white shadow-sm dark:bg-white dark:text-zinc-900">
-            G
-          </span>
-          <span className="text-base font-semibold tracking-tight text-zinc-900 dark:text-zinc-100">
-            Grinta
-          </span>
+          <Image
+            src="/Icon-grinta.svg"
+            alt="Grinta"
+            width={48}
+            height={48}
+            priority
+            className="h-12 w-12 shrink-0"
+          />
+          <Image
+            src="/text-grinta.svg"
+            alt="Grinta"
+            width={128}
+            height={128}
+            priority
+            className="h-8 w-auto"
+          />
         </Link>
       </div>
       <nav className="flex flex-col gap-0.5 px-3">

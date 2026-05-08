@@ -18,7 +18,9 @@ export default async function PreparationPage({
     await Promise.all([
       supabase
         .from("sessions")
-        .select("id, date, theme, team_id, teams(name)")
+        .select(
+          "id, date, theme, start_time, duration_minutes, team_id, teams(name)",
+        )
         .eq("id", sessionId)
         .single(),
       supabase
@@ -54,6 +56,11 @@ export default async function PreparationPage({
       sessionId={sessionId}
       initial={initial}
       libraryExercises={(library ?? []) as LibraryExercise[]}
+      sessionMeta={{
+        title: session.theme ?? "",
+        startTime: (session.start_time as string | null)?.slice(0, 5) ?? "",
+        durationMinutes: session.duration_minutes ?? null,
+      }}
     />
   );
 }
