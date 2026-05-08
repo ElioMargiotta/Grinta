@@ -546,46 +546,6 @@ function DurPill({
   );
 }
 
-function RadioCard({
-  label,
-  hint,
-  active,
-  onClick,
-}: {
-  label: string;
-  hint?: string;
-  active: boolean;
-  onClick: () => void;
-}) {
-  return (
-    <button
-      type="button"
-      onClick={onClick}
-      className={`flex flex-1 items-center gap-2.5 rounded-[10px] border-[1.5px] px-3 py-2.5 text-left transition ${
-        active
-          ? "border-zinc-900 bg-[#0c0c0d]/[0.025]"
-          : "border-zinc-200 bg-white hover:border-zinc-300"
-      }`}
-    >
-      <span
-        className={`flex h-4 w-4 shrink-0 items-center justify-center rounded-full border-[1.5px] transition ${
-          active ? "border-zinc-900" : "border-zinc-300"
-        }`}
-      >
-        {active && <span className="h-2 w-2 rounded-full bg-zinc-900" />}
-      </span>
-      <span className="min-w-0">
-        <span className="block text-[12px] font-medium text-zinc-900">
-          {label}
-        </span>
-        {hint && (
-          <span className="block text-[11px] text-zinc-400">{hint}</span>
-        )}
-      </span>
-    </button>
-  );
-}
-
 const FOCUS_FAMILY_LABELS: Record<FocusFamily, string> = {
   TE: "Technique",
   TA: "Tactique",
@@ -1400,6 +1360,7 @@ function Step2({ data, patch }: { data: PreparationData; patch: Patcher }) {
                 <div className="overflow-hidden [&>div]:border-0 [&>div]:bg-transparent">
                   <SchemaEditor
                     settingsKey="warmup"
+                    showHint={false}
                     value={data.initial.phase1.schema}
                     onChange={(v) =>
                   patch((d) => ({
@@ -1543,6 +1504,7 @@ function Step2({ data, patch }: { data: PreparationData; patch: Patcher }) {
                 <div className="overflow-hidden [&>div]:border-0 [&>div]:bg-transparent">
                   <SchemaEditor
                     settingsKey="warmup"
+                    showHint={false}
                     value={data.initial.phase2.schema}
                     onChange={(v) =>
                       patch((d) => ({
@@ -1727,40 +1689,84 @@ function StepMain({
   }
 
   return (
-    <div className="flex flex-col gap-3.5">
-      <div className="flex flex-wrap items-center gap-3">
-        <DurPill
-          value={ex.duration}
-          onChange={(v) => upd("duration", v)}
-          placeholder="20 min"
-        />
-        <div className="flex flex-1 gap-2">
-          <RadioCard
-            label="Forme jouée"
-            hint="Game-like"
-            active={ex.type === "playForm"}
-            onClick={() => upd("type", "playForm")}
-          />
-          <RadioCard
-            label="Exercice"
-            hint="Analytic drill"
-            active={ex.type === "exercise"}
-            onClick={() => upd("type", "exercise")}
-          />
+    <div className="mx-auto flex w-full max-w-[1120px] flex-col gap-3 py-0">
+      <section className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_430px]">
+        <div>
+          <div className="text-[10px] font-semibold uppercase tracking-[0.14em] text-red-600">
+            Main block {slot + 1}
+          </div>
+          <h2 className="mt-0.5 text-[20px] font-semibold tracking-[-0.02em] text-[#0c0c0d]">
+            Mettre le problème sur le terrain
+          </h2>
+          <p className="mt-0.5 max-w-[620px] text-[12px] leading-4 text-zinc-500">
+            Le bloc central doit rendre visible le comportement attendu, puis
+            donner au coach des repères précis pour intervenir.
+          </p>
         </div>
-        <button
-          type="button"
-          onClick={() => setPickerOpen(true)}
-          className="inline-flex items-center gap-1.5 rounded-[10px] border-[1.5px] border-zinc-900 bg-zinc-900 px-3 py-2 text-[12px] font-medium text-white transition hover:bg-zinc-800"
-        >
-          <BookOpen className="h-3.5 w-3.5" strokeWidth={2} />
-          Importer depuis bibliothèque
-        </button>
-      </div>
-      <div className="grid grid-cols-1 gap-3.5 lg:grid-cols-2">
-        <Field label="Schéma terrain">
+        <div className="self-center border-l border-zinc-200 pl-5">
+          <div className="grid items-end gap-3 lg:grid-cols-[minmax(0,1fr)_95px]">
+            <div>
+              <div className="mb-1.5 text-[10px] font-semibold uppercase tracking-[0.12em] text-zinc-400">
+                Format
+              </div>
+              <div className="grid grid-cols-2 gap-1">
+                {[
+                  ["playForm", "Forme jouée"],
+                  ["exercise", "Exercice"],
+                ].map(([id, label]) => (
+                  <button
+                    key={id}
+                    type="button"
+                    onClick={() =>
+                      upd("type", id as PreparationData["main"][number]["type"])
+                    }
+                    className={`h-6 border-b text-center text-[11px] font-semibold transition ${
+                      ex.type === id
+                        ? "border-red-500 text-zinc-950"
+                        : "border-zinc-200 text-zinc-500 hover:border-zinc-400 hover:text-zinc-900"
+                    }`}
+                  >
+                    {label}
+                  </button>
+                ))}
+              </div>
+            </div>
+            <FieldUl label="Durée">
+              <div className="flex items-center gap-2">
+                <Timer className="h-3.5 w-3.5 text-zinc-400" />
+                <input
+                  value={ex.duration}
+                  onChange={(e) => upd("duration", e.target.value)}
+                  placeholder="20 min"
+                  className={inpUlClass}
+                />
+              </div>
+            </FieldUl>
+          </div>
+        </div>
+      </section>
+
+      <section className="border-t border-zinc-200 pt-1">
+        <div className="mb-1.5 flex items-center justify-between gap-4">
+          <div>
+            <div className="text-[13px] font-semibold text-zinc-900">
+              {ex.type === "playForm" ? "Forme jouée" : "Exercice"}
+            </div>
+          </div>
+          <button
+            type="button"
+            onClick={() => setPickerOpen(true)}
+            className="inline-flex h-7 shrink-0 items-center gap-1.5 border-b border-zinc-900 px-1 text-[11px] font-semibold text-zinc-950 transition hover:border-red-500 hover:text-red-600"
+          >
+            <BookOpen className="h-3.5 w-3.5" strokeWidth={2} />
+            Importer
+          </button>
+        </div>
+
+        <div className="grid grid-cols-1 items-start gap-4 lg:grid-cols-[minmax(280px,0.62fr)_minmax(0,1.38fr)]">
+          <div className="overflow-hidden [&>div]:border-0 [&>div]:bg-transparent">
           {ex.imageUrl ? (
-            <div className="relative overflow-hidden rounded-[10px] border-[1.5px] border-zinc-200 bg-zinc-100">
+            <div className="relative overflow-hidden border-t border-zinc-200 pt-1">
               <div className="relative aspect-[4/3] w-full">
                 <Image
                   src={ex.imageUrl}
@@ -1781,59 +1787,66 @@ function StepMain({
               </button>
             </div>
           ) : (
-            <SchemaEditor
-              pitch="full-vertical"
-              settingsKey="block"
-              value={ex.schema}
-              onChange={(v) => upd("schema", v)}
-            />
+            <div className="border-t border-zinc-200 pt-1">
+              <SchemaEditor
+                pitch="full-vertical"
+                settingsKey="block"
+                showHint={false}
+                value={ex.schema}
+                onChange={(v) => upd("schema", v)}
+              />
+            </div>
           )}
-        </Field>
-        <div className="flex flex-col gap-2.5">
-          <Field label="Description">
+          </div>
+
+          <div className="grid min-w-0 gap-3 md:grid-cols-2">
+          <FieldUl label="Contenu">
             <FitTextarea
-              rows={4}
+              rows={7}
               maxChars={520}
               area={{ w: zones.description.w, h: zones.description.h }}
               value={ex.description}
               onChange={(v) => upd("description", v)}
-              placeholder="e.g., Build-up: GK + back four + #6 vs 3 high-pressing strikers."
+              placeholder="Situation, règles, scoring, contraintes."
+              className={txtaUlClass}
             />
-          </Field>
-          <Field label="Coaching">
+          </FieldUl>
+          <FieldUl label="Coaching">
             <FitTextarea
-              rows={3}
+              rows={7}
               maxChars={520}
               area={{ w: zones.coaching.w, h: zones.coaching.h }}
               value={ex.coaching}
               onChange={(v) => upd("coaching", v)}
-              placeholder="e.g., Trigger = back-pass to GK. Reward forward passes through the gate."
+              placeholder="Déclencheurs, comportements attendus, corrections."
+              className={txtaUlClass}
             />
-          </Field>
-          <div className="grid grid-cols-1 gap-2 md:grid-cols-2">
-            <Field label="Organisation">
+          </FieldUl>
+          <FieldUl label="Organisation">
               <FitTextarea
                 rows={3}
                 maxChars={300}
                 area={{ w: zones.organisation.w, h: zones.organisation.h }}
                 value={ex.organisation}
                 onChange={(v) => upd("organisation", v)}
-                placeholder="e.g., Half-pitch. 3 yellow gates on the half-line."
+                placeholder="Espace, joueurs, matériel."
+                className={txtaUlClass}
               />
-            </Field>
-            <Field label="Variations">
+          </FieldUl>
+          <FieldUl label="Variations">
               <FitTextarea
                 rows={3}
                 maxChars={300}
                 area={{ w: zones.variations.w, h: zones.variations.h }}
                 value={ex.variations}
                 onChange={(v) => upd("variations", v)}
-                placeholder="+ harder  − easier"
+                placeholder="+ difficile / - difficile"
+                className={txtaUlClass}
               />
-            </Field>
+          </FieldUl>
           </div>
         </div>
-      </div>
+      </section>
       <ExerciseLibraryPicker
         open={pickerOpen}
         onClose={() => setPickerOpen(false)}
@@ -1867,6 +1880,7 @@ function Step5({ data, patch }: { data: PreparationData; patch: Patcher }) {
           <SchemaEditor
             pitch="full-horizontal"
             settingsKey="game"
+            showHint={false}
             value={data.game.schema}
             onChange={(v) =>
               patch((d) => ({ ...d, game: { ...d.game, schema: v } }))
