@@ -1020,37 +1020,30 @@ function Step1({
   }
 
   return (
-    <div className="mx-auto flex w-full max-w-[1120px] flex-col gap-4 py-2">
-      <section>
-        <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_360px] lg:items-end">
+    <div className="mx-auto flex w-full max-w-[1120px] flex-col gap-3 py-1">
+      <section className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_300px]">
+        <div>
           <div>
             <div className="text-[10px] font-semibold uppercase tracking-[0.14em] text-red-600">
               Brief guidé
             </div>
-            <h2 className="mt-1.5 text-[23px] font-semibold tracking-[-0.02em] text-[#0c0c0d]">
+            <h2 className="mt-1 text-[22px] font-semibold tracking-[-0.02em] text-[#0c0c0d]">
               Construire le fil conducteur
             </h2>
-            <p className="mt-1 max-w-[640px] text-[12px] leading-4 text-zinc-500">
+            <p className="mt-0.5 max-w-[640px] text-[12px] leading-4 text-zinc-500">
               On garde la logique terrain : point de départ, situation exacte,
               comportements attendus, puis questions qui guident les joueurs.
             </p>
           </div>
-          <div className="hidden justify-end lg:flex">
-            <Image
-              src="/icon-grinta.svg"
-              alt=""
-              width={48}
-              height={48}
-              className="h-11 w-11 opacity-90"
-            />
-          </div>
         </div>
 
-        <div className="mt-3 border-t border-zinc-200 pt-2 text-[12px] text-zinc-500">
-          <div className="mb-1.5 text-[10px] font-semibold uppercase tracking-[0.12em] text-zinc-400">
-            Séance
+        <div className="self-center border-l border-zinc-200 pl-5 text-[12px] text-zinc-500">
+          <div className="mb-2 flex items-center justify-between gap-3">
+            <div className="text-[10px] font-semibold uppercase tracking-[0.12em] text-zinc-400">
+              Séance
+            </div>
           </div>
-          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-[1fr_0.7fr_0.55fr_1fr_1fr]">
+          <div className="space-y-1.5">
             <label className="flex min-w-0 items-center gap-2">
               <CalendarDays className="h-3.5 w-3.5 text-zinc-400" />
               <input
@@ -1062,40 +1055,42 @@ function Step1({
                 }
               />
             </label>
-            <label className="flex min-w-0 items-center gap-2">
-              <Clock className="h-3.5 w-3.5 text-zinc-400" />
-              <input
-                type="time"
-                className={inpUlClass}
-                min={bounds.min}
-                max={bounds.max}
-                value={meta.startTime}
-                onChange={(e) =>
-                  patchMeta((m) => ({
-                    ...m,
-                    startTime: clampToSlot(e.target.value, slot),
-                  }))
-                }
-              />
-            </label>
-            <label className="flex min-w-0 items-center gap-2">
-              <Timer className="h-3.5 w-3.5 text-zinc-400" />
-              <input
-                type="number"
-                min={1}
-                className={inpUlClass}
-                placeholder="90"
-                value={meta.durationMinutes ?? ""}
-                onChange={(e) =>
-                  patchMeta((m) => ({
-                    ...m,
-                    durationMinutes: e.target.value
-                      ? Number(e.target.value)
-                      : null,
-                  }))
-                }
-              />
-            </label>
+            <div className="grid grid-cols-2 gap-2.5">
+              <label className="flex min-w-0 items-center gap-2">
+                <Clock className="h-3.5 w-3.5 text-zinc-400" />
+                <input
+                  type="time"
+                  className={inpUlClass}
+                  min={bounds.min}
+                  max={bounds.max}
+                  value={meta.startTime}
+                  onChange={(e) =>
+                    patchMeta((m) => ({
+                      ...m,
+                      startTime: clampToSlot(e.target.value, slot),
+                    }))
+                  }
+                />
+              </label>
+              <label className="flex min-w-0 items-center gap-2">
+                <Timer className="h-3.5 w-3.5 text-zinc-400" />
+                <input
+                  type="number"
+                  min={1}
+                  className={inpUlClass}
+                  placeholder="90"
+                  value={meta.durationMinutes ?? ""}
+                  onChange={(e) =>
+                    patchMeta((m) => ({
+                      ...m,
+                      durationMinutes: e.target.value
+                        ? Number(e.target.value)
+                        : null,
+                    }))
+                  }
+                />
+              </label>
+            </div>
             <label className="flex min-w-0 items-center gap-2">
               <Users className="h-3.5 w-3.5 text-zinc-400" />
               <input
@@ -1122,12 +1117,12 @@ function Step1({
         </div>
       </section>
 
-      <section className="grid gap-5 lg:grid-cols-[200px_minmax(0,1fr)]">
+      <section className="grid gap-4 lg:grid-cols-[190px_minmax(0,1fr)]">
         <div className="text-[12px] text-zinc-500">
-          <div className="mb-2 text-[10px] font-semibold uppercase tracking-[0.12em] text-zinc-400">
+          <div className="mb-1.5 text-[10px] font-semibold uppercase tracking-[0.12em] text-zinc-400">
             Moment du jeu
           </div>
-          <div className="space-y-1">
+          <div className="space-y-0.5">
             {phaseOptions.map((ph) => {
               const checked = data.phases[ph.key];
               const isRecommended =
@@ -1139,7 +1134,7 @@ function Step1({
                   key={ph.key}
                   type="button"
                   onClick={() => selectPhase(ph.key)}
-                  className={`flex w-full items-center justify-between border-b py-1.5 text-left transition ${
+                  className={`flex w-full items-center justify-between border-b py-1 text-left transition ${
                     checked
                       ? "border-red-500 text-zinc-950"
                       : isRecommended
@@ -1175,7 +1170,7 @@ function Step1({
 
         <div className="relative pl-6">
           <div className="absolute bottom-2 left-0 top-1 w-px bg-zinc-200" />
-          <div className="space-y-3">
+          <div className="space-y-2.5">
             <div className="relative">
               <span className="absolute -left-[34px] top-1 flex h-4 w-4 items-center justify-center rounded-full bg-[#0c0c0d] text-[9px] font-semibold text-white">
                 1
@@ -1183,7 +1178,7 @@ function Step1({
               <div className="text-[11px] font-semibold uppercase tracking-[0.1em] text-zinc-400">
                 Point de départ
               </div>
-              <div className="mt-0.5 text-[17px] font-semibold tracking-[-0.015em] text-zinc-950">
+              <div className="mt-0.5 text-[16px] font-semibold tracking-[-0.015em] text-zinc-950">
                 Aujourd&apos;hui, on démarre quand{" "}
                 <span className="text-red-600">
                   {selectedPhase?.label.toLowerCase() ?? "le moment est choisi"}
@@ -1216,7 +1211,7 @@ function Step1({
                 3
               </span>
               <FieldUl label="Focus">
-                <div className="mb-2">
+                <div className="mb-1.5">
                   <FocusFamilyChips
                     value={data.focusFamilies}
                     onChange={(v) =>
@@ -1295,283 +1290,356 @@ function Step2({ data, patch }: { data: PreparationData; patch: Patcher }) {
   const [tab, setTab] = useState<"p1" | "p2" | "p3">("p1");
   const pv = data.initial.phase1.prevention;
   const prevRows = [
-    { k: "ankle" as const, l: "Ankle / Cheville" },
-    { k: "knee" as const, l: "Knee / Genou" },
-    { k: "hip" as const, l: "Hip / Hanche" },
-    { k: "hamstring" as const, l: "Hamstrings" },
+    {
+      k: "ankle" as const,
+      l: "Cheville",
+      descriptionArea: Z_INITIAL.ankleDescription,
+      coachingArea: Z_INITIAL.ankleCoaching,
+    },
+    {
+      k: "knee" as const,
+      l: "Genou",
+      descriptionArea: Z_INITIAL.kneeDescription,
+      coachingArea: Z_INITIAL.kneeCoaching,
+    },
+    {
+      k: "hip" as const,
+      l: "Hanche",
+      descriptionArea: Z_INITIAL.hipDescription,
+      coachingArea: Z_INITIAL.hipCoaching,
+    },
+    {
+      k: "hamstring" as const,
+      l: "Ischios",
+      descriptionArea: Z_INITIAL.hamstringDescription,
+      coachingArea: Z_INITIAL.hamstringCoaching,
+    },
   ];
-  const tabs: Array<["p1" | "p2" | "p3", string]> = [
-    ["p1", "Phase 1 — Warmup"],
-    ["p2", "Phase 2 — TE/TA/PE"],
-    ["p3", "Phase 3 — Explosivité"],
+  const tabs: Array<["p1" | "p2" | "p3", string, string]> = [
+    ["p1", "Activer", "Mobilité + prévention"],
+    ["p2", "Connecter", "TE / TA / PE"],
+    ["p3", "Accélérer", "Explosivité"],
   ];
 
   return (
-    <div className="flex flex-col gap-3.5">
-      <div className="flex flex-wrap items-center gap-3.5">
-        <DurPill
-          value={data.initial.duration}
-          onChange={(v) =>
-            patch((d) => ({ ...d, initial: { ...d.initial, duration: v } }))
-          }
-          placeholder="25 min"
-        />
-        <div className="flex gap-1 rounded-[9px] bg-zinc-100 p-[3px]">
-          {tabs.map(([id, label]) => (
-            <button
-              key={id}
-              type="button"
-              onClick={() => setTab(id)}
-              className={`flex h-7 items-center whitespace-nowrap rounded-[7px] px-3 text-[12px] font-medium transition ${
-                tab === id
-                  ? "bg-white text-zinc-900 shadow-[0_1px_3px_rgb(0_0_0/0.1)]"
-                  : "text-zinc-500 hover:text-zinc-700"
-              }`}
-            >
-              {label}
-            </button>
-          ))}
+    <div className="mx-auto flex w-full max-w-[1120px] flex-col gap-4 py-1">
+      <section className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_500px]">
+        <div>
+          <div className="text-[10px] font-semibold uppercase tracking-[0.14em] text-red-600">
+            Warm-up & prep
+          </div>
+          <h2 className="mt-1 text-[22px] font-semibold tracking-[-0.02em] text-[#0c0c0d]">
+            Préparer le corps, puis le thème
+          </h2>
+          <p className="mt-0.5 max-w-[620px] text-[12px] leading-4 text-zinc-500">
+            Le début de séance installe l&apos;intensité, connecte les joueurs
+            au problème du jour, puis finit par une courte accélération.
+          </p>
         </div>
-      </div>
-
-      {tab === "p1" && (
-        <div className="grid grid-cols-1 gap-3.5 lg:grid-cols-[2fr_3fr]">
-          <Field label="Schéma terrain">
-            <SchemaEditor
-              settingsKey="warmup"
-              value={data.initial.phase1.schema}
-              onChange={(v) =>
-                patch((d) => ({
-                  ...d,
-                  initial: {
-                    ...d.initial,
-                    phase1: { ...d.initial.phase1, schema: v },
-                  },
-                }))
-              }
-            />
-          </Field>
-          <div className="flex flex-col gap-2.5">
-            <Field label="Description">
-              <FitTextarea
-                rows={3}
-                maxChars={420}
-                area={{
-                  w: Z_INITIAL.phase1Description.w,
-                  h: Z_INITIAL.phase1Description.h,
-                }}
-                value={data.initial.phase1.description}
-                onChange={(v) =>
-                  patch((d) => ({
-                    ...d,
-                    initial: {
-                      ...d.initial,
-                      phase1: { ...d.initial.phase1, description: v },
-                    },
-                  }))
-                }
-                placeholder="e.g., Pairs jog around half-pitch, ball rolling between them. 4 min."
-              />
-            </Field>
-            <Field label="Coaching">
-              <FitTextarea
-                rows={3}
-                maxChars={420}
-                area={{
-                  w: Z_INITIAL.phase1Coaching.w,
-                  h: Z_INITIAL.phase1Coaching.h,
-                }}
-                value={data.initial.phase1.coaching}
-                onChange={(v) =>
-                  patch((d) => ({
-                    ...d,
-                    initial: {
-                      ...d.initial,
-                      phase1: { ...d.initial.phase1, coaching: v },
-                    },
-                  }))
-                }
-                placeholder="e.g., High-quality first touch, head up before passing."
-              />
-            </Field>
-            <div className="rounded-[10px] border border-zinc-100 bg-zinc-50/80 p-3">
-              <div className="mb-2.5 flex items-center justify-between text-[10px] font-semibold uppercase tracking-[0.08em] text-zinc-400">
-                <span>Prévention — stabilité corporelle</span>
-                <span>25″ / rep</span>
+        <div className="self-center border-l border-zinc-200 pl-5">
+          <div className="grid items-end gap-4 lg:grid-cols-[minmax(0,1fr)_120px]">
+            <div className="min-w-0">
+              <div className="mb-1.5 flex items-center justify-between gap-3">
+                <div className="text-[10px] font-semibold uppercase tracking-[0.12em] text-zinc-400">
+                  3 parties
+                </div>
               </div>
-              <div className="flex flex-col gap-1.5">
-                {prevRows.map(({ k, l }) => (
-                  <div
-                    key={k}
-                    className="grid grid-cols-1 items-start gap-1.5 md:grid-cols-[88px_1fr_1fr]"
+              <div className="grid grid-cols-3 gap-1">
+                {tabs.map(([id], idx) => (
+                  <button
+                    key={id}
+                    type="button"
+                    onClick={() => setTab(id)}
+                    className={`h-7 border-b text-center text-[11px] font-semibold transition ${
+                      tab === id
+                        ? "border-red-500 text-zinc-950"
+                        : "border-zinc-200 text-zinc-500 hover:border-zinc-400 hover:text-zinc-900"
+                    }`}
                   >
-                    <div className="pt-2 text-[11px] font-semibold leading-tight text-zinc-700">
-                      {l}
-                    </div>
-                    <textarea
-                      rows={2}
-                      className={txtaClass}
-                      placeholder="Description"
-                      value={pv[k].description}
-                      onChange={(e) =>
-                        patch((d) => ({
-                          ...d,
-                          initial: {
-                            ...d.initial,
-                            phase1: {
-                              ...d.initial.phase1,
-                              prevention: {
-                                ...d.initial.phase1.prevention,
-                                [k]: {
-                                  ...d.initial.phase1.prevention[k],
-                                  description: e.target.value,
-                                },
-                              },
-                            },
-                          },
-                        }))
-                      }
-                    />
-                    <textarea
-                      rows={2}
-                      className={txtaClass}
-                      placeholder="Coaching cue"
-                      value={pv[k].coaching}
-                      onChange={(e) =>
-                        patch((d) => ({
-                          ...d,
-                          initial: {
-                            ...d.initial,
-                            phase1: {
-                              ...d.initial.phase1,
-                              prevention: {
-                                ...d.initial.phase1.prevention,
-                                [k]: {
-                                  ...d.initial.phase1.prevention[k],
-                                  coaching: e.target.value,
-                                },
-                              },
-                            },
-                          },
-                        }))
-                      }
-                    />
-                  </div>
+                    Phase {idx + 1}
+                  </button>
                 ))}
               </div>
             </div>
+            <FieldUl label="Durée totale">
+              <div className="flex items-center gap-2">
+                <Timer className="h-3.5 w-3.5 text-zinc-400" />
+                <input
+                  value={data.initial.duration}
+                  onChange={(e) =>
+                    patch((d) => ({
+                      ...d,
+                      initial: { ...d.initial, duration: e.target.value },
+                    }))
+                  }
+                  placeholder="25 min"
+                  className={inpUlClass}
+                />
+              </div>
+            </FieldUl>
           </div>
         </div>
-      )}
+      </section>
 
-      {tab === "p2" && (
-        <div className="grid grid-cols-1 gap-3.5 lg:grid-cols-[2fr_3fr]">
-          <Field label="Schéma terrain">
-            <SchemaEditor
-              settingsKey="warmup"
-              value={data.initial.phase2.schema}
-              onChange={(v) =>
-                patch((d) => ({
-                  ...d,
-                  initial: {
-                    ...d.initial,
-                    phase2: { ...d.initial.phase2, schema: v },
-                  },
-                }))
-              }
-            />
-          </Field>
-          <div className="flex flex-col gap-2.5">
-            <Field label="Description">
-              <FitTextarea
-                rows={5}
-                maxChars={420}
-                area={{
-                  w: Z_INITIAL.phase2Description.w,
-                  h: Z_INITIAL.phase2Description.h,
-                }}
-                value={data.initial.phase2.description}
-                onChange={(v) =>
+      <section className="flex flex-col gap-5 pt-2">
+        <div className="min-w-0">
+          {tab === "p1" && (
+            <div className="grid grid-cols-1 items-start gap-5 lg:grid-cols-[minmax(300px,0.68fr)_minmax(0,1.32fr)]">
+              <div>
+                <div className="overflow-hidden border-t border-zinc-200 pt-3 [&>div]:border-0 [&>div]:bg-transparent">
+                  <SchemaEditor
+                    settingsKey="warmup"
+                    value={data.initial.phase1.schema}
+                    onChange={(v) =>
                   patch((d) => ({
                     ...d,
                     initial: {
                       ...d.initial,
-                      phase2: { ...d.initial.phase2, description: v },
+                          phase1: { ...d.initial.phase1, schema: v },
                     },
                   }))
-                }
-                placeholder="e.g., Rondo 4v2 in 8m square, two-touch. 3×4 min."
-              />
-            </Field>
-            <Field label="Coaching">
-              <FitTextarea
-                rows={5}
-                maxChars={420}
-                area={{
-                  w: Z_INITIAL.phase2Coaching.w,
-                  h: Z_INITIAL.phase2Coaching.h,
-                }}
-                value={data.initial.phase2.coaching}
-                onChange={(v) =>
-                  patch((d) => ({
-                    ...d,
-                    initial: {
-                      ...d.initial,
-                      phase2: { ...d.initial.phase2, coaching: v },
-                    },
-                  }))
-                }
-                placeholder="e.g., Rotate defenders after winning. Cue: scan before receiving."
-              />
-            </Field>
-          </div>
-        </div>
-      )}
+                    }
+                  />
+                </div>
+              </div>
 
-      {tab === "p3" && (
-        <div className="grid grid-cols-1 gap-3 lg:grid-cols-2">
-          <Field label="Description">
-            <textarea
-              rows={7}
-              className={txtaClass}
-              placeholder="e.g., 4×10m sprint with change of direction at cone, 30s rest. 3 sets."
-              value={data.initial.phase3.description}
-              onChange={(e) =>
-                patch((d) => ({
-                  ...d,
-                  initial: {
-                    ...d.initial,
-                    phase3: {
-                      ...d.initial.phase3,
-                      description: e.target.value,
-                    },
-                  },
-                }))
-              }
-            />
-          </Field>
-          <Field label="Coaching">
-            <textarea
-              rows={7}
-              className={txtaClass}
-              placeholder="e.g., Full intensity. Walk back recovery. Stay low through the change of direction."
-              value={data.initial.phase3.coaching}
-              onChange={(e) =>
-                patch((d) => ({
-                  ...d,
-                  initial: {
-                    ...d.initial,
-                    phase3: {
-                      ...d.initial.phase3,
-                      coaching: e.target.value,
-                    },
-                  },
-                }))
-              }
-            />
-          </Field>
+              <div className="flex min-w-0 flex-col gap-3 border-t border-zinc-200 pt-3">
+                <div className="grid gap-3 md:grid-cols-2">
+                  <FieldUl label="Contenu">
+                    <FitTextarea
+                      rows={6}
+                      maxChars={420}
+                      area={Z_INITIAL.phase1Description}
+                      value={data.initial.phase1.description}
+                      onChange={(v) =>
+                        patch((d) => ({
+                          ...d,
+                          initial: {
+                            ...d.initial,
+                            phase1: {
+                              ...d.initial.phase1,
+                              description: v,
+                            },
+                          },
+                        }))
+                      }
+                      placeholder="Activation, ballon, mobilité, rythme."
+                      className={txtaUlClass}
+                    />
+                  </FieldUl>
+                  <FieldUl label="Coaching">
+                    <FitTextarea
+                      rows={6}
+                      maxChars={420}
+                      area={Z_INITIAL.phase1Coaching}
+                      value={data.initial.phase1.coaching}
+                      onChange={(v) =>
+                        patch((d) => ({
+                          ...d,
+                          initial: {
+                            ...d.initial,
+                            phase1: {
+                              ...d.initial.phase1,
+                              coaching: v,
+                            },
+                          },
+                        }))
+                      }
+                      placeholder="Qualité technique, posture, scanning."
+                      className={txtaUlClass}
+                    />
+                  </FieldUl>
+                </div>
+
+                <div>
+                  <div className="mb-1.5 flex items-center justify-between text-[10px] font-semibold uppercase tracking-[0.1em] text-zinc-400">
+                    <span>Prévention</span>
+                    <span>25&quot; / rep</span>
+                  </div>
+                  <div className="grid gap-x-4 gap-y-2 md:grid-cols-2">
+                    {prevRows.map(
+                      ({ k, l, descriptionArea, coachingArea }) => (
+                        <div key={k} className="grid gap-1">
+                          <div className="text-[11px] font-semibold text-zinc-700">
+                            {l}
+                          </div>
+                          <div className="grid gap-2 sm:grid-cols-2">
+                            <FitTextarea
+                              rows={2}
+                              maxChars={90}
+                              area={descriptionArea}
+                              placeholder="Exercice"
+                              value={pv[k].description}
+                              onChange={(v) =>
+                                patch((d) => ({
+                                  ...d,
+                                  initial: {
+                                    ...d.initial,
+                                    phase1: {
+                                      ...d.initial.phase1,
+                                      prevention: {
+                                        ...d.initial.phase1.prevention,
+                                        [k]: {
+                                          ...d.initial.phase1.prevention[k],
+                                          description: v,
+                                        },
+                                      },
+                                    },
+                                  },
+                                }))
+                              }
+                              className={txtaUlClass}
+                            />
+                            <FitTextarea
+                              rows={2}
+                              maxChars={120}
+                              area={coachingArea}
+                              placeholder="Consigne"
+                              value={pv[k].coaching}
+                              onChange={(v) =>
+                                patch((d) => ({
+                                  ...d,
+                                  initial: {
+                                    ...d.initial,
+                                    phase1: {
+                                      ...d.initial.phase1,
+                                      prevention: {
+                                        ...d.initial.phase1.prevention,
+                                        [k]: {
+                                          ...d.initial.phase1.prevention[k],
+                                          coaching: v,
+                                        },
+                                      },
+                                    },
+                                  },
+                                }))
+                              }
+                              className={txtaUlClass}
+                            />
+                          </div>
+                        </div>
+                      ),
+                    )}
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {tab === "p2" && (
+            <div className="grid grid-cols-1 items-start gap-5 lg:grid-cols-[minmax(300px,0.68fr)_minmax(0,1.32fr)]">
+              <div>
+                <div className="overflow-hidden border-t border-zinc-200 pt-3 [&>div]:border-0 [&>div]:bg-transparent">
+                  <SchemaEditor
+                    settingsKey="warmup"
+                    value={data.initial.phase2.schema}
+                    onChange={(v) =>
+                      patch((d) => ({
+                        ...d,
+                        initial: {
+                          ...d.initial,
+                          phase2: { ...d.initial.phase2, schema: v },
+                        },
+                      }))
+                    }
+                  />
+                </div>
+              </div>
+              <div className="grid min-w-0 gap-4 border-t border-zinc-200 pt-3 md:grid-cols-2">
+                <FieldUl label="Contenu">
+                  <FitTextarea
+                    rows={9}
+                    maxChars={420}
+                    area={Z_INITIAL.phase2Description}
+                    value={data.initial.phase2.description}
+                    onChange={(v) =>
+                      patch((d) => ({
+                        ...d,
+                        initial: {
+                          ...d.initial,
+                          phase2: { ...d.initial.phase2, description: v },
+                        },
+                      }))
+                    }
+                    placeholder="Rondo, conservation, contrainte liée au thème."
+                    className={txtaUlClass}
+                  />
+                </FieldUl>
+                <FieldUl label="Coaching">
+                  <FitTextarea
+                    rows={9}
+                    maxChars={420}
+                    area={Z_INITIAL.phase2Coaching}
+                    value={data.initial.phase2.coaching}
+                    onChange={(v) =>
+                      patch((d) => ({
+                        ...d,
+                        initial: {
+                          ...d.initial,
+                          phase2: { ...d.initial.phase2, coaching: v },
+                        },
+                      }))
+                    }
+                    placeholder="Déclencheurs, orientation, rythme de décision."
+                    className={txtaUlClass}
+                  />
+                </FieldUl>
+              </div>
+            </div>
+          )}
+
+          {tab === "p3" && (
+            <div className="grid grid-cols-1 gap-5">
+              <div className="grid min-w-0 gap-4 border-t border-zinc-200 pt-3 md:grid-cols-2">
+                <FieldUl label="Contenu">
+                  <FitTextarea
+                    rows={10}
+                    maxChars={420}
+                    area={Z_INITIAL.phase3Description}
+                    value={data.initial.phase3.description}
+                    onChange={(v) =>
+                      patch((d) => ({
+                        ...d,
+                        initial: {
+                          ...d.initial,
+                          phase3: {
+                            ...d.initial.phase3,
+                            description: v,
+                          },
+                        },
+                      }))
+                    }
+                    placeholder="Sprints, changements de direction, réaction."
+                    className={txtaUlClass}
+                  />
+                </FieldUl>
+                <FieldUl label="Coaching">
+                  <FitTextarea
+                    rows={10}
+                    maxChars={420}
+                    area={Z_INITIAL.phase3Coaching}
+                    value={data.initial.phase3.coaching}
+                    onChange={(v) =>
+                      patch((d) => ({
+                        ...d,
+                        initial: {
+                          ...d.initial,
+                          phase3: {
+                            ...d.initial.phase3,
+                            coaching: v,
+                          },
+                        },
+                      }))
+                    }
+                    placeholder="Intensité maximale, récupération, posture."
+                    className={txtaUlClass}
+                  />
+                </FieldUl>
+              </div>
+            </div>
+          )}
         </div>
-      )}
+      </section>
     </div>
   );
 }
@@ -2444,7 +2512,7 @@ export function PreparationSheet({
             </div>
 
             {/* Step header */}
-            <div className="flex shrink-0 items-start justify-between gap-4 border-b border-zinc-200 bg-white px-7 py-2.5">
+            <div className="flex shrink-0 items-start justify-between gap-4 border-b border-zinc-200 bg-white px-7 py-2">
               <div className="min-w-0">
                 <div className="mb-1 text-[10px] font-semibold uppercase tracking-[0.1em] text-zinc-400">
                   {STEPS[step].eyebrow}
@@ -2487,7 +2555,7 @@ export function PreparationSheet({
             {/* Step body */}
             <div
               key={stepKey}
-              className="min-h-0 flex-1 overflow-y-auto overflow-x-hidden px-7 py-2.5 motion-safe:animate-[prep-step-in_250ms_cubic-bezier(0.4,0,0.2,1)]"
+              className="min-h-0 flex-1 overflow-y-auto overflow-x-hidden px-7 py-2 motion-safe:animate-[prep-step-in_250ms_cubic-bezier(0.4,0,0.2,1)]"
             >
               {stepBody}
             </div>
