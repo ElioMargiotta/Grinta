@@ -538,11 +538,13 @@ export function SchemaEditor({
   onChange,
   pitch = DEFAULT_PITCH,
   settingsKey = "default",
+  showHint = true,
 }: {
   value: SchemaData;
   onChange: (next: SchemaData) => void;
   pitch?: PitchKind;
   settingsKey?: SchemaSettingsKey;
+  showHint?: boolean;
 }) {
   const [settings, setSettings] = useSchemaSettings(settingsKey);
   const pitchCfg = PITCHES[pitch];
@@ -868,11 +870,13 @@ export function SchemaEditor({
           />
         </svg>
       </div>
-      <div className="border-t border-zinc-200 px-3 py-2 text-xs text-zinc-500">
-        Astuce : choisis un outil, puis clique sur le terrain. Pour les flèches,
-        clique-glisse. Sélectionne un objet pour changer sa couleur ou son
-        épaisseur sans toucher aux autres.
-      </div>
+      {showHint ? (
+        <div className="border-t border-zinc-200 px-3 py-2 text-xs text-zinc-500">
+          Astuce : choisis un outil, puis clique sur le terrain. Pour les
+          flèches, clique-glisse. Sélectionne un objet pour changer sa couleur
+          ou son épaisseur sans toucher aux autres.
+        </div>
+      ) : null}
     </div>
   );
 }
