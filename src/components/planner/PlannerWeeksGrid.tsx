@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useMemo, useState, useTransition } from "react";
 import { useTranslations, useLocale } from "next-intl";
 import { useRouter } from "@/i18n/navigation";
 import type { Macrocycle, Mesocycle } from "./PlannerTourView";
@@ -9,6 +9,7 @@ import {
   THEME_COLORS,
   type ThemeKey,
 } from "./MicrocycleThemePicker";
+import { createSessionForSlotAction } from "@/app/[locale]/(app)/planner/actions";
 
 const KNOWN_THEMES: ThemeKey[] = [
   "possede_ballon",
@@ -50,11 +51,6 @@ function timeOf(start: string | null): string | null {
   const m = /T(\d{2}:\d{2})/.exec(start);
   return m ? m[1] : null;
 }
-
-const DEFAULT_TIME: Record<Slot, string> = {
-  morning: "10:00",
-  afternoon: "16:00",
-};
 
 type MesoInfo = {
   id: string;
@@ -188,7 +184,6 @@ const DAYS: ("mon" | "tue" | "wed" | "thu" | "fri" | "sat" | "sun")[] = [
   "sat",
   "sun",
 ];
-const WEEKLY_LOAD_TARGET_MIN = 420;
 
 function startOfWeek(d: Date): Date {
   const x = new Date(d.getFullYear(), d.getMonth(), d.getDate());
@@ -243,6 +238,7 @@ export function PlannerWeeksGrid({
   const tTour = useTranslations("planner.tour");
   const tTheme = useTranslations("planner.theme");
   const today = ymd(new Date());
+  const [isCreatingSlot, startSlotCreate] = useTransition();
 
   const { microByStart, mesoById } = useMemo(() => {
     const microByStart = new Map<string, MicroLookup>();
@@ -439,13 +435,6 @@ export function PlannerWeeksGrid({
       }
     }
 
-    const loadPct = Math.min(
-      100,
-      Math.round((weekTotal / WEEKLY_LOAD_TARGET_MIN) * 100)
-    );
-
-    const isHighLoad = loadPct > 85;
-
     const isPickerOpen = openMicroId === micro.id;
     const themeDot = themeColors?.dot ?? "#cbd5e1";
 
@@ -471,11 +460,6 @@ export function PlannerWeeksGrid({
                   </span>
                 ) : null}
               </div>
-              {isHighLoad ? (
-                <span className="inline-flex items-center rounded-full border border-red-300 bg-red-100 px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-red-800 dark:border-red-800 dark:bg-red-950/60 dark:text-red-200">
-                  {t("tag.high")}
-                </span>
-              ) : null}
             </div>
             <div className="mt-0.5 text-[11px] text-zinc-500 dark:text-zinc-400">
               {weekStart.toLocaleDateString(locale, {
@@ -548,11 +532,17 @@ export function PlannerWeeksGrid({
           const isToday = dateStr === today;
           const isWeekend = di >= 5;
 
-          const goToNew = (slot: Slot) =>
-            router.push({
-              pathname: `/planner/${teamId}/sessions/new`,
-              query: { date: dateStr, startTime: DEFAULT_TIME[slot] },
+          const goToNew = (slot: Slot) => {
+            if (isCreatingSlot) return;
+            startSlotCreate(async () => {
+              await createSessionForSlotAction({
+                teamId,
+                date: dateStr,
+                slot,
+                locale,
+              });
             });
+          };
 
           const baseBg = isToday
             ? "bg-amber-50/60 dark:bg-amber-950/20"
@@ -573,7 +563,7 @@ export function PlannerWeeksGrid({
                   onClick={(e) => {
                     e.stopPropagation();
                     router.push(
-                      `/planner/${teamId}/sessions/${session.id}`
+                      `/planner/${teamId}/sessions/${session.id}/preparation`
                     );
                   }}
                   title={session.title}

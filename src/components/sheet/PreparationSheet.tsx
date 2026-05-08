@@ -26,6 +26,7 @@ import {
   useSyncExternalStore,
   useTransition,
 } from "react";
+import { cancelSessionAction } from "@/app/[locale]/(app)/planner/actions";
 import { savePreparationAction } from "@/app/[locale]/(app)/planner/[teamId]/sessions/[sessionId]/preparation/actions";
 import { exampleSheet } from "./example";
 import {
@@ -862,8 +863,61 @@ function computeStatuses(data: PreparationData): SectionStatus[] {
 
 type Patcher = (updater: (d: PreparationData) => PreparationData) => void;
 
+export type SessionMeta = {
+  title: string;
+  startTime: string;
+  durationMinutes: number | null;
+};
+
+type SessionMetaPatcher = (updater: (m: SessionMeta) => SessionMeta) => void;
+
+const SLOT_BOUNDS: Record<
+  "morning" | "afternoon",
+  { min: string; max: string }
+> = {
+  morning: { min: "07:00", max: "11:59" },
+  afternoon: { min: "12:00", max: "22:00" },
+};
+
+function slotFromStart(time: string): "morning" | "afternoon" {
+  const hh = Number(time.slice(0, 2));
+  return Number.isFinite(hh) && hh >= 12 ? "afternoon" : "morning";
+}
+
+function timeToMin(t: string): number {
+  const [h, m] = t.split(":").map(Number);
+  return (h || 0) * 60 + (m || 0);
+}
+
+function clampToSlot(time: string, slot: "morning" | "afternoon"): string {
+  if (!time) return time;
+  const { min, max } = SLOT_BOUNDS[slot];
+  const v = timeToMin(time);
+  if (v < timeToMin(min)) return min;
+  if (v > timeToMin(max)) return max;
+  return time;
+}
+
+
 /* Step 1 — Session brief */
-function Step1({ data, patch }: { data: PreparationData; patch: Patcher }) {
+function Step1({
+  data,
+  patch,
+  meta,
+  patchMeta,
+  slot,
+  onCancel,
+  isCancelling,
+}: {
+  data: PreparationData;
+  patch: Patcher;
+  meta: SessionMeta;
+  patchMeta: SessionMetaPatcher;
+  slot: "morning" | "afternoon";
+  onCancel: () => void;
+  isCancelling: boolean;
+}) {
+  const bounds = SLOT_BOUNDS[slot];
   const phaseOptions = [
     { key: "possession" as const, label: "We have the ball", fr: "Mon équipe possède" },
     { key: "losing" as const, label: "We just lost the ball", fr: "Mon équipe perd" },
@@ -874,6 +928,55 @@ function Step1({ data, patch }: { data: PreparationData; patch: Patcher }) {
   return (
     <div className="flex flex-col gap-3.5">
       <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
+        <div className="sm:col-span-3">
+          <Field label="Titre" hint="Session title">
+            <input
+              className={inpClass}
+              placeholder="e.g., Build-up under press"
+              value={meta.title}
+              onChange={(e) =>
+                patchMeta((m) => ({ ...m, title: e.target.value }))
+              }
+            />
+          </Field>
+        </div>
+        <Field
+          label="Heure de début"
+          hint={
+            slot === "morning"
+              ? "Morning · 07:00 → 12:00"
+              : "Afternoon · 12:00 → 22:00"
+          }
+        >
+          <input
+            type="time"
+            className={inpClass}
+            min={bounds.min}
+            max={bounds.max}
+            value={meta.startTime}
+            onChange={(e) =>
+              patchMeta((m) => ({
+                ...m,
+                startTime: clampToSlot(e.target.value, slot),
+              }))
+            }
+          />
+        </Field>
+        <Field label="Durée" hint="Default 90 min">
+          <input
+            type="number"
+            min={1}
+            className={inpClass}
+            placeholder="90"
+            value={meta.durationMinutes ?? ""}
+            onChange={(e) =>
+              patchMeta((m) => ({
+                ...m,
+                durationMinutes: e.target.value ? Number(e.target.value) : null,
+              }))
+            }
+          />
+        </Field>
         <Field label="Date">
           <input
             type="date"
@@ -993,6 +1096,18 @@ function Step1({ data, patch }: { data: PreparationData; patch: Patcher }) {
             }
           />
         </Field>
+      </div>
+
+      <div className="mt-2 flex justify-end border-t border-zinc-200 pt-3">
+        <button
+          type="button"
+          onClick={onCancel}
+          disabled={isCancelling}
+          className="inline-flex items-center gap-1.5 rounded-[9px] border-[1.5px] border-red-200 bg-white px-3 py-1.5 text-[12px] font-medium text-red-600 transition hover:border-red-300 hover:bg-red-50 disabled:opacity-60"
+        >
+          <X className="h-3.5 w-3.5" strokeWidth={2} />
+          {isCancelling ? "Cancelling…" : "Cancel session"}
+        </button>
       </div>
     </div>
   );
@@ -1766,13 +1881,16 @@ export function PreparationSheet({
   sessionId,
   initial,
   libraryExercises,
+  sessionMeta,
 }: {
   teamId: string;
   sessionId: string;
   initial: PreparationData;
   libraryExercises: LibraryExercise[];
+  sessionMeta: SessionMeta;
 }) {
   const [data, setData] = useState<PreparationData>(initial);
+  const [meta, setMeta] = useState<SessionMeta>(sessionMeta);
   const [error, setError] = useState<string | null>(null);
   const [justSaved, setJustSaved] = useState(false);
   const [dirty, setDirty] = useState(false);
@@ -1782,23 +1900,59 @@ export function PreparationSheet({
   const locale = useLocale();
   const router = useRouter();
 
+  const slot = useMemo<"morning" | "afternoon">(
+    () => slotFromStart(sessionMeta.startTime || meta.startTime || "10:00"),
+    // Lock slot to the session's original time so the user can't switch halves.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [],
+  );
+
   const patch = useCallback<Patcher>((updater) => {
     setDirty(true);
     setData(updater);
+  }, []);
+
+  const patchMeta = useCallback<SessionMetaPatcher>((updater) => {
+    setDirty(true);
+    setMeta(updater);
   }, []);
 
   const statuses = useMemo(() => computeStatuses(data), [data]);
   const completeCount = statuses.filter((s) => s === "complete").length;
   const pct = Math.round((completeCount / 5) * 100);
 
+  function cancelSession() {
+    if (
+      !confirm(
+        "Cancel this session? It will be removed from the planner.",
+      )
+    )
+      return;
+    setError(null);
+    startTransition(async () => {
+      const result = await cancelSessionAction({
+        teamId,
+        sessionId,
+        locale,
+      });
+      if (result?.error) setError(result.error);
+    });
+  }
+
   function save() {
     setError(null);
+    const durationMinutes = meta.durationMinutes ?? 90;
     startTransition(async () => {
       const result = await savePreparationAction({
         teamId,
         sessionId,
         locale,
         data,
+        sessionMeta: {
+          title: meta.title.trim(),
+          startTime: meta.startTime || null,
+          durationMinutes,
+        },
       });
       if (result?.error) setError(result.error);
       else {
@@ -1836,7 +1990,17 @@ export function PreparationSheet({
   const stepBody: ReactNode = (() => {
     switch (step) {
       case 0:
-        return <Step1 data={data} patch={patch} />;
+        return (
+          <Step1
+            data={data}
+            patch={patch}
+            meta={meta}
+            patchMeta={patchMeta}
+            slot={slot}
+            onCancel={cancelSession}
+            isCancelling={isPending}
+          />
+        );
       case 1:
         return <Step2 data={data} patch={patch} />;
       case 2:

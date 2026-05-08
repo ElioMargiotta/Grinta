@@ -210,10 +210,7 @@
       "emptyMonth": "Nothing planned for these weeks yet — add a cycle or set up a season to start filling them in.",
       "emptyMonthCta": "Open season overview",
       "tag": {
-        "current": "Current",
-        "high": "High load",
-        "light": "Light",
-        "normal": "Normal"
+        "current": "Current"
       },
       "type": {
         "tactical": "Tactical",

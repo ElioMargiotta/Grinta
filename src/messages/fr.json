@@ -211,10 +211,7 @@
       "emptyMonth": "Rien de prévu sur ces semaines — ajoute un cycle ou paramètre une saison pour commencer à les remplir.",
       "emptyMonthCta": "Ouvrir la vue saison",
       "tag": {
-        "current": "En cours",
-        "high": "Charge élevée",
-        "light": "Léger",
-        "normal": "Normal"
+        "current": "En cours"
       },
       "type": {
         "tactical": "Tactique",

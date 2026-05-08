@@ -10,11 +10,17 @@ export async function savePreparationAction({
   sessionId,
   locale,
   data,
+  sessionMeta,
 }: {
   teamId: string;
   sessionId: string;
   locale: string;
   data: PreparationData;
+  sessionMeta?: {
+    title: string;
+    startTime: string | null;
+    durationMinutes: number;
+  };
 }) {
   if (!teamId || !sessionId) return { error: "Missing fields" };
 
@@ -33,6 +39,18 @@ export async function savePreparationAction({
     return { error: "Not found" };
   }
 
+  if (sessionMeta) {
+    const { error: sessionError } = await supabase
+      .from("sessions")
+      .update({
+        theme: sessionMeta.title || null,
+        start_time: sessionMeta.startTime,
+        duration_minutes: sessionMeta.durationMinutes,
+      })
+      .eq("id", sessionId);
+    if (sessionError) return { error: sessionError.message };
+  }
+
   const { error } = await supabase
     .from("session_preparations")
     .upsert(
@@ -47,6 +65,8 @@ export async function savePreparationAction({
 
   if (error) return { error: error.message };
 
+  revalidatePath(`/${locale}/planner/${teamId}`);
+  revalidatePath(`/${locale}/planner/${teamId}/sessions/${sessionId}`);
   revalidatePath(
     `/${locale}/planner/${teamId}/sessions/${sessionId}/preparation`,
   );
