@@ -442,37 +442,6 @@ function PdfExport({ data }: { data: PreparationData }) {
 
 /* ----- Form atoms ------------------------------------------- */
 
-function Field({
-  label,
-  hint,
-  charMax,
-  charVal,
-  children,
-}: {
-  label: string;
-  hint?: string;
-  charMax?: number;
-  charVal?: number;
-  children: ReactNode;
-}) {
-  return (
-    <div className="flex flex-col gap-1.5">
-      <div className="text-[12px] font-medium text-zinc-700">{label}</div>
-      {hint && (
-        <div className="-mt-0.5 text-[11px] leading-snug text-zinc-400">
-          {hint}
-        </div>
-      )}
-      {children}
-      {charMax !== undefined && (
-        <div className="text-right text-[10px] tabular-nums text-zinc-400">
-          {charVal ?? 0}/{charMax}
-        </div>
-      )}
-    </div>
-  );
-}
-
 const txtaClass =
   "w-full resize-none rounded-[9px] border-[1.5px] border-zinc-200 bg-white px-3 py-2.5 text-[13px] leading-[1.55] text-zinc-900 shadow-[0_1px_2px_rgb(0_0_0/0.04)] outline-none transition placeholder:text-zinc-400 hover:border-zinc-300 focus:border-zinc-900 focus:shadow-[0_0_0_3px_rgb(12_12_13/0.07)]";
 
@@ -522,30 +491,6 @@ function FieldUl({
   );
 }
 
-function DurPill({
-  value,
-  onChange,
-  placeholder,
-}: {
-  value: string;
-  onChange: (v: string) => void;
-  placeholder?: string;
-}) {
-  return (
-    <label className="inline-flex items-center gap-2 rounded-[9px] border-[1.5px] border-zinc-200 bg-white px-3 py-1.5 shadow-[0_1px_2px_rgb(0_0_0/0.04)]">
-      <span className="whitespace-nowrap text-[10px] font-semibold uppercase tracking-[0.06em] text-zinc-400">
-        Durée
-      </span>
-      <input
-        value={value}
-        onChange={(e) => onChange(e.target.value)}
-        placeholder={placeholder ?? "— min"}
-        className="w-16 border-0 bg-transparent p-0 text-[13px] font-semibold text-zinc-900 outline-none"
-      />
-    </label>
-  );
-}
-
 const FOCUS_FAMILY_LABELS: Record<FocusFamily, string> = {
   TE: "Technique",
   TA: "Tactique",
@@ -586,47 +531,6 @@ function FocusFamilyChips({
           </button>
         );
       })}
-    </div>
-  );
-}
-
-function Card({
-  icon,
-  title,
-  hint,
-  rightAction,
-  children,
-}: {
-  icon?: ReactNode;
-  title?: string;
-  hint?: string;
-  rightAction?: ReactNode;
-  children: ReactNode;
-}) {
-  const hasHeader = !!(icon || title || hint || rightAction);
-  return (
-    <div className="overflow-hidden rounded-[12px] border border-zinc-200 bg-white shadow-[0_1px_3px_rgb(0_0_0/0.05),0_1px_2px_rgb(0_0_0/0.04)]">
-      {hasHeader && (
-        <div className="flex items-center gap-2.5 border-b border-zinc-100 px-4 py-3">
-          {icon && (
-            <div className="flex h-[26px] w-[26px] shrink-0 items-center justify-center rounded-[7px] bg-[#0c0c0d] text-white">
-              {icon}
-            </div>
-          )}
-          <div className="min-w-0 flex-1">
-            {title && (
-              <div className="text-[12px] font-semibold text-zinc-900">
-                {title}
-              </div>
-            )}
-            {hint && (
-              <div className="mt-0.5 text-[11px] text-zinc-400">{hint}</div>
-            )}
-          </div>
-          {rightAction}
-        </div>
-      )}
-      <div className="p-4">{children}</div>
     </div>
   );
 }
@@ -850,6 +754,8 @@ export type SessionMeta = {
   durationMinutes: number | null;
 };
 
+const SESSION_TITLE_MAX = 20;
+
 type SessionMetaPatcher = (updater: (m: SessionMeta) => SessionMeta) => void;
 
 type PhaseKey = "possession" | "losing" | "noPossession" | "recovering";
@@ -1004,6 +910,25 @@ function Step1({
             </div>
           </div>
           <div className="space-y-1.5">
+            <label className="flex min-w-0 items-center gap-2">
+              <FileText className="h-3.5 w-3.5 text-zinc-400" />
+              <input
+                className={inpUlClass}
+                maxLength={SESSION_TITLE_MAX}
+                placeholder="Titre séance"
+                value={meta.title.slice(0, SESSION_TITLE_MAX)}
+                onChange={(e) =>
+                  patchMeta((m) => ({
+                    ...m,
+                    title: e.target.value.slice(0, SESSION_TITLE_MAX),
+                  }))
+                }
+              />
+              <span className="shrink-0 text-[10px] tabular-nums text-zinc-400">
+                {meta.title.slice(0, SESSION_TITLE_MAX).length}/
+                {SESSION_TITLE_MAX}
+              </span>
+            </label>
             <label className="flex min-w-0 items-center gap-2">
               <CalendarDays className="h-3.5 w-3.5 text-zinc-400" />
               <input
@@ -1862,21 +1787,64 @@ function StepMain({
 /* Step 5 — Final game & wrap-up */
 function Step5({ data, patch }: { data: PreparationData; patch: Patcher }) {
   return (
-    <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
-      <div className="flex flex-col gap-3">
-        <div className="flex items-center justify-between">
-          <div className="text-[13px] font-semibold text-zinc-900">
-            Jeu final
+    <div className="mx-auto flex w-full max-w-[1120px] flex-col gap-3 py-0">
+      <section className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_430px]">
+        <div>
+          <div className="text-[10px] font-semibold uppercase tracking-[0.14em] text-red-600">
+            Final game & wrap-up
           </div>
-          <DurPill
-            value={data.game.duration}
-            onChange={(v) =>
-              patch((d) => ({ ...d, game: { ...d.game, duration: v } }))
-            }
-            placeholder="15 min"
-          />
+          <h2 className="mt-0.5 text-[20px] font-semibold tracking-[-0.02em] text-[#0c0c0d]">
+            Finir, redescendre, retenir
+          </h2>
+          <p className="mt-0.5 max-w-[620px] text-[12px] leading-4 text-zinc-500">
+            Le dernier temps vérifie le thème en situation libre, puis ferme la
+            séance avec un retour court et des notes utiles pour la suite.
+          </p>
         </div>
-        <Field label="Schéma terrain">
+        <div className="self-center border-l border-zinc-200 pl-5">
+          <div className="grid items-end gap-3 lg:grid-cols-2">
+            <FieldUl label="Jeu final">
+              <div className="flex items-center gap-2">
+                <Timer className="h-3.5 w-3.5 text-zinc-400" />
+                <input
+                  value={data.game.duration}
+                  onChange={(e) =>
+                    patch((d) => ({
+                      ...d,
+                      game: { ...d.game, duration: e.target.value },
+                    }))
+                  }
+                  placeholder="15 min"
+                  className={inpUlClass}
+                />
+              </div>
+            </FieldUl>
+            <FieldUl label="Retour au calme">
+              <div className="flex items-center gap-2">
+                <Timer className="h-3.5 w-3.5 text-zinc-400" />
+                <input
+                  value={data.end.duration}
+                  onChange={(e) =>
+                    patch((d) => ({
+                      ...d,
+                      end: { ...d.end, duration: e.target.value },
+                    }))
+                  }
+                  placeholder="5 min"
+                  className={inpUlClass}
+                />
+              </div>
+            </FieldUl>
+          </div>
+        </div>
+      </section>
+
+      <section className="border-t border-zinc-200 pt-1.5">
+        <div className="mb-1.5 text-[13px] font-semibold text-zinc-900">
+          Jeu final
+        </div>
+        <div className="grid grid-cols-1 items-start gap-4 lg:grid-cols-[minmax(330px,0.78fr)_minmax(0,1.22fr)]">
+          <div className="overflow-hidden [&>div]:border-0 [&>div]:bg-transparent">
           <SchemaEditor
             pitch="full-horizontal"
             settingsKey="game"
@@ -1886,60 +1854,51 @@ function Step5({ data, patch }: { data: PreparationData; patch: Patcher }) {
               patch((d) => ({ ...d, game: { ...d.game, schema: v } }))
             }
           />
-        </Field>
-        <Field label="Notes — format, contraintes, coaching">
-          <FitTextarea
-            rows={4}
-            maxChars={360}
-            area={{ w: Z_END.gameNotes.w, h: Z_END.gameNotes.h }}
-            value={data.game.notes}
-            onChange={(v) =>
-              patch((d) => ({ ...d, game: { ...d.game, notes: v } }))
-            }
-            placeholder="e.g., 11v11 full pitch. Normal rules. Last 15 min."
-          />
-        </Field>
-      </div>
+          </div>
 
-      <div className="flex flex-col gap-3.5">
-        <Card
-          title="Fin de séance"
-          rightAction={
-            <DurPill
-              value={data.end.duration}
-              onChange={(v) =>
-                patch((d) => ({ ...d, end: { ...d.end, duration: v } }))
-              }
-              placeholder="5 min"
-            />
-          }
-        >
-          <Field label="Notes">
-            <FitTextarea
-              rows={4}
-              maxChars={360}
-              area={{ w: Z_END.endNotes.w, h: Z_END.endNotes.h }}
-              value={data.end.notes}
-              onChange={(v) =>
-                patch((d) => ({ ...d, end: { ...d.end, notes: v } }))
-              }
-              placeholder="e.g., Walk to center circle. 60s breathing. Quick verbal debrief."
-            />
-          </Field>
-        </Card>
-        <Card title="Réflexion post-séance">
-          <Field label="Notes personnelles après la séance">
-            <FitTextarea
-              rows={6}
-              maxChars={360}
-              area={{ w: Z_END.reflection.w, h: Z_END.reflection.h }}
-              value={data.reflection}
-              onChange={(v) => patch((d) => ({ ...d, reflection: v }))}
-              placeholder="What worked, what didn't, who needs individual work next week."
-            />
-          </Field>
-        </Card>
-      </div>
+          <div className="grid min-w-0 gap-3 md:grid-cols-2">
+            <FieldUl label="Format, contraintes, coaching">
+              <FitTextarea
+                rows={7}
+                maxChars={360}
+                area={{ w: Z_END.gameNotes.w, h: Z_END.gameNotes.h }}
+                value={data.game.notes}
+                onChange={(v) =>
+                  patch((d) => ({ ...d, game: { ...d.game, notes: v } }))
+                }
+                placeholder="Format, règles, contraintes, derniers points de coaching."
+                className={txtaUlClass}
+              />
+            </FieldUl>
+            <FieldUl label="Retour au calme">
+              <FitTextarea
+                rows={7}
+                maxChars={360}
+                area={{ w: Z_END.endNotes.w, h: Z_END.endNotes.h }}
+                value={data.end.notes}
+                onChange={(v) =>
+                  patch((d) => ({ ...d, end: { ...d.end, notes: v } }))
+                }
+                placeholder="Retour au calme, message final, mini débrief."
+                className={txtaUlClass}
+              />
+            </FieldUl>
+            <div className="md:col-span-2">
+              <FieldUl label="Réflexion post-séance">
+                <FitTextarea
+                  rows={3}
+                  maxChars={360}
+                  area={{ w: Z_END.reflection.w, h: Z_END.reflection.h }}
+                  value={data.reflection}
+                  onChange={(v) => patch((d) => ({ ...d, reflection: v }))}
+                  placeholder="Ce qui a fonctionné, ce qui doit être repris, joueurs à suivre."
+                  className={txtaUlClass}
+                />
+              </FieldUl>
+            </div>
+          </div>
+        </div>
+      </section>
     </div>
   );
 }
@@ -2221,7 +2180,7 @@ export function PreparationSheet({
         locale,
         data,
         sessionMeta: {
-          title: meta.title.trim(),
+          title: meta.title.trim().slice(0, SESSION_TITLE_MAX),
           startTime: meta.startTime || null,
           durationMinutes,
         },
@@ -2537,19 +2496,13 @@ export function PreparationSheet({
             </div>
 
             {/* Step header */}
-            <div className="flex shrink-0 items-start justify-between gap-4 border-b border-zinc-200 bg-white px-7 py-2">
+            <div className="flex shrink-0 items-center justify-between gap-4 px-7 pb-0 pt-2">
               <div className="min-w-0">
-                <div className="mb-1 text-[10px] font-semibold uppercase tracking-[0.1em] text-zinc-400">
+                <div className="text-[10px] font-semibold uppercase tracking-[0.1em] text-zinc-400">
                   {STEPS[step].eyebrow}
                 </div>
-                <h2 className="text-[16px] font-semibold leading-tight tracking-[-0.01em] text-[#0c0c0d]">
-                  {STEPS[step].label}
-                </h2>
-                <p className="mt-0.5 text-[12px] leading-4 text-zinc-500">
-                  {STEPS[step].desc}
-                </p>
               </div>
-              <div className="flex shrink-0 items-center gap-2 pt-1">
+              <div className="flex shrink-0 items-center gap-2">
                 <button
                   type="button"
                   onClick={goPrev}
