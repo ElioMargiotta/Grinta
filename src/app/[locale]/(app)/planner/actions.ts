@@ -161,6 +161,187 @@ export async function cancelSessionAction({
   redirect(`/${locale}/planner/${teamId}`);
 }
 
+export async function movePlannerSessionAction({
+  teamId,
+  sessionId,
+  date,
+  slot,
+  locale,
+}: {
+  teamId: string;
+  sessionId: string;
+  date: string;
+  slot: "morning" | "afternoon";
+  locale: string;
+}) {
+  if (!teamId || !sessionId || !date) return { error: "Missing fields" };
+
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) redirect(`/${locale}/login`);
+
+  const { data: source } = await supabase
+    .from("sessions")
+    .select("id, trainer_id, team_id")
+    .eq("id", sessionId)
+    .single();
+  if (!source || source.trainer_id !== user.id || source.team_id !== teamId) {
+    return { error: "Not found" };
+  }
+
+  const { data: sameDay } = await supabase
+    .from("sessions")
+    .select("id, start_time")
+    .eq("team_id", teamId)
+    .eq("date", date);
+  if (
+    (sameDay ?? []).some(
+      (s) =>
+        s.id !== sessionId &&
+        slotOf((s.start_time as string | null) ?? null) === slot,
+    )
+  ) {
+    return {
+      error:
+        slot === "morning"
+          ? "A morning session already exists for this day."
+          : "An afternoon session already exists for this day.",
+    };
+  }
+
+  const microcycleId = await resolveMicrocycleId(supabase, teamId, date);
+  const { error } = await supabase
+    .from("sessions")
+    .update({
+      date,
+      start_time: SLOT_DEFAULT_TIME[slot],
+      microcycle_id: microcycleId,
+    })
+    .eq("id", sessionId);
+  if (error) return { error: error.message };
+
+  revalidatePath(`/${locale}/planner/${teamId}`);
+}
+
+export async function duplicatePlannerSessionAction({
+  teamId,
+  sessionId,
+  date,
+  slot,
+  locale,
+}: {
+  teamId: string;
+  sessionId: string;
+  date: string;
+  slot: "morning" | "afternoon";
+  locale: string;
+}) {
+  if (!teamId || !sessionId || !date) return { error: "Missing fields" };
+
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) redirect(`/${locale}/login`);
+
+  const { data: source } = await supabase
+    .from("sessions")
+    .select("id, team_id, trainer_id, date, start_time, duration_minutes, theme, notes")
+    .eq("id", sessionId)
+    .single();
+  if (!source || source.trainer_id !== user.id || source.team_id !== teamId) {
+    return { error: "Not found" };
+  }
+
+  const { data: sameDay } = await supabase
+    .from("sessions")
+    .select("id, start_time")
+    .eq("team_id", teamId)
+    .eq("date", date);
+  if (
+    (sameDay ?? []).some(
+      (s) => slotOf((s.start_time as string | null) ?? null) === slot,
+    )
+  ) {
+    return {
+      error:
+        slot === "morning"
+          ? "A morning session already exists for this day."
+          : "An afternoon session already exists for this day.",
+    };
+  }
+
+  const microcycleId = await resolveMicrocycleId(supabase, teamId, date);
+  const { data: created, error } = await supabase
+    .from("sessions")
+    .insert({
+      team_id: teamId,
+      trainer_id: user.id,
+      date,
+      start_time: SLOT_DEFAULT_TIME[slot],
+      duration_minutes: source.duration_minutes,
+      theme: source.theme,
+      notes: source.notes,
+      microcycle_id: microcycleId,
+    })
+    .select("id")
+    .single();
+  if (error) return { error: error.message };
+
+  const { data: preparation } = await supabase
+    .from("session_preparations")
+    .select("data")
+    .eq("session_id", sessionId)
+    .maybeSingle();
+  if (preparation?.data) {
+    const copiedPreparation =
+      typeof preparation.data === "object" && preparation.data !== null
+        ? { ...preparation.data, date }
+        : preparation.data;
+    const { error: prepError } = await supabase
+      .from("session_preparations")
+      .insert({
+        session_id: created.id,
+        trainer_id: user.id,
+        data: copiedPreparation,
+        updated_at: new Date().toISOString(),
+      });
+    if (prepError) return { error: prepError.message };
+  }
+
+  revalidatePath(`/${locale}/planner/${teamId}`);
+}
+
+export async function deletePlannerSessionAction({
+  teamId,
+  sessionId,
+  locale,
+}: {
+  teamId: string;
+  sessionId: string;
+  locale: string;
+}) {
+  if (!teamId || !sessionId) return { error: "Missing fields" };
+
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) redirect(`/${locale}/login`);
+
+  const { error } = await supabase
+    .from("sessions")
+    .delete()
+    .eq("id", sessionId)
+    .eq("team_id", teamId)
+    .eq("trainer_id", user.id);
+  if (error) return { error: error.message };
+
+  revalidatePath(`/${locale}/planner/${teamId}`);
+}
+
 export async function createSessionAction(formData: FormData) {
   const fields = readSessionFields(formData);
   const locale = String(formData.get("locale") ?? "en");
@@ -257,4 +438,3 @@ export async function updateSessionAction(formData: FormData) {
   revalidatePath(`/${locale}/planner/${fields.teamId}`);
   revalidatePath(`/${locale}/planner/${fields.teamId}/sessions/${id}`);
 }
-
