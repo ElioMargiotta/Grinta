@@ -920,7 +920,7 @@ function Toolbar({
   onToggleSettings: () => void;
 }) {
   return (
-    <div className="flex flex-wrap items-center gap-1 border-b border-zinc-200 px-2 py-2">
+    <div className="flex flex-wrap items-center gap-1 border-b border-emerald-100 bg-emerald-50/55 px-2 py-2">
       <ToolButton active={tool === "select"} onClick={() => setTool("select")} title="Sélection">
         <CursorIcon />
       </ToolButton>
@@ -936,7 +936,7 @@ function Toolbar({
       </ToolButton>
       <ToolButton active={tool === "ball"} onClick={() => setTool("ball")} title="Ballon">
         <span
-          className="inline-block h-3 w-3 rounded-full"
+          className="inline-block h-3.5 w-3.5 rounded-full shadow-[0_1px_2px_rgb(0_0_0/0.16)] ring-1 ring-white/90"
           style={{ background: settings.colors.ball }}
         />
       </ToolButton>
@@ -970,16 +970,17 @@ function Toolbar({
         type="button"
         onClick={onUndo}
         disabled={!canUndo}
-        className="rounded-md border border-zinc-200 bg-white px-2 py-1 text-xs text-zinc-700 hover:bg-zinc-50 disabled:cursor-not-allowed disabled:opacity-40"
-        title="Annuler"
+        className="flex h-8 w-8 items-center justify-center rounded-md border border-transparent text-zinc-700 transition hover:bg-white/80 hover:text-zinc-950 disabled:cursor-not-allowed disabled:opacity-35"
+        title="Retour"
+        aria-label="Retour"
       >
-        Annuler
+        <UndoArrowIcon />
       </button>
       <button
         type="button"
         onClick={onDelete}
         disabled={!canDelete}
-        className="rounded-md border border-zinc-200 bg-white px-2 py-1 text-xs text-zinc-700 hover:bg-zinc-50 disabled:cursor-not-allowed disabled:opacity-40"
+        className="rounded-md border border-transparent px-2 py-1 text-xs font-medium text-zinc-700 transition hover:bg-white/80 hover:text-zinc-950 disabled:cursor-not-allowed disabled:opacity-35"
         title="Supprimer la sélection"
       >
         Suppr.
@@ -988,7 +989,7 @@ function Toolbar({
         type="button"
         onClick={onClear}
         disabled={!canClear}
-        className="rounded-md border border-zinc-200 bg-white px-2 py-1 text-xs text-red-600 hover:bg-red-50 disabled:cursor-not-allowed disabled:opacity-40"
+        className="rounded-md border border-transparent px-2 py-1 text-xs font-medium text-red-600 transition hover:bg-white/80 disabled:cursor-not-allowed disabled:opacity-35"
         title="Tout effacer"
       >
         Tout effacer
@@ -997,15 +998,14 @@ function Toolbar({
         type="button"
         onClick={onToggleSettings}
         aria-pressed={showSettings}
-        className={`ml-auto flex items-center gap-1 rounded-md border px-2 py-1 text-xs transition ${
+        className={`ml-auto flex h-8 w-8 items-center justify-center rounded-md border text-xs font-medium transition ${
           showSettings
-            ? "border-zinc-900 bg-zinc-900 text-white"
-            : "border-zinc-200 bg-white text-zinc-700 hover:bg-zinc-50"
+            ? "border-emerald-900 bg-emerald-900 text-white"
+            : "border-transparent text-zinc-700 hover:bg-white/80 hover:text-zinc-950"
         }`}
         title="Réglages des symboles"
       >
         <GearIcon />
-        Réglages
       </button>
     </div>
   );
@@ -1355,8 +1355,8 @@ function ToolButton({
       aria-pressed={active}
       className={`flex h-8 w-8 items-center justify-center rounded-md border text-xs transition ${
         active
-          ? "border-zinc-900 bg-zinc-900 text-white"
-          : "border-zinc-200 bg-white text-zinc-700 hover:bg-zinc-50"
+          ? "border-emerald-900 bg-emerald-900 text-white shadow-[0_1px_2px_rgb(20_83_45/0.18)]"
+          : "border-transparent text-zinc-700 hover:bg-white/80 hover:text-zinc-950"
       }`}
     >
       {children}
@@ -1385,6 +1385,24 @@ function GearIcon() {
   );
 }
 
+function UndoArrowIcon() {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      width="16"
+      height="16"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2.2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <path d="M9 7 4 12l5 5" />
+      <path d="M20 12H4" />
+    </svg>
+  );
+}
+
 function PlayerSwatch({
   color,
   label,
@@ -1396,7 +1414,7 @@ function PlayerSwatch({
 }) {
   return (
     <span
-      className="flex h-5 w-5 items-center justify-center rounded-full text-[10px] font-bold"
+      className="flex h-5 w-5 items-center justify-center rounded-full text-[10px] font-bold shadow-[0_1px_2px_rgb(0_0_0/0.16)] ring-1 ring-white/90"
       style={{ background: color, color: textColor }}
     >
       {label}
@@ -1407,7 +1425,8 @@ function PlayerSwatch({
 function ConeSwatch({ color }: { color: string }) {
   return (
     <svg viewBox="0 0 24 24" width="14" height="14">
-      <path d="M12 3 L20 20 L4 20 Z" fill={color} stroke="#7c2d12" strokeWidth="1.5" strokeLinejoin="round" />
+      <path d="M12 3 L20 20 L4 20 Z" fill={color} stroke="#ffffff" strokeWidth="2" strokeLinejoin="round" />
+      <path d="M12 3 L20 20 L4 20 Z" fill="none" stroke="#7c2d12" strokeWidth="0.9" strokeLinejoin="round" opacity="0.7" />
     </svg>
   );
 }
@@ -1416,17 +1435,17 @@ function GoalSwatch({ orientation }: { orientation: "h" | "v" }) {
   if (orientation === "h") {
     return (
       <svg viewBox="0 0 24 24" width="16" height="16">
-        <rect x="3" y="10" width="18" height="5" fill="white" stroke="#111827" strokeWidth="1.6" />
-        <line x1="3" y1="9" x2="3" y2="11" stroke="#111827" strokeWidth="1.6" strokeLinecap="round" />
-        <line x1="21" y1="9" x2="21" y2="11" stroke="#111827" strokeWidth="1.6" strokeLinecap="round" />
+        <rect x="3" y="10" width="18" height="5" rx="0.8" fill="#f8fafc" stroke="#334155" strokeWidth="1.4" />
+        <line x1="3" y1="9" x2="3" y2="11" stroke="#334155" strokeWidth="1.4" strokeLinecap="round" />
+        <line x1="21" y1="9" x2="21" y2="11" stroke="#334155" strokeWidth="1.4" strokeLinecap="round" />
       </svg>
     );
   }
   return (
     <svg viewBox="0 0 24 24" width="16" height="16">
-      <rect x="10" y="3" width="5" height="18" fill="white" stroke="#111827" strokeWidth="1.6" />
-      <line x1="9" y1="3" x2="11" y2="3" stroke="#111827" strokeWidth="1.6" strokeLinecap="round" />
-      <line x1="9" y1="21" x2="11" y2="21" stroke="#111827" strokeWidth="1.6" strokeLinecap="round" />
+      <rect x="10" y="3" width="5" height="18" rx="0.8" fill="#f8fafc" stroke="#334155" strokeWidth="1.4" />
+      <line x1="9" y1="3" x2="11" y2="3" stroke="#334155" strokeWidth="1.4" strokeLinecap="round" />
+      <line x1="9" y1="21" x2="11" y2="21" stroke="#334155" strokeWidth="1.4" strokeLinecap="round" />
     </svg>
   );
 }

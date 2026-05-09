@@ -1691,29 +1691,28 @@ function StepMain({
 
         <div className="grid grid-cols-1 items-start gap-4 lg:grid-cols-[minmax(280px,0.62fr)_minmax(0,1.38fr)]">
           <div className="overflow-hidden [&>div]:border-0 [&>div]:bg-transparent">
-          {ex.imageUrl ? (
-            <div className="relative overflow-hidden border-t border-zinc-200 pt-1">
-              <div className="relative aspect-[4/3] w-full">
-                <Image
-                  src={ex.imageUrl}
-                  alt="Imported exercise diagram"
-                  fill
-                  sizes="(max-width: 1024px) 100vw, 50vw"
-                  className="object-contain"
-                />
+            {ex.imageUrl ? (
+              <div className="relative overflow-hidden">
+                <div className="relative aspect-[4/3] w-full">
+                  <Image
+                    src={ex.imageUrl}
+                    alt="Imported exercise diagram"
+                    fill
+                    sizes="(max-width: 1024px) 100vw, 50vw"
+                    className="object-contain"
+                  />
+                </div>
+                <button
+                  type="button"
+                  onClick={clearImport}
+                  className="absolute right-2 top-2 inline-flex items-center gap-1 rounded-md bg-white/95 px-2 py-1 text-[11px] font-medium text-zinc-700 shadow-sm ring-1 ring-zinc-200 transition hover:bg-white hover:text-zinc-900"
+                  title="Retirer l'image et revenir au schéma éditable"
+                >
+                  <X className="h-3 w-3" strokeWidth={2.5} />
+                  Retirer l&apos;image
+                </button>
               </div>
-              <button
-                type="button"
-                onClick={clearImport}
-                className="absolute right-2 top-2 inline-flex items-center gap-1 rounded-md bg-white/95 px-2 py-1 text-[11px] font-medium text-zinc-700 shadow-sm ring-1 ring-zinc-200 transition hover:bg-white hover:text-zinc-900"
-                title="Retirer l'image et revenir au schéma éditable"
-              >
-                <X className="h-3 w-3" strokeWidth={2.5} />
-                Retirer l&apos;image
-              </button>
-            </div>
-          ) : (
-            <div className="border-t border-zinc-200 pt-1">
+            ) : (
               <SchemaEditor
                 pitch="full-vertical"
                 settingsKey="block"
@@ -1721,8 +1720,7 @@ function StepMain({
                 value={ex.schema}
                 onChange={(v) => upd("schema", v)}
               />
-            </div>
-          )}
+            )}
           </div>
 
           <div className="grid min-w-0 gap-3 md:grid-cols-2">
