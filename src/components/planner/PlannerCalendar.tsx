@@ -5,6 +5,7 @@ import { useRouter } from "@/i18n/navigation";
 import { Button } from "@/components/ui/Button";
 import { PlannerTourView, type Macrocycle } from "./PlannerTourView";
 import { PlannerWeeksGrid } from "./PlannerWeeksGrid";
+import type { FocusFamily } from "@/components/sheet/types";
 
 type SessionEvent = {
   id: string;
@@ -12,6 +13,7 @@ type SessionEvent = {
   start: string;
   date: string;
   durationMinutes: number | null;
+  focusFamilies?: FocusFamily[];
 };
 
 export type PlannerView = "tour" | "weekly";
@@ -67,9 +69,10 @@ export function PlannerCalendar({
             id: e.id,
             title: e.title,
             date: e.date,
-            start: e.start,
-            durationMinutes: e.durationMinutes,
-          }))}
+	            start: e.start,
+	            durationMinutes: e.durationMinutes,
+	            focusFamilies: e.focusFamilies,
+	          }))}
           macrocycles={macrocycles}
         />
       )}

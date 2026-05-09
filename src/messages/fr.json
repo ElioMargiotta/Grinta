@@ -217,6 +217,7 @@
         "tactical": "Tactique",
         "physical": "Physique",
         "technical": "Technique",
+        "mental": "Mentalité",
         "recovery": "Récup.",
         "setpiece": "Coups arrêtés",
         "match": "Match"

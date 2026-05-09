@@ -216,6 +216,7 @@
         "tactical": "Tactical",
         "physical": "Physical",
         "technical": "Technical",
+        "mental": "Mental",
         "recovery": "Recovery",
         "setpiece": "Set pieces",
         "match": "Match"

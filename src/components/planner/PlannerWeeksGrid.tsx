@@ -1,15 +1,23 @@
 "use client";
 
 import { useMemo, useState, useTransition } from "react";
+import type { DragEvent } from "react";
 import { useTranslations, useLocale } from "next-intl";
 import { useRouter } from "@/i18n/navigation";
+import { Copy, Trash2 } from "lucide-react";
 import type { Macrocycle, Mesocycle } from "./PlannerTourView";
 import {
   MicrocycleThemePicker,
   THEME_COLORS,
   type ThemeKey,
 } from "./MicrocycleThemePicker";
-import { createSessionForSlotAction } from "@/app/[locale]/(app)/planner/actions";
+import {
+  createSessionForSlotAction,
+  deletePlannerSessionAction,
+  duplicatePlannerSessionAction,
+  movePlannerSessionAction,
+} from "@/app/[locale]/(app)/planner/actions";
+import type { FocusFamily } from "@/components/sheet/types";
 
 const KNOWN_THEMES: ThemeKey[] = [
   "possede_ballon",
@@ -35,6 +43,7 @@ type GridSession = {
   date: string;
   start: string | null;
   durationMinutes: number | null;
+  focusFamilies?: FocusFamily[];
 };
 
 type Slot = "morning" | "afternoon";
@@ -75,6 +84,7 @@ type SessionType =
   | "tactical"
   | "physical"
   | "technical"
+  | "mental"
   | "recovery"
   | "setpiece"
   | "match";
@@ -83,33 +93,20 @@ const TYPE_ORDER: SessionType[] = [
   "tactical",
   "physical",
   "technical",
+  "mental",
   "recovery",
   "setpiece",
   "match",
 ];
 
 const TYPE_COLOR: Record<SessionType, string> = {
-  tactical: "#2563eb",
-  physical: "#dc2626",
-  technical: "#0f7d3f",
-  recovery: "#475569",
-  setpiece: "#7c3aed",
-  match: "#d97706",
-};
-
-const TYPE_BLOCK_CLASS: Record<SessionType, string> = {
-  tactical:
-    "bg-blue-50 border-l-blue-600 text-blue-900 dark:bg-blue-950/40 dark:text-blue-100 dark:border-l-blue-500",
-  physical:
-    "bg-red-50 border-l-red-600 text-red-900 dark:bg-red-950/40 dark:text-red-100 dark:border-l-red-500",
-  technical:
-    "bg-emerald-50 border-l-emerald-700 text-emerald-900 dark:bg-emerald-950/40 dark:text-emerald-100 dark:border-l-emerald-500",
-  recovery:
-    "bg-slate-100 border-l-slate-500 text-slate-900 dark:bg-slate-900/60 dark:text-slate-100 dark:border-l-slate-400",
-  setpiece:
-    "bg-violet-50 border-l-violet-600 text-violet-900 dark:bg-violet-950/40 dark:text-violet-100 dark:border-l-violet-500",
-  match:
-    "bg-amber-50 border-l-amber-600 text-amber-900 dark:bg-amber-950/40 dark:text-amber-100 dark:border-l-amber-500",
+  tactical: "#2f5fba",
+  physical: "#c94a4a",
+  technical: "#2d8f5f",
+  mental: "#7a5bb8",
+  recovery: "#64748b",
+  setpiece: "#7a5bb8",
+  match: "#c47a24",
 };
 
 const TYPE_KEYWORDS: { type: SessionType; words: string[] }[] = [
@@ -175,6 +172,36 @@ function inferType(theme: string | null | undefined): SessionType {
   return "tactical";
 }
 
+const FOCUS_TO_TYPE: Record<FocusFamily, SessionType> = {
+  TA: "tactical",
+  TE: "technical",
+  PE: "physical",
+  AT: "mental",
+};
+
+function typesFromFocusFamilies(families: FocusFamily[] | undefined): SessionType[] {
+  const types = (families ?? []).map((f) => FOCUS_TO_TYPE[f]).filter(Boolean);
+  return [...new Set(types)];
+}
+
+function sessionTypes(session: GridSession): SessionType[] {
+  const fromFocus = typesFromFocusFamilies(session.focusFamilies);
+  return fromFocus.length ? fromFocus : [inferType(session.title)];
+}
+
+function typeBar(types: SessionType[]): string {
+  const colors = types.map((type) => TYPE_COLOR[type]);
+  if (colors.length <= 1) return colors[0] ?? TYPE_COLOR.tactical;
+  const step = 100 / colors.length;
+  return `linear-gradient(180deg, ${colors
+    .map((color, index) => {
+      const start = Math.round(index * step);
+      const end = Math.round((index + 1) * step);
+      return `${color} ${start}% ${end}%`;
+    })
+    .join(", ")})`;
+}
+
 const DAYS: ("mon" | "tue" | "wed" | "thu" | "fri" | "sat" | "sun")[] = [
   "mon",
   "tue",
@@ -221,7 +248,7 @@ function ymd(d: Date): string {
   return `${y}-${m}-${dd}`;
 }
 
-type EnrichedSession = GridSession & { type: SessionType; slot: Slot };
+type EnrichedSession = GridSession & { types: SessionType[]; slot: Slot };
 
 export function PlannerWeeksGrid({
   teamId,
@@ -239,6 +266,9 @@ export function PlannerWeeksGrid({
   const tTheme = useTranslations("planner.theme");
   const today = ymd(new Date());
   const [isCreatingSlot, startSlotCreate] = useTransition();
+  const [isSessionActionPending, startSessionAction] = useTransition();
+  const [draggingSessionId, setDraggingSessionId] = useState<string | null>(null);
+  const [copiedSessionId, setCopiedSessionId] = useState<string | null>(null);
 
   const { microByStart, mesoById } = useMemo(() => {
     const microByStart = new Map<string, MicroLookup>();
@@ -300,11 +330,11 @@ export function PlannerWeeksGrid({
 
   const enriched = useMemo<EnrichedSession[]>(
     () =>
-      sessions.map((s) => ({
-        ...s,
-        type: inferType(s.title),
-        slot: slotOf(s.start),
-      })),
+	      sessions.map((s) => ({
+	        ...s,
+	        types: sessionTypes(s),
+	        slot: slotOf(s.start),
+	      })),
     [sessions]
   );
 
@@ -329,16 +359,19 @@ export function PlannerWeeksGrid({
     const byType = new Map<SessionType, number>();
     for (const w of weeks) {
       for (let i = 0; i < 7; i++) {
-        const list = byDate.get(ymd(addDays(w, i))) ?? [];
-        for (const s of list) {
-          if (!activeTypes.has(s.type)) continue;
-          totalSessions++;
-          const min = s.durationMinutes ?? 0;
-          totalMin += min;
-          byType.set(s.type, (byType.get(s.type) ?? 0) + min);
-        }
-      }
-    }
+	        const list = byDate.get(ymd(addDays(w, i))) ?? [];
+	        for (const s of list) {
+	          if (!s.types.some((type) => activeTypes.has(type))) continue;
+	          totalSessions++;
+	          const min = s.durationMinutes ?? 0;
+	          totalMin += min;
+	          const split = min / s.types.length;
+	          for (const type of s.types) {
+	            byType.set(type, (byType.get(type) ?? 0) + split);
+	          }
+	        }
+	      }
+	    }
     return { totalSessions, totalMin, byType };
   }, [weeks, byDate, activeTypes]);
 
@@ -349,6 +382,54 @@ export function PlannerWeeksGrid({
       else n.add(type);
       return n;
     });
+  }
+
+  function runSessionAction(
+    action: () => Promise<{ error?: string } | undefined | void>,
+  ) {
+    if (isSessionActionPending) return;
+    startSessionAction(async () => {
+      const result = await action();
+      if (result?.error) {
+        window.alert(result.error);
+        return;
+      }
+      router.refresh();
+    });
+  }
+
+  function dropOnSlot(e: DragEvent, date: string, slot: Slot) {
+    e.preventDefault();
+    e.stopPropagation();
+    const sessionId =
+      e.dataTransfer.getData("text/plain") || draggingSessionId || "";
+    setDraggingSessionId(null);
+    if (!sessionId) return;
+    runSessionAction(() =>
+      movePlannerSessionAction({
+        teamId,
+        sessionId,
+        date,
+        slot,
+        locale,
+      }),
+    );
+  }
+
+  function pasteCopiedSession(date: string, slot: Slot, keepSelection = false) {
+    if (!copiedSessionId) return false;
+    const sessionId = copiedSessionId;
+    if (!keepSelection) setCopiedSessionId(null);
+    runSessionAction(() =>
+      duplicatePlannerSessionAction({
+        teamId,
+        sessionId,
+        date,
+        slot,
+        locale,
+      }),
+    );
+    return true;
   }
 
   const monthLabel = new Date(
@@ -425,15 +506,18 @@ export function PlannerWeeksGrid({
     let sessionCount = 0;
     const weekByType = new Map<SessionType, number>();
     for (let i = 0; i < 7; i++) {
-      const list = byDate.get(ymd(addDays(weekStart, i))) ?? [];
-      for (const s of list) {
-        if (!activeTypes.has(s.type)) continue;
-        const min = s.durationMinutes ?? 0;
-        weekTotal += min;
-        sessionCount++;
-        weekByType.set(s.type, (weekByType.get(s.type) ?? 0) + min);
-      }
-    }
+	      const list = byDate.get(ymd(addDays(weekStart, i))) ?? [];
+	      for (const s of list) {
+	        if (!s.types.some((type) => activeTypes.has(type))) continue;
+	        const min = s.durationMinutes ?? 0;
+	        weekTotal += min;
+	        sessionCount++;
+	        const split = min / s.types.length;
+	        for (const type of s.types) {
+	          weekByType.set(type, (weekByType.get(type) ?? 0) + split);
+	        }
+	      }
+	    }
 
     const isPickerOpen = openMicroId === micro.id;
     const themeDot = themeColors?.dot ?? "#cbd5e1";
@@ -524,9 +608,9 @@ export function PlannerWeeksGrid({
         {DAYS.map((_, di) => {
           const cellDate = addDays(weekStart, di);
           const dateStr = ymd(cellDate);
-          const list = (byDate.get(dateStr) ?? []).filter((s) =>
-            activeTypes.has(s.type)
-          );
+	          const list = (byDate.get(dateStr) ?? []).filter((s) =>
+	            s.types.some((type) => activeTypes.has(type)),
+	          );
           const morning = list.find((s) => s.slot === "morning") ?? null;
           const afternoon = list.find((s) => s.slot === "afternoon") ?? null;
           const isToday = dateStr === today;
@@ -555,70 +639,137 @@ export function PlannerWeeksGrid({
             session: EnrichedSession | null,
             label: string
           ) => {
-            if (session) {
-              const t = timeOf(session.start);
-              return (
-                <button
-                  type="button"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    router.push(
-                      `/planner/${teamId}/sessions/${session.id}/preparation`
-                    );
-                  }}
-                  title={session.title}
-                  className={`flex w-full flex-col gap-0.5 rounded border-l-[3px] px-1.5 py-1 text-left transition-transform hover:-translate-y-px hover:shadow-sm ${
-                    TYPE_BLOCK_CLASS[session.type]
-                  }`}
-                >
-                  {t ? (
-                    <span className="text-[10px] font-semibold tabular-nums opacity-70">
-                      {t}
-                    </span>
-                  ) : null}
-                  <span className="truncate text-[11px] font-semibold leading-tight">
-                    {session.type === "match" ? "⚽ " : ""}
-                    {session.title}
-                  </span>
-                  {session.durationMinutes ? (
-                    <span className="flex items-center gap-1 text-[10px] tabular-nums opacity-75">
-                      <svg
-                        width="9"
-                        height="9"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        strokeWidth="2.5"
-                      >
-                        <circle cx="12" cy="12" r="10" />
-                        <polyline points="12 6 12 12 16 14" />
-                      </svg>
-                      {session.durationMinutes}m
-                    </span>
-                  ) : null}
-                </button>
-              );
-            }
-            return (
-              <button
+	              if (session) {
+	                const t = timeOf(session.start);
+	                const isCopied = copiedSessionId === session.id;
+	                return (
+	                  <div
+	                  draggable={!isSessionActionPending}
+	                  onDragStart={(e) => {
+	                    e.dataTransfer.effectAllowed = "move";
+	                    e.dataTransfer.setData("text/plain", session.id);
+	                    setDraggingSessionId(session.id);
+	                  }}
+	                  onDragEnd={() => setDraggingSessionId(null)}
+	                    className={`group/session relative flex w-full overflow-hidden rounded-md border bg-zinc-50 text-left text-zinc-800 transition-transform hover:-translate-y-px hover:border-zinc-300 hover:bg-white hover:shadow-sm dark:bg-zinc-800/70 dark:text-zinc-100 dark:hover:border-zinc-600 dark:hover:bg-zinc-800 ${
+	                      isCopied
+	                        ? "border-zinc-900 ring-2 ring-zinc-900/10 dark:border-zinc-100 dark:ring-zinc-100/10"
+	                        : "border-zinc-200 dark:border-zinc-700/80"
+	                    } ${draggingSessionId === session.id ? "opacity-50" : ""}`}
+	                  >
+	                  <span
+	                    aria-hidden="true"
+	                    className="absolute bottom-0 left-0 top-0 w-[3px]"
+	                    style={{ background: typeBar(session.types) }}
+	                  />
+	                  <button
+	                    type="button"
+	                    onClick={(e) => {
+	                      e.stopPropagation();
+	                      router.push(
+	                        `/planner/${teamId}/sessions/${session.id}/preparation`,
+	                      );
+	                    }}
+	                      title={session.title}
+	                      className="flex min-w-0 flex-1 flex-col gap-0.5 py-1.5 pl-3 pr-8 text-left"
+	                  >
+	                    <span className="flex items-center justify-between gap-2">
+	                      <span className="text-[10px] font-semibold tabular-nums text-zinc-500 dark:text-zinc-400">
+	                        {t ?? ""}
+	                      </span>
+	                      {session.durationMinutes ? (
+	                        <span className="text-[10px] font-medium tabular-nums text-zinc-400 dark:text-zinc-500">
+	                          {session.durationMinutes}&apos;
+	                        </span>
+	                      ) : null}
+	                    </span>
+	                    <span className="truncate text-[11px] font-semibold leading-tight text-zinc-900 dark:text-zinc-100">
+	                      {session.types.includes("match") ? "⚽ " : ""}
+	                      {session.title}
+	                    </span>
+	                  </button>
+	                    <div className="absolute right-1 top-1 flex items-center gap-0.5 opacity-0 transition-opacity group-hover/session:opacity-100">
+	                      <button
+	                      type="button"
+	                      title="Dupliquer"
+	                      aria-label="Dupliquer la séance"
+	                        disabled={isSessionActionPending}
+	                        onClick={(e) => {
+	                          e.stopPropagation();
+	                          setCopiedSessionId((current) =>
+	                            current === session.id ? null : session.id,
+	                          );
+	                        }}
+	                        className={`flex h-5 w-5 items-center justify-center rounded disabled:opacity-40 ${
+	                          isCopied
+	                            ? "bg-zinc-900 text-white dark:bg-zinc-100 dark:text-zinc-900"
+	                            : "text-zinc-400 hover:bg-zinc-200/70 hover:text-zinc-800 dark:hover:bg-zinc-700 dark:hover:text-zinc-100"
+	                        }`}
+	                    >
+	                      <Copy size={12} strokeWidth={2.2} />
+	                    </button>
+	                    <button
+	                      type="button"
+	                      title="Supprimer"
+	                      aria-label="Supprimer la séance"
+	                      disabled={isSessionActionPending}
+	                      onClick={(e) => {
+	                        e.stopPropagation();
+	                        if (!window.confirm("Supprimer cette séance ?")) return;
+	                        runSessionAction(() =>
+	                          deletePlannerSessionAction({
+	                            teamId,
+	                            sessionId: session.id,
+	                            locale,
+	                          }),
+	                        );
+	                      }}
+	                      className="flex h-5 w-5 items-center justify-center rounded text-zinc-400 hover:bg-red-50 hover:text-red-600 disabled:opacity-40 dark:hover:bg-red-950/40 dark:hover:text-red-300"
+	                    >
+	                      <Trash2 size={12} strokeWidth={2.2} />
+	                    </button>
+	                  </div>
+	                </div>
+	              );
+	            }
+	            return (
+	              <button
                 type="button"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  goToNew(slot);
-                }}
-                onKeyDown={(e) => {
-                  if (e.key === "Enter" || e.key === " ") {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    goToNew(slot);
-                  }
-                }}
-                className="flex w-full items-center justify-between gap-1 rounded border border-dashed border-zinc-200 px-1.5 py-1 text-[10px] text-zinc-400 opacity-0 transition-opacity hover:bg-zinc-50 group-hover:opacity-100 dark:border-zinc-700 dark:text-zinc-500 dark:hover:bg-zinc-800/60"
-              >
-                <span className="font-semibold uppercase tracking-wide">
-                  {label}
-                </span>
-                <span>+</span>
+	                onClick={(e) => {
+	                  e.stopPropagation();
+	                  if (pasteCopiedSession(dateStr, slot, e.metaKey || e.ctrlKey)) {
+	                    return;
+	                  }
+	                  goToNew(slot);
+	                }}
+	                onKeyDown={(e) => {
+	                  if (e.key === "Enter" || e.key === " ") {
+	                    e.preventDefault();
+	                    e.stopPropagation();
+	                    if (pasteCopiedSession(dateStr, slot)) return;
+	                    goToNew(slot);
+		                  }
+		                }}
+	                onDragOver={(e) => {
+	                  if (!draggingSessionId) return;
+	                  e.preventDefault();
+	                  e.dataTransfer.dropEffect = "move";
+	                }}
+	                onDrop={(e) => dropOnSlot(e, dateStr, slot)}
+		                className={`flex w-full items-center justify-between gap-1 rounded border border-dashed px-1.5 py-1 text-[10px] transition-opacity hover:bg-zinc-50 dark:hover:bg-zinc-800/60 ${
+		                  copiedSessionId
+		                    ? "border-zinc-400 bg-white text-zinc-700 opacity-100 dark:border-zinc-500 dark:bg-zinc-900 dark:text-zinc-200"
+		                    : "border-zinc-200 text-zinc-400 dark:border-zinc-700 dark:text-zinc-500"
+		                } ${
+		                  draggingSessionId || copiedSessionId
+		                    ? "opacity-100"
+		                    : "opacity-0 group-hover:opacity-100"
+		                }`}
+		              >
+	                <span className="font-semibold uppercase tracking-wide">
+	                  {copiedSessionId ? "Coller ici" : label}
+	                </span>
+	                <span>{copiedSessionId ? <Copy size={11} /> : "+"}</span>
               </button>
             );
           };
@@ -663,10 +814,10 @@ export function PlannerWeeksGrid({
           <div className="flex h-1.5 overflow-hidden rounded-full bg-zinc-200 dark:bg-zinc-800">
             {weekTotal > 0
               ? [...weekByType.entries()].map(([type, min]) => (
-                  <span
-                    key={type}
-                    title={`${t(`type.${type}`)}: ${min}m`}
-                    className="block h-full"
+	                <span
+	                  key={type}
+	                  title={`${t(`type.${type}`)}: ${Math.round(min)}m`}
+	                  className="block h-full"
                     style={{
                       width: `${(min / weekTotal) * 100}%`,
                       background: TYPE_COLOR[type],
@@ -855,10 +1006,10 @@ export function PlannerWeeksGrid({
           <div className="flex h-1.5 overflow-hidden rounded-full bg-zinc-200 dark:bg-zinc-800">
             {stats.totalMin > 0
               ? sortedByType.map(([type, min]) => (
-                  <span
-                    key={type}
-                    title={`${t(`type.${type}`)}: ${min}m`}
-                    className="block h-full"
+	                  <span
+	                    key={type}
+	                    title={`${t(`type.${type}`)}: ${Math.round(min)}m`}
+	                    className="block h-full"
                     style={{
                       width: `${(min / stats.totalMin) * 100}%`,
                       background: TYPE_COLOR[type],
