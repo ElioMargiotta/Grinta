@@ -27,6 +27,7 @@ import {
   useCallback,
   useEffect,
   useMemo,
+  useRef,
   useState,
   useSyncExternalStore,
   useTransition,
@@ -2144,6 +2145,7 @@ export function PreparationSheet({
   const [isPending, startTransition] = useTransition();
   const [step, setStep] = useState(0);
   const [stepKey, setStepKey] = useState(0);
+  const stepBodyRef = useRef<HTMLDivElement | null>(null);
   const locale = useLocale();
   const router = useRouter();
 
@@ -2214,6 +2216,10 @@ export function PreparationSheet({
     const t = setTimeout(() => setJustSaved(false), 2000);
     return () => clearTimeout(t);
   }, [justSaved]);
+
+  useEffect(() => {
+    stepBodyRef.current?.scrollTo({ top: 0 });
+  }, [stepKey]);
 
   function loadExample() {
     if (
@@ -2297,21 +2303,21 @@ export function PreparationSheet({
   return (
     <>
       <div
-        className="prep-no-print fixed inset-0 z-50 flex flex-col overflow-hidden bg-[#0c0c0d] text-zinc-900"
+        className="prep-no-print fixed inset-0 z-50 flex flex-col overflow-hidden bg-[#f8f8f9] text-zinc-900"
         style={{ ["--g-green" as string]: GRINTA_GREEN }}
       >
         {/* Topbar */}
-        <header className="relative z-10 flex h-[52px] flex-shrink-0 items-center justify-between border-b border-white/10 bg-[#0c0c0d]/90 px-5 backdrop-blur-md">
+        <header className="relative z-10 flex h-[52px] flex-shrink-0 items-center justify-between border-b border-zinc-200 bg-white/95 px-5 backdrop-blur-md">
           <div className="flex min-w-0 items-center gap-2.5">
             <button
               type="button"
               onClick={() => router.back()}
-              className="flex items-center gap-1 border-0 bg-transparent text-[12px] text-white/40 transition hover:text-white/80"
+              className="flex items-center gap-1 border-0 bg-transparent text-[12px] font-medium text-zinc-500 transition hover:text-zinc-950"
             >
               <ChevronLeft className="h-3.5 w-3.5" strokeWidth={2} />
               Back
             </button>
-            <span className="mx-3 h-[18px] w-px bg-white/10" />
+            <span className="mx-3 h-[18px] w-px bg-zinc-200" />
             <Image
               src="/icon-grinta.svg"
               alt=""
@@ -2321,30 +2327,30 @@ export function PreparationSheet({
               className="h-7 w-7 shrink-0"
             />
             <div className="min-w-0 leading-none">
-              <div className="text-[13px] font-semibold text-white">
+              <div className="text-[13px] font-semibold text-zinc-950">
                 Préparation d&apos;entraînement
               </div>
-              <div className="mt-0.5 truncate text-[10px] text-white/35">
+              <div className="mt-0.5 truncate text-[10px] text-zinc-500">
                 {data.team || "No team set"} · {data.date || "No date"}
               </div>
             </div>
           </div>
           <div className="flex items-center gap-2">
-            <div className="mr-1 flex items-center gap-2 rounded-lg bg-white/[0.06] px-3 py-[5px]">
-              <div className="h-[3px] w-20 overflow-hidden rounded-full bg-white/10">
+            <div className="mr-1 flex items-center gap-2 rounded-lg bg-zinc-100 px-3 py-[5px]">
+              <div className="h-[3px] w-20 overflow-hidden rounded-full bg-zinc-200">
                 <div
-                  className="h-full rounded-full bg-white transition-all duration-500 ease-[cubic-bezier(0.4,0,0.2,1)]"
+                  className="h-full rounded-full bg-zinc-950 transition-all duration-500 ease-[cubic-bezier(0.4,0,0.2,1)]"
                   style={{ width: `${pct}%` }}
                 />
               </div>
-              <span className="text-[11px] font-semibold text-white/50">
+              <span className="text-[11px] font-semibold text-zinc-500">
                 {pct}%
               </span>
             </div>
             <button
               type="button"
               onClick={loadExample}
-              className="hidden h-8 items-center gap-1.5 rounded-[8px] px-3 text-[12px] font-medium text-white/60 transition hover:bg-white/5 hover:text-white sm:inline-flex"
+              className="hidden h-8 items-center gap-1.5 rounded-[8px] px-3 text-[12px] font-medium text-zinc-500 transition hover:bg-zinc-100 hover:text-zinc-950 sm:inline-flex"
               title="Load example data"
             >
               <FileText className="h-3.5 w-3.5" strokeWidth={2} />
@@ -2385,7 +2391,7 @@ export function PreparationSheet({
         {/* Shell */}
         <div className="flex min-h-0 flex-1 overflow-hidden">
           {/* Sidebar */}
-          <aside className="hidden w-[232px] shrink-0 flex-col overflow-hidden border-r border-white/[0.06] bg-[#111113] md:flex">
+          <aside className="hidden w-[232px] shrink-0 flex-col overflow-hidden border-r border-zinc-200 bg-white md:flex">
             <div className="flex items-center gap-2 px-4 pb-3 pt-4">
               <Image
                 src="/icon-grinta.svg"
@@ -2402,7 +2408,7 @@ export function PreparationSheet({
                 className="h-5 w-auto"
               />
             </div>
-            <div className="px-4 pb-2 pt-2 text-[9px] font-semibold uppercase tracking-[0.1em] text-white/25">
+            <div className="px-4 pb-2 pt-2 text-[9px] font-semibold uppercase tracking-[0.1em] text-zinc-400">
               Étapes de préparation
             </div>
             <nav className="flex flex-1 flex-col gap-0.5 overflow-y-auto px-2 pb-2">
@@ -2410,25 +2416,26 @@ export function PreparationSheet({
                 const st: SectionStatus | null = i < 5 ? statuses[i] : null;
                 const isActive = step === i;
                 const numCls = isActive
-                  ? "bg-white text-[#111]"
+                  ? "bg-zinc-950 text-white"
                   : st === "complete"
-                    ? "bg-emerald-500/10 text-emerald-500"
+                    ? "bg-emerald-50 text-emerald-600"
                     : st === "partial"
-                      ? "bg-amber-500/10 text-amber-500"
-                      : "bg-white/[0.06] text-white/30";
+                      ? "bg-amber-50 text-amber-600"
+                      : "bg-zinc-100 text-zinc-400";
                 return (
                   <button
                     key={i}
                     type="button"
                     onClick={() => goTo(i)}
-                    className={`relative flex w-full items-center gap-2.5 rounded-[9px] px-2.5 py-2 text-left transition ${
+                    aria-current={isActive ? "step" : undefined}
+                    className={`group relative flex w-full items-center gap-2.5 rounded-[9px] px-2.5 py-2 text-left transition ${
                       isActive
-                        ? "bg-white/[0.09]"
-                        : "hover:bg-white/[0.05]"
+                        ? "bg-zinc-50"
+                        : "hover:bg-zinc-50"
                     }`}
                   >
                     {isActive && (
-                      <span className="absolute left-0 top-1/2 h-5 w-[3px] -translate-y-1/2 rounded-r-[3px] bg-white" />
+                      <span className="absolute left-0 top-1/2 h-5 w-[3px] -translate-y-1/2 rounded-r-[3px] bg-red-500" />
                     )}
                     <span
                       className={`flex h-[26px] w-[26px] shrink-0 items-center justify-center rounded-[7px] text-[11px] font-semibold transition ${numCls}`}
@@ -2443,28 +2450,28 @@ export function PreparationSheet({
                       <span
                         className={`block text-[12px] font-medium leading-tight transition ${
                           isActive
-                            ? "text-white"
-                            : "text-white/50 group-hover:text-white/80"
+                            ? "text-zinc-950"
+                            : "text-zinc-500 group-hover:text-zinc-900"
                         }`}
                       >
                         {s.label}
                       </span>
                     </span>
-                    {st && !isActive && <StatusDot status={st} dark />}
+                    {st && !isActive && <StatusDot status={st} />}
                   </button>
                 );
               })}
             </nav>
-            <div className="border-t border-white/[0.06] px-4 py-3.5">
+            <div className="border-t border-zinc-200 px-4 py-3.5">
               <div className="mb-1.5 flex justify-between">
-                <span className="text-[10px] text-white/30">Progress</span>
-                <span className="text-[10px] font-semibold text-white/60">
+                <span className="text-[10px] text-zinc-400">Progress</span>
+                <span className="text-[10px] font-semibold text-zinc-600">
                   {pct}%
                 </span>
               </div>
-              <div className="h-[3px] overflow-hidden rounded-full bg-white/10">
+              <div className="h-[3px] overflow-hidden rounded-full bg-zinc-200">
                 <div
-                  className="h-full rounded-full bg-gradient-to-r from-white to-white/70 transition-all duration-500 ease-[cubic-bezier(0.4,0,0.2,1)]"
+                  className="h-full rounded-full bg-zinc-950 transition-all duration-500 ease-[cubic-bezier(0.4,0,0.2,1)]"
                   style={{ width: `${pct}%` }}
                 />
               </div>
@@ -2549,8 +2556,9 @@ export function PreparationSheet({
 
             {/* Step body */}
             <div
+              ref={stepBodyRef}
               key={stepKey}
-              className="min-h-0 flex-1 overflow-y-auto overflow-x-hidden px-7 py-2 motion-safe:animate-[prep-step-in_250ms_cubic-bezier(0.4,0,0.2,1)]"
+              className="min-h-0 flex-1 overflow-y-auto overflow-x-hidden px-7 py-2 motion-safe:animate-[prep-step-in_180ms_cubic-bezier(0.4,0,0.2,1)]"
             >
               {stepBody}
             </div>
