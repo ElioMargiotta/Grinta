@@ -6,6 +6,7 @@ import {
 } from "@/components/planner/PlannerCalendar";
 import { PlannerSetupWizard } from "@/components/planner/PlannerSetupWizard";
 import { type Macrocycle } from "@/components/planner/PlannerTourView";
+import { FOCUS_FAMILIES, type FocusFamily } from "@/components/sheet/types";
 import { requireUser } from "@/lib/auth/getUser";
 
 const VALID_VIEWS: PlannerView[] = ["tour", "weekly"];
@@ -34,19 +35,39 @@ export default async function PlannerTeamPage({
     .single();
   if (!team) notFound();
 
-  const { data: sessions } = await supabase
-    .from("sessions")
-    .select("id, date, start_time, theme, duration_minutes, microcycle_id")
-    .eq("team_id", teamId)
-    .order("date", { ascending: true });
+	  const { data: sessions } = await supabase
+	    .from("sessions")
+	    .select("id, date, start_time, theme, duration_minutes, microcycle_id")
+	    .eq("team_id", teamId)
+	    .order("date", { ascending: true });
 
-  const events = (sessions ?? []).map((s) => ({
-    id: s.id,
-    title: s.theme || t("session.newTitle"),
-    start: s.start_time ? `${s.date}T${s.start_time}` : s.date,
-    date: s.date,
-    durationMinutes: s.duration_minutes ?? null,
-  }));
+	  const sessionIds = (sessions ?? []).map((s) => s.id);
+	  const { data: preparationRows } = sessionIds.length
+	    ? await supabase
+	        .from("session_preparations")
+	        .select("session_id, data")
+	        .in("session_id", sessionIds)
+	    : { data: [] as never[] };
+
+	  const focusBySession = new Map<string, FocusFamily[]>();
+	  for (const row of preparationRows ?? []) {
+	    const raw = (row.data as { focusFamilies?: unknown } | null)?.focusFamilies;
+	    const focusFamilies = Array.isArray(raw)
+	      ? (raw.filter((f) =>
+	          FOCUS_FAMILIES.includes(f as FocusFamily),
+	        ) as FocusFamily[])
+	      : [];
+	    if (focusFamilies.length) focusBySession.set(row.session_id, focusFamilies);
+	  }
+
+	  const events = (sessions ?? []).map((s) => ({
+	    id: s.id,
+	    title: s.theme || t("session.newTitle"),
+	    start: s.start_time ? `${s.date}T${s.start_time}` : s.date,
+	    date: s.date,
+	    durationMinutes: s.duration_minutes ?? null,
+	    focusFamilies: focusBySession.get(s.id) ?? [],
+	  }));
 
   const { data: macroRows } = await supabase
     .from("macrocycles")

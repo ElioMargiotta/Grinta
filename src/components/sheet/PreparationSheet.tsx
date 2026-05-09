@@ -499,6 +499,19 @@ const FOCUS_FAMILY_LABELS: Record<FocusFamily, string> = {
   AT: "Mentalité",
 };
 
+const FOCUS_FAMILY_COLORS: Record<FocusFamily, string> = {
+  TA: "#2563eb",
+  TE: "#16a34a",
+  PE: "#dc2626",
+  AT: "#7c3aed",
+};
+
+function formatFocusFamilies(families: FocusFamily[]): string {
+  return families
+    .map((f) => `${f} - ${FOCUS_FAMILY_LABELS[f]}`)
+    .join(" ; ");
+}
+
 function FocusFamilyChips({
   value,
   onChange,
@@ -511,7 +524,7 @@ function FocusFamilyChips({
     else onChange([...value, f]);
   }
   return (
-    <div className="flex flex-wrap gap-1.5">
+    <div className="flex items-center gap-3 overflow-hidden">
       {FOCUS_FAMILIES.map((f) => {
         const active = value.includes(f);
         return (
@@ -519,16 +532,24 @@ function FocusFamilyChips({
             key={f}
             type="button"
             onClick={() => toggle(f)}
-            className={`inline-flex items-center gap-1.5 rounded-full border-[1.5px] px-2.5 py-1 text-[11px] font-medium transition ${
+            className={`group flex min-w-0 items-center gap-1.5 border-b pb-1 text-left transition ${
               active
-                ? "border-zinc-900 bg-zinc-900 text-white"
-                : "border-zinc-200 bg-white text-zinc-700 hover:border-zinc-300"
+                ? "border-zinc-900 text-zinc-950"
+                : "border-zinc-200 text-zinc-400 hover:border-zinc-400 hover:text-zinc-700"
             }`}
           >
-            <span className="font-mono text-[10px] tabular-nums opacity-70">
+            <span
+              className={`h-1.5 w-1.5 shrink-0 rounded-full transition ${
+                active ? "opacity-100" : "opacity-35 group-hover:opacity-70"
+              }`}
+              style={{ background: FOCUS_FAMILY_COLORS[f] }}
+            />
+            <span className="font-mono text-[11px] font-semibold tabular-nums">
               {f}
             </span>
-            <span>{FOCUS_FAMILY_LABELS[f]}</span>
+            <span className="truncate text-[10px] font-medium">
+              {FOCUS_FAMILY_LABELS[f]}
+            </span>
           </button>
         );
       })}
@@ -1098,13 +1119,18 @@ function Step1({
               </span>
               <FieldUl label="Focus">
                 <div className="mb-1.5">
-                  <FocusFamilyChips
-                    value={data.focusFamilies}
-                    onChange={(v) =>
-                      patch((d) => ({ ...d, focusFamilies: v }))
-                    }
-                  />
-                </div>
+	                  <FocusFamilyChips
+	                    value={data.focusFamilies}
+	                    onChange={(v) => {
+	                      const autoFocus = formatFocusFamilies(v);
+	                      patch((d) => ({
+	                        ...d,
+	                        focusFamilies: v,
+	                        focus: autoFocus.slice(0, 115),
+	                      }));
+	                    }}
+	                  />
+	                </div>
                 <FitTextarea
                   area={Z_GLOBAL.focus}
                   rows={1}

@@ -10,6 +10,7 @@ import {
   type ThemeKey,
 } from "./MicrocycleThemePicker";
 import { createSessionForSlotAction } from "@/app/[locale]/(app)/planner/actions";
+import type { FocusFamily } from "@/components/sheet/types";
 
 const KNOWN_THEMES: ThemeKey[] = [
   "possede_ballon",
@@ -35,6 +36,7 @@ type GridSession = {
   date: string;
   start: string | null;
   durationMinutes: number | null;
+  focusFamilies?: FocusFamily[];
 };
 
 type Slot = "morning" | "afternoon";
@@ -75,6 +77,7 @@ type SessionType =
   | "tactical"
   | "physical"
   | "technical"
+  | "mental"
   | "recovery"
   | "setpiece"
   | "match";
@@ -83,6 +86,7 @@ const TYPE_ORDER: SessionType[] = [
   "tactical",
   "physical",
   "technical",
+  "mental",
   "recovery",
   "setpiece",
   "match",
@@ -92,6 +96,7 @@ const TYPE_COLOR: Record<SessionType, string> = {
   tactical: "#2563eb",
   physical: "#dc2626",
   technical: "#0f7d3f",
+  mental: "#7c3aed",
   recovery: "#475569",
   setpiece: "#7c3aed",
   match: "#d97706",
@@ -104,6 +109,8 @@ const TYPE_BLOCK_CLASS: Record<SessionType, string> = {
     "bg-red-50 border-l-red-600 text-red-900 dark:bg-red-950/40 dark:text-red-100 dark:border-l-red-500",
   technical:
     "bg-emerald-50 border-l-emerald-700 text-emerald-900 dark:bg-emerald-950/40 dark:text-emerald-100 dark:border-l-emerald-500",
+  mental:
+    "bg-violet-50 border-l-violet-600 text-violet-900 dark:bg-violet-950/40 dark:text-violet-100 dark:border-l-violet-500",
   recovery:
     "bg-slate-100 border-l-slate-500 text-slate-900 dark:bg-slate-900/60 dark:text-slate-100 dark:border-l-slate-400",
   setpiece:
@@ -175,6 +182,36 @@ function inferType(theme: string | null | undefined): SessionType {
   return "tactical";
 }
 
+const FOCUS_TO_TYPE: Record<FocusFamily, SessionType> = {
+  TA: "tactical",
+  TE: "technical",
+  PE: "physical",
+  AT: "mental",
+};
+
+function typesFromFocusFamilies(families: FocusFamily[] | undefined): SessionType[] {
+  const types = (families ?? []).map((f) => FOCUS_TO_TYPE[f]).filter(Boolean);
+  return [...new Set(types)];
+}
+
+function sessionTypes(session: GridSession): SessionType[] {
+  const fromFocus = typesFromFocusFamilies(session.focusFamilies);
+  return fromFocus.length ? fromFocus : [inferType(session.title)];
+}
+
+function typeGradient(types: SessionType[]): string {
+  const colors = types.map((type) => TYPE_COLOR[type]);
+  if (colors.length <= 1) return colors[0] ?? TYPE_COLOR.tactical;
+  const step = 100 / colors.length;
+  return `linear-gradient(135deg, ${colors
+    .map((color, index) => {
+      const start = Math.round(index * step);
+      const end = Math.round((index + 1) * step);
+      return `${color} ${start}% ${end}%`;
+    })
+    .join(", ")})`;
+}
+
 const DAYS: ("mon" | "tue" | "wed" | "thu" | "fri" | "sat" | "sun")[] = [
   "mon",
   "tue",
@@ -221,7 +258,7 @@ function ymd(d: Date): string {
   return `${y}-${m}-${dd}`;
 }
 
-type EnrichedSession = GridSession & { type: SessionType; slot: Slot };
+type EnrichedSession = GridSession & { types: SessionType[]; slot: Slot };
 
 export function PlannerWeeksGrid({
   teamId,
@@ -300,11 +337,11 @@ export function PlannerWeeksGrid({
 
   const enriched = useMemo<EnrichedSession[]>(
     () =>
-      sessions.map((s) => ({
-        ...s,
-        type: inferType(s.title),
-        slot: slotOf(s.start),
-      })),
+	      sessions.map((s) => ({
+	        ...s,
+	        types: sessionTypes(s),
+	        slot: slotOf(s.start),
+	      })),
     [sessions]
   );
 
@@ -329,16 +366,19 @@ export function PlannerWeeksGrid({
     const byType = new Map<SessionType, number>();
     for (const w of weeks) {
       for (let i = 0; i < 7; i++) {
-        const list = byDate.get(ymd(addDays(w, i))) ?? [];
-        for (const s of list) {
-          if (!activeTypes.has(s.type)) continue;
-          totalSessions++;
-          const min = s.durationMinutes ?? 0;
-          totalMin += min;
-          byType.set(s.type, (byType.get(s.type) ?? 0) + min);
-        }
-      }
-    }
+	        const list = byDate.get(ymd(addDays(w, i))) ?? [];
+	        for (const s of list) {
+	          if (!s.types.some((type) => activeTypes.has(type))) continue;
+	          totalSessions++;
+	          const min = s.durationMinutes ?? 0;
+	          totalMin += min;
+	          const split = min / s.types.length;
+	          for (const type of s.types) {
+	            byType.set(type, (byType.get(type) ?? 0) + split);
+	          }
+	        }
+	      }
+	    }
     return { totalSessions, totalMin, byType };
   }, [weeks, byDate, activeTypes]);
 
@@ -425,15 +465,18 @@ export function PlannerWeeksGrid({
     let sessionCount = 0;
     const weekByType = new Map<SessionType, number>();
     for (let i = 0; i < 7; i++) {
-      const list = byDate.get(ymd(addDays(weekStart, i))) ?? [];
-      for (const s of list) {
-        if (!activeTypes.has(s.type)) continue;
-        const min = s.durationMinutes ?? 0;
-        weekTotal += min;
-        sessionCount++;
-        weekByType.set(s.type, (weekByType.get(s.type) ?? 0) + min);
-      }
-    }
+	      const list = byDate.get(ymd(addDays(weekStart, i))) ?? [];
+	      for (const s of list) {
+	        if (!s.types.some((type) => activeTypes.has(type))) continue;
+	        const min = s.durationMinutes ?? 0;
+	        weekTotal += min;
+	        sessionCount++;
+	        const split = min / s.types.length;
+	        for (const type of s.types) {
+	          weekByType.set(type, (weekByType.get(type) ?? 0) + split);
+	        }
+	      }
+	    }
 
     const isPickerOpen = openMicroId === micro.id;
     const themeDot = themeColors?.dot ?? "#cbd5e1";
@@ -524,9 +567,9 @@ export function PlannerWeeksGrid({
         {DAYS.map((_, di) => {
           const cellDate = addDays(weekStart, di);
           const dateStr = ymd(cellDate);
-          const list = (byDate.get(dateStr) ?? []).filter((s) =>
-            activeTypes.has(s.type)
-          );
+	          const list = (byDate.get(dateStr) ?? []).filter((s) =>
+	            s.types.some((type) => activeTypes.has(type))
+	          );
           const morning = list.find((s) => s.slot === "morning") ?? null;
           const afternoon = list.find((s) => s.slot === "afternoon") ?? null;
           const isToday = dateStr === today;
@@ -550,15 +593,16 @@ export function PlannerWeeksGrid({
               ? "bg-zinc-50/70 dark:bg-zinc-950/40"
               : "bg-white dark:bg-zinc-900";
 
-          const renderSlot = (
-            slot: Slot,
-            session: EnrichedSession | null,
-            label: string
-          ) => {
-            if (session) {
-              const t = timeOf(session.start);
-              return (
-                <button
+	            const renderSlot = (
+	              slot: Slot,
+	              session: EnrichedSession | null,
+	              label: string
+	            ) => {
+	              if (session) {
+	                const t = timeOf(session.start);
+	                const primaryType = session.types[0] ?? "tactical";
+	                return (
+	                <button
                   type="button"
                   onClick={(e) => {
                     e.stopPropagation();
@@ -566,20 +610,25 @@ export function PlannerWeeksGrid({
                       `/planner/${teamId}/sessions/${session.id}/preparation`
                     );
                   }}
-                  title={session.title}
-                  className={`flex w-full flex-col gap-0.5 rounded border-l-[3px] px-1.5 py-1 text-left transition-transform hover:-translate-y-px hover:shadow-sm ${
-                    TYPE_BLOCK_CLASS[session.type]
-                  }`}
-                >
+	                  title={session.title}
+	                  className={`flex w-full flex-col gap-0.5 rounded border-l-[3px] px-1.5 py-1 text-left transition-transform hover:-translate-y-px hover:shadow-sm ${
+	                    TYPE_BLOCK_CLASS[primaryType]
+	                  }`}
+	                  style={{
+	                    borderLeftColor: TYPE_COLOR[primaryType],
+	                    background: typeGradient(session.types),
+	                    color: "white",
+	                  }}
+	                >
                   {t ? (
                     <span className="text-[10px] font-semibold tabular-nums opacity-70">
                       {t}
                     </span>
                   ) : null}
-                  <span className="truncate text-[11px] font-semibold leading-tight">
-                    {session.type === "match" ? "⚽ " : ""}
-                    {session.title}
-                  </span>
+	                  <span className="truncate text-[11px] font-semibold leading-tight">
+	                    {session.types.includes("match") ? "⚽ " : ""}
+	                    {session.title}
+	                  </span>
                   {session.durationMinutes ? (
                     <span className="flex items-center gap-1 text-[10px] tabular-nums opacity-75">
                       <svg
@@ -663,10 +712,10 @@ export function PlannerWeeksGrid({
           <div className="flex h-1.5 overflow-hidden rounded-full bg-zinc-200 dark:bg-zinc-800">
             {weekTotal > 0
               ? [...weekByType.entries()].map(([type, min]) => (
-                  <span
-                    key={type}
-                    title={`${t(`type.${type}`)}: ${min}m`}
-                    className="block h-full"
+	                <span
+	                  key={type}
+	                  title={`${t(`type.${type}`)}: ${Math.round(min)}m`}
+	                  className="block h-full"
                     style={{
                       width: `${(min / weekTotal) * 100}%`,
                       background: TYPE_COLOR[type],
@@ -855,10 +904,10 @@ export function PlannerWeeksGrid({
           <div className="flex h-1.5 overflow-hidden rounded-full bg-zinc-200 dark:bg-zinc-800">
             {stats.totalMin > 0
               ? sortedByType.map(([type, min]) => (
-                  <span
-                    key={type}
-                    title={`${t(`type.${type}`)}: ${min}m`}
-                    className="block h-full"
+	                  <span
+	                    key={type}
+	                    title={`${t(`type.${type}`)}: ${Math.round(min)}m`}
+	                    className="block h-full"
                     style={{
                       width: `${(min / stats.totalMin) * 100}%`,
                       background: TYPE_COLOR[type],
