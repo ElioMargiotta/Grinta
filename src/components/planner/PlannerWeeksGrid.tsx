@@ -93,30 +93,13 @@ const TYPE_ORDER: SessionType[] = [
 ];
 
 const TYPE_COLOR: Record<SessionType, string> = {
-  tactical: "#2563eb",
-  physical: "#dc2626",
-  technical: "#0f7d3f",
-  mental: "#7c3aed",
-  recovery: "#475569",
-  setpiece: "#7c3aed",
-  match: "#d97706",
-};
-
-const TYPE_BLOCK_CLASS: Record<SessionType, string> = {
-  tactical:
-    "bg-blue-50 border-l-blue-600 text-blue-900 dark:bg-blue-950/40 dark:text-blue-100 dark:border-l-blue-500",
-  physical:
-    "bg-red-50 border-l-red-600 text-red-900 dark:bg-red-950/40 dark:text-red-100 dark:border-l-red-500",
-  technical:
-    "bg-emerald-50 border-l-emerald-700 text-emerald-900 dark:bg-emerald-950/40 dark:text-emerald-100 dark:border-l-emerald-500",
-  mental:
-    "bg-violet-50 border-l-violet-600 text-violet-900 dark:bg-violet-950/40 dark:text-violet-100 dark:border-l-violet-500",
-  recovery:
-    "bg-slate-100 border-l-slate-500 text-slate-900 dark:bg-slate-900/60 dark:text-slate-100 dark:border-l-slate-400",
-  setpiece:
-    "bg-violet-50 border-l-violet-600 text-violet-900 dark:bg-violet-950/40 dark:text-violet-100 dark:border-l-violet-500",
-  match:
-    "bg-amber-50 border-l-amber-600 text-amber-900 dark:bg-amber-950/40 dark:text-amber-100 dark:border-l-amber-500",
+  tactical: "#2f5fba",
+  physical: "#c94a4a",
+  technical: "#2d8f5f",
+  mental: "#7a5bb8",
+  recovery: "#64748b",
+  setpiece: "#7a5bb8",
+  match: "#c47a24",
 };
 
 const TYPE_KEYWORDS: { type: SessionType; words: string[] }[] = [
@@ -199,11 +182,11 @@ function sessionTypes(session: GridSession): SessionType[] {
   return fromFocus.length ? fromFocus : [inferType(session.title)];
 }
 
-function typeGradient(types: SessionType[]): string {
+function typeBar(types: SessionType[]): string {
   const colors = types.map((type) => TYPE_COLOR[type]);
   if (colors.length <= 1) return colors[0] ?? TYPE_COLOR.tactical;
   const step = 100 / colors.length;
-  return `linear-gradient(135deg, ${colors
+  return `linear-gradient(180deg, ${colors
     .map((color, index) => {
       const start = Math.round(index * step);
       const end = Math.round((index + 1) * step);
@@ -593,16 +576,15 @@ export function PlannerWeeksGrid({
               ? "bg-zinc-50/70 dark:bg-zinc-950/40"
               : "bg-white dark:bg-zinc-900";
 
-	            const renderSlot = (
-	              slot: Slot,
-	              session: EnrichedSession | null,
-	              label: string
-	            ) => {
-	              if (session) {
-	                const t = timeOf(session.start);
-	                const primaryType = session.types[0] ?? "tactical";
-	                return (
-	                <button
+          const renderSlot = (
+            slot: Slot,
+            session: EnrichedSession | null,
+            label: string
+          ) => {
+            if (session) {
+              const t = timeOf(session.start);
+              return (
+                <button
                   type="button"
                   onClick={(e) => {
                     e.stopPropagation();
@@ -610,41 +592,30 @@ export function PlannerWeeksGrid({
                       `/planner/${teamId}/sessions/${session.id}/preparation`
                     );
                   }}
-	                  title={session.title}
-	                  className={`flex w-full flex-col gap-0.5 rounded border-l-[3px] px-1.5 py-1 text-left transition-transform hover:-translate-y-px hover:shadow-sm ${
-	                    TYPE_BLOCK_CLASS[primaryType]
-	                  }`}
-	                  style={{
-	                    borderLeftColor: TYPE_COLOR[primaryType],
-	                    background: typeGradient(session.types),
-	                    color: "white",
-	                  }}
-	                >
-                  {t ? (
-                    <span className="text-[10px] font-semibold tabular-nums opacity-70">
-                      {t}
+                  title={session.title}
+                  className="relative flex w-full overflow-hidden rounded-md border border-zinc-200 bg-zinc-50 px-2 py-1.5 pl-3 text-left text-zinc-800 transition-transform hover:-translate-y-px hover:border-zinc-300 hover:bg-white hover:shadow-sm dark:border-zinc-700/80 dark:bg-zinc-800/70 dark:text-zinc-100 dark:hover:border-zinc-600 dark:hover:bg-zinc-800"
+                >
+                  <span
+                    aria-hidden="true"
+                    className="absolute bottom-0 left-0 top-0 w-[3px]"
+                    style={{ background: typeBar(session.types) }}
+                  />
+                  <span className="flex min-w-0 flex-1 flex-col gap-0.5">
+                    <span className="flex items-center justify-between gap-2">
+                      <span className="text-[10px] font-semibold tabular-nums text-zinc-500 dark:text-zinc-400">
+                        {t ?? ""}
+                      </span>
+	                      {session.durationMinutes ? (
+	                        <span className="text-[10px] font-medium tabular-nums text-zinc-400 dark:text-zinc-500">
+	                          {session.durationMinutes}&apos;
+	                        </span>
+	                      ) : null}
                     </span>
-                  ) : null}
-	                  <span className="truncate text-[11px] font-semibold leading-tight">
-	                    {session.types.includes("match") ? "⚽ " : ""}
-	                    {session.title}
-	                  </span>
-                  {session.durationMinutes ? (
-                    <span className="flex items-center gap-1 text-[10px] tabular-nums opacity-75">
-                      <svg
-                        width="9"
-                        height="9"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        strokeWidth="2.5"
-                      >
-                        <circle cx="12" cy="12" r="10" />
-                        <polyline points="12 6 12 12 16 14" />
-                      </svg>
-                      {session.durationMinutes}m
+                    <span className="truncate text-[11px] font-semibold leading-tight text-zinc-900 dark:text-zinc-100">
+                      {session.types.includes("match") ? "⚽ " : ""}
+                      {session.title}
                     </span>
-                  ) : null}
+                  </span>
                 </button>
               );
             }
