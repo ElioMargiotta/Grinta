@@ -1903,167 +1903,183 @@ function Step5({ data, patch }: { data: PreparationData; patch: Patcher }) {
   );
 }
 
-function ReviewCard({
-  title,
-  status,
-  onEdit,
-  rows,
+function ReviewValue({
+  label,
+  value,
 }: {
-  title: string;
-  status: SectionStatus;
-  onEdit: () => void;
-  rows: Array<[string, string]>;
+  label: string;
+  value: string;
 }) {
+  const empty = !value.trim();
   return (
-    <div className="overflow-hidden rounded-[12px] border border-zinc-200 bg-white shadow-[0_1px_3px_rgb(0_0_0/0.05)]">
-      <div className="flex items-center justify-between border-b border-zinc-100 bg-zinc-50 px-3.5 py-2.5">
-        <div className="flex items-center gap-2 text-[12px] font-semibold text-zinc-900">
-          <StatusDot status={status} />
-          {title}
-        </div>
-        <button
-          type="button"
-          className="rounded-[6px] px-2.5 py-1 text-[11px] font-medium text-zinc-500 transition hover:bg-zinc-100 hover:text-zinc-900"
-          onClick={onEdit}
-        >
-          Edit
-        </button>
+    <div className="border-b border-zinc-200 pb-1.5">
+      <div className="text-[10px] font-semibold uppercase tracking-[0.08em] text-zinc-400">
+        {label}
       </div>
-      <div className="px-3.5 py-1">
-        {rows.map(([k, v], i) => {
-          const empty = !v || !v.trim();
-          return (
-            <div
-              key={i}
-              className="flex items-baseline justify-between gap-2.5 border-b border-zinc-50 py-1.5 last:border-b-0"
-            >
-              <span className="shrink-0 whitespace-nowrap text-[10px] font-medium uppercase tracking-[0.06em] text-zinc-400">
-                {k}
-              </span>
-              <span
-                className={`max-w-[58%] truncate text-right text-[12px] ${empty ? "text-zinc-300" : "text-zinc-900"}`}
-              >
-                {empty ? "—" : v}
-              </span>
-            </div>
-          );
-        })}
+      <div
+        className={`mt-0.5 truncate text-[13px] font-medium ${
+          empty ? "text-zinc-300" : "text-zinc-950"
+        }`}
+      >
+        {empty ? "À compléter" : value}
       </div>
     </div>
+  );
+}
+
+function ReviewCheck({
+  label,
+  status,
+  onEdit,
+}: {
+  label: string;
+  status: SectionStatus;
+  onEdit: () => void;
+}) {
+  const text =
+    status === "complete"
+      ? "Complet"
+      : status === "partial"
+        ? "À vérifier"
+        : "Vide";
+  return (
+    <button
+      type="button"
+      onClick={onEdit}
+      className="flex items-center justify-between gap-3 border-b border-zinc-200 py-1.5 text-left transition hover:border-zinc-400"
+    >
+      <span className="flex min-w-0 items-center gap-2">
+        <StatusDot status={status} />
+        <span className="truncate text-[13px] font-medium text-zinc-900">
+          {label}
+        </span>
+      </span>
+      <span className="shrink-0 text-[11px] font-medium text-zinc-400">
+        {text}
+      </span>
+    </button>
   );
 }
 
 /* Step 6 — Review & export */
 function Step6({
   data,
+  meta,
   statuses,
   onJumpTo,
   onExport,
 }: {
   data: PreparationData;
+  meta: SessionMeta;
   statuses: SectionStatus[];
   onJumpTo: (i: number) => void;
   onExport: () => void;
 }) {
   const phaseLabels: Array<[keyof PreparationData["phases"], string]> = [
-    ["possession", "Possession"],
-    ["losing", "Losing"],
-    ["noPossession", "No possession"],
-    ["recovering", "Recovering"],
+    ["possession", "On a le ballon"],
+    ["losing", "On l'a perdu"],
+    ["noPossession", "Ils ont le ballon"],
+    ["recovering", "On le récupère"],
   ];
   const activePhases = phaseLabels
     .filter(([k]) => data.phases[k])
     .map(([, l]) => l)
     .join(", ");
+  const totalDuration =
+    meta.durationMinutes !== null ? `${meta.durationMinutes} min` : "";
+  const blockDurations = [
+    data.initial.duration && `Warm-up ${data.initial.duration}`,
+    data.main[0].duration && `B1 ${data.main[0].duration}`,
+    data.main[1].duration && `B2 ${data.main[1].duration}`,
+    data.game.duration && `Jeu ${data.game.duration}`,
+  ]
+    .filter(Boolean)
+    .join(" · ");
 
   return (
-    <div className="flex flex-col gap-3.5">
-      <div className="flex flex-wrap items-center justify-between gap-3 rounded-[12px] bg-gradient-to-br from-[#0c0c0d] to-zinc-800 p-5 shadow-[0_4px_24px_rgb(0_0_0/0.18)]">
+    <div className="mx-auto grid w-full max-w-[1120px] gap-5 py-1 lg:grid-cols-[minmax(0,1fr)_330px]">
+      <section className="min-w-0">
         <div>
-          <div className="mb-0.5 text-[9px] font-semibold uppercase tracking-[0.1em] text-white/40">
-            Ready to print
+          <div className="text-[10px] font-semibold uppercase tracking-[0.14em] text-red-600">
+            Review & export
           </div>
-          <div className="text-[15px] font-semibold text-white">
-            {data.team || "Your team"} — Preparation sheet
+          <h2 className="mt-0.5 text-[20px] font-semibold tracking-[-0.02em] text-[#0c0c0d]">
+            Dernier contrôle
+          </h2>
+          <p className="mt-0.5 max-w-[620px] text-[12px] leading-4 text-zinc-500">
+            Vérifie les informations qui structurent la séance avant de générer
+            la fiche PDF.
+          </p>
+        </div>
+
+        <div className="mt-5 grid gap-x-6 gap-y-3 md:grid-cols-2">
+          <ReviewValue label="Titre planning" value={meta.title} />
+          <ReviewValue label="Date" value={data.date} />
+          <ReviewValue label="Heure" value={meta.startTime} />
+          <ReviewValue label="Durée séance" value={totalDuration} />
+          <ReviewValue label="Équipe" value={data.team} />
+          <ReviewValue label="Coach" value={data.coach} />
+          <ReviewValue label="Moment du jeu" value={activePhases} />
+          <ReviewValue label="Focus" value={data.focus} />
+          <ReviewValue label="Objectif" value={data.objectives} />
+          <ReviewValue label="Durées blocs" value={blockDurations} />
+        </div>
+
+        <div className="mt-6 border-t border-zinc-200 pt-3">
+          <div className="mb-1.5 text-[10px] font-semibold uppercase tracking-[0.1em] text-zinc-400">
+            À vérifier rapidement
           </div>
-          <div className="mt-0.5 text-[12px] text-white/50">
-            {data.date || "No date"} · Coach {data.coach || "—"}
+          <div className="grid gap-x-6 md:grid-cols-2">
+            <ReviewCheck
+              label="Session brief"
+              status={statuses[0]}
+              onEdit={() => onJumpTo(0)}
+            />
+            <ReviewCheck
+              label="Warm-up & prep"
+              status={statuses[1]}
+              onEdit={() => onJumpTo(1)}
+            />
+            <ReviewCheck
+              label="Main block 1"
+              status={statuses[2]}
+              onEdit={() => onJumpTo(2)}
+            />
+            <ReviewCheck
+              label="Main block 2"
+              status={statuses[3]}
+              onEdit={() => onJumpTo(3)}
+            />
+            <ReviewCheck
+              label="Final game & wrap-up"
+              status={statuses[4]}
+              onEdit={() => onJumpTo(4)}
+            />
+          </div>
+        </div>
+      </section>
+
+      <aside className="flex flex-col gap-3">
+        <div className="overflow-hidden rounded-[10px] border border-zinc-200 bg-white p-2 shadow-[0_8px_28px_rgb(0_0_0/0.08)]">
+          <div className="relative aspect-[210/297] overflow-hidden bg-white">
+            <Image
+              src="/page1.svg"
+              alt="Aperçu fiche PDF"
+              fill
+              sizes="330px"
+              className="object-contain"
+            />
           </div>
         </div>
         <button
           type="button"
           onClick={onExport}
-          className="inline-flex h-9 items-center gap-1.5 rounded-[9px] border border-zinc-200 bg-white px-4 text-[13px] font-medium text-zinc-900 shadow-[0_1px_2px_rgb(0_0_0/0.05)] transition hover:bg-zinc-50 active:scale-[0.98]"
+          className="inline-flex h-10 items-center justify-center gap-2 rounded-[9px] bg-[#0c0c0d] px-4 text-[13px] font-semibold text-white shadow-[0_1px_3px_rgb(0_0_0/0.15)] transition hover:bg-[#1a1a1d] active:scale-[0.98]"
         >
-          <Printer className="h-3.5 w-3.5" strokeWidth={2} />
-          Export PDF
+          <Printer className="h-4 w-4" strokeWidth={2} />
+          Exporter PDF
         </button>
-      </div>
-      <div className="grid grid-cols-1 gap-2.5 lg:grid-cols-2">
-        <ReviewCard
-          title="1 · Session brief"
-          status={statuses[0]}
-          onEdit={() => onJumpTo(0)}
-          rows={[
-            ["Date", data.date],
-            ["Team", data.team],
-            ["Coach", data.coach],
-            ["Game moments", activePhases],
-            ["Forme", data.characteristicForm],
-            ["Objectifs", data.objectives],
-          ]}
-        />
-        <ReviewCard
-          title="2 · Warm-up & prep"
-          status={statuses[1]}
-          onEdit={() => onJumpTo(1)}
-          rows={[
-            ["Duration", data.initial.duration],
-            ["Phase 1", data.initial.phase1.description],
-            ["Phase 2", data.initial.phase2.description],
-            ["Phase 3", data.initial.phase3.description],
-          ]}
-        />
-        <ReviewCard
-          title="3 · Main block 1"
-          status={statuses[2]}
-          onEdit={() => onJumpTo(2)}
-          rows={[
-            [
-              "Type",
-              data.main[0].type === "playForm" ? "Forme jouée" : "Exercice",
-            ],
-            ["Duration", data.main[0].duration],
-            ["Description", data.main[0].description],
-            ["Organisation", data.main[0].organisation],
-          ]}
-        />
-        <ReviewCard
-          title="4 · Main block 2"
-          status={statuses[3]}
-          onEdit={() => onJumpTo(3)}
-          rows={[
-            [
-              "Type",
-              data.main[1].type === "playForm" ? "Forme jouée" : "Exercice",
-            ],
-            ["Duration", data.main[1].duration],
-            ["Description", data.main[1].description],
-            ["Organisation", data.main[1].organisation],
-          ]}
-        />
-        <ReviewCard
-          title="5 · Final game & wrap-up"
-          status={statuses[4]}
-          onEdit={() => onJumpTo(4)}
-          rows={[
-            ["Game duration", data.game.duration],
-            ["Game notes", data.game.notes],
-            ["End duration", data.end.duration],
-            ["Reflection", data.reflection],
-          ]}
-        />
-      </div>
+      </aside>
     </div>
   );
 }
@@ -2269,6 +2285,7 @@ export function PreparationSheet({
         return (
           <Step6
             data={data}
+            meta={meta}
             statuses={statuses}
             onJumpTo={goTo}
             onExport={handlePrint}
