@@ -27,6 +27,7 @@ import {
   useCallback,
   useEffect,
   useMemo,
+  useRef,
   useState,
   useSyncExternalStore,
   useTransition,
@@ -442,37 +443,6 @@ function PdfExport({ data }: { data: PreparationData }) {
 
 /* ----- Form atoms ------------------------------------------- */
 
-function Field({
-  label,
-  hint,
-  charMax,
-  charVal,
-  children,
-}: {
-  label: string;
-  hint?: string;
-  charMax?: number;
-  charVal?: number;
-  children: ReactNode;
-}) {
-  return (
-    <div className="flex flex-col gap-1.5">
-      <div className="text-[12px] font-medium text-zinc-700">{label}</div>
-      {hint && (
-        <div className="-mt-0.5 text-[11px] leading-snug text-zinc-400">
-          {hint}
-        </div>
-      )}
-      {children}
-      {charMax !== undefined && (
-        <div className="text-right text-[10px] tabular-nums text-zinc-400">
-          {charVal ?? 0}/{charMax}
-        </div>
-      )}
-    </div>
-  );
-}
-
 const txtaClass =
   "w-full resize-none rounded-[9px] border-[1.5px] border-zinc-200 bg-white px-3 py-2.5 text-[13px] leading-[1.55] text-zinc-900 shadow-[0_1px_2px_rgb(0_0_0/0.04)] outline-none transition placeholder:text-zinc-400 hover:border-zinc-300 focus:border-zinc-900 focus:shadow-[0_0_0_3px_rgb(12_12_13/0.07)]";
 
@@ -522,30 +492,6 @@ function FieldUl({
   );
 }
 
-function DurPill({
-  value,
-  onChange,
-  placeholder,
-}: {
-  value: string;
-  onChange: (v: string) => void;
-  placeholder?: string;
-}) {
-  return (
-    <label className="inline-flex items-center gap-2 rounded-[9px] border-[1.5px] border-zinc-200 bg-white px-3 py-1.5 shadow-[0_1px_2px_rgb(0_0_0/0.04)]">
-      <span className="whitespace-nowrap text-[10px] font-semibold uppercase tracking-[0.06em] text-zinc-400">
-        Durée
-      </span>
-      <input
-        value={value}
-        onChange={(e) => onChange(e.target.value)}
-        placeholder={placeholder ?? "— min"}
-        className="w-16 border-0 bg-transparent p-0 text-[13px] font-semibold text-zinc-900 outline-none"
-      />
-    </label>
-  );
-}
-
 const FOCUS_FAMILY_LABELS: Record<FocusFamily, string> = {
   TE: "Technique",
   TA: "Tactique",
@@ -586,47 +532,6 @@ function FocusFamilyChips({
           </button>
         );
       })}
-    </div>
-  );
-}
-
-function Card({
-  icon,
-  title,
-  hint,
-  rightAction,
-  children,
-}: {
-  icon?: ReactNode;
-  title?: string;
-  hint?: string;
-  rightAction?: ReactNode;
-  children: ReactNode;
-}) {
-  const hasHeader = !!(icon || title || hint || rightAction);
-  return (
-    <div className="overflow-hidden rounded-[12px] border border-zinc-200 bg-white shadow-[0_1px_3px_rgb(0_0_0/0.05),0_1px_2px_rgb(0_0_0/0.04)]">
-      {hasHeader && (
-        <div className="flex items-center gap-2.5 border-b border-zinc-100 px-4 py-3">
-          {icon && (
-            <div className="flex h-[26px] w-[26px] shrink-0 items-center justify-center rounded-[7px] bg-[#0c0c0d] text-white">
-              {icon}
-            </div>
-          )}
-          <div className="min-w-0 flex-1">
-            {title && (
-              <div className="text-[12px] font-semibold text-zinc-900">
-                {title}
-              </div>
-            )}
-            {hint && (
-              <div className="mt-0.5 text-[11px] text-zinc-400">{hint}</div>
-            )}
-          </div>
-          {rightAction}
-        </div>
-      )}
-      <div className="p-4">{children}</div>
     </div>
   );
 }
@@ -850,6 +755,8 @@ export type SessionMeta = {
   durationMinutes: number | null;
 };
 
+const SESSION_TITLE_MAX = 20;
+
 type SessionMetaPatcher = (updater: (m: SessionMeta) => SessionMeta) => void;
 
 type PhaseKey = "possession" | "losing" | "noPossession" | "recovering";
@@ -1004,6 +911,25 @@ function Step1({
             </div>
           </div>
           <div className="space-y-1.5">
+            <label className="flex min-w-0 items-center gap-2">
+              <FileText className="h-3.5 w-3.5 text-zinc-400" />
+              <input
+                className={inpUlClass}
+                maxLength={SESSION_TITLE_MAX}
+                placeholder="Titre séance"
+                value={meta.title.slice(0, SESSION_TITLE_MAX)}
+                onChange={(e) =>
+                  patchMeta((m) => ({
+                    ...m,
+                    title: e.target.value.slice(0, SESSION_TITLE_MAX),
+                  }))
+                }
+              />
+              <span className="shrink-0 text-[10px] tabular-nums text-zinc-400">
+                {meta.title.slice(0, SESSION_TITLE_MAX).length}/
+                {SESSION_TITLE_MAX}
+              </span>
+            </label>
             <label className="flex min-w-0 items-center gap-2">
               <CalendarDays className="h-3.5 w-3.5 text-zinc-400" />
               <input
@@ -1862,21 +1788,64 @@ function StepMain({
 /* Step 5 — Final game & wrap-up */
 function Step5({ data, patch }: { data: PreparationData; patch: Patcher }) {
   return (
-    <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
-      <div className="flex flex-col gap-3">
-        <div className="flex items-center justify-between">
-          <div className="text-[13px] font-semibold text-zinc-900">
-            Jeu final
+    <div className="mx-auto flex w-full max-w-[1120px] flex-col gap-3 py-0">
+      <section className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_430px]">
+        <div>
+          <div className="text-[10px] font-semibold uppercase tracking-[0.14em] text-red-600">
+            Final game & wrap-up
           </div>
-          <DurPill
-            value={data.game.duration}
-            onChange={(v) =>
-              patch((d) => ({ ...d, game: { ...d.game, duration: v } }))
-            }
-            placeholder="15 min"
-          />
+          <h2 className="mt-0.5 text-[20px] font-semibold tracking-[-0.02em] text-[#0c0c0d]">
+            Finir, redescendre, retenir
+          </h2>
+          <p className="mt-0.5 max-w-[620px] text-[12px] leading-4 text-zinc-500">
+            Le dernier temps vérifie le thème en situation libre, puis ferme la
+            séance avec un retour court et des notes utiles pour la suite.
+          </p>
         </div>
-        <Field label="Schéma terrain">
+        <div className="self-center border-l border-zinc-200 pl-5">
+          <div className="grid items-end gap-3 lg:grid-cols-2">
+            <FieldUl label="Jeu final">
+              <div className="flex items-center gap-2">
+                <Timer className="h-3.5 w-3.5 text-zinc-400" />
+                <input
+                  value={data.game.duration}
+                  onChange={(e) =>
+                    patch((d) => ({
+                      ...d,
+                      game: { ...d.game, duration: e.target.value },
+                    }))
+                  }
+                  placeholder="15 min"
+                  className={inpUlClass}
+                />
+              </div>
+            </FieldUl>
+            <FieldUl label="Retour au calme">
+              <div className="flex items-center gap-2">
+                <Timer className="h-3.5 w-3.5 text-zinc-400" />
+                <input
+                  value={data.end.duration}
+                  onChange={(e) =>
+                    patch((d) => ({
+                      ...d,
+                      end: { ...d.end, duration: e.target.value },
+                    }))
+                  }
+                  placeholder="5 min"
+                  className={inpUlClass}
+                />
+              </div>
+            </FieldUl>
+          </div>
+        </div>
+      </section>
+
+      <section className="border-t border-zinc-200 pt-1.5">
+        <div className="mb-1.5 text-[13px] font-semibold text-zinc-900">
+          Jeu final
+        </div>
+        <div className="grid grid-cols-1 items-start gap-4 lg:grid-cols-[minmax(330px,0.78fr)_minmax(0,1.22fr)]">
+          <div className="overflow-hidden [&>div]:border-0 [&>div]:bg-transparent">
           <SchemaEditor
             pitch="full-horizontal"
             settingsKey="game"
@@ -1886,225 +1855,232 @@ function Step5({ data, patch }: { data: PreparationData; patch: Patcher }) {
               patch((d) => ({ ...d, game: { ...d.game, schema: v } }))
             }
           />
-        </Field>
-        <Field label="Notes — format, contraintes, coaching">
-          <FitTextarea
-            rows={4}
-            maxChars={360}
-            area={{ w: Z_END.gameNotes.w, h: Z_END.gameNotes.h }}
-            value={data.game.notes}
-            onChange={(v) =>
-              patch((d) => ({ ...d, game: { ...d.game, notes: v } }))
-            }
-            placeholder="e.g., 11v11 full pitch. Normal rules. Last 15 min."
-          />
-        </Field>
-      </div>
+          </div>
 
-      <div className="flex flex-col gap-3.5">
-        <Card
-          title="Fin de séance"
-          rightAction={
-            <DurPill
-              value={data.end.duration}
-              onChange={(v) =>
-                patch((d) => ({ ...d, end: { ...d.end, duration: v } }))
-              }
-              placeholder="5 min"
-            />
-          }
-        >
-          <Field label="Notes">
-            <FitTextarea
-              rows={4}
-              maxChars={360}
-              area={{ w: Z_END.endNotes.w, h: Z_END.endNotes.h }}
-              value={data.end.notes}
-              onChange={(v) =>
-                patch((d) => ({ ...d, end: { ...d.end, notes: v } }))
-              }
-              placeholder="e.g., Walk to center circle. 60s breathing. Quick verbal debrief."
-            />
-          </Field>
-        </Card>
-        <Card title="Réflexion post-séance">
-          <Field label="Notes personnelles après la séance">
-            <FitTextarea
-              rows={6}
-              maxChars={360}
-              area={{ w: Z_END.reflection.w, h: Z_END.reflection.h }}
-              value={data.reflection}
-              onChange={(v) => patch((d) => ({ ...d, reflection: v }))}
-              placeholder="What worked, what didn't, who needs individual work next week."
-            />
-          </Field>
-        </Card>
+          <div className="grid min-w-0 gap-3 md:grid-cols-2">
+            <FieldUl label="Format, contraintes, coaching">
+              <FitTextarea
+                rows={7}
+                maxChars={360}
+                area={{ w: Z_END.gameNotes.w, h: Z_END.gameNotes.h }}
+                value={data.game.notes}
+                onChange={(v) =>
+                  patch((d) => ({ ...d, game: { ...d.game, notes: v } }))
+                }
+                placeholder="Format, règles, contraintes, derniers points de coaching."
+                className={txtaUlClass}
+              />
+            </FieldUl>
+            <FieldUl label="Retour au calme">
+              <FitTextarea
+                rows={7}
+                maxChars={360}
+                area={{ w: Z_END.endNotes.w, h: Z_END.endNotes.h }}
+                value={data.end.notes}
+                onChange={(v) =>
+                  patch((d) => ({ ...d, end: { ...d.end, notes: v } }))
+                }
+                placeholder="Retour au calme, message final, mini débrief."
+                className={txtaUlClass}
+              />
+            </FieldUl>
+            <div className="md:col-span-2">
+              <FieldUl label="Réflexion post-séance">
+                <FitTextarea
+                  rows={3}
+                  maxChars={360}
+                  area={{ w: Z_END.reflection.w, h: Z_END.reflection.h }}
+                  value={data.reflection}
+                  onChange={(v) => patch((d) => ({ ...d, reflection: v }))}
+                  placeholder="Ce qui a fonctionné, ce qui doit être repris, joueurs à suivre."
+                  className={txtaUlClass}
+                />
+              </FieldUl>
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
+  );
+}
+
+function ReviewValue({
+  label,
+  value,
+}: {
+  label: string;
+  value: string;
+}) {
+  const empty = !value.trim();
+  return (
+    <div className="border-b border-zinc-200 pb-1.5">
+      <div className="text-[10px] font-semibold uppercase tracking-[0.08em] text-zinc-400">
+        {label}
+      </div>
+      <div
+        className={`mt-0.5 truncate text-[13px] font-medium ${
+          empty ? "text-zinc-300" : "text-zinc-950"
+        }`}
+      >
+        {empty ? "À compléter" : value}
       </div>
     </div>
   );
 }
 
-function ReviewCard({
-  title,
+function ReviewCheck({
+  label,
   status,
   onEdit,
-  rows,
 }: {
-  title: string;
+  label: string;
   status: SectionStatus;
   onEdit: () => void;
-  rows: Array<[string, string]>;
 }) {
+  const text =
+    status === "complete"
+      ? "Complet"
+      : status === "partial"
+        ? "À vérifier"
+        : "Vide";
   return (
-    <div className="overflow-hidden rounded-[12px] border border-zinc-200 bg-white shadow-[0_1px_3px_rgb(0_0_0/0.05)]">
-      <div className="flex items-center justify-between border-b border-zinc-100 bg-zinc-50 px-3.5 py-2.5">
-        <div className="flex items-center gap-2 text-[12px] font-semibold text-zinc-900">
-          <StatusDot status={status} />
-          {title}
-        </div>
-        <button
-          type="button"
-          className="rounded-[6px] px-2.5 py-1 text-[11px] font-medium text-zinc-500 transition hover:bg-zinc-100 hover:text-zinc-900"
-          onClick={onEdit}
-        >
-          Edit
-        </button>
-      </div>
-      <div className="px-3.5 py-1">
-        {rows.map(([k, v], i) => {
-          const empty = !v || !v.trim();
-          return (
-            <div
-              key={i}
-              className="flex items-baseline justify-between gap-2.5 border-b border-zinc-50 py-1.5 last:border-b-0"
-            >
-              <span className="shrink-0 whitespace-nowrap text-[10px] font-medium uppercase tracking-[0.06em] text-zinc-400">
-                {k}
-              </span>
-              <span
-                className={`max-w-[58%] truncate text-right text-[12px] ${empty ? "text-zinc-300" : "text-zinc-900"}`}
-              >
-                {empty ? "—" : v}
-              </span>
-            </div>
-          );
-        })}
-      </div>
-    </div>
+    <button
+      type="button"
+      onClick={onEdit}
+      className="flex items-center justify-between gap-3 border-b border-zinc-200 py-1.5 text-left transition hover:border-zinc-400"
+    >
+      <span className="flex min-w-0 items-center gap-2">
+        <StatusDot status={status} />
+        <span className="truncate text-[13px] font-medium text-zinc-900">
+          {label}
+        </span>
+      </span>
+      <span className="shrink-0 text-[11px] font-medium text-zinc-400">
+        {text}
+      </span>
+    </button>
   );
 }
 
 /* Step 6 — Review & export */
 function Step6({
   data,
+  meta,
   statuses,
   onJumpTo,
   onExport,
 }: {
   data: PreparationData;
+  meta: SessionMeta;
   statuses: SectionStatus[];
   onJumpTo: (i: number) => void;
   onExport: () => void;
 }) {
   const phaseLabels: Array<[keyof PreparationData["phases"], string]> = [
-    ["possession", "Possession"],
-    ["losing", "Losing"],
-    ["noPossession", "No possession"],
-    ["recovering", "Recovering"],
+    ["possession", "On a le ballon"],
+    ["losing", "On l'a perdu"],
+    ["noPossession", "Ils ont le ballon"],
+    ["recovering", "On le récupère"],
   ];
   const activePhases = phaseLabels
     .filter(([k]) => data.phases[k])
     .map(([, l]) => l)
     .join(", ");
+  const totalDuration =
+    meta.durationMinutes !== null ? `${meta.durationMinutes} min` : "";
+  const blockDurations = [
+    data.initial.duration && `Warm-up ${data.initial.duration}`,
+    data.main[0].duration && `B1 ${data.main[0].duration}`,
+    data.main[1].duration && `B2 ${data.main[1].duration}`,
+    data.game.duration && `Jeu ${data.game.duration}`,
+  ]
+    .filter(Boolean)
+    .join(" · ");
 
   return (
-    <div className="flex flex-col gap-3.5">
-      <div className="flex flex-wrap items-center justify-between gap-3 rounded-[12px] bg-gradient-to-br from-[#0c0c0d] to-zinc-800 p-5 shadow-[0_4px_24px_rgb(0_0_0/0.18)]">
+    <div className="mx-auto grid w-full max-w-[1120px] gap-5 py-1 lg:grid-cols-[minmax(0,1fr)_330px]">
+      <section className="min-w-0">
         <div>
-          <div className="mb-0.5 text-[9px] font-semibold uppercase tracking-[0.1em] text-white/40">
-            Ready to print
+          <div className="text-[10px] font-semibold uppercase tracking-[0.14em] text-red-600">
+            Review & export
           </div>
-          <div className="text-[15px] font-semibold text-white">
-            {data.team || "Your team"} — Preparation sheet
+          <h2 className="mt-0.5 text-[20px] font-semibold tracking-[-0.02em] text-[#0c0c0d]">
+            Dernier contrôle
+          </h2>
+          <p className="mt-0.5 max-w-[620px] text-[12px] leading-4 text-zinc-500">
+            Vérifie les informations qui structurent la séance avant de générer
+            la fiche PDF.
+          </p>
+        </div>
+
+        <div className="mt-5 grid gap-x-6 gap-y-3 md:grid-cols-2">
+          <ReviewValue label="Titre planning" value={meta.title} />
+          <ReviewValue label="Date" value={data.date} />
+          <ReviewValue label="Heure" value={meta.startTime} />
+          <ReviewValue label="Durée séance" value={totalDuration} />
+          <ReviewValue label="Équipe" value={data.team} />
+          <ReviewValue label="Coach" value={data.coach} />
+          <ReviewValue label="Moment du jeu" value={activePhases} />
+          <ReviewValue label="Focus" value={data.focus} />
+          <ReviewValue label="Objectif" value={data.objectives} />
+          <ReviewValue label="Durées blocs" value={blockDurations} />
+        </div>
+
+        <div className="mt-6 border-t border-zinc-200 pt-3">
+          <div className="mb-1.5 text-[10px] font-semibold uppercase tracking-[0.1em] text-zinc-400">
+            À vérifier rapidement
           </div>
-          <div className="mt-0.5 text-[12px] text-white/50">
-            {data.date || "No date"} · Coach {data.coach || "—"}
+          <div className="grid gap-x-6 md:grid-cols-2">
+            <ReviewCheck
+              label="Session brief"
+              status={statuses[0]}
+              onEdit={() => onJumpTo(0)}
+            />
+            <ReviewCheck
+              label="Warm-up & prep"
+              status={statuses[1]}
+              onEdit={() => onJumpTo(1)}
+            />
+            <ReviewCheck
+              label="Main block 1"
+              status={statuses[2]}
+              onEdit={() => onJumpTo(2)}
+            />
+            <ReviewCheck
+              label="Main block 2"
+              status={statuses[3]}
+              onEdit={() => onJumpTo(3)}
+            />
+            <ReviewCheck
+              label="Final game & wrap-up"
+              status={statuses[4]}
+              onEdit={() => onJumpTo(4)}
+            />
+          </div>
+        </div>
+      </section>
+
+      <aside className="flex flex-col gap-3">
+        <div className="overflow-hidden rounded-[10px] border border-zinc-200 bg-white p-2 shadow-[0_8px_28px_rgb(0_0_0/0.08)]">
+          <div className="relative aspect-[210/297] overflow-hidden bg-white">
+            <Image
+              src="/page1.svg"
+              alt="Aperçu fiche PDF"
+              fill
+              sizes="330px"
+              className="object-contain"
+            />
           </div>
         </div>
         <button
           type="button"
           onClick={onExport}
-          className="inline-flex h-9 items-center gap-1.5 rounded-[9px] border border-zinc-200 bg-white px-4 text-[13px] font-medium text-zinc-900 shadow-[0_1px_2px_rgb(0_0_0/0.05)] transition hover:bg-zinc-50 active:scale-[0.98]"
+          className="inline-flex h-10 items-center justify-center gap-2 rounded-[9px] bg-[#0c0c0d] px-4 text-[13px] font-semibold text-white shadow-[0_1px_3px_rgb(0_0_0/0.15)] transition hover:bg-[#1a1a1d] active:scale-[0.98]"
         >
-          <Printer className="h-3.5 w-3.5" strokeWidth={2} />
-          Export PDF
+          <Printer className="h-4 w-4" strokeWidth={2} />
+          Exporter PDF
         </button>
-      </div>
-      <div className="grid grid-cols-1 gap-2.5 lg:grid-cols-2">
-        <ReviewCard
-          title="1 · Session brief"
-          status={statuses[0]}
-          onEdit={() => onJumpTo(0)}
-          rows={[
-            ["Date", data.date],
-            ["Team", data.team],
-            ["Coach", data.coach],
-            ["Game moments", activePhases],
-            ["Forme", data.characteristicForm],
-            ["Objectifs", data.objectives],
-          ]}
-        />
-        <ReviewCard
-          title="2 · Warm-up & prep"
-          status={statuses[1]}
-          onEdit={() => onJumpTo(1)}
-          rows={[
-            ["Duration", data.initial.duration],
-            ["Phase 1", data.initial.phase1.description],
-            ["Phase 2", data.initial.phase2.description],
-            ["Phase 3", data.initial.phase3.description],
-          ]}
-        />
-        <ReviewCard
-          title="3 · Main block 1"
-          status={statuses[2]}
-          onEdit={() => onJumpTo(2)}
-          rows={[
-            [
-              "Type",
-              data.main[0].type === "playForm" ? "Forme jouée" : "Exercice",
-            ],
-            ["Duration", data.main[0].duration],
-            ["Description", data.main[0].description],
-            ["Organisation", data.main[0].organisation],
-          ]}
-        />
-        <ReviewCard
-          title="4 · Main block 2"
-          status={statuses[3]}
-          onEdit={() => onJumpTo(3)}
-          rows={[
-            [
-              "Type",
-              data.main[1].type === "playForm" ? "Forme jouée" : "Exercice",
-            ],
-            ["Duration", data.main[1].duration],
-            ["Description", data.main[1].description],
-            ["Organisation", data.main[1].organisation],
-          ]}
-        />
-        <ReviewCard
-          title="5 · Final game & wrap-up"
-          status={statuses[4]}
-          onEdit={() => onJumpTo(4)}
-          rows={[
-            ["Game duration", data.game.duration],
-            ["Game notes", data.game.notes],
-            ["End duration", data.end.duration],
-            ["Reflection", data.reflection],
-          ]}
-        />
-      </div>
+      </aside>
     </div>
   );
 }
@@ -2169,6 +2145,7 @@ export function PreparationSheet({
   const [isPending, startTransition] = useTransition();
   const [step, setStep] = useState(0);
   const [stepKey, setStepKey] = useState(0);
+  const stepBodyRef = useRef<HTMLDivElement | null>(null);
   const locale = useLocale();
   const router = useRouter();
 
@@ -2221,7 +2198,7 @@ export function PreparationSheet({
         locale,
         data,
         sessionMeta: {
-          title: meta.title.trim(),
+          title: meta.title.trim().slice(0, SESSION_TITLE_MAX),
           startTime: meta.startTime || null,
           durationMinutes,
         },
@@ -2239,6 +2216,10 @@ export function PreparationSheet({
     const t = setTimeout(() => setJustSaved(false), 2000);
     return () => clearTimeout(t);
   }, [justSaved]);
+
+  useEffect(() => {
+    stepBodyRef.current?.scrollTo({ top: 0 });
+  }, [stepKey]);
 
   function loadExample() {
     if (
@@ -2310,6 +2291,7 @@ export function PreparationSheet({
         return (
           <Step6
             data={data}
+            meta={meta}
             statuses={statuses}
             onJumpTo={goTo}
             onExport={handlePrint}
@@ -2321,21 +2303,21 @@ export function PreparationSheet({
   return (
     <>
       <div
-        className="prep-no-print fixed inset-0 z-50 flex flex-col overflow-hidden bg-[#0c0c0d] text-zinc-900"
+        className="prep-no-print fixed inset-0 z-50 flex flex-col overflow-hidden bg-[#f8f8f9] text-zinc-900"
         style={{ ["--g-green" as string]: GRINTA_GREEN }}
       >
         {/* Topbar */}
-        <header className="relative z-10 flex h-[52px] flex-shrink-0 items-center justify-between border-b border-white/10 bg-[#0c0c0d]/90 px-5 backdrop-blur-md">
+        <header className="relative z-10 flex h-[52px] flex-shrink-0 items-center justify-between border-b border-zinc-200 bg-white/95 px-5 backdrop-blur-md">
           <div className="flex min-w-0 items-center gap-2.5">
             <button
               type="button"
               onClick={() => router.back()}
-              className="flex items-center gap-1 border-0 bg-transparent text-[12px] text-white/40 transition hover:text-white/80"
+              className="flex items-center gap-1 border-0 bg-transparent text-[12px] font-medium text-zinc-500 transition hover:text-zinc-950"
             >
               <ChevronLeft className="h-3.5 w-3.5" strokeWidth={2} />
               Back
             </button>
-            <span className="mx-3 h-[18px] w-px bg-white/10" />
+            <span className="mx-3 h-[18px] w-px bg-zinc-200" />
             <Image
               src="/icon-grinta.svg"
               alt=""
@@ -2345,30 +2327,30 @@ export function PreparationSheet({
               className="h-7 w-7 shrink-0"
             />
             <div className="min-w-0 leading-none">
-              <div className="text-[13px] font-semibold text-white">
+              <div className="text-[13px] font-semibold text-zinc-950">
                 Préparation d&apos;entraînement
               </div>
-              <div className="mt-0.5 truncate text-[10px] text-white/35">
+              <div className="mt-0.5 truncate text-[10px] text-zinc-500">
                 {data.team || "No team set"} · {data.date || "No date"}
               </div>
             </div>
           </div>
           <div className="flex items-center gap-2">
-            <div className="mr-1 flex items-center gap-2 rounded-lg bg-white/[0.06] px-3 py-[5px]">
-              <div className="h-[3px] w-20 overflow-hidden rounded-full bg-white/10">
+            <div className="mr-1 flex items-center gap-2 rounded-lg bg-zinc-100 px-3 py-[5px]">
+              <div className="h-[3px] w-20 overflow-hidden rounded-full bg-zinc-200">
                 <div
-                  className="h-full rounded-full bg-white transition-all duration-500 ease-[cubic-bezier(0.4,0,0.2,1)]"
+                  className="h-full rounded-full bg-zinc-950 transition-all duration-500 ease-[cubic-bezier(0.4,0,0.2,1)]"
                   style={{ width: `${pct}%` }}
                 />
               </div>
-              <span className="text-[11px] font-semibold text-white/50">
+              <span className="text-[11px] font-semibold text-zinc-500">
                 {pct}%
               </span>
             </div>
             <button
               type="button"
               onClick={loadExample}
-              className="hidden h-8 items-center gap-1.5 rounded-[8px] px-3 text-[12px] font-medium text-white/60 transition hover:bg-white/5 hover:text-white sm:inline-flex"
+              className="hidden h-8 items-center gap-1.5 rounded-[8px] px-3 text-[12px] font-medium text-zinc-500 transition hover:bg-zinc-100 hover:text-zinc-950 sm:inline-flex"
               title="Load example data"
             >
               <FileText className="h-3.5 w-3.5" strokeWidth={2} />
@@ -2409,7 +2391,7 @@ export function PreparationSheet({
         {/* Shell */}
         <div className="flex min-h-0 flex-1 overflow-hidden">
           {/* Sidebar */}
-          <aside className="hidden w-[232px] shrink-0 flex-col overflow-hidden border-r border-white/[0.06] bg-[#111113] md:flex">
+          <aside className="hidden w-[232px] shrink-0 flex-col overflow-hidden border-r border-zinc-200 bg-white md:flex">
             <div className="flex items-center gap-2 px-4 pb-3 pt-4">
               <Image
                 src="/icon-grinta.svg"
@@ -2426,7 +2408,7 @@ export function PreparationSheet({
                 className="h-5 w-auto"
               />
             </div>
-            <div className="px-4 pb-2 pt-2 text-[9px] font-semibold uppercase tracking-[0.1em] text-white/25">
+            <div className="px-4 pb-2 pt-2 text-[9px] font-semibold uppercase tracking-[0.1em] text-zinc-400">
               Étapes de préparation
             </div>
             <nav className="flex flex-1 flex-col gap-0.5 overflow-y-auto px-2 pb-2">
@@ -2434,25 +2416,26 @@ export function PreparationSheet({
                 const st: SectionStatus | null = i < 5 ? statuses[i] : null;
                 const isActive = step === i;
                 const numCls = isActive
-                  ? "bg-white text-[#111]"
+                  ? "bg-zinc-950 text-white"
                   : st === "complete"
-                    ? "bg-emerald-500/10 text-emerald-500"
+                    ? "bg-emerald-50 text-emerald-600"
                     : st === "partial"
-                      ? "bg-amber-500/10 text-amber-500"
-                      : "bg-white/[0.06] text-white/30";
+                      ? "bg-amber-50 text-amber-600"
+                      : "bg-zinc-100 text-zinc-400";
                 return (
                   <button
                     key={i}
                     type="button"
                     onClick={() => goTo(i)}
-                    className={`relative flex w-full items-center gap-2.5 rounded-[9px] px-2.5 py-2 text-left transition ${
+                    aria-current={isActive ? "step" : undefined}
+                    className={`group relative flex w-full items-center gap-2.5 rounded-[9px] px-2.5 py-2 text-left transition ${
                       isActive
-                        ? "bg-white/[0.09]"
-                        : "hover:bg-white/[0.05]"
+                        ? "bg-zinc-50"
+                        : "hover:bg-zinc-50"
                     }`}
                   >
                     {isActive && (
-                      <span className="absolute left-0 top-1/2 h-5 w-[3px] -translate-y-1/2 rounded-r-[3px] bg-white" />
+                      <span className="absolute left-0 top-1/2 h-5 w-[3px] -translate-y-1/2 rounded-r-[3px] bg-red-500" />
                     )}
                     <span
                       className={`flex h-[26px] w-[26px] shrink-0 items-center justify-center rounded-[7px] text-[11px] font-semibold transition ${numCls}`}
@@ -2467,28 +2450,28 @@ export function PreparationSheet({
                       <span
                         className={`block text-[12px] font-medium leading-tight transition ${
                           isActive
-                            ? "text-white"
-                            : "text-white/50 group-hover:text-white/80"
+                            ? "text-zinc-950"
+                            : "text-zinc-500 group-hover:text-zinc-900"
                         }`}
                       >
                         {s.label}
                       </span>
                     </span>
-                    {st && !isActive && <StatusDot status={st} dark />}
+                    {st && !isActive && <StatusDot status={st} />}
                   </button>
                 );
               })}
             </nav>
-            <div className="border-t border-white/[0.06] px-4 py-3.5">
+            <div className="border-t border-zinc-200 px-4 py-3.5">
               <div className="mb-1.5 flex justify-between">
-                <span className="text-[10px] text-white/30">Progress</span>
-                <span className="text-[10px] font-semibold text-white/60">
+                <span className="text-[10px] text-zinc-400">Progress</span>
+                <span className="text-[10px] font-semibold text-zinc-600">
                   {pct}%
                 </span>
               </div>
-              <div className="h-[3px] overflow-hidden rounded-full bg-white/10">
+              <div className="h-[3px] overflow-hidden rounded-full bg-zinc-200">
                 <div
-                  className="h-full rounded-full bg-gradient-to-r from-white to-white/70 transition-all duration-500 ease-[cubic-bezier(0.4,0,0.2,1)]"
+                  className="h-full rounded-full bg-zinc-950 transition-all duration-500 ease-[cubic-bezier(0.4,0,0.2,1)]"
                   style={{ width: `${pct}%` }}
                 />
               </div>
@@ -2537,19 +2520,13 @@ export function PreparationSheet({
             </div>
 
             {/* Step header */}
-            <div className="flex shrink-0 items-start justify-between gap-4 border-b border-zinc-200 bg-white px-7 py-2">
+            <div className="flex shrink-0 items-center justify-between gap-4 px-7 pb-0 pt-2">
               <div className="min-w-0">
-                <div className="mb-1 text-[10px] font-semibold uppercase tracking-[0.1em] text-zinc-400">
+                <div className="text-[10px] font-semibold uppercase tracking-[0.1em] text-zinc-400">
                   {STEPS[step].eyebrow}
                 </div>
-                <h2 className="text-[16px] font-semibold leading-tight tracking-[-0.01em] text-[#0c0c0d]">
-                  {STEPS[step].label}
-                </h2>
-                <p className="mt-0.5 text-[12px] leading-4 text-zinc-500">
-                  {STEPS[step].desc}
-                </p>
               </div>
-              <div className="flex shrink-0 items-center gap-2 pt-1">
+              <div className="flex shrink-0 items-center gap-2">
                 <button
                   type="button"
                   onClick={goPrev}
@@ -2579,8 +2556,9 @@ export function PreparationSheet({
 
             {/* Step body */}
             <div
+              ref={stepBodyRef}
               key={stepKey}
-              className="min-h-0 flex-1 overflow-y-auto overflow-x-hidden px-7 py-2 motion-safe:animate-[prep-step-in_250ms_cubic-bezier(0.4,0,0.2,1)]"
+              className="min-h-0 flex-1 overflow-y-auto overflow-x-hidden px-7 py-2 motion-safe:animate-[prep-step-in_180ms_cubic-bezier(0.4,0,0.2,1)]"
             >
               {stepBody}
             </div>
