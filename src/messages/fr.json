@@ -1,7 +1,164 @@
 {
   "app": {
     "name": "Grinta",
-    "tagline": ""
+    "tagline": "Planifie ta saison de football."
+  },
+  "landing": {
+    "navLogin": "Se connecter",
+    "eyebrow": "Le club au centre de la progression",
+    "heroTitle": "Donne une philosophie commune à toute ta structure.",
+    "heroSubtitle": "Grinta aide le club à formaliser son identité de jeu, puis à la traduire en cycles, thèmes hebdomadaires et séances concrètes. Chaque équipe avance avec la même ligne directrice, adaptée à son âge et à son niveau.",
+    "primaryCta": "Créer un compte",
+    "secondaryCta": "J'ai déjà un compte",
+    "scrollLabel": "Voir le principe de Grinta",
+    "mockupLabel": "Philosophie club",
+    "mockupTitle": "Un cadre partagé",
+    "mockupBadge": "Grinta",
+    "mockupCenter": "Club",
+    "mockupPillars": {
+      "training": "Entraînement",
+      "identity": "Identité",
+      "players": "Joueurs",
+      "match": "Match"
+    },
+    "mockupFocus": "Principe commun",
+    "mockupTheme": "Former, transmettre, jouer",
+    "principlesEyebrow": "Ligne directrice",
+    "principlesTitle": "Une philosophie qui descend jusqu'au terrain.",
+    "principles": {
+      "identity": {
+        "title": "Une identité lisible",
+        "body": "Le club définit ses principes: comment il veut former, jouer, progresser et évaluer."
+      },
+      "continuity": {
+        "title": "Une continuité par catégorie",
+        "body": "Chaque équipe garde la même colonne vertébrale, avec des contenus adaptés à son âge et à son niveau."
+      },
+      "transmission": {
+        "title": "Une transmission claire",
+        "body": "Les entraîneurs partagent un langage commun, des objectifs communs et des séances cohérentes."
+      }
+    },
+    "wizardEyebrow": "Démo de la fiche",
+    "wizardTitle": "Le wizard transforme une idée de séance en PDF prêt terrain.",
+    "wizardBody": "Au scroll, la fiche de préparation montre son vrai parcours: brief guidé, échauffement, blocs terrain, puis export PDF sur le modèle Grinta.",
+    "wizardSteps": {
+      "brief": {
+        "short": "Brief",
+        "kicker": "Étape 1",
+        "title": "Construire le fil conducteur",
+        "body": "Le coach choisit le moment du jeu, le focus, l'objectif et les questions qui guideront les joueurs."
+      },
+      "warmup": {
+        "short": "Échauffement",
+        "kicker": "Étape 2",
+        "title": "Préparer le corps et le thème",
+        "body": "La séance démarre par une activation, une connexion au thème et une phase d'explosivité."
+      },
+      "blocks": {
+        "short": "Terrain",
+        "kicker": "Étape 3",
+        "title": "Dessiner les situations et les consignes",
+        "body": "Les blocs principaux combinent schéma, durée, organisation, coaching et variantes."
+      },
+      "pdf": {
+        "short": "PDF",
+        "kicker": "Étape 4",
+        "title": "Exporter une fiche propre",
+        "body": "La préparation devient une fiche A4 imprimable, lisible pour le staff et exploitable sur le terrain."
+      }
+    },
+    "wizardMock": {
+      "label": "Wizard préparation",
+      "title": "Fiche de séance",
+      "export": "Export PDF",
+      "sessionLabel": "Titre séance",
+      "sessionTitle": "Récupérer haut, attaquer vite",
+      "pillars": {
+        "moment": "Moment du jeu",
+        "focus": "Focus TE / TA / PE",
+        "objective": "Objectif",
+        "questions": "Questions coach"
+      },
+      "warmup": {
+        "activate": {
+          "label": "Phase 1",
+          "duration": "8 min",
+          "title": "Activer",
+          "hint": "Mobilité, prévention, ballon et rythme."
+        },
+        "connect": {
+          "label": "Phase 2",
+          "duration": "12 min",
+          "title": "Connecter",
+          "hint": "Rondo ou conservation avec contrainte liée au thème."
+        },
+        "accelerate": {
+          "label": "Phase 3",
+          "duration": "5 min",
+          "title": "Accélérer",
+          "hint": "Explosivité, réaction, intensité maximale."
+        }
+      },
+      "blocks": {
+        "main1": {
+          "title": "Bloc principal 1",
+          "duration": "20 min",
+          "hint": "Forme jouée avec comportement attendu visible."
+        },
+        "main2": {
+          "title": "Bloc principal 2",
+          "duration": "20 min",
+          "hint": "Exercice ou variante pour stabiliser l'apprentissage."
+        },
+        "game": {
+          "title": "Jeu final",
+          "duration": "18 min",
+          "hint": "Retour au jeu avec critères d'observation."
+        }
+      },
+      "addExercise": "Importer un exercice",
+      "pdfTitle": "Deux pages A4 structurées",
+      "pdfBody": "Les champs du wizard se replacent dans la fiche PDF avec les schémas, consignes, durées et réflexions.",
+      "save": "Sauvegarder",
+      "create": "Exporter PDF"
+    },
+    "flowEyebrow": "Principe",
+    "flowTitle": "De la philosophie du club à la séance du jour.",
+    "flow": {
+      "philosophy": {
+        "title": "Philosophie",
+        "body": "Le club pose ses idées fortes: intentions de jeu, valeurs de formation et priorités de progression."
+      },
+      "category": {
+        "title": "Catégories",
+        "body": "Les principes sont déclinés selon les âges pour construire un parcours joueur cohérent."
+      },
+      "cycle": {
+        "title": "Cycles",
+        "body": "La saison est organisée en blocs lisibles, avec des thèmes qui construisent la progression."
+      },
+      "session": {
+        "title": "Séance",
+        "body": "Chaque séance devient une traduction concrète de la philosophie, pas un contenu isolé."
+      }
+    },
+    "featuresEyebrow": "Ce que Grinta structure",
+    "featuresTitle": "Un club plus cohérent, sans rigidifier le terrain.",
+    "features": {
+      "identity": {
+        "title": "Cadre club",
+        "body": "Formalise les principes communs pour que tout le staff sache ce qui doit être transmis."
+      },
+      "planner": {
+        "title": "Planification continue",
+        "body": "Relie catégories, cycles, semaines et séances pour garder une progression visible."
+      },
+      "preparation": {
+        "title": "Fiche de préparation",
+        "body": "Prépare des séances claires, imprimables et alignées avec les principes du club."
+      }
+    }
   },
   "nav": {
     "dashboard": "Tableau de bord",
