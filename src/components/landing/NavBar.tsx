@@ -22,9 +22,7 @@ export function NavBar({
 
   const links = [
     { label: "Méthode", href: "#methode" },
-    { label: "Vision", href: "#vision" },
-    { label: "Planificateur", href: "#planificateur" },
-    { label: "Exercices", href: "#exercices" },
+    { label: "Comment ça marche", href: "#flow" },
     { label: "Tarifs", href: "#tarifs" },
   ];
 

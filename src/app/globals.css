@@ -101,6 +101,183 @@ body {
   scrollbar-width: none;
 }
 
+/* ── Flow narrative — single serpentine drawing as you scroll ─────── */
+.flow-snake .snake-line {
+  stroke-dasharray: var(--len, 2400);
+  stroke-dashoffset: var(--len, 2400);
+  transition: stroke-dashoffset 2200ms cubic-bezier(0.4, 0.05, 0.2, 1);
+}
+.flow-snake.is-drawn .snake-line {
+  stroke-dashoffset: 0;
+}
+.flow-snake .snake-head,
+.flow-snake .snake-dot {
+  opacity: 0;
+  transform-box: fill-box;
+  transform-origin: center;
+}
+.flow-snake .snake-head {
+  transition: opacity 300ms ease 1900ms;
+}
+.flow-snake.is-drawn .snake-head {
+  opacity: 1;
+}
+.flow-snake .snake-dot {
+  transform: scale(0.4);
+  transition:
+    opacity 350ms ease,
+    transform 450ms cubic-bezier(0.2, 0.8, 0.2, 1);
+  transition-delay: calc(180ms + var(--dot-i, 0) * 360ms);
+}
+.flow-snake.is-drawn .snake-dot {
+  opacity: 1;
+  transform: scale(1);
+}
+
+@supports (animation-timeline: view()) {
+  .flow-snake .snake-line {
+    transition: none;
+    animation: snake-draw linear both;
+    animation-timeline: view();
+    animation-range: entry 0% cover 85%;
+  }
+  .flow-snake .snake-head {
+    transition: none;
+    animation: snake-fade linear both;
+    animation-timeline: view();
+    animation-range: cover 78% cover 92%;
+  }
+  .flow-snake .snake-dot {
+    transition: none;
+    animation: snake-pop linear both;
+    animation-timeline: view();
+    /* Each dot pops in as the line passes it: ranges spread across cover. */
+    animation-range:
+      cover calc(2% + var(--dot-i, 0) * 18%)
+      cover calc(10% + var(--dot-i, 0) * 18%);
+  }
+}
+
+@keyframes snake-draw {
+  from {
+    stroke-dashoffset: var(--len, 2400);
+  }
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+@keyframes snake-fade {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+@keyframes snake-pop {
+  from {
+    opacity: 0;
+    transform: scale(0.4);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .flow-snake .snake-line,
+  .flow-snake .snake-head,
+  .flow-snake .snake-dot {
+    animation: none !important;
+    transition: none !important;
+    stroke-dashoffset: 0 !important;
+    opacity: 1 !important;
+    transform: none !important;
+  }
+}
+
+/* ── Manifesto — horizontal line with three dots ──────────────────── */
+.mani-line-svg .mani-line {
+  stroke-dasharray: var(--len, 940);
+  stroke-dashoffset: var(--len, 940);
+  transition: stroke-dashoffset 1400ms cubic-bezier(0.4, 0.05, 0.2, 1);
+}
+.mani-line-svg.is-drawn .mani-line {
+  stroke-dashoffset: 0;
+}
+.mani-line-svg .mani-head,
+.mani-line-svg .mani-dot {
+  opacity: 0;
+  transform-box: fill-box;
+  transform-origin: center;
+}
+.mani-line-svg .mani-head {
+  transition: opacity 300ms ease 1200ms;
+}
+.mani-line-svg.is-drawn .mani-head {
+  opacity: 1;
+}
+.mani-line-svg .mani-dot {
+  transform: scale(0.4);
+  transition:
+    opacity 320ms ease,
+    transform 420ms cubic-bezier(0.2, 0.8, 0.2, 1);
+  transition-delay: calc(180ms + var(--dot-i, 0) * 360ms);
+}
+.mani-line-svg.is-drawn .mani-dot {
+  opacity: 1;
+  transform: scale(1);
+}
+
+@supports (animation-timeline: view()) {
+  .mani-line-svg .mani-line {
+    transition: none;
+    animation: mani-draw linear both;
+    animation-timeline: view();
+    animation-range: entry 0% cover 60%;
+  }
+  .mani-line-svg .mani-head {
+    transition: none;
+    animation: mani-fade linear both;
+    animation-timeline: view();
+    animation-range: cover 55% cover 70%;
+  }
+  .mani-line-svg .mani-dot {
+    transition: none;
+    animation: mani-pop linear both;
+    animation-timeline: view();
+    animation-range:
+      cover calc(8% + var(--dot-i, 0) * 22%)
+      cover calc(20% + var(--dot-i, 0) * 22%);
+  }
+}
+
+@keyframes mani-draw {
+  from { stroke-dashoffset: var(--len, 940); }
+  to { stroke-dashoffset: 0; }
+}
+@keyframes mani-fade {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+@keyframes mani-pop {
+  from { opacity: 0; transform: scale(0.4); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .mani-line-svg .mani-line,
+  .mani-line-svg .mani-head,
+  .mani-line-svg .mani-dot {
+    animation: none !important;
+    transition: none !important;
+    stroke-dashoffset: 0 !important;
+    opacity: 1 !important;
+    transform: none !important;
+  }
+}
+
 @keyframes prep-step-in {
   from { opacity: 0; transform: translateY(4px); }
   to { opacity: 1; transform: translateY(0); }

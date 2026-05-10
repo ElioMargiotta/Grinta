@@ -6,10 +6,8 @@ import { ArrowRight, Check } from "lucide-react";
 import { NavBar } from "@/components/landing/NavBar";
 import { Reveal } from "@/components/landing/Reveal";
 import { GrintaMark, GrintaWordmark } from "@/components/landing/Brand";
-import { PlannerMockup } from "@/components/landing/PlannerMockup";
-import { VisionMockup } from "@/components/landing/VisionMockup";
-import { ExerciseDetailMockup } from "@/components/landing/ExerciseDetailMockup";
-import { SessionWizardMockup } from "@/components/landing/SessionWizardMockup";
+import { FlowSection } from "@/components/landing/FlowSection";
+import { ManifestoLine } from "@/components/landing/ManifestoLine";
 
 export default async function LocaleHome({
   params,
@@ -37,9 +35,7 @@ export default async function LocaleHome({
       <main>
         <Hero />
         <Manifesto />
-        <VisionSection />
-        <PlannerSection />
-        <LibrarySection />
+        <FlowSection />
         <PricingSection />
         <FinalCTA />
       </main>
@@ -95,18 +91,18 @@ function Hero() {
             <Reveal delay={240}>
               <div className="mt-8 flex flex-wrap items-center gap-3">
                 <a
-                  href="#planificateur"
+                  href="#flow"
                   className="inline-flex items-center gap-2 text-[14px] font-medium px-5 py-3 rounded-lg btn-accent"
                 >
-                  Voir le planificateur
+                  Comment ça marche
                   <ArrowRight className="h-4 w-4" />
                 </a>
                 <a
-                  href="#vision"
+                  href="#tarifs"
                   className="inline-flex items-center gap-2 text-[14px] font-medium px-5 py-3 rounded-lg border"
                   style={{ borderColor: "var(--line-2)" }}
                 >
-                  Vision globale
+                  Voir les tarifs
                 </a>
               </div>
             </Reveal>
@@ -213,33 +209,54 @@ function Manifesto() {
             </p>
           </div>
         </Reveal>
-        <div className="mt-14 relative">
-          <div
-            className="hidden md:block absolute left-0 right-0 top-7 h-px"
-            style={{
-              background:
-                "linear-gradient(to right, transparent, var(--line-2), transparent)",
-            }}
-          />
-          <div className="grid md:grid-cols-3 gap-12">
+        <div className="mt-16 hidden md:block">
+          <ManifestoLine />
+          <div className="mt-8 grid md:grid-cols-3 gap-12">
             {pillars.map((p, i) => (
-              <Reveal key={p.kicker} delay={i * 100}>
-                <div className="flex flex-col gap-4">
-                  <div className="flex items-center gap-3">
-                    <span
-                      className="font-mono text-[11px] tracking-widest"
-                      style={{ color: "var(--ink-3)" }}
-                    >
-                      {p.kicker}
-                    </span>
-                    <span
-                      className="h-px flex-1"
-                      style={{ background: "var(--line-2)" }}
-                    />
-                    <span className="w-2 h-2 rounded-full dot-accent" />
-                  </div>
+              <Reveal key={p.kicker} delay={i * 120}>
+                <div className="flex flex-col gap-3 text-center">
+                  <span
+                    className="font-mono text-[11px] tracking-widest"
+                    style={{ color: "var(--ink-3)" }}
+                  >
+                    {p.kicker}
+                  </span>
                   <h3
                     className="text-3xl font-semibold tracking-tight"
+                    style={{ letterSpacing: "-0.02em" }}
+                  >
+                    {p.title}
+                  </h3>
+                  <p
+                    className="text-[14px] leading-relaxed mx-auto max-w-xs"
+                    style={{ color: "var(--ink-2)", textWrap: "pretty" }}
+                  >
+                    {p.body}
+                  </p>
+                </div>
+              </Reveal>
+            ))}
+          </div>
+        </div>
+
+        {/* Mobile: simple stacked pillars without horizontal line */}
+        <div className="md:hidden mt-12 flex flex-col gap-10">
+          {pillars.map((p, i) => (
+            <Reveal key={p.kicker} delay={i * 80}>
+              <div className="flex items-start gap-4">
+                <span
+                  aria-hidden
+                  className="mt-2 w-2.5 h-2.5 rounded-full dot-accent shrink-0"
+                />
+                <div className="flex flex-col gap-2">
+                  <span
+                    className="font-mono text-[11px] tracking-widest"
+                    style={{ color: "var(--ink-3)" }}
+                  >
+                    {p.kicker}
+                  </span>
+                  <h3
+                    className="text-2xl font-semibold tracking-tight"
                     style={{ letterSpacing: "-0.02em" }}
                   >
                     {p.title}
@@ -251,203 +268,9 @@ function Manifesto() {
                     {p.body}
                   </p>
                 </div>
-              </Reveal>
-            ))}
-          </div>
-        </div>
-      </div>
-    </section>
-  );
-}
-
-// ── Vision ────────────────────────────────────────────────────────────────
-function VisionSection() {
-  return (
-    <section id="vision" className="relative py-20 lg:py-24">
-      <div className="mx-auto max-w-7xl px-6 lg:px-10">
-        <div className="grid lg:grid-cols-12 gap-10 items-start">
-          <div className="lg:col-span-5">
-            <Reveal>
-              <div className="eyebrow-mono">Vision globale</div>
-              <h2 className="h-display mt-4 text-4xl sm:text-5xl font-semibold">
-                De la pré-formation à l&apos;équipe une, en une seule vue.
-              </h2>
-              <p
-                className="mt-5 text-[15px] leading-relaxed"
-                style={{ color: "var(--ink-2)", textWrap: "pretty" }}
-              >
-                Toutes les catégories du club dans un même tableau. Le directeur
-                sportif voit l&apos;avancement de chaque équipe, les principes
-                appliqués, les charges, les matchs à venir. L&apos;entraîneur
-                reste maître de sa séance.
-              </p>
-              <ul className="mt-8 flex flex-col gap-4">
-                {[
-                  ["Hiérarchie partagée", "Catégories, staff, joueurs — synchronisés en temps réel."],
-                  ["Principes de jeu", "Définis une fois au club, déclinés par catégorie."],
-                  ["Charge et thèmes", "Comparez les semaines U13 / U17 / Senior d'un coup d'œil."],
-                ].map(([t, b]) => (
-                  <li key={t} className="flex gap-3">
-                    <span className="mt-1 w-4 h-4 rounded-full border-2 border-accent shrink-0" />
-                    <div>
-                      <div className="text-[14px] font-medium">{t}</div>
-                      <div
-                        className="text-[13px] leading-relaxed"
-                        style={{ color: "var(--ink-3)" }}
-                      >
-                        {b}
-                      </div>
-                    </div>
-                  </li>
-                ))}
-              </ul>
-            </Reveal>
-          </div>
-          <div className="lg:col-span-7">
-            <Reveal delay={120}>
-              <VisionMockup />
-            </Reveal>
-          </div>
-        </div>
-      </div>
-    </section>
-  );
-}
-
-// ── Planner ───────────────────────────────────────────────────────────────
-function PlannerSection() {
-  return (
-    <section id="planificateur" className="relative py-20 lg:py-24 overflow-hidden">
-      <div
-        className="absolute inset-0 pointer-events-none"
-        style={{
-          background:
-            "linear-gradient(to bottom, transparent 0%, var(--bg-2) 18%, var(--bg-2) 82%, transparent 100%)",
-        }}
-      />
-      <div className="relative mx-auto max-w-7xl px-6 lg:px-10">
-        <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-6 mb-10">
-          <Reveal>
-            <div className="max-w-2xl">
-              <div className="eyebrow-mono">Planificateur de saison</div>
-              <h2 className="h-display mt-4 text-4xl sm:text-5xl font-semibold">
-                Configure ta saison{" "}
-                <span className="text-accent-ink italic">en 90 secondes</span>.
-              </h2>
-            </div>
-          </Reveal>
-          <Reveal delay={120}>
-            <p
-              className="max-w-md text-[15px] leading-relaxed"
-              style={{ color: "var(--ink-2)", textWrap: "pretty" }}
-            >
-              Trois dates, trois mésocycles. Grinta ancre ton macrocycle sur des
-              dates réelles, numérote les semaines (-3, -2, -1, +1…) et te
-              laisse remplir thèmes et séances au fil de l&apos;eau.
-            </p>
-          </Reveal>
-        </div>
-
-        <Reveal delay={120}>
-          <PlannerMockup />
-        </Reveal>
-
-        <div className="mt-6 grid md:grid-cols-3 gap-4 text-[13px]">
-          {[
-            ["Calé au lundi", "La semaine contenant le premier match devient la semaine +1."],
-            ["Mésocycles libres", "Préparation, compétition, transition, ou personnalisés — couleurs au choix."],
-            ["Thèmes & format", "Possède, ne possède pas, récupère, perd — du 1:1 au 5:5."],
-          ].map(([t, b], i) => (
-            <Reveal key={t} delay={i * 80}>
-              <div
-                className="rounded-xl border p-4 transition-colors"
-                style={{ borderColor: "var(--line)" }}
-              >
-                <div className="font-medium">{t}</div>
-                <div
-                  className="leading-relaxed mt-1"
-                  style={{ color: "var(--ink-3)" }}
-                >
-                  {b}
-                </div>
               </div>
             </Reveal>
           ))}
-        </div>
-      </div>
-    </section>
-  );
-}
-
-// ── Library + Preparation ────────────────────────────────────────────────
-function LibrarySection() {
-  return (
-    <section id="exercices" className="relative py-20 lg:py-24 overflow-hidden">
-      <div
-        className="absolute inset-0 pointer-events-none"
-        style={{
-          background:
-            "linear-gradient(to bottom, transparent 0%, var(--bg-2) 30%, var(--bg-2) 70%, transparent 100%)",
-        }}
-      />
-      <div className="relative mx-auto max-w-7xl px-6 lg:px-10">
-        <div className="grid lg:grid-cols-12 gap-10 items-start">
-          <div className="lg:col-span-4 lg:sticky lg:top-24">
-            <Reveal>
-              <div className="eyebrow-mono flex items-center gap-2">
-                <span className="font-mono">Live</span>
-                <span className="w-1 h-1 rounded-full dot-accent animate-pulse" />
-                Démo interactive
-              </div>
-              <h2 className="h-display mt-4 text-4xl sm:text-5xl font-semibold">
-                Ajoute un bloc, la fiche{" "}
-                <span className="text-accent-ink italic">se construit</span>.
-              </h2>
-              <p
-                className="mt-5 text-[15px] leading-relaxed"
-                style={{ color: "var(--ink-2)", textWrap: "pretty" }}
-              >
-                Importe un exercice depuis ta bibliothèque ou crée-le
-                directement sur schéma. Chaque bloc s&apos;empile, le minutage
-                se recalcule, et la fiche A4 prend forme à droite — prête à
-                exporter en PDF pour le terrain.
-              </p>
-              <ul
-                className="mt-7 flex flex-col gap-3 text-[13px]"
-                style={{ color: "var(--ink-2)" }}
-              >
-                {[
-                  ["Importer un exo", "Pioche dans la bibliothèque catégorisée (PE / TE / TA / AT)."],
-                  ["Créer sur schéma", "Trace ton exercice sur un demi-terrain, il rejoint la séance."],
-                  ["Export PDF A4", "Une fiche imprimable, lisible pour le staff, exploitable sur le terrain."],
-                ].map(([t, b]) => (
-                  <li key={t} className="flex gap-3">
-                    <span className="mt-1 w-1.5 h-1.5 rounded-full dot-accent shrink-0" />
-                    <div>
-                      <span className="font-medium">{t}.</span>{" "}
-                      <span style={{ color: "var(--ink-3)" }}>{b}</span>
-                    </div>
-                  </li>
-                ))}
-              </ul>
-            </Reveal>
-          </div>
-          <div className="lg:col-span-8 flex flex-col gap-6">
-            <Reveal delay={100}>
-              <div
-                className="rounded-2xl border p-6 shadow-[0_24px_60px_-40px_rgba(24,24,27,.25)]"
-                style={{
-                  background: "var(--paper)",
-                  borderColor: "var(--line)",
-                }}
-              >
-                <ExerciseDetailMockup />
-              </div>
-            </Reveal>
-            <Reveal delay={200}>
-              <SessionWizardMockup />
-            </Reveal>
-          </div>
         </div>
       </div>
     </section>
@@ -641,11 +464,11 @@ function FinalCTA() {
                   <ArrowRight className="h-4 w-4" />
                 </Link>
                 <a
-                  href="#planificateur"
+                  href="#flow"
                   className="text-[13px] font-medium"
                   style={{ color: "rgba(250,250,247,.7)" }}
                 >
-                  Demander une démo →
+                  Comment ça marche →
                 </a>
               </div>
             </div>
