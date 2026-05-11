@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { ArrowRight } from "lucide-react";
 import { Link } from "@/i18n/navigation";
-import { GrintaMark, GrintaWordmark } from "./Brand";
+import { GrintaLogoIcon, GrintaLogoType } from "./BrandSeal";
 
 export function NavBar({
   loginLabel,
@@ -37,9 +37,9 @@ export function NavBar({
       }}
     >
       <div className="mx-auto max-w-7xl px-6 lg:px-10 h-16 flex items-center justify-between gap-6">
-        <Link href="/" className="flex items-center gap-2.5 shrink-0">
-          <GrintaMark size={32} />
-          <GrintaWordmark height={20} />
+        <Link href="/" className="flex items-center gap-2 shrink-0">
+          <GrintaLogoIcon size={32} title="Grinta" />
+          <GrintaLogoType height={18} title="GRINTA" />
         </Link>
         <nav className="hidden md:flex items-center gap-7">
           {links.map((l) => (

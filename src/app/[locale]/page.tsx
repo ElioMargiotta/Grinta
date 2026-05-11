@@ -1,11 +1,14 @@
-import Image from "next/image";
 import { Link, redirect } from "@/i18n/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { setRequestLocale } from "next-intl/server";
 import { ArrowRight, Check } from "lucide-react";
 import { NavBar } from "@/components/landing/NavBar";
 import { Reveal } from "@/components/landing/Reveal";
-import { GrintaMark, GrintaWordmark } from "@/components/landing/Brand";
+import {
+  GrintaLogoIcon,
+  GrintaLogoType,
+  GrintaLogoTagline,
+} from "@/components/landing/BrandSeal";
 import { FlowSection } from "@/components/landing/FlowSection";
 import { ManifestoLine } from "@/components/landing/ManifestoLine";
 
@@ -146,15 +149,24 @@ function Hero() {
           </div>
           <div className="lg:col-span-6">
             <Reveal delay={200}>
-              <div className="relative flex items-center justify-center">
-                <Image
-                  src="/Icon-grinta-clean.svg"
-                  alt="Grinta"
-                  width={520}
-                  height={520}
-                  priority
-                  className="h-auto w-full max-w-[520px]"
+              <div className="relative mx-auto flex w-full max-w-[520px] flex-col items-center gap-6">
+                <GrintaLogoIcon
+                  size={420}
+                  title="Grinta"
+                  className="h-auto w-full max-w-[420px]"
                 />
+                <div className="flex flex-col items-center gap-3">
+                  <GrintaLogoType
+                    height={56}
+                    title="GRINTA"
+                    className="h-auto w-auto max-w-[320px]"
+                  />
+                  <GrintaLogoTagline
+                    height={18}
+                    title="One club. One identity. One method."
+                    className="h-auto w-auto max-w-[320px] opacity-80"
+                  />
+                </div>
               </div>
             </Reveal>
           </div>
@@ -507,9 +519,9 @@ function FooterBar() {
       <div className="mx-auto max-w-7xl px-6 lg:px-10">
         <div className="grid lg:grid-cols-12 gap-10">
           <div className="lg:col-span-4">
-            <div className="flex items-center gap-2.5">
-              <GrintaMark size={32} />
-              <GrintaWordmark height={20} />
+            <div className="flex items-center gap-2">
+              <GrintaLogoIcon size={32} title="Grinta" />
+              <GrintaLogoType height={18} title="GRINTA" />
             </div>
             <p
               className="mt-4 text-[13px] leading-relaxed max-w-xs"
