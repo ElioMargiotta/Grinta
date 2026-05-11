@@ -5,11 +5,11 @@ import { Button } from "@/components/ui/Button";
 import { Link } from "@/i18n/navigation";
 import { requireUser } from "@/lib/auth/getUser";
 
-// Two exercise libraries seeded from different PDFs.
-// `phases` = clubcorner_2026 (tactical phases of play, ~24 exercises)
-// `gestes` = asf_te_2026     (technical-gesture exercises, currently
-//                            Passe et prise de balle — Base TE Niveau 1–3)
-type LibraryFamily = "phases" | "gestes";
+// Exercise libraries seeded from different PDFs.
+// `phases` = clubcorner_2026 (tactical phases of play)
+// `gestes` = asf_te_2026     (technical-gesture booklets, Base TE)
+// `co`     = asf_co_2026     (physical conditioning booklets, Base CO)
+type LibraryFamily = "phases" | "gestes" | "co";
 
 const PHASE_THEMES = [
   "Mon équipe possède le ballon",
@@ -25,9 +25,13 @@ const GESTE_THEMES = [
   "Techniques aériennes",
 ] as const;
 
+const CO_THEMES = ["Explosivité"] as const;
+
 const PHASE_TRACKS = ["Base TA", "Développement TA", "Stratégie Team"] as const;
+const CO_TRACKS = ["Accélérations", "Changements de direction", "Sauts"] as const;
 const PHASE_LEVELS = [1, 2, 3, 4, 5, 6] as const;
 const GESTE_LEVELS = [1, 2, 3] as const;
+const CO_LEVELS = [1, 2, 3, 4, 5, 6, 7, 8] as const;
 
 const LIBRARY_TABS: { id: LibraryFamily; label: string; source: string; hint: string }[] = [
   {
@@ -41,6 +45,12 @@ const LIBRARY_TABS: { id: LibraryFamily; label: string; source: string; hint: st
     label: "Gestes techniques",
     source: "asf_te_2026",
     hint: "ASF Base TE — passe, conduite & dribble, tir au but, techniques aériennes, niveaux 1 à 3",
+  },
+  {
+    id: "co",
+    label: "Condition physique",
+    source: "asf_co_2026",
+    hint: "ASF Base CO — explosivité (accélérations, changements de direction, sauts), niveaux 1 à 8",
   },
 ];
 
@@ -119,9 +129,21 @@ export default async function ExercisesPage({
 
   const activeTab =
     LIBRARY_TABS.find((t) => t.id === sp.family) ?? LIBRARY_TABS[0];
-  const themes = activeTab.id === "phases" ? PHASE_THEMES : GESTE_THEMES;
-  const levels = activeTab.id === "phases" ? PHASE_LEVELS : GESTE_LEVELS;
-  const showTracks = activeTab.id === "phases";
+  const themes =
+    activeTab.id === "phases"
+      ? PHASE_THEMES
+      : activeTab.id === "co"
+        ? CO_THEMES
+        : GESTE_THEMES;
+  const levels =
+    activeTab.id === "phases"
+      ? PHASE_LEVELS
+      : activeTab.id === "co"
+        ? CO_LEVELS
+        : GESTE_LEVELS;
+  const tracks =
+    activeTab.id === "phases" ? PHASE_TRACKS : activeTab.id === "co" ? CO_TRACKS : null;
+  const showTracks = tracks !== null;
 
   let query = supabase
     .from("exercises")
@@ -194,12 +216,12 @@ export default async function ExercisesPage({
         </FilterRow>
 
         <FilterRow label="Niveau">
-          {showTracks && (
+          {showTracks && tracks && (
             <>
               <Link href={chipHref(sp, "track", null)} className={chipStyle(!sp.track)}>
                 All tracks
               </Link>
-              {PHASE_TRACKS.map((t) => (
+              {tracks.map((t) => (
                 <Link key={t} href={chipHref(sp, "track", t)} className={chipStyle(sp.track === t)}>
                   {t}
                 </Link>
