@@ -57,6 +57,13 @@ CHAPTERS: dict[str, dict[str, str]] = {
         # digit-group is optional. chapter_n isn't load-bearing downstream.
         "chapter_re": r"Tir au but(?:\s+(\d))?.*?[–\-]\s*Base TE\s+NIVEAU",
     },
+    "aerienne": {
+        "pdf": "technique_aérienne.pdf",
+        "sql": "supabase/migrations/0009_seed_te_aerienne_library.sql",
+        "theme": "Techniques aériennes",
+        "code_prefix": "TE_TA",
+        "chapter_re": r"Techniques a[eé]riennes\s+(\d).*?[–\-]\s*Base TE\s+NIVEAU",
+    },
 }
 
 ANCHOR_RE = re.compile(r"^\s*Base TE:\s*Niveau\s+(\d)-(\d)\b")
