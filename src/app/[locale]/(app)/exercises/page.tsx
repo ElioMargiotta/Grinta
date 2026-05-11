@@ -25,10 +25,23 @@ const GESTE_THEMES = [
   "Techniques aériennes",
 ] as const;
 
-const CO_THEMES = ["Explosivité"] as const;
+const CO_THEMES = ["Explosivité", "Stabilité corporelle"] as const;
 
 const PHASE_TRACKS = ["Base TA", "Développement TA", "Stratégie Team"] as const;
-const CO_TRACKS = ["Accélérations", "Changements de direction", "Sauts"] as const;
+// CO tracks depend on the selected theme. When no theme is active we show
+// the union so users see what's available without committing to a theme.
+const CO_TRACKS_BY_THEME: Record<string, readonly string[]> = {
+  Explosivité: ["Accélérations", "Changements de direction", "Sauts"],
+  "Stabilité corporelle": [
+    "Coordination et TE",
+    "Coordination et TE en salle",
+    "Duels",
+  ],
+};
+const CO_TRACKS_ALL = [
+  ...CO_TRACKS_BY_THEME["Explosivité"],
+  ...CO_TRACKS_BY_THEME["Stabilité corporelle"],
+] as const;
 const PHASE_LEVELS = [1, 2, 3, 4, 5, 6] as const;
 const GESTE_LEVELS = [1, 2, 3] as const;
 const CO_LEVELS = [1, 2, 3, 4, 5, 6, 7, 8] as const;
@@ -50,7 +63,7 @@ const LIBRARY_TABS: { id: LibraryFamily; label: string; source: string; hint: st
     id: "co",
     label: "Condition physique",
     source: "asf_co_2026",
-    hint: "ASF Base CO — explosivité (accélérations, changements de direction, sauts), niveaux 1 à 8",
+    hint: "ASF Base CO — explosivité, stabilité corporelle (niveaux 1 à 8)",
   },
 ];
 
@@ -141,8 +154,14 @@ export default async function ExercisesPage({
       : activeTab.id === "co"
         ? CO_LEVELS
         : GESTE_LEVELS;
-  const tracks =
-    activeTab.id === "phases" ? PHASE_TRACKS : activeTab.id === "co" ? CO_TRACKS : null;
+  const tracks: readonly string[] | null =
+    activeTab.id === "phases"
+      ? PHASE_TRACKS
+      : activeTab.id === "co"
+        ? sp.theme && CO_TRACKS_BY_THEME[sp.theme]
+          ? CO_TRACKS_BY_THEME[sp.theme]
+          : CO_TRACKS_ALL
+        : null;
   const showTracks = tracks !== null;
 
   let query = supabase

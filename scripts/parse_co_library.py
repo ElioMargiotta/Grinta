@@ -42,35 +42,61 @@ CHAPTERS: dict[str, dict[str, str]] = {
         "theme": "Explosivité",
         "code_prefix": "CO_EX",
     },
+    "stabilite": {
+        "pdf": "stabilité_corporelle.pdf",
+        "sql": "supabase/migrations/0011_seed_co_stabilite_library.sql",
+        "theme": "Stabilité corporelle",
+        "code_prefix": "CO_SC",
+    },
 }
 
-# Anchor: "Base CO : <track> Niveau <N>". Tracks are hard-coded because they
-# carry meaning (we map them onto the `track` column for filtering).
-ANCHOR_RE = re.compile(
-    r"^\s*Base CO\s*:\s*(Accélérations|Changements de direction|Sauts)\s+Niveau\s+(\d+)"
-)
+# Anchor: "Base CO : <track> Niveau <N>". Non-greedy track capture so we
+# match the right boundary regardless of how many words the track has —
+# Niveau is the unambiguous separator. Anchors without "Niveau N"
+# (e.g. "Renforcement musculaire") simply don't match here and are
+# skipped — they tend to use a different 2×2 layout we don't support yet.
+ANCHOR_RE = re.compile(r"^\s*Base CO\s*:\s*(.+?)\s+Niveau\s+(\d+)\b")
 TOP_HEADER_RE = re.compile(r"Organisation\s+Condition physique\s+Description")
 INTER_HEADER_RE = re.compile(r"^\s*Exercice\s+Description\s+Coaching\s+Variantes")
 PAGE_NUM_RE = re.compile(r"^\s*\d{1,3}(?:\s+\d{1,3})*\s*$")
 
+# Tracks we've seen so far. Used to slugify exercise codes. Unknown tracks
+# fall back to a "X<N>" slug at runtime — add them here when a new booklet
+# introduces something we want a stable, human-readable code for.
 TRACK_SLUGS = {
     "Accélérations": "ACC",
     "Changements de direction": "CD",
     "Sauts": "S",
+    "Coordination et TE": "COORD",
+    "Coordination et TE en salle": "COORDS",
+    "Duels": "DUEL",
 }
+
+
+def slugify_track(track: str) -> str:
+    if track in TRACK_SLUGS:
+        return TRACK_SLUGS[track]
+    # Fallback: take initials of each word, uppercase.
+    return "".join(w[0] for w in re.findall(r"\w+", track)).upper() or "X"
 
 
 @dataclass
 class CoExercise:
     code: str
-    track: str               # "Accélérations" / "Changements de direction" / "Sauts"
+    track: str               # "Accélérations" / "Coordination et TE" / "Duels" / …
     level: int               # 1..8
     titre: str
     description: str
     dimensions: str
     player_count_text: str
+    duree_text: str = ""
     condition_physique: list[str] = field(default_factory=list)
+    # The bottom-band middle column varies per booklet:
+    # - Explosivité  → "Paramètres" (training prescription, lands here)
+    # - Stab. corp.  → "Technique"  (a 2nd coaching family, lands in `technique`)
+    # Only one of these is populated for a given exercise.
     parametres: list[str] = field(default_factory=list)
+    technique: list[str] = field(default_factory=list)
     remarques: str = ""
     variantes_text: str = ""
     main_image: str = ""
@@ -88,6 +114,8 @@ class CoExercise:
             parts.append(f"Dimensions\n{self.dimensions}")
         if self.player_count_text:
             parts.append(f"Joueurs\n{self.player_count_text}")
+        if self.duree_text:
+            parts.append(f"Durée\n{self.duree_text}")
         if self.parametres:
             parts.append("Paramètres\n" + "\n".join(self.parametres))
         if self.remarques:
@@ -139,10 +167,11 @@ def join_paragraphs(lines: list[str]) -> str:
     return "\n".join(merge_tags(lines))
 
 
-def parse_org_block(lines: list[str]) -> tuple[str, str]:
-    """Parse the Organisation column (Dimensions, Joueurs — no Durée here)."""
+def parse_org_block(lines: list[str]) -> tuple[str, str, str]:
+    """Parse the Organisation column (Dimensions, Joueurs, optional Durée)."""
     dimensions: list[str] = []
     joueurs: list[str] = []
+    duree: list[str] = []
     current: str | None = None
     for raw in lines:
         s = raw.strip()
@@ -154,39 +183,45 @@ def parse_org_block(lines: list[str]) -> tuple[str, str]:
         if s == "Joueurs":
             current = "jou"
             continue
-        if s in ("Durée", "Organisation"):
+        if s == "Durée":
+            current = "dur"
+            continue
+        if s == "Organisation":
             continue
         if current == "dim":
             dimensions.append(s)
         elif current == "jou":
             joueurs.append(s)
-    return ("\n".join(merge_tags(dimensions)), "\n".join(merge_tags(joueurs)))
+        elif current == "dur":
+            duree.append(s)
+    return (
+        "\n".join(merge_tags(dimensions)),
+        "\n".join(merge_tags(joueurs)),
+        "\n".join(merge_tags(duree)),
+    )
 
 
 def parse_page(page: str, pidx: int, code_prefix: str) -> list[CoExercise]:
     lines = page.split("\n")
 
-    # Lock column positions from the first top-band header on the page.
-    cols: list[int] | None = None
-    for line in lines:
-        if TOP_HEADER_RE.search(line):
-            cols = detect_columns(line)
-            if cols:
-                break
-    if not cols:
-        return []
-    org_x, cp_x, desc_x = cols
-
     anchors: list[tuple[int, str, int]] = []
     for i, line in enumerate(lines):
         m = ANCHOR_RE.match(line)
         if m:
-            anchors.append((i, m.group(1), int(m.group(2))))
+            anchors.append((i, m.group(1).strip(), int(m.group(2))))
 
     exercises: list[CoExercise] = []
     for ai, (anchor_idx, track, lvl) in enumerate(anchors):
         next_idx = anchors[ai + 1][0] if ai + 1 < len(anchors) else len(lines)
         block = lines[anchor_idx:next_idx]
+
+        # Detect columns from this exercise's anchor line (carries the headers).
+        # Column positions can drift slightly between exercises on the same page,
+        # so we re-detect here rather than once per page.
+        cols = detect_columns(block[0])
+        if not cols:
+            continue
+        org_x, cp_x, desc_x = cols
 
         # Band split — first row where the Organisation column starts with "Déroulement".
         split_idx = -1
@@ -204,20 +239,22 @@ def parse_page(page: str, pidx: int, code_prefix: str) -> list[CoExercise]:
                 end_idx = i
                 break
         top = block[1:split_idx]
+        bot_header = block[split_idx]
         bot = block[split_idx + 1 : end_idx]
+
+        # Identify the bottom-middle column header — "Paramètres" or "Technique".
+        bot_mid_label = slice_col(bot_header, cp_x, desc_x).strip()
 
         # --- Top band ---
         org_lines = [slice_col(l, org_x, cp_x) for l in top]
         cp_lines = [slice_col(l, cp_x, desc_x) for l in top]
         var_top_lines = [slice_col(l, desc_x, None) for l in top]
 
-        dims, joueurs = parse_org_block(org_lines)
-        # Strip the "Condition physique" column header line if it leaked in.
+        dims, joueurs, duree = parse_org_block(org_lines)
         cp_tags = merge_tags(
             [l for l in cp_lines if l.strip() != "Condition physique"]
         )
-        # Top variantes column also starts with a "Description" / "Organisation"
-        # header pair (column header + first sub-header). Strip those.
+        # Top variantes column starts with header tokens we want to strip.
         var_top_items: list[str] = []
         for raw in var_top_lines:
             s = raw.strip()
@@ -234,18 +271,27 @@ def parse_page(page: str, pidx: int, code_prefix: str) -> list[CoExercise]:
         titre = der_items[0]
         description = "\n".join(der_items[1:])
 
-        param_lines = [slice_col(l, cp_x, desc_x) for l in bot]
-        parametres = merge_tags(
-            [l for l in param_lines if l.strip() != "Paramètres"]
+        # Bottom-middle column: "Paramètres" → parametres list, "Technique" → technique tags.
+        mid_lines = [slice_col(l, cp_x, desc_x) for l in bot]
+        mid_items = merge_tags(
+            [l for l in mid_lines if l.strip() not in ("Paramètres", "Technique")]
         )
+        parametres: list[str] = []
+        technique: list[str] = []
+        if bot_mid_label.startswith("Paramètres"):
+            parametres = mid_items
+        elif bot_mid_label.startswith("Technique"):
+            technique = mid_items
+        else:
+            # Unknown layout — keep it as parametres so the data isn't lost.
+            parametres = mid_items
 
         rem_lines = [slice_col(l, desc_x, None) for l in bot]
         remarques = join_paragraphs(
             [l for l in rem_lines if l.strip() != "Remarques théoriques"]
         )
 
-        track_slug = TRACK_SLUGS.get(track, "X")
-        code = f"{code_prefix}_{track_slug}_{lvl}"
+        code = f"{code_prefix}_{slugify_track(track)}_{lvl}"
 
         exercises.append(
             CoExercise(
@@ -256,8 +302,10 @@ def parse_page(page: str, pidx: int, code_prefix: str) -> list[CoExercise]:
                 description=description,
                 dimensions=dims,
                 player_count_text=joueurs,
+                duree_text=duree,
                 condition_physique=cp_tags,
                 parametres=parametres,
+                technique=technique,
                 remarques=remarques,
                 variantes_text=variantes_top,
                 pdf_page=pidx,
@@ -279,14 +327,13 @@ def parse_all(pdf_path: str, code_prefix: str) -> list[CoExercise]:
 def derive_intensity(condition_physique: list[str]) -> str | None:
     for t in condition_physique:
         low = t.lower()
-        if "intensité élevée" in low:
+        if "intensité élevée" in low or "explosivité" in low:
             return "high"
         if "intensité moyenne" in low:
             return "medium"
         if "intensité faible" in low or "intensité basse" in low:
             return "low"
-    # CO booklets don't carry an intensity tag — explosivité is by definition high.
-    return "high"
+    return None
 
 
 def extract_main_images(exercises: list[CoExercise], pdf_path: str) -> None:
@@ -369,13 +416,13 @@ insert into exercises (
             f"    {sql_text(ex.titre)},\n"
             f"    {sql_text(theme)}, {sql_text(ex.track)}, {ex.level}, {sql_text(ex.niveau)},\n"
             f"    {sql_text(ex.description)},\n"
-            f"    null,\n"
+            f"    {sql_text(ex.duree_text)},\n"
             f"    {sql_text(ex.organisation)},\n"
             f"    null, {sql_text(intensity)}, array[]::text[],\n"
             f"    {sql_text_array(ex.condition_physique)},\n"
             f"    array[]::text[],\n"
             f"    array[]::text[],\n"
-            f"    array[]::text[],\n"
+            f"    {sql_text_array(ex.technique)},\n"
             f"    '/exercises/{ex.code}_main.png',\n"
             f"    {sql_text(ex.variantes_text)},\n"
             f"    null\n"
@@ -427,17 +474,22 @@ def main() -> None:
         sys.exit(1)
 
     exercises = parse_all(pdf_path, code_prefix)
-    # Sort by track then level for a stable seed.
-    track_order = {"Accélérations": 0, "Changements de direction": 1, "Sauts": 2}
+    # Sort by first-seen-order on (track, level) for a stable seed.
+    seen_tracks: list[str] = []
+    for ex in exercises:
+        if ex.track not in seen_tracks:
+            seen_tracks.append(ex.track)
+    track_order = {t: i for i, t in enumerate(seen_tracks)}
     exercises.sort(key=lambda e: (track_order.get(e.track, 99), e.level))
 
     print(f"== [{chapter_key}] parsed {len(exercises)} exercises")
     for ex in exercises:
         print(
-            f"  {ex.code:14s}  {ex.track:25s}  L{ex.level}  "
+            f"  {ex.code:18s}  {ex.track:30s}  L{ex.level}  "
             f"page={ex.pdf_page} pos={ex.page_pos}  titre={ex.titre!r}  "
             f"cp={len(ex.condition_physique)} par={len(ex.parametres)} "
-            f"rem={'y' if ex.remarques else 'n'} var={'y' if ex.variantes_text else 'n'}"
+            f"tec={len(ex.technique)} rem={'y' if ex.remarques else 'n'} "
+            f"var={'y' if ex.variantes_text else 'n'}"
         )
 
     extract_main_images(exercises, pdf_path)
