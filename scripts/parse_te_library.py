@@ -47,6 +47,16 @@ CHAPTERS: dict[str, dict[str, str]] = {
         "code_prefix": "TE_CD",
         "chapter_re": r"Conduite du ballon et dribble\s+(\d)\s*[–\-]\s*Base TE\s+NIVEAU",
     },
+    "tir": {
+        "pdf": "prise_balle_tir.pdf",
+        "sql": "supabase/migrations/0008_seed_te_tir_library.sql",
+        "theme": "Tir au but",
+        "code_prefix": "TE_TB",
+        # This booklet's chapter titles vary ("Tir au but avec prise de balle",
+        # "Tir au but 2 après un dribble", "Tir au but 3 sur centre" …) so the
+        # digit-group is optional. chapter_n isn't load-bearing downstream.
+        "chapter_re": r"Tir au but(?:\s+(\d))?.*?[–\-]\s*Base TE\s+NIVEAU",
+    },
 }
 
 ANCHOR_RE = re.compile(r"^\s*Base TE:\s*Niveau\s+(\d)-(\d)\b")
@@ -304,7 +314,11 @@ def parse_all(pdf_path: str, chapter_re: re.Pattern[str], code_prefix: str) -> l
     for pidx, page in enumerate(pages, start=1):
         m = chapter_re.search(page)
         if m:
-            chapter_n = int(m.group(1))
+            try:
+                chapter_n = int(m.group(1))
+            except (IndexError, TypeError, ValueError):
+                # Booklets with optional/missing digit-group fall through here.
+                pass
         out.extend(parse_page(page, pidx, chapter_n, code_prefix))
     return out
 

@@ -21,6 +21,7 @@ const PHASE_THEMES = [
 const GESTE_THEMES = [
   "Passe et prise de balle",
   "Conduite du ballon et dribble",
+  "Tir au but",
 ] as const;
 
 const PHASE_TRACKS = ["Base TA", "Développement TA", "Stratégie Team"] as const;
@@ -38,7 +39,7 @@ const LIBRARY_TABS: { id: LibraryFamily; label: string; source: string; hint: st
     id: "gestes",
     label: "Gestes techniques",
     source: "asf_te_2026",
-    hint: "ASF Base TE — passe & prise de balle et conduite & dribble, niveaux 1 à 3",
+    hint: "ASF Base TE — passe, conduite & dribble, tir au but, niveaux 1 à 3",
   },
 ];
 
