@@ -1,16 +1,18 @@
 #!/usr/bin/env python3
 """
-Parses TE-Prise_balle_passe.pdf into:
-  - supabase/migrations/0006_seed_te_library.sql
-  - public/exercises/<CODE>_main.png   (one diagram per exercise)
+Parses the ASF Base TE technical-gesture booklets into:
+  - supabase/migrations/<NNNN>_seed_te_<slug>_library.sql
+  - public/exercises/<CODE>_main.png
 
 This is the technical-gesture sibling of parse_exercise_library.py — the
 clubcorner library covers tactical phases (Mon équipe possède le ballon …)
-while this script covers the "Passe et prise de balle" booklet of
-technique exercises (Base TE Niveau 1–3).
+while this script covers the Base TE booklets, where each booklet shares
+the same 5-column table layout but covers a different theme.
 
 Usage (from repo root):
-    python3 scripts/parse_te_library.py
+    python3 scripts/parse_te_library.py [chapter]
+
+chapter ∈ {passe, conduite}. Defaults to 'passe'.
 """
 
 from __future__ import annotations
@@ -24,18 +26,29 @@ import tempfile
 from dataclasses import dataclass, field
 
 REPO = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
-PDF_PATH = os.path.join(REPO, "TE-Prise_balle_passe.pdf")
-OUT_SQL = os.path.join(REPO, "supabase/migrations/0006_seed_te_library.sql")
 OUT_IMG = os.path.join(REPO, "public/exercises")
 
 SOURCE = "asf_te_2026"
-THEME = "Passe et prise de balle"
 TRACK = "Base TE"
 
-CHAPTER_RE = re.compile(
-    r"Passe et prise de balle\s+(\d)\s*[–\-]\s*Base TE\s+NIVEAU",
-    re.IGNORECASE,
-)
+# Per-chapter config. Add an entry here when you parse a new TE booklet.
+CHAPTERS: dict[str, dict[str, str]] = {
+    "passe": {
+        "pdf": "TE-Prise_balle_passe.pdf",
+        "sql": "supabase/migrations/0006_seed_te_library.sql",
+        "theme": "Passe et prise de balle",
+        "code_prefix": "TE_PB",
+        "chapter_re": r"Passe et prise de balle\s+(\d)\s*[–\-]\s*Base TE\s+NIVEAU",
+    },
+    "conduite": {
+        "pdf": "conduite_balle_dribble.pdf",
+        "sql": "supabase/migrations/0007_seed_te_conduite_library.sql",
+        "theme": "Conduite du ballon et dribble",
+        "code_prefix": "TE_CD",
+        "chapter_re": r"Conduite du ballon et dribble\s+(\d)\s*[–\-]\s*Base TE\s+NIVEAU",
+    },
+}
+
 ANCHOR_RE = re.compile(r"^\s*Base TE:\s*Niveau\s+(\d)-(\d)\b")
 TOP_HEADER_RE = re.compile(r"Organisation\s+Tactique\s+Technique\s+Moins")
 BOT_HEADER_RE = re.compile(r"Déroulement\s+Force mentale\s+Condition physique\s+Description")
@@ -175,7 +188,7 @@ def parse_org_block(lines: list[str]) -> tuple[str, str, str, str]:
     return ("\n".join(dims_merged), "\n".join(jou_merged), seq, vol)
 
 
-def parse_page(page: str, pidx: int, chapter_n: int) -> list[TeExercise]:
+def parse_page(page: str, pidx: int, chapter_n: int, code_prefix: str) -> list[TeExercise]:
     lines = page.split("\n")
     # Find the top header line on this page to lock in column positions.
     cols: list[int] | None = None
@@ -257,7 +270,7 @@ def parse_page(page: str, pidx: int, chapter_n: int) -> list[TeExercise]:
         variation_less = re.sub(r"^Description\n?", "", variation_less)
         variation_more = re.sub(r"^Description\n?", "", variation_more)
 
-        code = f"TE_PB_{lvl}-{sub}"
+        code = f"{code_prefix}_{lvl}-{sub}"
         exercises.append(
             TeExercise(
                 code=code,
@@ -283,16 +296,16 @@ def parse_page(page: str, pidx: int, chapter_n: int) -> list[TeExercise]:
     return exercises
 
 
-def parse_all() -> list[TeExercise]:
-    text = run_cmd(["pdftotext", "-layout", PDF_PATH, "-"])
+def parse_all(pdf_path: str, chapter_re: re.Pattern[str], code_prefix: str) -> list[TeExercise]:
+    text = run_cmd(["pdftotext", "-layout", pdf_path, "-"])
     pages = text.split("\f")
     out: list[TeExercise] = []
     chapter_n = 0
     for pidx, page in enumerate(pages, start=1):
-        m = CHAPTER_RE.search(page)
+        m = chapter_re.search(page)
         if m:
             chapter_n = int(m.group(1))
-        out.extend(parse_page(page, pidx, chapter_n))
+        out.extend(parse_page(page, pidx, chapter_n, code_prefix))
     return out
 
 
@@ -308,12 +321,12 @@ def derive_intensity(condition_physique: list[str]) -> str | None:
     return None
 
 
-def extract_main_images(exercises: list[TeExercise]) -> None:
+def extract_main_images(exercises: list[TeExercise], pdf_path: str) -> None:
     """Each PDF page lays out 2 exercises × 3 images (main, moins, plus).
     The page-image stream is: [top main, top less, top more, bot main, bot less, bot more].
     We grab the top exercise's image at index 0 of its page, and the bottom at index 3.
     """
-    listing = run_cmd(["pdfimages", "-list", PDF_PATH])
+    listing = run_cmd(["pdfimages", "-list", pdf_path])
     rows = [r for r in listing.splitlines() if re.match(r"^\s*\d+", r)]
     # Map page → list of absolute image indexes (in PDF stream order).
     page_to_imgs: dict[int, list[int]] = {}
@@ -324,7 +337,7 @@ def extract_main_images(exercises: list[TeExercise]) -> None:
     os.makedirs(OUT_IMG, exist_ok=True)
     with tempfile.TemporaryDirectory() as tmp:
         prefix = os.path.join(tmp, "img")
-        run_cmd(["pdfimages", "-png", PDF_PATH, prefix])
+        run_cmd(["pdfimages", "-png", pdf_path, prefix])
         for ex in exercises:
             page_imgs = page_to_imgs.get(ex.pdf_page, [])
             offset = ex.page_pos * 3  # 0 for top, 3 for bottom
@@ -365,10 +378,10 @@ def sql_int(n: int | None) -> str:
     return "null" if n is None else str(n)
 
 
-def render_seed(exercises: list[TeExercise]) -> str:
-    header = """-- Auto-generated by scripts/parse_te_library.py
--- Imports the ASF "Passe et prise de balle" Base TE library
--- (technical-gesture exercises) from TE-Prise_balle_passe.pdf.
+def render_seed(exercises: list[TeExercise], theme: str, pdf_name: str) -> str:
+    header = f"""-- Auto-generated by scripts/parse_te_library.py
+-- Imports the ASF "{theme}" Base TE library
+-- (technical-gesture exercises) from {pdf_name}.
 -- Run order: depends on 0003_exercise_library.sql.
 -- Idempotent: ON CONFLICT (code) does an upsert.
 
@@ -394,7 +407,7 @@ insert into exercises (
             "  (\n"
             f"    null, '{SOURCE}', '{ex.code}', {sql_text(ex.titre)}, null,\n"
             f"    {sql_text(ex.titre)},\n"
-            f"    {sql_text(THEME)}, {sql_text(TRACK)}, {ex.level}, {sql_text(ex.niveau)},\n"
+            f"    {sql_text(theme)}, {sql_text(TRACK)}, {ex.level}, {sql_text(ex.niveau)},\n"
             f"    {sql_text(ex.description)},\n"
             f"    {sql_text(ex.duree)},\n"
             f"    {sql_text(ex.organisation)},\n"
@@ -436,15 +449,28 @@ on conflict (code) where code is not null do update set
 
 
 def main() -> None:
-    if not os.path.exists(PDF_PATH):
-        print(f"missing PDF at {PDF_PATH}", file=sys.stderr)
+    chapter_key = sys.argv[1] if len(sys.argv) > 1 else "passe"
+    if chapter_key not in CHAPTERS:
+        print(
+            f"unknown chapter '{chapter_key}'. choices: {', '.join(CHAPTERS)}",
+            file=sys.stderr,
+        )
+        sys.exit(2)
+    cfg = CHAPTERS[chapter_key]
+    pdf_path = os.path.join(REPO, cfg["pdf"])
+    out_sql = os.path.join(REPO, cfg["sql"])
+    theme = cfg["theme"]
+    code_prefix = cfg["code_prefix"]
+    chapter_re = re.compile(cfg["chapter_re"], re.IGNORECASE)
+
+    if not os.path.exists(pdf_path):
+        print(f"missing PDF at {pdf_path}", file=sys.stderr)
         sys.exit(1)
 
-    exercises = parse_all()
-    # Sort by level, then sub.
+    exercises = parse_all(pdf_path, chapter_re, code_prefix)
     exercises.sort(key=lambda e: (e.level, e.sub))
 
-    print(f"== parsed {len(exercises)} exercises")
+    print(f"== [{chapter_key}] parsed {len(exercises)} exercises")
     for ex in exercises:
         print(
             f"  {ex.code:12s}  L{ex.level}  sub={ex.sub}  page={ex.pdf_page}  "
@@ -452,12 +478,12 @@ def main() -> None:
             f"fm={len(ex.force_mentale)} cp={len(ex.condition_physique)}"
         )
 
-    extract_main_images(exercises)
+    extract_main_images(exercises, pdf_path)
 
-    sql = render_seed(exercises)
-    with open(OUT_SQL, "w") as f:
+    sql = render_seed(exercises, theme, os.path.basename(pdf_path))
+    with open(out_sql, "w") as f:
         f.write(sql)
-    print(f"== wrote {OUT_SQL}")
+    print(f"== wrote {out_sql}")
 
 
 if __name__ == "__main__":
