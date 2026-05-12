@@ -2343,7 +2343,7 @@ export function PreparationSheet({
             </button>
             <span className="mx-3 h-[18px] w-px bg-zinc-200" />
             <Image
-              src="/icon-grinta.svg"
+              src="/grinta-icon.svg"
               alt=""
               width={28}
               height={28}
@@ -2418,14 +2418,14 @@ export function PreparationSheet({
           <aside className="hidden w-[232px] shrink-0 flex-col overflow-hidden border-r border-zinc-200 bg-white md:flex">
             <div className="flex items-center gap-2 px-4 pb-3 pt-4">
               <Image
-                src="/icon-grinta.svg"
+                src="/grinta-icon.svg"
                 alt=""
                 width={20}
                 height={20}
                 className="h-5 w-5"
               />
               <Image
-                src="/text-grinta.svg"
+                src="/grinta-wordmark.svg"
                 alt="Grinta"
                 width={72}
                 height={20}

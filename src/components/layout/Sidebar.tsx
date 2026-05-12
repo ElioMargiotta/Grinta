@@ -21,7 +21,7 @@ export function Sidebar() {
       <div className="px-5 py-6">
         <Link href="/dashboard" className="flex items-center gap-2">
           <Image
-            src="/Icon-grinta.svg"
+            src="/grinta-icon.svg"
             alt="Grinta"
             width={48}
             height={48}
@@ -29,7 +29,7 @@ export function Sidebar() {
             className="h-12 w-12 shrink-0"
           />
           <Image
-            src="/text-grinta.svg"
+            src="/grinta-wordmark.svg"
             alt="Grinta"
             width={128}
             height={128}
