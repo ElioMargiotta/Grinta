@@ -165,6 +165,7 @@
     "teams": "'Equipes",
     "exercises": "Exercices",
     "planner": "Planning",
+    "settings": "Paramètres",
     "logout": "Quitter"
   },
   "auth": {

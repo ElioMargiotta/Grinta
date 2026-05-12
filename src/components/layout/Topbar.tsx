@@ -5,6 +5,8 @@ import { useTranslations } from "next-intl";
 import { useTransition } from "react";
 import { Button } from "@/components/ui/Button";
 import { logoutAction } from "@/app/[locale]/(app)/actions";
+import { ClubSwitcher } from "./ClubSwitcher";
+import type { ClubMembership } from "@/lib/club/types";
 
 function initials(name: string) {
   const trimmed = name.trim();
@@ -14,7 +16,15 @@ function initials(name: string) {
   return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
 }
 
-export function Topbar({ userName }: { userName: string }) {
+export function Topbar({
+  userName,
+  currentMembership,
+  memberships,
+}: {
+  userName: string;
+  currentMembership: ClubMembership;
+  memberships: ClubMembership[];
+}) {
   const t = useTranslations("nav");
   const [isPending, startTransition] = useTransition();
 
@@ -31,6 +41,9 @@ export function Topbar({ userName }: { userName: string }) {
           <div className="text-[11px] text-zinc-500 dark:text-zinc-400">
             Signed in
           </div>
+        </div>
+        <div className="ml-2">
+          <ClubSwitcher current={currentMembership} memberships={memberships} />
         </div>
       </div>
       <Button

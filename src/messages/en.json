@@ -165,6 +165,7 @@
     "teams": "Teams",
     "exercises": "Exercises",
     "planner": "Planner",
+    "settings": "Settings",
     "logout": "Log out"
   },
   "auth": {

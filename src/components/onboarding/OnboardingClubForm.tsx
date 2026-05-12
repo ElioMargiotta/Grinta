@@ -1,0 +1,56 @@
+"use client";
+
+import { useState, useTransition } from "react";
+import { useLocale } from "next-intl";
+import { Button } from "@/components/ui/Button";
+import { AuthField } from "@/components/auth/AuthField";
+import { createClubAction } from "@/app/[locale]/(auth)/onboarding/club/actions";
+
+const inputClass =
+  "h-10 w-full rounded-md border border-zinc-300 bg-white px-3 text-sm text-zinc-900 placeholder:text-zinc-400 focus:border-zinc-900 focus:outline-none focus:ring-2 focus:ring-zinc-900/10";
+
+export function OnboardingClubForm() {
+  const locale = useLocale();
+  const [error, setError] = useState<string | null>(null);
+  const [isPending, startTransition] = useTransition();
+
+  return (
+    <form
+      className="flex flex-col gap-5"
+      action={(formData) => {
+        setError(null);
+        formData.set("locale", locale);
+        startTransition(async () => {
+          const result = await createClubAction(formData);
+          if (result?.error) setError(result.error);
+        });
+      }}
+    >
+      <AuthField
+        label="Nom du club"
+        htmlFor="name"
+        help="Ex. FC Lausanne, ASF Centre formation, etc."
+        required
+      >
+        <input
+          id="name"
+          name="name"
+          required
+          maxLength={80}
+          placeholder="Mon club"
+          className={inputClass}
+        />
+      </AuthField>
+
+      {error && (
+        <div className="rounded-md border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700">
+          {error}
+        </div>
+      )}
+
+      <Button type="submit" disabled={isPending} className="w-full">
+        {isPending ? "Création…" : "Créer mon club"}
+      </Button>
+    </form>
+  );
+}

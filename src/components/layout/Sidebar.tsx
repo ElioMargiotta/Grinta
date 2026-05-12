@@ -1,6 +1,6 @@
 "use client";
 
-import { CalendarDays, Dumbbell, LayoutDashboard, Users } from "lucide-react";
+import { CalendarDays, Dumbbell, LayoutDashboard, Settings, Users } from "lucide-react";
 import { useTranslations } from "next-intl";
 import Image from "next/image";
 import { Link, usePathname } from "@/i18n/navigation";
@@ -10,6 +10,7 @@ const items = [
   { href: "/teams", key: "teams", icon: Users },
   { href: "/exercises", key: "exercises", icon: Dumbbell },
   { href: "/planner", key: "planner", icon: CalendarDays },
+  { href: "/settings/club", key: "settings", icon: Settings },
 ] as const;
 
 export function Sidebar() {

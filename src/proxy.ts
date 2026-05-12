@@ -5,7 +5,7 @@ import { updateSession } from "@/lib/supabase/middleware";
 
 const intlMiddleware = createIntlMiddleware(routing);
 
-const PUBLIC_PATHS = new Set(["", "login", "signup"]);
+const PUBLIC_PATHS = new Set(["", "login", "signup", "invite"]);
 
 export async function proxy(request: NextRequest) {
   const { response: supabaseResponse, user } = await updateSession(request);
@@ -32,9 +32,16 @@ export async function proxy(request: NextRequest) {
     return NextResponse.redirect(url);
   }
 
-  if (user && (firstAfterLocale === "login" || firstAfterLocale === "signup")) {
+  // Don't bounce logged-in users away from /invite/[token] — they may be
+  // accepting an invite to a different club from the one they're already in.
+  if (
+    user &&
+    (firstAfterLocale === "login" || firstAfterLocale === "signup")
+  ) {
+    const next = request.nextUrl.searchParams.get("next");
     const url = request.nextUrl.clone();
-    url.pathname = `/${locale}/dashboard`;
+    url.search = "";
+    url.pathname = next && next.startsWith("/") ? `/${locale}${next}` : `/${locale}/dashboard`;
     return NextResponse.redirect(url);
   }
 

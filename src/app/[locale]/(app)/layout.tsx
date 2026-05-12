@@ -1,7 +1,8 @@
 import { setRequestLocale } from "next-intl/server";
 import { Sidebar } from "@/components/layout/Sidebar";
 import { Topbar } from "@/components/layout/Topbar";
-import { requireUser } from "@/lib/auth/getUser";
+import { requireMembership } from "@/lib/auth/getUser";
+import { getMyMemberships } from "@/lib/club/queries";
 
 export default async function AppLayout({
   children,
@@ -12,13 +13,12 @@ export default async function AppLayout({
 }) {
   const { locale } = await params;
   setRequestLocale(locale);
-  const { supabase, user } = await requireUser(locale);
+  const { supabase, user, membership } = await requireMembership(locale);
 
-  const { data: profile } = await supabase
-    .from("profiles")
-    .select("full_name")
-    .eq("id", user.id)
-    .single();
+  const [{ data: profile }, memberships] = await Promise.all([
+    supabase.from("profiles").select("full_name").eq("id", user.id).single(),
+    getMyMemberships(),
+  ]);
 
   const displayName = profile?.full_name?.trim() || user.email || "";
 
@@ -29,7 +29,11 @@ export default async function AppLayout({
       </div>
       <div className="flex flex-1 flex-col">
         <div className="print:hidden">
-          <Topbar userName={displayName} />
+          <Topbar
+            userName={displayName}
+            currentMembership={membership}
+            memberships={memberships}
+          />
         </div>
         <main className="flex-1 p-4 md:p-6 print:p-0">{children}</main>
       </div>
