@@ -90,6 +90,48 @@ export async function archiveTeamAction(formData: FormData): Promise<void> {
   redirect(`/${locale}/teams`);
 }
 
+export async function restoreTeamAction(formData: FormData): Promise<void> {
+  const teamId = String(formData.get("teamId") ?? "");
+  const locale = String(formData.get("locale") ?? "en");
+  if (!teamId) throw new Error("Missing team id");
+
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) redirect(`/${locale}/login`);
+
+  const { error } = await supabase.rpc("restore_team", { p_team_id: teamId });
+  if (error) throw new Error(error.message);
+
+  revalidatePath(`/${locale}/teams`);
+  revalidatePath(`/${locale}/teams/archived`);
+  redirect(`/${locale}/teams/${teamId}`);
+}
+
+export async function permanentlyDeleteTeamAction(
+  formData: FormData,
+): Promise<void> {
+  const teamId = String(formData.get("teamId") ?? "");
+  const locale = String(formData.get("locale") ?? "en");
+  if (!teamId) throw new Error("Missing team id");
+
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) redirect(`/${locale}/login`);
+
+  const { error } = await supabase.rpc("delete_team_permanently", {
+    p_team_id: teamId,
+  });
+  if (error) throw new Error(error.message);
+
+  revalidatePath(`/${locale}/teams`);
+  revalidatePath(`/${locale}/teams/archived`);
+  redirect(`/${locale}/teams/archived`);
+}
+
 export async function createPlayerAction(formData: FormData) {
   const teamId = String(formData.get("teamId") ?? "");
   const firstName = String(formData.get("firstName") ?? "").trim();

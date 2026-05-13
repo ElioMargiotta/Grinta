@@ -1,6 +1,6 @@
 import { redirect } from "next/navigation";
 import { getTranslations, setRequestLocale } from "next-intl/server";
-import { Plus } from "lucide-react";
+import { Archive, Plus } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
 import { Link } from "@/i18n/navigation";
@@ -27,12 +27,19 @@ export default async function TeamsPage({
   const membership = await resolveCurrentMembership();
   if (!membership) redirect(`/${locale}/onboarding/club`);
 
-  const { data: teams } = await supabase
-    .from("teams")
-    .select("id, name, season, age_group")
-    .eq("club_id", membership.club_id)
-    .is("archived_at", null)
-    .order("created_at", { ascending: false });
+  const [{ data: teams }, { count: archivedCount }] = await Promise.all([
+    supabase
+      .from("teams")
+      .select("id, name, season, age_group")
+      .eq("club_id", membership.club_id)
+      .is("archived_at", null)
+      .order("created_at", { ascending: false }),
+    supabase
+      .from("teams")
+      .select("id", { head: true, count: "exact" })
+      .eq("club_id", membership.club_id)
+      .not("archived_at", "is", null),
+  ]);
 
   return (
     <div className="flex flex-col gap-6">
@@ -49,12 +56,22 @@ export default async function TeamsPage({
         <h1 className="text-2xl font-semibold text-zinc-900 dark:text-zinc-100">
           {t("title")}
         </h1>
-        <Link href="/teams/new">
-          <Button>
-            <Plus className="h-4 w-4" />
-            {t("new")}
-          </Button>
-        </Link>
+        <div className="flex items-center gap-2">
+          {(archivedCount ?? 0) > 0 && (
+            <Link href="/teams/archived">
+              <Button variant="ghost" size="sm">
+                <Archive className="h-4 w-4" />
+                Archivées ({archivedCount})
+              </Button>
+            </Link>
+          )}
+          <Link href="/teams/new">
+            <Button>
+              <Plus className="h-4 w-4" />
+              {t("new")}
+            </Button>
+          </Link>
+        </div>
       </div>
 
       {!teams || teams.length === 0 ? (
