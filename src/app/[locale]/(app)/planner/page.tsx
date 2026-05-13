@@ -1,7 +1,9 @@
+import { redirect } from "next/navigation";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { Card } from "@/components/ui/Card";
 import { Link } from "@/i18n/navigation";
 import { requireUser } from "@/lib/auth/getUser";
+import { resolveCurrentMembership } from "@/lib/club/context";
 
 export default async function PlannerIndexPage({
   params,
@@ -13,9 +15,15 @@ export default async function PlannerIndexPage({
   const { supabase } = await requireUser(locale);
   const t = await getTranslations("planner");
 
+  // Scope to the currently selected club (see TeamsPage for rationale).
+  const membership = await resolveCurrentMembership();
+  if (!membership) redirect(`/${locale}/onboarding/club`);
+
   const { data: teams } = await supabase
     .from("teams")
     .select("id, name, season, age_group")
+    .eq("club_id", membership.club_id)
+    .is("archived_at", null)
     .order("created_at", { ascending: false });
 
   return (

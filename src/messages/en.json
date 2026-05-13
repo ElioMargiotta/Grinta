@@ -162,6 +162,7 @@
   },
   "nav": {
     "dashboard": "Dashboard",
+    "session": "My session",
     "teams": "Teams",
     "exercises": "Exercises",
     "planner": "Planner",
@@ -203,7 +204,15 @@
     "teamsCard": "Teams",
     "exercisesCard": "Exercises",
     "nextSession": "Next session",
-    "noNextSession": "No upcoming session."
+    "noNextSession": "No upcoming session.",
+    "ctaJoinClubTitle": "Join a club",
+    "ctaJoinClubDesc": "Paste an invitation link to join an existing club.",
+    "ctaCreateClubTitle": "Create a club",
+    "ctaCreateClubDesc": "Plan seasons, manage teams, invite staff. Paid plan.",
+    "ctaCreateSessionTitle": "Create my session",
+    "ctaCreateSessionDesc": "One training sheet, ready in two minutes.",
+    "ctaLibraryTitle": "Exercise library",
+    "ctaLibraryDesc": "Browse 170+ proven drills."
   },
   "teams": {
     "title": "Teams",

@@ -3,6 +3,7 @@
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
+import { resolveCurrentMembership } from "@/lib/club/context";
 
 function parseEquipment(raw: string): string[] | null {
   const trimmed = raw.trim();
@@ -31,7 +32,12 @@ export async function createExerciseAction(formData: FormData) {
   } = await supabase.auth.getUser();
   if (!user) redirect(`/${locale}/login`);
 
+  // Premium users write under their current club; free-solo users write with
+  // club_id null (RLS path: club_id IS NULL AND trainer_id = auth.uid()).
+  const membership = await resolveCurrentMembership();
+
   const { error } = await supabase.from("exercises").insert({
+    club_id: membership?.club_id ?? null,
     trainer_id: user.id,
     name,
     description,

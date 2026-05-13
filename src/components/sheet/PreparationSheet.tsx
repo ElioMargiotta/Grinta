@@ -2154,7 +2154,7 @@ export function PreparationSheet({
   sessionMeta,
   weekTheme,
 }: {
-  teamId: string;
+  teamId: string | null;
   sessionId: string;
   initial: PreparationData;
   libraryExercises: LibraryExercise[];

@@ -3,7 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 import { resolveCurrentMembership } from "@/lib/club/context";
-import { canManageClub, isTeamScopedLevel } from "@/lib/club/types";
+import { canManageClub } from "@/lib/club/types";
 import type { AccessLevel } from "@/lib/club/types";
 
 type InviteResult =
@@ -249,6 +249,5 @@ export async function loadClubSettingsData() {
     }[],
     members,
     invitations,
-    teamScopedRequired: (lvl: AccessLevel) => isTeamScopedLevel(lvl),
   };
 }

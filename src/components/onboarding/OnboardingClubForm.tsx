@@ -4,7 +4,7 @@ import { useState, useTransition } from "react";
 import { useLocale } from "next-intl";
 import { Button } from "@/components/ui/Button";
 import { AuthField } from "@/components/auth/AuthField";
-import { createClubAction } from "@/app/[locale]/(auth)/onboarding/club/actions";
+import { createClubAction } from "@/app/[locale]/(app)/onboarding/club/actions";
 
 const inputClass =
   "h-10 w-full rounded-md border border-zinc-300 bg-white px-3 text-sm text-zinc-900 placeholder:text-zinc-400 focus:border-zinc-900 focus:outline-none focus:ring-2 focus:ring-zinc-900/10";

@@ -1,27 +1,50 @@
+import { redirect } from "next/navigation";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { Plus } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
 import { Link } from "@/i18n/navigation";
 import { requireUser } from "@/lib/auth/getUser";
+import { resolveCurrentMembership } from "@/lib/club/context";
 
 export default async function TeamsPage({
   params,
+  searchParams,
 }: {
   params: Promise<{ locale: string }>;
+  searchParams: Promise<{ onboarding?: string }>;
 }) {
   const { locale } = await params;
+  const { onboarding } = await searchParams;
   setRequestLocale(locale);
   const { supabase } = await requireUser(locale);
   const t = await getTranslations("teams");
+  const isOnboarding = onboarding === "1";
+
+  // Scope to the currently selected club. Without this filter the RLS-only
+  // query would return teams across every club the user belongs to, which
+  // makes the ClubSwitcher useless.
+  const membership = await resolveCurrentMembership();
+  if (!membership) redirect(`/${locale}/onboarding/club`);
 
   const { data: teams } = await supabase
     .from("teams")
     .select("id, name, season, age_group")
+    .eq("club_id", membership.club_id)
+    .is("archived_at", null)
     .order("created_at", { ascending: false });
 
   return (
     <div className="flex flex-col gap-6">
+      {isOnboarding && (
+        <div className="rounded-2xl border border-emerald-200 bg-emerald-50 p-4 text-sm text-emerald-900 dark:border-emerald-500/30 dark:bg-emerald-950/30 dark:text-emerald-100">
+          <div className="font-medium">Club créé · {membership.club_name}</div>
+          <p className="mt-1 text-emerald-800 dark:text-emerald-200">
+            Une équipe par défaut <strong>Actif</strong> a été créée. Clique
+            dessus pour la renommer ou ajouter d&apos;autres équipes.
+          </p>
+        </div>
+      )}
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-semibold text-zinc-900 dark:text-zinc-100">
           {t("title")}

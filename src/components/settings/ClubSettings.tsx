@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useTransition } from "react";
-import { Copy, Trash2, UserMinus } from "lucide-react";
+import { Trash2, UserMinus } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import type { AccessLevel } from "@/lib/club/types";
 import {
@@ -64,7 +64,7 @@ const inputClass =
   "h-10 w-full rounded-md border border-zinc-300 bg-white px-3 text-sm text-zinc-900 placeholder:text-zinc-400 focus:border-zinc-900 focus:outline-none focus:ring-2 focus:ring-zinc-900/10";
 
 export function ClubSettings({ data }: { data: Data }) {
-  const [inviteUrl, setInviteUrl] = useState<string | null>(null);
+  const [invitedEmail, setInvitedEmail] = useState<string | null>(null);
   const [inviteError, setInviteError] = useState<string | null>(null);
   const [selectedRoleId, setSelectedRoleId] = useState<string>(
     data.roles[0]?.id ?? "",
@@ -85,18 +85,20 @@ export function ClubSettings({ data }: { data: Data }) {
           Inviter un membre
         </h2>
         <p className="mt-1 text-sm text-zinc-600">
-          Sélectionne un rôle et envoie le lien généré.
+          L&apos;invité verra l&apos;invitation sur son dashboard à sa prochaine
+          connexion avec cette adresse email.
         </p>
 
         <form
           className="mt-4 flex flex-col gap-4"
           action={(formData) => {
             setInviteError(null);
-            setInviteUrl(null);
+            setInvitedEmail(null);
+            const email = String(formData.get("email") ?? "");
             startTransition(async () => {
               const result = await inviteMemberAction(formData);
               if ("error" in result) setInviteError(result.error);
-              else setInviteUrl(result.url);
+              else setInvitedEmail(email);
             });
           }}
         >
@@ -159,22 +161,15 @@ export function ClubSettings({ data }: { data: Data }) {
             </div>
           )}
 
-          {inviteUrl && (
-            <div className="flex items-center justify-between gap-3 rounded-md border border-emerald-200 bg-emerald-50 px-3 py-2 text-sm text-emerald-800">
-              <span className="truncate font-mono text-xs">{inviteUrl}</span>
-              <button
-                type="button"
-                onClick={() => navigator.clipboard.writeText(inviteUrl)}
-                className="inline-flex items-center gap-1 rounded-md bg-emerald-900 px-2 py-1 text-xs font-medium text-white hover:bg-emerald-800"
-              >
-                <Copy className="h-3 w-3" />
-                Copier
-              </button>
+          {invitedEmail && (
+            <div className="rounded-md border border-emerald-200 bg-emerald-50 px-3 py-2 text-sm text-emerald-800">
+              Invitation enregistrée pour <strong>{invitedEmail}</strong>.
+              Elle sera visible sur son dashboard à sa prochaine connexion.
             </div>
           )}
 
           <Button type="submit" disabled={isPending} className="self-start">
-            {isPending ? "Création…" : "Générer le lien d'invitation"}
+            {isPending ? "Création…" : "Envoyer l'invitation"}
           </Button>
         </form>
       </section>

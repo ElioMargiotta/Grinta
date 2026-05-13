@@ -142,11 +142,11 @@ export async function cancelSessionAction({
   sessionId,
   locale,
 }: {
-  teamId: string;
+  teamId: string | null;
   sessionId: string;
   locale: string;
 }) {
-  if (!teamId || !sessionId) return { error: "Missing fields" };
+  if (!sessionId) return { error: "Missing fields" };
 
   const supabase = await createClient();
   const {
@@ -157,8 +157,13 @@ export async function cancelSessionAction({
   const { error } = await supabase.from("sessions").delete().eq("id", sessionId);
   if (error) return { error: error.message };
 
-  revalidatePath(`/${locale}/planner/${teamId}`);
-  redirect(`/${locale}/planner/${teamId}`);
+  if (teamId) {
+    revalidatePath(`/${locale}/planner/${teamId}`);
+    redirect(`/${locale}/planner/${teamId}`);
+  } else {
+    revalidatePath(`/${locale}/sessions`);
+    redirect(`/${locale}/sessions`);
+  }
 }
 
 export async function movePlannerSessionAction({

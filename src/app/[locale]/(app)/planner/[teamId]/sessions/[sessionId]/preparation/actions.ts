@@ -13,7 +13,7 @@ export async function savePreparationAction({
   data,
   sessionMeta,
 }: {
-  teamId: string;
+  teamId: string | null;
   sessionId: string;
   locale: string;
   data: PreparationData;
@@ -23,7 +23,7 @@ export async function savePreparationAction({
     durationMinutes: number;
   };
 }) {
-  if (!teamId || !sessionId) return { error: "Missing fields" };
+  if (!sessionId) return { error: "Missing fields" };
 
   const supabase = await createClient();
   const {
@@ -41,6 +41,7 @@ export async function savePreparationAction({
   }
 
   // Backfill microcycle_id for sessions created before the link was wired in.
+  // Solo sessions (team_id NULL) have no microcycle by design.
   let microcycleId = session.microcycle_id as string | null;
   if (!microcycleId && session.team_id && session.date) {
     microcycleId = await resolveMicrocycleId(
@@ -81,9 +82,13 @@ export async function savePreparationAction({
 
   if (error) return { error: error.message };
 
-  revalidatePath(`/${locale}/planner/${teamId}`);
-  revalidatePath(`/${locale}/planner/${teamId}/sessions/${sessionId}`);
-  revalidatePath(
-    `/${locale}/planner/${teamId}/sessions/${sessionId}/preparation`,
-  );
+  if (teamId) {
+    revalidatePath(`/${locale}/planner/${teamId}`);
+    revalidatePath(`/${locale}/planner/${teamId}/sessions/${sessionId}`);
+    revalidatePath(
+      `/${locale}/planner/${teamId}/sessions/${sessionId}/preparation`,
+    );
+  } else {
+    revalidatePath(`/${locale}/sessions`);
+  }
 }

@@ -1,41 +1,54 @@
 "use client";
 
-import { CalendarDays, Dumbbell, LayoutDashboard, Settings, Users } from "lucide-react";
+import { CalendarDays, Dumbbell, LayoutDashboard, PenSquare, Settings, Users } from "lucide-react";
 import { useTranslations } from "next-intl";
 import Image from "next/image";
 import { Link, usePathname } from "@/i18n/navigation";
 
-const items = [
+// Free-tier (no club) sees only dashboard + their solo session + library.
+// Club-affiliated members also see teams, planner, and club settings.
+const FREE_ITEMS = [
   { href: "/dashboard", key: "dashboard", icon: LayoutDashboard },
+  { href: "/sessions", key: "session", icon: PenSquare },
+  { href: "/exercises", key: "exercises", icon: Dumbbell },
+] as const;
+
+const CLUB_ITEMS = [
+  { href: "/dashboard", key: "dashboard", icon: LayoutDashboard },
+  { href: "/sessions", key: "session", icon: PenSquare },
   { href: "/teams", key: "teams", icon: Users },
   { href: "/exercises", key: "exercises", icon: Dumbbell },
   { href: "/planner", key: "planner", icon: CalendarDays },
   { href: "/settings/club", key: "settings", icon: Settings },
 ] as const;
 
-export function Sidebar() {
+export function Sidebar({ hasMembership }: { hasMembership: boolean }) {
   const t = useTranslations("nav");
   const pathname = usePathname();
+  const items = hasMembership ? CLUB_ITEMS : FREE_ITEMS;
 
   return (
     <aside className="hidden w-60 shrink-0 border-r border-zinc-200 bg-white md:flex md:flex-col dark:border-zinc-800 dark:bg-zinc-950">
-      <div className="px-5 py-6">
-        <Link href="/dashboard" className="flex items-center gap-2">
+      <div className="px-4 py-5">
+        <Link
+          href="/dashboard"
+          className="flex min-w-0 items-center gap-2 overflow-hidden"
+        >
           <Image
             src="/grinta-icon.svg"
             alt="Grinta"
-            width={48}
-            height={48}
+            width={36}
+            height={36}
             priority
-            className="h-12 w-12 shrink-0"
+            className="h-9 w-9 shrink-0"
           />
           <Image
             src="/grinta-wordmark.svg"
             alt="Grinta"
-            width={128}
-            height={128}
+            width={120}
+            height={28}
             priority
-            className="h-8 w-auto"
+            className="h-6 w-auto max-w-[140px] object-contain"
           />
         </Link>
       </div>

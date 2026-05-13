@@ -162,6 +162,7 @@
   },
   "nav": {
     "dashboard": "Tableau de bord",
+    "session": "Mon entraînement",
     "teams": "'Equipes",
     "exercises": "Exercices",
     "planner": "Planning",
@@ -202,8 +203,16 @@
     "welcome": "Bienvenue, {name}.",
     "teamsCard": "Équipes",
     "exercisesCard": "Exercices",
-    "nextSession": "",
-    "noNextSession": ""
+    "nextSession": "Prochaine séance",
+    "noNextSession": "Aucune séance à venir.",
+    "ctaJoinClubTitle": "Rejoindre un club",
+    "ctaJoinClubDesc": "Collez un lien d'invitation pour rejoindre un club existant.",
+    "ctaCreateClubTitle": "Créer un club",
+    "ctaCreateClubDesc": "Planifiez vos saisons, gérez vos équipes, invitez le staff. Offre payante.",
+    "ctaCreateSessionTitle": "Créer mon entraînement",
+    "ctaCreateSessionDesc": "Une fiche d'entraînement prête en deux minutes.",
+    "ctaLibraryTitle": "Bibliothèque d'exercices",
+    "ctaLibraryDesc": "Parcourez 170+ exercices éprouvés."
   },
   "teams": {
     "title": "Équipes",

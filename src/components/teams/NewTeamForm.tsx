@@ -19,8 +19,14 @@ export function NewTeamForm() {
         setError(null);
         formData.set("locale", locale);
         startTransition(async () => {
-          const result = await createTeamAction(formData);
-          if (result?.error) setError(result.error);
+          try {
+            const result = await createTeamAction(formData);
+            if (result?.error) setError(result.error);
+          } catch (e) {
+            // Surface anything that isn't a Next redirect (which is throw-based)
+            const msg = e instanceof Error ? e.message : "Unknown error";
+            if (!msg.includes("NEXT_REDIRECT")) setError(msg);
+          }
         });
       }}
     >

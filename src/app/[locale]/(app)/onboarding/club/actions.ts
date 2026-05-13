@@ -32,5 +32,8 @@ export async function createClubAction(formData: FormData) {
   }
 
   await setCurrentClubId(clubId as string);
-  redirect(`/${locale}/dashboard`);
+  // create_club RPC auto-seeds a default "Actif" team so the club is
+  // immediately usable even if the user drops off here. Land them on /teams
+  // where they can rename / add more.
+  redirect(`/${locale}/teams?onboarding=1`);
 }
