@@ -47,9 +47,20 @@ export async function updateTeamAction(formData: FormData): Promise<{ error?: st
   const season = String(formData.get("season") ?? "").trim();
   const ageGroup = String(formData.get("ageGroup") ?? "").trim();
   const description = String(formData.get("description") ?? "").trim();
+  const photoUrl = String(formData.get("photoUrl") ?? "").trim();
   const locale = String(formData.get("locale") ?? "en");
 
   if (!teamId || !name) return { error: "Missing fields" };
+  if (photoUrl) {
+    try {
+      const url = new URL(photoUrl);
+      if (url.protocol !== "https:") {
+        return { error: "La photo doit être une URL https." };
+      }
+    } catch {
+      return { error: "URL de photo invalide." };
+    }
+  }
 
   const supabase = await createClient();
   const {
@@ -63,6 +74,7 @@ export async function updateTeamAction(formData: FormData): Promise<{ error?: st
     p_season: season || null,
     p_age_group: ageGroup || null,
     p_description: description || null,
+    p_photo_url: photoUrl || null,
   });
 
   if (error) return { error: error.message };

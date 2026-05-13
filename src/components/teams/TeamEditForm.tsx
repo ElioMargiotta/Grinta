@@ -13,6 +13,7 @@ type Team = {
   season: string | null;
   age_group: string | null;
   description: string | null;
+  photo_url: string | null;
 };
 
 export function TeamEditForm({ team }: { team: Team }) {
@@ -60,6 +61,17 @@ export function TeamEditForm({ team }: { team: Team }) {
           defaultValue={team.age_group ?? ""}
         />
       </div>
+
+      <Input
+        id="photoUrl"
+        name="photoUrl"
+        label="Photo d'équipe"
+        type="url"
+        inputMode="url"
+        placeholder="https://..."
+        defaultValue={team.photo_url ?? ""}
+        hint="URL https pour l'instant. L'upload direct peut venir ensuite."
+      />
 
       <Textarea
         id="description"

@@ -78,7 +78,7 @@ export default async function TeamsPage({
           <p className="text-sm text-zinc-600 dark:text-zinc-400">{t("empty")}</p>
         </div>
       ) : (
-        <div className="overflow-hidden border-y border-[var(--club-line)] bg-white/72">
+        <div className="overflow-hidden border-y border-[var(--club-line)] bg-white/[0.72]">
           {teams.map((team) => (
             <Link
               key={team.id}

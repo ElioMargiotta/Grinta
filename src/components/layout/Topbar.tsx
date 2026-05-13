@@ -63,7 +63,7 @@ export function Topbar({
   const subtitle = planSubtitle(currentMembership, teamCount);
 
   return (
-    <header className="sticky top-0 z-30 flex h-14 items-center justify-between border-b border-[var(--club-line)] bg-white/82 px-4 backdrop-blur md:px-6 dark:border-zinc-800 dark:bg-zinc-950/80">
+    <header className="sticky top-0 z-30 flex h-14 items-center justify-between border-b border-[var(--club-line)] bg-white/[0.82] px-4 backdrop-blur md:px-6 dark:border-zinc-800 dark:bg-zinc-950/80">
       <div className="flex items-center gap-3">
         <span className="flex h-8 w-8 items-center justify-center rounded-full bg-[var(--club-primary)] text-xs font-semibold text-[var(--club-primary-foreground)]">
           {initials(userName)}

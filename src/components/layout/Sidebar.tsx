@@ -36,7 +36,7 @@ export function Sidebar({
   const logoUrl = currentMembership?.logo_url;
 
   return (
-    <aside className="hidden w-60 shrink-0 border-r border-[var(--club-line)] bg-white/92 md:flex md:flex-col dark:border-zinc-800 dark:bg-zinc-950">
+    <aside className="hidden w-60 shrink-0 border-r border-[var(--club-line)] bg-white/[0.92] md:flex md:flex-col dark:border-zinc-800 dark:bg-zinc-950">
       <div className="px-4 py-5">
         <Link
           href="/dashboard"
