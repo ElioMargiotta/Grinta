@@ -4,11 +4,87 @@ import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 import { resolveCurrentMembership } from "@/lib/club/context";
 import { canManageClub } from "@/lib/club/types";
-import type { AccessLevel } from "@/lib/club/types";
+import type { AccessLevel, ClubThemeMode } from "@/lib/club/types";
 
 type InviteResult =
   | { ok: true; token: string; url: string }
   | { error: string };
+
+const HEX_COLOR_RE = /^#[0-9a-fA-F]{6}$/;
+
+function cleanColor(value: FormDataEntryValue | null, fallback: string): string {
+  const color = String(value ?? "").trim();
+  return HEX_COLOR_RE.test(color) ? color : fallback;
+}
+
+function cleanUrl(value: FormDataEntryValue | null): string | null {
+  const raw = String(value ?? "").trim();
+  if (!raw) return null;
+  try {
+    const url = new URL(raw);
+    if (url.protocol !== "https:") return null;
+    return url.toString();
+  } catch {
+    return null;
+  }
+}
+
+export async function updateClubIdentityAction(formData: FormData) {
+  const name = String(formData.get("clubName") ?? "").trim();
+  if (name.length < 2) {
+    return { error: "Le nom du club doit contenir au moins 2 caractères." };
+  }
+  if (name.length > 80) {
+    return { error: "Le nom du club est trop long." };
+  }
+
+  const themeMode = String(formData.get("themeMode") ?? "day") as ClubThemeMode;
+  if (themeMode !== "day" && themeMode !== "night") {
+    return { error: "Mode invalide." };
+  }
+
+  const logoRaw = String(formData.get("logoUrl") ?? "").trim();
+  const logoUrl = cleanUrl(formData.get("logoUrl"));
+  if (logoRaw && !logoUrl) {
+    return { error: "Le logo doit être une URL https valide." };
+  }
+
+  const membership = await resolveCurrentMembership();
+  if (!membership || !canManageClub(membership.access_level)) {
+    return { error: "Action interdite." };
+  }
+
+  const supabase = await createClient();
+  const { error } = await supabase
+    .from("clubs")
+    .update({
+      name,
+      logo_url: logoUrl,
+      theme_mode: themeMode,
+      theme_primary_color: cleanColor(
+        formData.get("primaryColor"),
+        membership.theme_primary_color,
+      ),
+      theme_secondary_color: cleanColor(
+        formData.get("secondaryColor"),
+        membership.theme_secondary_color,
+      ),
+      theme_night_primary_color: cleanColor(
+        formData.get("nightPrimaryColor"),
+        membership.theme_night_primary_color,
+      ),
+      theme_night_secondary_color: cleanColor(
+        formData.get("nightSecondaryColor"),
+        membership.theme_night_secondary_color,
+      ),
+    })
+    .eq("id", membership.club_id);
+
+  if (error) return { error: error.message };
+  revalidatePath("/settings/club");
+  revalidatePath("/dashboard");
+  return { ok: true as const };
+}
 
 export async function inviteMemberAction(formData: FormData): Promise<InviteResult> {
   const email = String(formData.get("email") ?? "").trim().toLowerCase();
@@ -171,6 +247,16 @@ type RawInvitation = {
   club_roles: { name: string; access_level: AccessLevel }[] | { name: string; access_level: AccessLevel } | null;
 };
 
+type RawClub = {
+  name: string;
+  logo_url: string | null;
+  theme_mode: ClubThemeMode;
+  theme_primary_color: string;
+  theme_secondary_color: string;
+  theme_night_primary_color: string;
+  theme_night_secondary_color: string;
+};
+
 function unwrap<T>(value: T[] | T | null | undefined): T | null {
   if (!value) return null;
   if (Array.isArray(value)) return value[0] ?? null;
@@ -215,6 +301,14 @@ export async function loadClubSettingsData() {
       .order("created_at", { ascending: false }),
   ]);
 
+  const { data: club } = await supabase
+    .from("clubs")
+    .select(
+      "name, logo_url, theme_mode, theme_primary_color, theme_secondary_color, theme_night_primary_color, theme_night_secondary_color",
+    )
+    .eq("id", membership.club_id)
+    .single<RawClub>();
+
   const members = (membersRes.data as RawMember[] | null ?? []).map((m) => ({
     id: m.id,
     user_id: m.user_id,
@@ -236,6 +330,15 @@ export async function loadClubSettingsData() {
 
   return {
     membership,
+    clubIdentity: club ?? {
+      name: membership.club_name,
+      logo_url: membership.logo_url,
+      theme_mode: membership.theme_mode,
+      theme_primary_color: membership.theme_primary_color,
+      theme_secondary_color: membership.theme_secondary_color,
+      theme_night_primary_color: membership.theme_night_primary_color,
+      theme_night_secondary_color: membership.theme_night_secondary_color,
+    },
     roles: (rolesRes.data ?? []) as {
       id: string;
       name: string;

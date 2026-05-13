@@ -10,7 +10,9 @@ import {
   inviteMemberAction,
   removeMemberAction,
   revokeInvitationAction,
+  updateClubIdentityAction,
 } from "@/app/[locale]/(app)/settings/club/actions";
+import type { ClubIdentity } from "@/lib/club/types";
 
 type Role = {
   id: string;
@@ -40,6 +42,7 @@ type Invitation = {
 
 type Data = {
   membership: { access_level: AccessLevel; club_id: string };
+  clubIdentity: ClubIdentity & { name: string };
   roles: Role[];
   teams: Team[];
   members: Member[];
@@ -79,6 +82,133 @@ export function ClubSettings({ data }: { data: Data }) {
 
   return (
     <div className="flex flex-col gap-10">
+      {/* IDENTITY */}
+      <section className="border-y border-[var(--club-line)] bg-white/70 px-0 py-6">
+        <div className="flex flex-col gap-5 md:flex-row md:items-start md:justify-between">
+          <div className="max-w-xl">
+            <h2 className="text-lg font-semibold text-zinc-900">
+              Identité du club
+            </h2>
+            <p className="mt-1 text-sm text-zinc-600">
+              Ces couleurs pilotent le menu, les boutons, les états actifs et
+              les écrans club. Le mode nuit permet de tester une identité plus
+              sombre sans changer les couleurs jour.
+            </p>
+          </div>
+          <div className="flex items-center gap-3 rounded-lg border border-[var(--club-line)] bg-white px-3 py-2">
+            {data.clubIdentity.logo_url ? (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img
+                src={data.clubIdentity.logo_url}
+                alt={data.clubIdentity.name}
+                className="h-10 w-10 rounded-md object-contain"
+              />
+            ) : (
+              <div className="h-10 w-10 rounded-md bg-[var(--club-primary)]" />
+            )}
+            <div className="min-w-0">
+              <div className="truncate text-sm font-semibold text-zinc-900">
+                {data.clubIdentity.name}
+              </div>
+              <div className="text-xs text-zinc-500">
+                Aperçu workspace
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <form
+          className="mt-5 grid gap-4"
+          action={(formData) =>
+            startTransition(async () => {
+              await updateClubIdentityAction(formData);
+            })
+          }
+        >
+          <label className="flex flex-col gap-1 text-sm">
+            <span className="font-medium text-zinc-700">Nom du club</span>
+            <input
+              name="clubName"
+              required
+              minLength={2}
+              maxLength={80}
+              defaultValue={data.clubIdentity.name}
+              className={inputClass}
+            />
+          </label>
+
+          <label className="flex flex-col gap-1 text-sm">
+            <span className="font-medium text-zinc-700">Logo URL</span>
+            <input
+              name="logoUrl"
+              type="url"
+              inputMode="url"
+              placeholder="https://..."
+              defaultValue={data.clubIdentity.logo_url ?? ""}
+              className={inputClass}
+            />
+          </label>
+
+          <div className="grid gap-4 md:grid-cols-2">
+            <div className="rounded-lg border border-zinc-200 bg-white p-4">
+              <div className="text-sm font-semibold text-zinc-900">Jour</div>
+              <div className="mt-3 grid gap-3 sm:grid-cols-2">
+                <ColorField
+                  label="Principale"
+                  name="primaryColor"
+                  defaultValue={data.clubIdentity.theme_primary_color}
+                />
+                <ColorField
+                  label="Secondaire"
+                  name="secondaryColor"
+                  defaultValue={data.clubIdentity.theme_secondary_color}
+                />
+              </div>
+            </div>
+            <div className="rounded-lg border border-zinc-200 bg-zinc-950 p-4">
+              <div className="text-sm font-semibold text-white">Nuit</div>
+              <div className="mt-3 grid gap-3 sm:grid-cols-2">
+                <ColorField
+                  label="Principale"
+                  name="nightPrimaryColor"
+                  defaultValue={data.clubIdentity.theme_night_primary_color}
+                  inverse
+                />
+                <ColorField
+                  label="Secondaire"
+                  name="nightSecondaryColor"
+                  defaultValue={data.clubIdentity.theme_night_secondary_color}
+                  inverse
+                />
+              </div>
+            </div>
+          </div>
+
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <fieldset className="inline-flex rounded-lg border border-zinc-200 bg-white p-1">
+              {(["day", "night"] as const).map((mode) => (
+                <label
+                  key={mode}
+                  className="has-[:checked]:bg-[var(--club-primary)] has-[:checked]:text-[var(--club-primary-foreground)] rounded-md px-3 py-1.5 text-sm font-medium text-zinc-600"
+                >
+                  <input
+                    type="radio"
+                    name="themeMode"
+                    value={mode}
+                    defaultChecked={data.clubIdentity.theme_mode === mode}
+                    className="sr-only"
+                  />
+                  {mode === "day" ? "Jour" : "Nuit"}
+                </label>
+              ))}
+            </fieldset>
+            <Button type="submit" disabled={isPending}>
+              Enregistrer l&apos;identité
+            </Button>
+          </div>
+        </form>
+      </section>
+
       {/* INVITE */}
       <section className="rounded-lg border border-zinc-200 bg-white p-6">
         <h2 className="text-lg font-semibold text-zinc-900">
@@ -332,5 +462,36 @@ export function ClubSettings({ data }: { data: Data }) {
         </ul>
       </section>
     </div>
+  );
+}
+
+function ColorField({
+  label,
+  name,
+  defaultValue,
+  inverse = false,
+}: {
+  label: string;
+  name: string;
+  defaultValue: string;
+  inverse?: boolean;
+}) {
+  return (
+    <label className="flex flex-col gap-1 text-sm">
+      <span className={inverse ? "font-medium text-zinc-200" : "font-medium text-zinc-700"}>
+        {label}
+      </span>
+      <span className="flex h-10 overflow-hidden rounded-md border border-zinc-300 bg-white">
+        <input
+          type="color"
+          name={name}
+          defaultValue={defaultValue}
+          className="h-10 w-12 shrink-0 cursor-pointer border-0 bg-transparent p-1"
+        />
+        <span className="flex flex-1 items-center px-3 font-mono text-xs text-zinc-500">
+          {defaultValue}
+        </span>
+      </span>
+    </label>
   );
 }

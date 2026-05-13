@@ -10,6 +10,12 @@ type Row = {
     name: string;
     subscription_status: ClubMembership["subscription_status"];
     trial_ends_at: string | null;
+    logo_url: string | null;
+    theme_mode: ClubMembership["theme_mode"];
+    theme_primary_color: string;
+    theme_secondary_color: string;
+    theme_night_primary_color: string;
+    theme_night_secondary_color: string;
   } | null;
   club_roles: {
     name: string;
@@ -28,7 +34,7 @@ export const getMyMemberships = cache(async (): Promise<ClubMembership[]> => {
     .from("club_memberships")
     .select(
       `club_id, role_id,
-       clubs!inner(name, subscription_status, trial_ends_at),
+       clubs!inner(name, subscription_status, trial_ends_at, logo_url, theme_mode, theme_primary_color, theme_secondary_color, theme_night_primary_color, theme_night_secondary_color),
        club_roles!inner(name, access_level)`,
     )
     .eq("user_id", user.id)
@@ -46,6 +52,12 @@ export const getMyMemberships = cache(async (): Promise<ClubMembership[]> => {
       access_level: r.club_roles.access_level,
       subscription_status: r.clubs.subscription_status,
       trial_ends_at: r.clubs.trial_ends_at,
+      logo_url: r.clubs.logo_url,
+      theme_mode: r.clubs.theme_mode,
+      theme_primary_color: r.clubs.theme_primary_color,
+      theme_secondary_color: r.clubs.theme_secondary_color,
+      theme_night_primary_color: r.clubs.theme_night_primary_color,
+      theme_night_secondary_color: r.clubs.theme_night_secondary_color,
     }));
 });
 

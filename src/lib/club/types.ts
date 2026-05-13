@@ -8,6 +8,17 @@ export type SubscriptionStatus =
   | "incomplete"
   | "paused";
 
+export type ClubThemeMode = "day" | "night";
+
+export type ClubIdentity = {
+  logo_url: string | null;
+  theme_mode: ClubThemeMode;
+  theme_primary_color: string;
+  theme_secondary_color: string;
+  theme_night_primary_color: string;
+  theme_night_secondary_color: string;
+};
+
 export type ClubMembership = {
   club_id: string;
   club_name: string;
@@ -16,7 +27,7 @@ export type ClubMembership = {
   access_level: AccessLevel;
   subscription_status: SubscriptionStatus;
   trial_ends_at: string | null;
-};
+} & ClubIdentity;
 
 export const ACCESS_LEVELS: AccessLevel[] = [
   "full",

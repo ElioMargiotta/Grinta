@@ -4,6 +4,7 @@ import { Topbar } from "@/components/layout/Topbar";
 import { requireUser } from "@/lib/auth/getUser";
 import { resolveCurrentMembership } from "@/lib/club/context";
 import { getMyMemberships } from "@/lib/club/queries";
+import { clubThemeStyle } from "@/lib/club/theme";
 
 export default async function AppLayout({
   children,
@@ -38,9 +39,12 @@ export default async function AppLayout({
   }
 
   return (
-    <div className="flex min-h-screen flex-1 bg-zinc-50 dark:bg-zinc-950 print:bg-white">
+    <div
+      className="flex min-h-screen flex-1 bg-[var(--club-page-bg)] dark:bg-zinc-950 print:bg-white"
+      style={clubThemeStyle(membership)}
+    >
       <div className="print:hidden">
-        <Sidebar hasMembership={hasMembership} />
+        <Sidebar hasMembership={hasMembership} currentMembership={membership} />
       </div>
       <div className="flex flex-1 flex-col">
         <div className="print:hidden">

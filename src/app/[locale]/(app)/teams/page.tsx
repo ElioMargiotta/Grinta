@@ -1,8 +1,7 @@
 import { redirect } from "next/navigation";
 import { getTranslations, setRequestLocale } from "next-intl/server";
-import { Archive, Plus } from "lucide-react";
+import { Archive, ChevronRight, Plus } from "lucide-react";
 import { Button } from "@/components/ui/Button";
-import { Card } from "@/components/ui/Card";
 import { Link } from "@/i18n/navigation";
 import { requireUser } from "@/lib/auth/getUser";
 import { resolveCurrentMembership } from "@/lib/club/context";
@@ -75,21 +74,36 @@ export default async function TeamsPage({
       </div>
 
       {!teams || teams.length === 0 ? (
-        <Card>
+        <div className="border-y border-[var(--club-line)] bg-white/70 px-4 py-8">
           <p className="text-sm text-zinc-600 dark:text-zinc-400">{t("empty")}</p>
-        </Card>
+        </div>
       ) : (
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="overflow-hidden border-y border-[var(--club-line)] bg-white/72">
           {teams.map((team) => (
-            <Link key={team.id} href={`/teams/${team.id}`}>
-              <Card className="transition-colors hover:bg-zinc-50 dark:hover:bg-zinc-800">
-                <div className="text-base font-semibold text-zinc-900 dark:text-zinc-100">
-                  {team.name}
+            <Link
+              key={team.id}
+              href={`/teams/${team.id}`}
+              className="group grid gap-3 border-b border-zinc-100 px-4 py-4 transition last:border-b-0 hover:bg-[var(--club-primary-soft)] md:grid-cols-[1fr_180px_44px] md:items-center"
+            >
+              <div className="flex min-w-0 items-center gap-3">
+                <span className="h-9 w-1 rounded-full bg-[var(--club-primary)]" />
+                <div className="min-w-0">
+                  <div className="truncate text-base font-semibold text-zinc-900 dark:text-zinc-100">
+                    {team.name}
+                  </div>
+                  <div className="mt-0.5 text-sm text-zinc-500 dark:text-zinc-400">
+                    {team.age_group || "Catégorie non définie"}
+                  </div>
                 </div>
-                <div className="mt-1 text-sm text-zinc-500 dark:text-zinc-400">
-                  {[team.age_group, team.season].filter(Boolean).join(" · ") || "—"}
+              </div>
+              <div className="text-sm text-zinc-500 md:text-right">
+                {team.season || "Saison non définie"}
+              </div>
+              <div className="hidden justify-end md:flex">
+                <div className="flex h-9 w-9 items-center justify-center rounded-md text-zinc-400 transition group-hover:bg-white group-hover:text-[var(--club-primary)]">
+                  <ChevronRight className="h-5 w-5" />
                 </div>
-              </Card>
+              </div>
             </Link>
           ))}
         </div>
