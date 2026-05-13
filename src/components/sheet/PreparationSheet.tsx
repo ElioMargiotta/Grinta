@@ -188,7 +188,7 @@ const Z_GLOBAL = {
   characteristicForm: { x: 63, y: 48, w: 134, h: 9 },
   focus: { x: 63, y: 57.5, w: 134, h: 7 },
   objectives: { x: 63, y: 64, w: 134, h: 7 },
-  developmentQuestions: { x: 63, y: 74, w: 134, h: 10 },
+  developmentQuestions: { x: 63, y: 72, w: 134, h: 10 },
 } as const;
 
 // Placeholder zones for later sections — kept here so the PDF
@@ -1197,10 +1197,56 @@ function Step1({
   );
 }
 
+function fitImportedText(text: string, area: Box, maxChars: number) {
+  const clean = text.trim();
+  if (clean.length <= maxChars && fitsInExportBox(clean, area.w, area.h)) {
+    return clean;
+  }
+
+  let next = clean.slice(0, Math.max(0, maxChars - 3)).trimEnd();
+  while (next.length > 0 && !fitsInExportBox(`${next}...`, area.w, area.h)) {
+    next = next.slice(0, -12).trimEnd();
+  }
+  return next ? `${next}...` : "";
+}
+
+function buildPhase3Import(ex: LibraryExercise) {
+  const coaching = (ex.forme_physique ?? []).map((tag) => `• ${tag}`).join("\n");
+  return {
+    description: fitImportedText(
+      ex.description ?? "",
+      Z_INITIAL.phase3Description,
+      420,
+    ),
+    coaching: fitImportedText(coaching, Z_INITIAL.phase3Coaching, 420),
+    exerciseId: ex.id,
+    imageUrl: ex.main_image ?? "",
+  };
+}
+
 /* Step 2 — Warm-up & prep (tabbed phases) */
-function Step2({ data, patch }: { data: PreparationData; patch: Patcher }) {
+function Step2({
+  data,
+  patch,
+  library,
+}: {
+  data: PreparationData;
+  patch: Patcher;
+  library: LibraryExercise[];
+}) {
   const [tab, setTab] = useState<"p1" | "p2" | "p3">("p1");
+  const [phase3PickerOpen, setPhase3PickerOpen] = useState(false);
   const pv = data.initial.phase1.prevention;
+  const phase3Exercises = useMemo(
+    () =>
+      library.filter(
+        (ex) =>
+          ex.theme === "Explosivité" ||
+          ex.source === "asf_co_2026" ||
+          ex.code?.startsWith("CO_EX_"),
+      ),
+    [library],
+  );
   const prevRows = [
     {
       k: "ankle" as const,
@@ -1238,6 +1284,38 @@ function Step2({ data, patch }: { data: PreparationData; patch: Patcher }) {
       : tab === "p2"
         ? "Phase 2 - Échauffement (TE/TA/PE)"
         : "Phase 3 - Explosivité";
+
+  function importPhase3(picked: LibraryExercise) {
+    const fill = buildPhase3Import(picked);
+    patch((d) => ({
+      ...d,
+      initial: {
+        ...d.initial,
+        phase3: {
+          ...d.initial.phase3,
+          description: fill.description,
+          coaching: fill.coaching,
+          exerciseId: fill.exerciseId,
+          imageUrl: fill.imageUrl,
+        },
+      },
+    }));
+    setPhase3PickerOpen(false);
+  }
+
+  function clearPhase3Import() {
+    patch((d) => ({
+      ...d,
+      initial: {
+        ...d.initial,
+        phase3: {
+          ...d.initial.phase3,
+          exerciseId: undefined,
+          imageUrl: undefined,
+        },
+      },
+    }));
+  }
 
   return (
     <div className="mx-auto flex w-full max-w-[1120px] flex-col gap-4 py-1">
@@ -1515,6 +1593,51 @@ function Step2({ data, patch }: { data: PreparationData; patch: Patcher }) {
 
           {tab === "p3" && (
             <div className="grid grid-cols-1 gap-5">
+              <div className="flex items-center justify-between gap-4 border-b border-zinc-200 pb-2">
+                <div className="min-w-0">
+                  <div className="text-[12px] font-semibold text-zinc-900">
+                    Explosivité
+                  </div>
+                  <div className="mt-0.5 truncate text-[11px] text-zinc-500">
+                    {data.initial.phase3.exerciseId
+                      ? "Exercice importé dans les champs exportés du PDF"
+                      : "Importer un exercice Base CO explosivité"}
+                  </div>
+                </div>
+                <div className="flex shrink-0 items-center gap-2">
+                  {data.initial.phase3.imageUrl && (
+                    <button
+                      type="button"
+                      onClick={clearPhase3Import}
+                      className="inline-flex h-7 items-center gap-1.5 border-b border-zinc-300 px-1 text-[11px] font-semibold text-zinc-500 transition hover:border-zinc-900 hover:text-zinc-900"
+                    >
+                      <X className="h-3.5 w-3.5" strokeWidth={2} />
+                      Retirer
+                    </button>
+                  )}
+                  <button
+                    type="button"
+                    onClick={() => setPhase3PickerOpen(true)}
+                    className="inline-flex h-7 items-center gap-1.5 border-b border-zinc-900 px-1 text-[11px] font-semibold text-zinc-950 transition hover:border-red-500 hover:text-red-600"
+                  >
+                    <BookOpen className="h-3.5 w-3.5" strokeWidth={2} />
+                    Importer
+                  </button>
+                </div>
+              </div>
+              {data.initial.phase3.imageUrl && (
+                <div className="relative max-w-[360px] overflow-hidden">
+                  <div className="relative aspect-[4/3] w-full">
+                    <Image
+                      src={data.initial.phase3.imageUrl}
+                      alt="Exercice explosivité importé"
+                      fill
+                      sizes="360px"
+                      className="object-contain"
+                    />
+                  </div>
+                </div>
+              )}
               <div className="grid min-w-0 gap-4 md:grid-cols-2">
                 <FieldUl label="Contenu">
                   <FitTextarea
@@ -1561,6 +1684,17 @@ function Step2({ data, patch }: { data: PreparationData; patch: Patcher }) {
                   />
                 </FieldUl>
               </div>
+              <ExerciseLibraryPicker
+                open={phase3PickerOpen}
+                onClose={() => setPhase3PickerOpen(false)}
+                exercises={phase3Exercises}
+                phases={data.phases}
+                focusFamilies={["PE"]}
+                onPick={importPhase3}
+                title="Bibliothèque explosivité"
+                subtitle={`${phase3Exercises.length} exercices Base CO explosivité · cliquer pour exporter dans la phase 3`}
+                phaseFiltering={false}
+              />
             </div>
           )}
         </div>
@@ -2288,7 +2422,7 @@ export function PreparationSheet({
           />
         );
       case 1:
-        return <Step2 data={data} patch={patch} />;
+        return <Step2 data={data} patch={patch} library={libraryExercises} />;
       case 2:
         return (
           <StepMain

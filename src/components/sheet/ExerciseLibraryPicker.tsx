@@ -8,6 +8,7 @@ import type { FocusFamily } from "./types";
 export type LibraryExercise = {
   id: string;
   code: string | null;
+  source: string | null;
   titre: string | null;
   name: string;
   theme: string | null;
@@ -62,6 +63,9 @@ export function ExerciseLibraryPicker({
   phases,
   focusFamilies,
   onPick,
+  title = "Bibliothèque d'exercices",
+  subtitle,
+  phaseFiltering = true,
 }: {
   open: boolean;
   onClose: () => void;
@@ -69,6 +73,9 @@ export function ExerciseLibraryPicker({
   phases: PreparationPhases;
   focusFamilies: FocusFamily[];
   onPick: (ex: LibraryExercise) => void;
+  title?: string;
+  subtitle?: string;
+  phaseFiltering?: boolean;
 }) {
   const [search, setSearch] = useState("");
   const [overridePhase, setOverridePhase] = useState<string | null>(null);
@@ -82,7 +89,7 @@ export function ExerciseLibraryPicker({
 
   const filtered = useMemo(() => {
     let list = exercises;
-    if (activeThemes.length > 0) {
+    if (phaseFiltering && activeThemes.length > 0) {
       list = list.filter((e) => e.theme && activeThemes.includes(e.theme));
     }
     if (search.trim()) {
@@ -106,7 +113,7 @@ export function ExerciseLibraryPicker({
       });
     }
     return list;
-  }, [exercises, activeThemes, search, focusFamilies]);
+  }, [exercises, activeThemes, search, focusFamilies, phaseFiltering]);
 
   if (!open) return null;
 
@@ -129,10 +136,11 @@ export function ExerciseLibraryPicker({
             </button>
             <div>
               <div className="text-[14px] font-semibold text-zinc-900">
-                Bibliothèque d&apos;exercices
+                {title}
               </div>
               <div className="text-[11px] text-zinc-500">
-                {filtered.length} exercices · pré-filtrés par phase de jeu et focus
+                {subtitle ??
+                  `${filtered.length} exercices · pré-filtrés par phase de jeu et focus`}
               </div>
             </div>
           </div>
@@ -154,18 +162,22 @@ export function ExerciseLibraryPicker({
           </label>
 
           <div className="mt-2 flex flex-wrap items-center gap-1.5 text-[11px]">
-            <span className="text-zinc-400">Phases:</span>
-            {activeThemes.length === 0 ? (
-              <span className="italic text-zinc-400">aucune sélectionnée</span>
-            ) : (
-              activeThemes.map((t) => (
-                <span
-                  key={t}
-                  className="rounded-full bg-zinc-900 px-2 py-0.5 font-medium text-white"
-                >
-                  {t}
-                </span>
-              ))
+            {phaseFiltering && (
+              <>
+                <span className="text-zinc-400">Phases:</span>
+                {activeThemes.length === 0 ? (
+                  <span className="italic text-zinc-400">aucune sélectionnée</span>
+                ) : (
+                  activeThemes.map((t) => (
+                    <span
+                      key={t}
+                      className="rounded-full bg-zinc-900 px-2 py-0.5 font-medium text-white"
+                    >
+                      {t}
+                    </span>
+                  ))
+                )}
+              </>
             )}
             <span className="ml-auto text-zinc-400">Focus:</span>
             {focusFamilies.length === 0 ? (
@@ -183,7 +195,7 @@ export function ExerciseLibraryPicker({
           </div>
 
           {/* Manual phase override */}
-          <div className="mt-2 flex flex-wrap items-center gap-1.5">
+          {phaseFiltering && <div className="mt-2 flex flex-wrap items-center gap-1.5">
             <span className="text-[11px] text-zinc-400">Filtrer par phase:</span>
             <button
               type="button"
@@ -210,7 +222,7 @@ export function ExerciseLibraryPicker({
                 {t.replace("Mon équipe ", "")}
               </button>
             ))}
-          </div>
+          </div>}
         </div>
 
         {/* Results */}

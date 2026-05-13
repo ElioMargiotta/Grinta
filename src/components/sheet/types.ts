@@ -83,7 +83,12 @@ export type PreparationData = {
       };
     };
     phase2: { description: string; coaching: string; schema: SchemaData };
-    phase3: { description: string; coaching: string };
+    phase3: {
+      description: string;
+      coaching: string;
+      exerciseId?: string;
+      imageUrl?: string;
+    };
   };
   main: Array<{
     type: "playForm" | "exercise";

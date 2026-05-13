@@ -70,7 +70,7 @@ export default async function SoloWizardPage({
     supabase
       .from("exercises")
       .select(
-        "id, code, titre, name, theme, niveau, track, level, duree, description, organisation, forme_physique, tactique, mentalite, technique, variation_less_text, variation_more_text, main_image",
+        "id, code, source, titre, name, theme, niveau, track, level, duree, description, organisation, forme_physique, tactique, mentalite, technique, variation_less_text, variation_more_text, main_image",
       )
       .not("code", "is", null)
       .order("theme", { ascending: true, nullsFirst: false })
