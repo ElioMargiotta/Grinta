@@ -104,7 +104,13 @@ export type PreparationData = {
     exerciseId?: string;
     imageUrl?: string;
   }>;
-  game: { duration: string; notes: string; schema: SchemaData };
+  game: {
+    duration: string;
+    notes: string;
+    schema: SchemaData;
+    exerciseId?: string;
+    imageUrl?: string;
+  };
   end: { duration: string; notes: string };
   reflection: string;
 };

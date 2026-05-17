@@ -66,6 +66,8 @@ const SETTINGS_LABELS: Record<SchemaSettingsKey, string> = {
   default: "schémas",
 };
 
+const SCHEMA_CLIPBOARD_KEY = "grinta.schemaClipboard.v1";
+
 type Tool =
   | "select"
   | "home"
@@ -88,6 +90,99 @@ function nextId() {
 function nextLabel(shapes: SchemaShape[], team: "home" | "away") {
   const n = shapes.filter((s) => s.kind === "player" && s.team === team).length;
   return String(n + 1);
+}
+
+function readCopiedSchema(): SchemaData | null {
+  if (typeof window === "undefined") return null;
+  try {
+    const raw = window.localStorage.getItem(SCHEMA_CLIPBOARD_KEY);
+    if (!raw) return null;
+    const parsed = JSON.parse(raw) as Partial<SchemaData>;
+    if (!parsed || !Array.isArray(parsed.shapes)) return null;
+    return { shapes: parsed.shapes as SchemaShape[] };
+  } catch {
+    return null;
+  }
+}
+
+function writeCopiedSchema(data: SchemaData) {
+  if (typeof window === "undefined") return;
+  try {
+    window.localStorage.setItem(SCHEMA_CLIPBOARD_KEY, JSON.stringify(data));
+  } catch {
+    /* ignore quota / privacy mode */
+  }
+}
+
+type SelectionBox = { x: number; y: number; w: number; h: number };
+
+function normalizeBox(
+  x1: number,
+  y1: number,
+  x2: number,
+  y2: number,
+): SelectionBox {
+  return {
+    x: Math.min(x1, x2),
+    y: Math.min(y1, y2),
+    w: Math.abs(x2 - x1),
+    h: Math.abs(y2 - y1),
+  };
+}
+
+function translateShape(s: SchemaShape, dx: number, dy: number): SchemaShape {
+  if (s.kind === "line" || s.kind === "arrow") {
+    return {
+      ...s,
+      x1: s.x1 + dx,
+      y1: s.y1 + dy,
+      x2: s.x2 + dx,
+      y2: s.y2 + dy,
+    };
+  }
+  return { ...s, x: s.x + dx, y: s.y + dy };
+}
+
+function shapeBounds(s: SchemaShape, settings: SchemaSettings): SelectionBox {
+  if (s.kind === "line" || s.kind === "arrow") {
+    const pad =
+      s.kind === "line"
+        ? (s.strokeWidth ?? settings.lineWidth)
+        : (s.strokeWidth ?? settings.arrowWidth);
+    const box = normalizeBox(s.x1, s.y1, s.x2, s.y2);
+    return {
+      x: box.x - pad,
+      y: box.y - pad,
+      w: box.w + pad * 2,
+      h: box.h + pad * 2,
+    };
+  }
+  if (s.kind === "player") {
+    const r = PLAYER_R * settings.symbolSize;
+    return { x: s.x - r, y: s.y - r, w: r * 2, h: r * 2 };
+  }
+  if (s.kind === "ball") {
+    const r = BALL_R * settings.symbolSize;
+    return { x: s.x - r, y: s.y - r, w: r * 2, h: r * 2 };
+  }
+  if (s.kind === "cone") {
+    const r = CONE_R * settings.symbolSize;
+    return { x: s.x - r, y: s.y - r, w: r * 2, h: r * 2 };
+  }
+  const w =
+    (s.orientation === "h" ? GOAL_LONG : GOAL_SHORT) * settings.symbolSize;
+  const h =
+    (s.orientation === "h" ? GOAL_SHORT : GOAL_LONG) * settings.symbolSize;
+  return { x: s.x - w / 2, y: s.y - h / 2, w, h };
+}
+
+function boxContainsBox(container: SelectionBox, item: SelectionBox) {
+  return (
+    item.x >= container.x &&
+    item.y >= container.y &&
+    item.x + item.w <= container.x + container.w &&
+    item.y + item.h <= container.y + container.h
+  );
 }
 
 /* Wave path (used for "dribble" arrows). Goes from (x1,y1) to (x2,y2)
@@ -214,12 +309,14 @@ function SchemaShapes({
   data,
   settings,
   selectedId,
+  selectedIds = [],
   onShapePointerDown,
   editable = false,
 }: {
   data: SchemaData;
   settings: SchemaSettings;
   selectedId?: string | null;
+  selectedIds?: string[];
   onShapePointerDown?: (s: SchemaShape, e: React.PointerEvent) => void;
   editable?: boolean;
 }) {
@@ -232,7 +329,8 @@ function SchemaShapes({
   return (
     <>
       {data.shapes.map((s) => {
-        const selected = !!editable && s.id === selectedId;
+        const selected =
+          !!editable && (s.id === selectedId || selectedIds.includes(s.id));
         const onDown = (e: React.PointerEvent) => onShapePointerDown?.(s, e);
         const ringStroke = selected ? "#0ea5e9" : "white";
         const ringWidth = selected ? 1.2 : 0.6;
@@ -550,24 +648,48 @@ export function SchemaEditor({
   const pitchCfg = PITCHES[pitch];
   const [tool, setTool] = useState<Tool>("select");
   const [selectedId, setSelectedId] = useState<string | null>(null);
+  const [selectedIds, setSelectedIds] = useState<string[]>([]);
+  const [selectionBox, setSelectionBox] = useState<SelectionBox | null>(null);
   const [history, setHistory] = useState<SchemaData[]>([]);
   const [showSettings, setShowSettings] = useState(false);
+  const [canPasteSchema, setCanPasteSchema] = useState(
+    () => readCopiedSchema() !== null,
+  );
   const svgRef = useRef<SVGSVGElement | null>(null);
   const dragRef = useRef<
     | { kind: "arrow"; id: string }
     | { kind: "line"; id: string }
-    | { kind: "shape"; id: string; lastX: number; lastY: number }
+    | {
+        kind: "shape";
+        ids: string[];
+        lastX: number;
+        lastY: number;
+        snapshot: SchemaData;
+        moved: boolean;
+      }
+    | {
+        kind: "area";
+        startX: number;
+        startY: number;
+        currentX: number;
+        currentY: number;
+      }
     | null
   >(null);
 
   const selectedShape =
-    selectedId != null
+    selectedId != null && selectedIds.length <= 1
       ? value.shapes.find((s) => s.id === selectedId) ?? null
       : null;
+  const selectedCount = selectedIds.length;
 
   function commit(next: SchemaData, snapshot: SchemaData = value) {
     setHistory((h) => [...h.slice(-29), snapshot]);
     onChange(next);
+  }
+
+  function remember(snapshot: SchemaData) {
+    setHistory((h) => [...h.slice(-29), snapshot]);
   }
 
   function clientToVb(e: { clientX: number; clientY: number }) {
@@ -584,7 +706,18 @@ export function SchemaEditor({
 
   function onCanvasPointerDown(e: React.PointerEvent<SVGSVGElement>) {
     if (tool === "select") {
+      const p = clientToVb(e);
       setSelectedId(null);
+      setSelectedIds([]);
+      setSelectionBox({ x: p.x, y: p.y, w: 0, h: 0 });
+      dragRef.current = {
+        kind: "area",
+        startX: p.x,
+        startY: p.y,
+        currentX: p.x,
+        currentY: p.y,
+      };
+      e.currentTarget.setPointerCapture(e.pointerId);
       return;
     }
     const p = clientToVb(e);
@@ -688,26 +821,23 @@ export function SchemaEditor({
           return s;
         }),
       });
-    } else {
+    } else if (drag.kind === "shape") {
       const dx = p.x - drag.lastX;
       const dy = p.y - drag.lastY;
+      if (Math.abs(dx) > 0.01 || Math.abs(dy) > 0.01) drag.moved = true;
       drag.lastX = p.x;
       drag.lastY = p.y;
+      const moving = new Set(drag.ids);
       onChange({
         shapes: value.shapes.map((s) => {
-          if (s.id !== drag.id) return s;
-          if (s.kind === "arrow" || s.kind === "line") {
-            return {
-              ...s,
-              x1: s.x1 + dx,
-              y1: s.y1 + dy,
-              x2: s.x2 + dx,
-              y2: s.y2 + dy,
-            };
-          }
-          return { ...s, x: s.x + dx, y: s.y + dy };
+          if (!moving.has(s.id)) return s;
+          return translateShape(s, dx, dy);
         }),
       });
+    } else {
+      drag.currentX = p.x;
+      drag.currentY = p.y;
+      setSelectionBox(normalizeBox(drag.startX, drag.startY, p.x, p.y));
     }
   }
 
@@ -722,6 +852,26 @@ export function SchemaEditor({
           onChange({ shapes: value.shapes.filter((s) => s.id !== drag.id) });
         }
       }
+    } else if (drag?.kind === "shape") {
+      if (drag.moved) remember(drag.snapshot);
+    } else if (drag?.kind === "area") {
+      const box = normalizeBox(
+        drag.startX,
+        drag.startY,
+        drag.currentX,
+        drag.currentY,
+      );
+      if (box.w >= 2 && box.h >= 2) {
+        const ids = value.shapes
+          .filter((s) => boxContainsBox(box, shapeBounds(s, settings)))
+          .map((s) => s.id);
+        setSelectedIds(ids);
+        setSelectedId(ids.length === 1 ? ids[0] : null);
+      } else {
+        setSelectedIds([]);
+        setSelectedId(null);
+      }
+      setSelectionBox(null);
     }
     dragRef.current = null;
   }
@@ -729,9 +879,18 @@ export function SchemaEditor({
   function onShapePointerDown(s: SchemaShape, e: React.PointerEvent) {
     if (tool !== "select") return;
     e.stopPropagation();
-    setSelectedId(s.id);
+    const ids = selectedIds.includes(s.id) ? selectedIds : [s.id];
+    setSelectedIds(ids);
+    setSelectedId(ids.length === 1 ? s.id : null);
     const p = clientToVb(e);
-    dragRef.current = { kind: "shape", id: s.id, lastX: p.x, lastY: p.y };
+    dragRef.current = {
+      kind: "shape",
+      ids,
+      lastX: p.x,
+      lastY: p.y,
+      snapshot: value,
+      moved: false,
+    };
     (e.currentTarget as Element).setPointerCapture?.(e.pointerId);
   }
 
@@ -741,18 +900,40 @@ export function SchemaEditor({
     setHistory((h) => h.slice(0, -1));
     onChange(last);
     setSelectedId(null);
+    setSelectedIds([]);
   }
 
   function clearAll() {
     if (value.shapes.length === 0) return;
     commit({ shapes: [] });
     setSelectedId(null);
+    setSelectedIds([]);
+  }
+
+  function copySchema() {
+    writeCopiedSchema(value);
+    setCanPasteSchema(value.shapes.length > 0);
+  }
+
+  function pasteSchema() {
+    const copied = readCopiedSchema();
+    if (!copied) {
+      setCanPasteSchema(false);
+      return;
+    }
+    commit({ shapes: copied.shapes.map((s) => ({ ...s })) });
+    setSelectedId(null);
+    setSelectedIds([]);
   }
 
   function deleteSelected() {
-    if (!selectedId) return;
-    commit({ shapes: value.shapes.filter((s) => s.id !== selectedId) });
+    const ids =
+      selectedIds.length > 0 ? selectedIds : selectedId ? [selectedId] : [];
+    if (ids.length === 0) return;
+    const removing = new Set(ids);
+    commit({ shapes: value.shapes.filter((s) => !removing.has(s.id)) });
     setSelectedId(null);
+    setSelectedIds([]);
   }
 
   function setSelectedColor(color: string) {
@@ -790,11 +971,16 @@ export function SchemaEditor({
 
   useEffect(() => {
     function onKey(e: KeyboardEvent) {
-      if ((e.key === "Delete" || e.key === "Backspace") && selectedId) {
+      if (
+        (e.key === "Delete" || e.key === "Backspace") &&
+        (selectedId || selectedIds.length > 0)
+      ) {
         e.preventDefault();
         deleteSelected();
       } else if (e.key === "Escape") {
         setSelectedId(null);
+        setSelectedIds([]);
+        setSelectionBox(null);
       }
     }
     window.addEventListener("keydown", onKey);
@@ -805,7 +991,7 @@ export function SchemaEditor({
 
   const cursor =
     tool === "select"
-      ? "default"
+      ? "crosshair"
       : tool.startsWith("arrow-") || tool === "line"
         ? "crosshair"
         : "copy";
@@ -816,9 +1002,13 @@ export function SchemaEditor({
         tool={tool}
         setTool={setTool}
         canUndo={history.length > 0}
-        canDelete={!!selectedId}
+        canDelete={selectedCount > 0 || !!selectedId}
         canClear={value.shapes.length > 0}
+        canCopy={value.shapes.length > 0}
+        canPaste={canPasteSchema}
         onUndo={undo}
+        onCopy={copySchema}
+        onPaste={pasteSchema}
         onDelete={deleteSelected}
         onClear={clearAll}
         settings={settings}
@@ -832,7 +1022,20 @@ export function SchemaEditor({
           onColorChange={setSelectedColor}
           onStrokeChange={setSelectedStrokeWidth}
           onReset={clearSelectedOverrides}
-          onClose={() => setSelectedId(null)}
+          onClose={() => {
+            setSelectedId(null);
+            setSelectedIds([]);
+          }}
+        />
+      )}
+      {!selectedShape && selectedCount > 1 && (
+        <MultiSelectionPanel
+          count={selectedCount}
+          onDelete={deleteSelected}
+          onClose={() => {
+            setSelectedId(null);
+            setSelectedIds([]);
+          }}
         />
       )}
       {showSettings && (
@@ -866,15 +1069,28 @@ export function SchemaEditor({
             settings={settings}
             editable
             selectedId={selectedId}
+            selectedIds={selectedIds}
             onShapePointerDown={onShapePointerDown}
           />
+          {selectionBox && (
+            <rect
+              x={selectionBox.x}
+              y={selectionBox.y}
+              width={selectionBox.w}
+              height={selectionBox.h}
+              fill="rgba(14, 165, 233, 0.12)"
+              stroke="#0ea5e9"
+              strokeWidth={0.7}
+              strokeDasharray="2 1.5"
+              pointerEvents="none"
+            />
+          )}
         </svg>
       </div>
       {showHint ? (
         <div className="border-t border-zinc-200 px-3 py-2 text-xs text-zinc-500">
-          Astuce : choisis un outil, puis clique sur le terrain. Pour les
-          flèches, clique-glisse. Sélectionne un objet pour changer sa couleur
-          ou son épaisseur sans toucher aux autres.
+          Astuce : avec Sélection, clique-glisse une zone puis déplace un des
+          éléments sélectionnés pour translater tout le groupe.
         </div>
       ) : null}
     </div>
@@ -900,7 +1116,11 @@ function Toolbar({
   canUndo,
   canDelete,
   canClear,
+  canCopy,
+  canPaste,
   onUndo,
+  onCopy,
+  onPaste,
   onDelete,
   onClear,
   settings,
@@ -912,7 +1132,11 @@ function Toolbar({
   canUndo: boolean;
   canDelete: boolean;
   canClear: boolean;
+  canCopy: boolean;
+  canPaste: boolean;
   onUndo: () => void;
+  onCopy: () => void;
+  onPaste: () => void;
   onDelete: () => void;
   onClear: () => void;
   settings: SchemaSettings;
@@ -921,7 +1145,11 @@ function Toolbar({
 }) {
   return (
     <div className="flex flex-wrap items-center gap-0.5 border-b border-zinc-200 bg-zinc-50 px-1.5 py-1.5">
-      <ToolButton active={tool === "select"} onClick={() => setTool("select")} title="Sélection">
+      <ToolButton
+        active={tool === "select"}
+        onClick={() => setTool("select")}
+        title="Sélection / déplacer une zone"
+      >
         <CursorIcon />
       </ToolButton>
       <Sep />
@@ -975,6 +1203,26 @@ function Toolbar({
         aria-label="Retour"
       >
         <UndoArrowIcon />
+      </button>
+      <button
+        type="button"
+        onClick={onCopy}
+        disabled={!canCopy}
+        className="flex h-7 w-7 items-center justify-center rounded-md border border-transparent text-zinc-700 transition hover:bg-white/80 hover:text-zinc-950 disabled:cursor-not-allowed disabled:opacity-35"
+        title="Copier le schéma"
+        aria-label="Copier le schéma"
+      >
+        <CopyIcon />
+      </button>
+      <button
+        type="button"
+        onClick={onPaste}
+        disabled={!canPaste}
+        className="flex h-7 w-7 items-center justify-center rounded-md border border-transparent text-zinc-700 transition hover:bg-white/80 hover:text-zinc-950 disabled:cursor-not-allowed disabled:opacity-35"
+        title="Coller le schéma"
+        aria-label="Coller le schéma"
+      >
+        <PasteIcon />
       </button>
       <button
         type="button"
@@ -1147,6 +1395,44 @@ function SelectionPanel({
           title="Revenir aux réglages par défaut pour cet élément"
         >
           Réinitialiser
+        </button>
+        <button
+          type="button"
+          onClick={onClose}
+          className="rounded-md px-2 py-1 text-[11px] text-zinc-500 hover:bg-zinc-100"
+          aria-label="Désélectionner"
+        >
+          ✕
+        </button>
+      </div>
+    </div>
+  );
+}
+
+function MultiSelectionPanel({
+  count,
+  onDelete,
+  onClose,
+}: {
+  count: number;
+  onDelete: () => void;
+  onClose: () => void;
+}) {
+  return (
+    <div className="border-b border-zinc-200 bg-sky-50/60 px-3 py-2 text-xs text-zinc-700">
+      <div className="flex flex-wrap items-center gap-3">
+        <span className="font-medium text-zinc-800">
+          {count} éléments sélectionnés
+        </span>
+        <span className="text-zinc-500">
+          Glisser un élément sélectionné déplace tout le groupe.
+        </span>
+        <button
+          type="button"
+          onClick={onDelete}
+          className="ml-auto rounded-md border border-zinc-200 bg-white px-2 py-1 text-[11px] text-red-600 hover:bg-zinc-50"
+        >
+          Supprimer
         </button>
         <button
           type="button"
@@ -1399,6 +1685,43 @@ function UndoArrowIcon() {
     >
       <path d="M9 7 4 12l5 5" />
       <path d="M20 12H4" />
+    </svg>
+  );
+}
+
+function CopyIcon() {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      width="14"
+      height="14"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <rect x="8" y="8" width="11" height="11" rx="2" />
+      <path d="M5 15H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v1" />
+    </svg>
+  );
+}
+
+function PasteIcon() {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      width="14"
+      height="14"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <path d="M8 4h8" />
+      <path d="M9 2h6v4H9z" />
+      <path d="M8 4H6a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2h-2" />
     </svg>
   );
 }
