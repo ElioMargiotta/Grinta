@@ -7,7 +7,12 @@
     "dev:staging": "node scripts/dev-staging.mjs",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "db:new": "supabase migration new",
+    "db:status:dev": "supabase migration list --db-url \"$SUPABASE_DB_URL_DEV\"",
+    "db:status:prod": "supabase migration list --db-url \"$SUPABASE_DB_URL_PROD\"",
+    "db:push:dev": "supabase db push --db-url \"$SUPABASE_DB_URL_DEV\"",
+    "db:push:prod": "supabase db push --db-url \"$SUPABASE_DB_URL_PROD\""
   },
   "dependencies": {
     "@fullcalendar/core": "^6.1.20",
