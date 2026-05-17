@@ -3,11 +3,170 @@
     "name": "Grinta",
     "tagline": "Plan your football season."
   },
+  "landing": {
+    "navLogin": "Log in",
+    "eyebrow": "Put the club at the center of progression",
+    "heroTitle": "Give your whole structure one shared philosophy.",
+    "heroSubtitle": "Grinta helps the club formalize its game identity, then translate it into cycles, weekly themes, and concrete sessions. Every team follows the same direction, adapted to its age and level.",
+    "primaryCta": "Create account",
+    "secondaryCta": "I already have an account",
+    "scrollLabel": "See how Grinta works",
+    "mockupLabel": "Club philosophy",
+    "mockupTitle": "One shared frame",
+    "mockupBadge": "Grinta",
+    "mockupCenter": "Club",
+    "mockupPillars": {
+      "training": "Training",
+      "identity": "Identity",
+      "players": "Players",
+      "match": "Match"
+    },
+    "mockupFocus": "Shared principle",
+    "mockupTheme": "Develop, transmit, play",
+    "principlesEyebrow": "Direction",
+    "principlesTitle": "A philosophy that reaches the pitch.",
+    "principles": {
+      "identity": {
+        "title": "A readable identity",
+        "body": "The club defines its principles: how it wants to develop, play, progress, and evaluate."
+      },
+      "continuity": {
+        "title": "Continuity by category",
+        "body": "Every team keeps the same backbone, with content adapted to its age and level."
+      },
+      "transmission": {
+        "title": "Clear transmission",
+        "body": "Coaches share one language, shared objectives, and coherent sessions."
+      }
+    },
+    "wizardEyebrow": "Sheet demo",
+    "wizardTitle": "The wizard turns a session idea into a pitch-ready PDF.",
+    "wizardBody": "As you scroll, the preparation sheet shows its real flow: guided brief, warm-up, pitch blocks, then PDF export on the Grinta template.",
+    "wizardSteps": {
+      "brief": {
+        "short": "Brief",
+        "kicker": "Step 1",
+        "title": "Build the guiding thread",
+        "body": "The coach chooses the game moment, focus, objective, and questions that will guide the players."
+      },
+      "warmup": {
+        "short": "Warm-up",
+        "kicker": "Step 2",
+        "title": "Prepare the body and the theme",
+        "body": "The session starts with activation, connection to the theme, and a short explosive phase."
+      },
+      "blocks": {
+        "short": "Pitch",
+        "kicker": "Step 3",
+        "title": "Draw the situations and coaching points",
+        "body": "The main blocks combine diagram, duration, organization, coaching, and variations."
+      },
+      "pdf": {
+        "short": "PDF",
+        "kicker": "Step 4",
+        "title": "Export a clean sheet",
+        "body": "The preparation becomes a printable A4 sheet, clear for staff and usable on the pitch."
+      }
+    },
+    "wizardMock": {
+      "label": "Preparation wizard",
+      "title": "Session sheet",
+      "export": "PDF export",
+      "sessionLabel": "Session title",
+      "sessionTitle": "Win it high, attack fast",
+      "pillars": {
+        "moment": "Game moment",
+        "focus": "TE / TA / PE focus",
+        "objective": "Objective",
+        "questions": "Coach questions"
+      },
+      "warmup": {
+        "activate": {
+          "label": "Phase 1",
+          "duration": "8 min",
+          "title": "Activate",
+          "hint": "Mobility, prevention, ball work, and rhythm."
+        },
+        "connect": {
+          "label": "Phase 2",
+          "duration": "12 min",
+          "title": "Connect",
+          "hint": "Rondo or possession with a constraint linked to the theme."
+        },
+        "accelerate": {
+          "label": "Phase 3",
+          "duration": "5 min",
+          "title": "Accelerate",
+          "hint": "Explosiveness, reaction, maximum intensity."
+        }
+      },
+      "blocks": {
+        "main1": {
+          "title": "Main block 1",
+          "duration": "20 min",
+          "hint": "Game form with the expected behavior made visible."
+        },
+        "main2": {
+          "title": "Main block 2",
+          "duration": "20 min",
+          "hint": "Exercise or variation to stabilize the learning."
+        },
+        "game": {
+          "title": "Final game",
+          "duration": "18 min",
+          "hint": "Back to play with observation criteria."
+        }
+      },
+      "addExercise": "Import exercise",
+      "pdfTitle": "Two structured A4 pages",
+      "pdfBody": "The wizard fields are placed into the PDF sheet with diagrams, coaching points, durations, and reflections.",
+      "save": "Save",
+      "create": "Export PDF"
+    },
+    "flowEyebrow": "Principle",
+    "flowTitle": "From club philosophy to today's session.",
+    "flow": {
+      "philosophy": {
+        "title": "Philosophy",
+        "body": "The club sets its strong ideas: game intentions, development values, and progression priorities."
+      },
+      "category": {
+        "title": "Categories",
+        "body": "Principles are adapted by age group to build a coherent player pathway."
+      },
+      "cycle": {
+        "title": "Cycles",
+        "body": "The season is organized into readable blocks, with themes that build progression."
+      },
+      "session": {
+        "title": "Session",
+        "body": "Each session becomes a concrete expression of the philosophy, not isolated content."
+      }
+    },
+    "featuresEyebrow": "What Grinta structures",
+    "featuresTitle": "A more coherent club, without rigid training.",
+    "features": {
+      "identity": {
+        "title": "Club frame",
+        "body": "Formalize shared principles so every staff member knows what should be transmitted."
+      },
+      "planner": {
+        "title": "Continuous planning",
+        "body": "Connect categories, cycles, weeks, and sessions so progression remains visible."
+      },
+      "preparation": {
+        "title": "Preparation sheet",
+        "body": "Prepare clear, printable sessions aligned with the club's principles."
+      }
+    }
+  },
   "nav": {
     "dashboard": "Dashboard",
+    "session": "My session",
     "teams": "Teams",
     "exercises": "Exercises",
     "planner": "Planner",
+    "settings": "Settings",
     "logout": "Log out"
   },
   "auth": {
@@ -45,7 +204,15 @@
     "teamsCard": "Teams",
     "exercisesCard": "Exercises",
     "nextSession": "Next session",
-    "noNextSession": "No upcoming session."
+    "noNextSession": "No upcoming session.",
+    "ctaJoinClubTitle": "Join a club",
+    "ctaJoinClubDesc": "Paste an invitation link to join an existing club.",
+    "ctaCreateClubTitle": "Create a club",
+    "ctaCreateClubDesc": "Plan seasons, manage teams, invite staff. Paid plan.",
+    "ctaCreateSessionTitle": "Create my session",
+    "ctaCreateSessionDesc": "One training sheet, ready in two minutes.",
+    "ctaLibraryTitle": "Exercise library",
+    "ctaLibraryDesc": "Browse 170+ proven drills."
   },
   "teams": {
     "title": "Teams",

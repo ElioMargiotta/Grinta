@@ -13,9 +13,9 @@ const base =
 
 const variants: Record<Variant, string> = {
   primary:
-    "bg-zinc-900 text-white shadow-sm hover:bg-zinc-800 focus-visible:ring-zinc-900 dark:bg-white dark:text-zinc-900 dark:hover:bg-zinc-200",
+    "bg-[var(--club-primary)] text-[var(--club-primary-foreground)] shadow-sm hover:brightness-95 focus-visible:ring-[var(--club-primary)]",
   secondary:
-    "bg-white text-zinc-900 shadow-sm ring-1 ring-zinc-200 hover:bg-zinc-50 hover:ring-zinc-300 focus-visible:ring-zinc-300 dark:bg-zinc-800 dark:text-zinc-100 dark:ring-zinc-700 dark:hover:bg-zinc-700",
+    "bg-white text-zinc-900 shadow-sm ring-1 ring-[var(--club-line)] hover:bg-[var(--club-primary-soft)] focus-visible:ring-[var(--club-primary)] dark:bg-zinc-800 dark:text-zinc-100 dark:ring-zinc-700 dark:hover:bg-zinc-700",
   ghost:
     "bg-transparent text-zinc-700 hover:bg-zinc-100 hover:text-zinc-900 dark:text-zinc-300 dark:hover:bg-zinc-800 dark:hover:text-zinc-100",
   danger:

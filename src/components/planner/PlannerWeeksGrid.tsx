@@ -651,7 +651,7 @@ export function PlannerWeeksGrid({
 	                    setDraggingSessionId(session.id);
 	                  }}
 	                  onDragEnd={() => setDraggingSessionId(null)}
-	                    className={`group/session relative flex w-full overflow-hidden rounded-md border bg-zinc-50 text-left text-zinc-800 transition-transform hover:-translate-y-px hover:border-zinc-300 hover:bg-white hover:shadow-sm dark:bg-zinc-800/70 dark:text-zinc-100 dark:hover:border-zinc-600 dark:hover:bg-zinc-800 ${
+                  className={`group/session relative flex w-full overflow-hidden rounded-lg border bg-zinc-50/70 text-left text-zinc-800 shadow-sm transition-all duration-150 hover:-translate-y-px hover:border-zinc-300 hover:bg-white hover:shadow-md active:scale-[0.99] dark:bg-zinc-800/70 dark:text-zinc-100 dark:hover:border-zinc-600 dark:hover:bg-zinc-800 ${
 	                      isCopied
 	                        ? "border-zinc-900 ring-2 ring-zinc-900/10 dark:border-zinc-100 dark:ring-zinc-100/10"
 	                        : "border-zinc-200 dark:border-zinc-700/80"
@@ -688,8 +688,8 @@ export function PlannerWeeksGrid({
 	                      {session.title}
 	                    </span>
 	                  </button>
-	                    <div className="absolute right-1 top-1 flex items-center gap-0.5 opacity-0 transition-opacity group-hover/session:opacity-100">
-	                      <button
+                  <div className="absolute right-1 top-1 flex items-center gap-1 rounded-lg bg-white/90 p-0.5 opacity-0 shadow-sm ring-1 ring-zinc-200 transition-opacity group-hover/session:opacity-100 dark:bg-zinc-900/90 dark:ring-zinc-700">
+                    <button
 	                      type="button"
 	                      title="Dupliquer"
 	                      aria-label="Dupliquer la séance"
@@ -700,11 +700,11 @@ export function PlannerWeeksGrid({
 	                            current === session.id ? null : session.id,
 	                          );
 	                        }}
-	                        className={`flex h-5 w-5 items-center justify-center rounded disabled:opacity-40 ${
-	                          isCopied
-	                            ? "bg-zinc-900 text-white dark:bg-zinc-100 dark:text-zinc-900"
-	                            : "text-zinc-400 hover:bg-zinc-200/70 hover:text-zinc-800 dark:hover:bg-zinc-700 dark:hover:text-zinc-100"
-	                        }`}
+                      className={`inline-flex h-6 w-6 items-center justify-center rounded-lg transition-all duration-150 active:scale-[0.98] disabled:pointer-events-none disabled:opacity-40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-zinc-300 ${
+                        isCopied
+                          ? "bg-zinc-900 text-white shadow-sm dark:bg-zinc-100 dark:text-zinc-900"
+                          : "text-zinc-500 hover:bg-zinc-100 hover:text-zinc-900 dark:text-zinc-400 dark:hover:bg-zinc-800 dark:hover:text-zinc-100"
+                      }`}
 	                    >
 	                      <Copy size={12} strokeWidth={2.2} />
 	                    </button>
@@ -724,7 +724,7 @@ export function PlannerWeeksGrid({
 	                          }),
 	                        );
 	                      }}
-	                      className="flex h-5 w-5 items-center justify-center rounded text-zinc-400 hover:bg-red-50 hover:text-red-600 disabled:opacity-40 dark:hover:bg-red-950/40 dark:hover:text-red-300"
+                      className="inline-flex h-6 w-6 items-center justify-center rounded-lg text-zinc-500 transition-all duration-150 hover:bg-red-50 hover:text-red-600 active:scale-[0.98] disabled:pointer-events-none disabled:opacity-40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-200 dark:text-zinc-400 dark:hover:bg-red-950/40 dark:hover:text-red-300"
 	                    >
 	                      <Trash2 size={12} strokeWidth={2.2} />
 	                    </button>
@@ -756,11 +756,11 @@ export function PlannerWeeksGrid({
 	                  e.dataTransfer.dropEffect = "move";
 	                }}
 	                onDrop={(e) => dropOnSlot(e, dateStr, slot)}
-		                className={`flex w-full items-center justify-between gap-1 rounded border border-dashed px-1.5 py-1 text-[10px] transition-opacity hover:bg-zinc-50 dark:hover:bg-zinc-800/60 ${
-		                  copiedSessionId
-		                    ? "border-zinc-400 bg-white text-zinc-700 opacity-100 dark:border-zinc-500 dark:bg-zinc-900 dark:text-zinc-200"
-		                    : "border-zinc-200 text-zinc-400 dark:border-zinc-700 dark:text-zinc-500"
-		                } ${
+                className={`flex h-8 w-full items-center justify-between gap-1 rounded-lg border border-dashed px-2 text-[11px] font-medium transition-all duration-150 active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-zinc-300 ${
+                  copiedSessionId
+                    ? "border-zinc-300 bg-white text-zinc-900 shadow-sm hover:bg-zinc-50 dark:border-zinc-600 dark:bg-zinc-900 dark:text-zinc-100 dark:hover:bg-zinc-800"
+                    : "border-zinc-200 bg-transparent text-zinc-400 hover:border-zinc-300 hover:bg-zinc-50 hover:text-zinc-700 dark:border-zinc-700 dark:text-zinc-500 dark:hover:border-zinc-600 dark:hover:bg-zinc-800/60 dark:hover:text-zinc-300"
+                } ${
 		                  draggingSessionId || copiedSessionId
 		                    ? "opacity-100"
 		                    : "opacity-0 group-hover:opacity-100"
@@ -833,12 +833,12 @@ export function PlannerWeeksGrid({
 
   return (
     <div className="flex flex-col gap-3">
-      <div className="flex flex-wrap items-center gap-3 rounded-lg border border-zinc-200 bg-zinc-50/70 p-2.5 dark:border-zinc-800 dark:bg-zinc-900/60">
+      <div className="flex flex-wrap items-center gap-3 rounded-lg border border-zinc-200 bg-zinc-50/60 p-3 dark:border-zinc-800 dark:bg-zinc-950/40">
         <div className="flex items-center gap-2 px-1">
           <button
             type="button"
             onClick={() => shiftMonth(-1)}
-            className="flex h-7 w-7 items-center justify-center rounded-md border border-zinc-200 bg-white text-zinc-600 hover:bg-zinc-50 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-300 dark:hover:bg-zinc-800"
+            className="inline-flex h-8 w-8 items-center justify-center rounded-lg border border-zinc-200 bg-white text-sm font-medium text-zinc-700 shadow-sm transition-all duration-150 hover:bg-zinc-50 hover:text-zinc-900 active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-zinc-300 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-300 dark:hover:bg-zinc-800 dark:hover:text-zinc-100"
             aria-label={t("prev")}
           >
             ‹
@@ -849,7 +849,7 @@ export function PlannerWeeksGrid({
           <button
             type="button"
             onClick={() => shiftMonth(1)}
-            className="flex h-7 w-7 items-center justify-center rounded-md border border-zinc-200 bg-white text-zinc-600 hover:bg-zinc-50 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-300 dark:hover:bg-zinc-800"
+            className="inline-flex h-8 w-8 items-center justify-center rounded-lg border border-zinc-200 bg-white text-sm font-medium text-zinc-700 shadow-sm transition-all duration-150 hover:bg-zinc-50 hover:text-zinc-900 active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-zinc-300 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-300 dark:hover:bg-zinc-800 dark:hover:text-zinc-100"
             aria-label={t("next")}
           >
             ›
@@ -857,7 +857,7 @@ export function PlannerWeeksGrid({
           <button
             type="button"
             onClick={jumpToToday}
-            className="ml-1 rounded-md border border-zinc-200 bg-white px-2.5 py-1 text-xs font-medium text-zinc-700 hover:bg-zinc-50 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-200 dark:hover:bg-zinc-800"
+            className="ml-1 inline-flex h-8 items-center justify-center rounded-lg border border-zinc-200 bg-white px-3 text-sm font-medium text-zinc-900 shadow-sm transition-all duration-150 hover:bg-zinc-50 hover:ring-1 hover:ring-zinc-300 active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-zinc-300 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100 dark:hover:bg-zinc-800"
           >
             {t("today")}
           </button>
@@ -871,10 +871,10 @@ export function PlannerWeeksGrid({
                 key={type}
                 type="button"
                 onClick={() => toggleType(type)}
-                className={`inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-xs font-medium shadow-sm transition-colors ${
+                className={`inline-flex h-8 items-center gap-1.5 rounded-lg border px-3 text-xs font-medium transition-all duration-150 active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-zinc-300 ${
                   on
-                    ? "border-zinc-200 bg-white text-zinc-800 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100"
-                    : "border-zinc-200 bg-white text-zinc-400 opacity-60 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-500"
+                    ? "border-zinc-200 bg-white text-zinc-900 shadow-sm dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100"
+                    : "border-transparent bg-transparent text-zinc-400 hover:bg-zinc-100 hover:text-zinc-700 dark:text-zinc-500 dark:hover:bg-zinc-800 dark:hover:text-zinc-300"
                 }`}
               >
                 <span

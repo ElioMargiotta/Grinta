@@ -22,6 +22,7 @@ import Image from "next/image";
 import { useRouter } from "next/navigation";
 import {
   type ChangeEvent,
+  type ClipboardEvent,
   type CSSProperties,
   type ReactNode,
   useCallback,
@@ -188,7 +189,7 @@ const Z_GLOBAL = {
   characteristicForm: { x: 63, y: 48, w: 134, h: 9 },
   focus: { x: 63, y: 57.5, w: 134, h: 7 },
   objectives: { x: 63, y: 64, w: 134, h: 7 },
-  developmentQuestions: { x: 63, y: 74, w: 134, h: 10 },
+  developmentQuestions: { x: 63, y: 72, w: 134, h: 10 },
 } as const;
 
 // Placeholder zones for later sections — kept here so the PDF
@@ -209,7 +210,8 @@ const Z_INITIAL = {
   hamstringCoaching: { x: 137, y: 176, w: 60, h: 9 },
   phase2Schema: { x: 18, y: 200, w: 51, h: 37 },
   phase2Description: { x: 75, y: 200, w: 60, h: 33 },
-  phase2Coaching: { x: 137, y: 200, w: 60, h: 33 },
+  phase2Coaching: { x: 137, y: 200, w: 60, h: 37 },
+  phase3Schema: { x: 18, y: 246, w: 51, h: 34 },
   phase3Description: { x: 75, y: 245, w: 60, h: 33 },
   phase3Coaching: { x: 138, y: 245, w: 60, h: 33 },
 } as const;
@@ -240,7 +242,7 @@ const Z_MAIN_2 = {
 
 const Z_END = {
   gameDuration: { x: 151.5, y: 191, w: 39, h: 6 },
-  gameSchema: { x: 14.5, y: 198, w: 66, h: 37 },
+  gameSchema: { x: 14.5, y: 198, w: 60, h: 31 },
   gameNotes: { x: 76, y: 196.5, w: 60, h: 35 },
   endDuration: { x: 151.5, y: 232, w: 39, h: 6 },
   endNotes: { x: 76, y: 238, w: 60, h: 18 },
@@ -344,6 +346,12 @@ function PdfExport({ data }: { data: PreparationData }) {
           value={data.initial.phase2.coaching}
           area={Z_INITIAL.phase2Coaching}
         />
+        {data.initial.phase3.imageUrl && (
+          <ExportImage
+            src={data.initial.phase3.imageUrl}
+            area={Z_INITIAL.phase3Schema}
+          />
+        )}
         <ExportText
           value={data.initial.phase3.description}
           area={Z_INITIAL.phase3Description}
@@ -417,11 +425,15 @@ function PdfExport({ data }: { data: PreparationData }) {
 
         {/* Jeu / Fin / Réflexion */}
         <ExportText value={data.game.duration} area={Z_END.gameDuration} />
-        <ExportSchema
-          data={data.game.schema}
-          area={Z_END.gameSchema}
-          settingsKey="game"
-        />
+        {data.game.imageUrl ? (
+          <ExportImage src={data.game.imageUrl} area={Z_END.gameSchema} />
+        ) : (
+          <ExportSchema
+            data={data.game.schema}
+            area={Z_END.gameSchema}
+            settingsKey="game"
+          />
+        )}
         <ExportText value={data.game.notes} area={Z_END.gameNotes} />
         <ExportText value={data.end.duration} area={Z_END.endDuration} />
         <ExportText value={data.end.notes} area={Z_END.endNotes} />
@@ -637,6 +649,49 @@ function FitTextarea({
     onChange(next);
   }
 
+  function handlePaste(e: ClipboardEvent<HTMLTextAreaElement>) {
+    const pasted = e.clipboardData.getData("text");
+    if (!pasted) return;
+
+    const target = e.currentTarget;
+    const start = target.selectionStart ?? value.length;
+    const end = target.selectionEnd ?? start;
+    const before = value.slice(0, start);
+    const after = value.slice(end);
+    const maxPasteLength =
+      maxChars === undefined
+        ? pasted.length
+        : Math.max(0, maxChars - before.length - after.length);
+    const pasteText = pasted.slice(0, maxPasteLength);
+
+    e.preventDefault();
+
+    const candidate = `${before}${pasteText}${after}`;
+    if (fitsInExportBox(candidate, area.w, area.h)) {
+      onChange(candidate);
+      return;
+    }
+
+    let lo = 0;
+    let hi = pasteText.length;
+    let best = "";
+    while (lo <= hi) {
+      const mid = Math.floor((lo + hi) / 2);
+      const next = `${before}${pasteText.slice(0, mid)}${after}`;
+      if (fitsInExportBox(next, area.w, area.h)) {
+        best = pasteText.slice(0, mid);
+        lo = mid + 1;
+      } else {
+        hi = mid - 1;
+      }
+    }
+
+    const clipped = `${before}${best}${after}`;
+    if (clipped !== value && fitsInExportBox(clipped, area.w, area.h)) {
+      onChange(clipped);
+    }
+  }
+
   const baseClass = className ?? txtaClass;
   const overflowFlag = className
     ? "border-red-400 focus:border-red-500"
@@ -649,6 +704,7 @@ function FitTextarea({
         rows={rows}
         value={value}
         onChange={handleChange}
+        onPaste={handlePaste}
         placeholder={placeholder}
         className={`${baseClass} ${fits ? "" : overflowFlag}`}
       />
@@ -1197,10 +1253,74 @@ function Step1({
   );
 }
 
+function fitImportedText(text: string, area: Box, maxChars: number) {
+  const clean = text.trim();
+  if (clean.length <= maxChars && fitsInExportBox(clean, area.w, area.h)) {
+    return clean;
+  }
+
+  let next = clean.slice(0, Math.max(0, maxChars - 3)).trimEnd();
+  while (next.length > 0 && !fitsInExportBox(`${next}...`, area.w, area.h)) {
+    next = next.slice(0, -12).trimEnd();
+  }
+  return next ? `${next}...` : "";
+}
+
+function buildPhase3Import(ex: LibraryExercise) {
+  const coaching = (ex.forme_physique ?? []).map((tag) => `• ${tag}`).join("\n");
+  return {
+    description: fitImportedText(
+      ex.description ?? "",
+      Z_INITIAL.phase3Description,
+      420,
+    ),
+    coaching: fitImportedText(coaching, Z_INITIAL.phase3Coaching, 420),
+    exerciseId: ex.id,
+    imageUrl: ex.main_image ?? "",
+  };
+}
+
+function buildFinalGameImport(ex: LibraryExercise, focusFamilies: FocusFamily[]) {
+  const fill = buildMainBlockFromLibrary(ex, focusFamilies);
+  const notes = [
+    fill.description,
+    fill.organisation && `Organisation:\n${fill.organisation}`,
+    fill.coaching && `Coaching:\n${fill.coaching}`,
+  ]
+    .filter(Boolean)
+    .join("\n\n");
+
+  return {
+    notes: fitImportedText(notes, Z_END.gameNotes, 360),
+    duration: fill.duration,
+    exerciseId: fill.exerciseId,
+    imageUrl: fill.imageUrl,
+  };
+}
+
 /* Step 2 — Warm-up & prep (tabbed phases) */
-function Step2({ data, patch }: { data: PreparationData; patch: Patcher }) {
+function Step2({
+  data,
+  patch,
+  library,
+}: {
+  data: PreparationData;
+  patch: Patcher;
+  library: LibraryExercise[];
+}) {
   const [tab, setTab] = useState<"p1" | "p2" | "p3">("p1");
+  const [phase3PickerOpen, setPhase3PickerOpen] = useState(false);
   const pv = data.initial.phase1.prevention;
+  const phase3Exercises = useMemo(
+    () =>
+      library.filter(
+        (ex) =>
+          ex.theme === "Explosivité" ||
+          ex.source === "asf_co_2026" ||
+          ex.code?.startsWith("CO_EX_"),
+      ),
+    [library],
+  );
   const prevRows = [
     {
       k: "ankle" as const,
@@ -1238,6 +1358,38 @@ function Step2({ data, patch }: { data: PreparationData; patch: Patcher }) {
       : tab === "p2"
         ? "Phase 2 - Échauffement (TE/TA/PE)"
         : "Phase 3 - Explosivité";
+
+  function importPhase3(picked: LibraryExercise) {
+    const fill = buildPhase3Import(picked);
+    patch((d) => ({
+      ...d,
+      initial: {
+        ...d.initial,
+        phase3: {
+          ...d.initial.phase3,
+          description: fill.description,
+          coaching: fill.coaching,
+          exerciseId: fill.exerciseId,
+          imageUrl: fill.imageUrl,
+        },
+      },
+    }));
+    setPhase3PickerOpen(false);
+  }
+
+  function clearPhase3Import() {
+    patch((d) => ({
+      ...d,
+      initial: {
+        ...d.initial,
+        phase3: {
+          ...d.initial.phase3,
+          exerciseId: undefined,
+          imageUrl: undefined,
+        },
+      },
+    }));
+  }
 
   return (
     <div className="mx-auto flex w-full max-w-[1120px] flex-col gap-4 py-1">
@@ -1493,7 +1645,7 @@ function Step2({ data, patch }: { data: PreparationData; patch: Patcher }) {
                 <FieldUl label="Coaching">
                   <FitTextarea
                     rows={9}
-                    maxChars={420}
+                    maxChars={560}
                     area={Z_INITIAL.phase2Coaching}
                     value={data.initial.phase2.coaching}
                     onChange={(v) =>
@@ -1515,6 +1667,51 @@ function Step2({ data, patch }: { data: PreparationData; patch: Patcher }) {
 
           {tab === "p3" && (
             <div className="grid grid-cols-1 gap-5">
+              <div className="flex items-center justify-between gap-4 border-b border-zinc-200 pb-2">
+                <div className="min-w-0">
+                  <div className="text-[12px] font-semibold text-zinc-900">
+                    Explosivité
+                  </div>
+                  <div className="mt-0.5 truncate text-[11px] text-zinc-500">
+                    {data.initial.phase3.exerciseId
+                      ? "Exercice importé dans les champs exportés du PDF"
+                      : "Importer un exercice Base CO explosivité"}
+                  </div>
+                </div>
+                <div className="flex shrink-0 items-center gap-2">
+                  {data.initial.phase3.imageUrl && (
+                    <button
+                      type="button"
+                      onClick={clearPhase3Import}
+                      className="inline-flex h-7 items-center gap-1.5 border-b border-zinc-300 px-1 text-[11px] font-semibold text-zinc-500 transition hover:border-zinc-900 hover:text-zinc-900"
+                    >
+                      <X className="h-3.5 w-3.5" strokeWidth={2} />
+                      Retirer
+                    </button>
+                  )}
+                  <button
+                    type="button"
+                    onClick={() => setPhase3PickerOpen(true)}
+                    className="inline-flex h-7 items-center gap-1.5 border-b border-zinc-900 px-1 text-[11px] font-semibold text-zinc-950 transition hover:border-red-500 hover:text-red-600"
+                  >
+                    <BookOpen className="h-3.5 w-3.5" strokeWidth={2} />
+                    Importer
+                  </button>
+                </div>
+              </div>
+              {data.initial.phase3.imageUrl && (
+                <div className="relative max-w-[360px] overflow-hidden">
+                  <div className="relative aspect-[4/3] w-full">
+                    <Image
+                      src={data.initial.phase3.imageUrl}
+                      alt="Exercice explosivité importé"
+                      fill
+                      sizes="360px"
+                      className="object-contain"
+                    />
+                  </div>
+                </div>
+              )}
               <div className="grid min-w-0 gap-4 md:grid-cols-2">
                 <FieldUl label="Contenu">
                   <FitTextarea
@@ -1561,6 +1758,17 @@ function Step2({ data, patch }: { data: PreparationData; patch: Patcher }) {
                   />
                 </FieldUl>
               </div>
+              <ExerciseLibraryPicker
+                open={phase3PickerOpen}
+                onClose={() => setPhase3PickerOpen(false)}
+                exercises={phase3Exercises}
+                phases={data.phases}
+                focusFamilies={["PE"]}
+                onPick={importPhase3}
+                title="Bibliothèque explosivité"
+                subtitle={`${phase3Exercises.length} exercices Base CO explosivité · cliquer pour exporter dans la phase 3`}
+                phaseFiltering={false}
+              />
             </div>
           )}
         </div>
@@ -1804,13 +2012,51 @@ function StepMain({
         phases={data.phases}
         focusFamilies={data.focusFamilies}
         onPick={importFromLibrary}
+        subtitle="Toute la bibliothèque · triée par pertinence avec le focus de séance"
+        phaseFiltering={false}
       />
     </div>
   );
 }
 
 /* Step 5 — Final game & wrap-up */
-function Step5({ data, patch }: { data: PreparationData; patch: Patcher }) {
+function Step5({
+  data,
+  patch,
+  library,
+}: {
+  data: PreparationData;
+  patch: Patcher;
+  library: LibraryExercise[];
+}) {
+  const [pickerOpen, setPickerOpen] = useState(false);
+
+  function importFinalGame(picked: LibraryExercise) {
+    const fill = buildFinalGameImport(picked, data.focusFamilies);
+    patch((d) => ({
+      ...d,
+      game: {
+        ...d.game,
+        duration: fill.duration || d.game.duration,
+        notes: fill.notes,
+        exerciseId: fill.exerciseId,
+        imageUrl: fill.imageUrl,
+      },
+    }));
+    setPickerOpen(false);
+  }
+
+  function clearFinalGameImport() {
+    patch((d) => ({
+      ...d,
+      game: {
+        ...d.game,
+        exerciseId: undefined,
+        imageUrl: undefined,
+      },
+    }));
+  }
+
   return (
     <div className="mx-auto flex w-full max-w-[1120px] flex-col gap-3 py-0">
       <section className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_430px]">
@@ -1865,20 +2111,53 @@ function Step5({ data, patch }: { data: PreparationData; patch: Patcher }) {
       </section>
 
       <section className="border-t border-zinc-200 pt-1.5">
-        <div className="mb-1.5 text-[13px] font-semibold text-zinc-900">
-          Jeu final
+        <div className="mb-1.5 flex items-center justify-between gap-4">
+          <div className="text-[13px] font-semibold text-zinc-900">
+            Jeu final
+          </div>
+          <button
+            type="button"
+            onClick={() => setPickerOpen(true)}
+            className="inline-flex h-7 shrink-0 items-center gap-1.5 border-b border-zinc-900 px-1 text-[11px] font-semibold text-zinc-950 transition hover:border-red-500 hover:text-red-600"
+          >
+            <BookOpen className="h-3.5 w-3.5" strokeWidth={2} />
+            Importer
+          </button>
         </div>
         <div className="grid grid-cols-1 items-start gap-4 lg:grid-cols-[minmax(330px,0.78fr)_minmax(0,1.22fr)]">
           <div className="overflow-hidden [&>div]:border-0 [&>div]:bg-transparent">
-          <SchemaEditor
-            pitch="full-horizontal"
-            settingsKey="game"
-            showHint={false}
-            value={data.game.schema}
-            onChange={(v) =>
-              patch((d) => ({ ...d, game: { ...d.game, schema: v } }))
-            }
-          />
+            {data.game.imageUrl ? (
+              <div className="relative overflow-hidden">
+                <div className="relative aspect-[4/3] w-full">
+                  <Image
+                    src={data.game.imageUrl}
+                    alt="Exercice importé pour le jeu final"
+                    fill
+                    sizes="(max-width: 1024px) 100vw, 50vw"
+                    className="object-contain"
+                  />
+                </div>
+                <button
+                  type="button"
+                  onClick={clearFinalGameImport}
+                  className="absolute right-2 top-2 inline-flex items-center gap-1 rounded-md bg-white/95 px-2 py-1 text-[11px] font-medium text-zinc-700 shadow-sm ring-1 ring-zinc-200 transition hover:bg-white hover:text-zinc-900"
+                  title="Retirer l'image et revenir au schéma éditable"
+                >
+                  <X className="h-3 w-3" strokeWidth={2.5} />
+                  Retirer l&apos;image
+                </button>
+              </div>
+            ) : (
+              <SchemaEditor
+                pitch="full-horizontal"
+                settingsKey="game"
+                showHint={false}
+                value={data.game.schema}
+                onChange={(v) =>
+                  patch((d) => ({ ...d, game: { ...d.game, schema: v } }))
+                }
+              />
+            )}
           </div>
 
           <div className="grid min-w-0 gap-3 md:grid-cols-2">
@@ -1924,6 +2203,17 @@ function Step5({ data, patch }: { data: PreparationData; patch: Patcher }) {
           </div>
         </div>
       </section>
+      <ExerciseLibraryPicker
+        open={pickerOpen}
+        onClose={() => setPickerOpen(false)}
+        exercises={library}
+        phases={data.phases}
+        focusFamilies={data.focusFamilies}
+        onPick={importFinalGame}
+        title="Bibliothèque jeu final"
+        subtitle="Toute la bibliothèque · cliquer pour importer dans le jeu final"
+        phaseFiltering={false}
+      />
     </div>
   );
 }
@@ -2154,7 +2444,7 @@ export function PreparationSheet({
   sessionMeta,
   weekTheme,
 }: {
-  teamId: string;
+  teamId: string | null;
   sessionId: string;
   initial: PreparationData;
   libraryExercises: LibraryExercise[];
@@ -2288,7 +2578,7 @@ export function PreparationSheet({
           />
         );
       case 1:
-        return <Step2 data={data} patch={patch} />;
+        return <Step2 data={data} patch={patch} library={libraryExercises} />;
       case 2:
         return (
           <StepMain
@@ -2310,7 +2600,7 @@ export function PreparationSheet({
           />
         );
       case 4:
-        return <Step5 data={data} patch={patch} />;
+        return <Step5 data={data} patch={patch} library={libraryExercises} />;
       default:
         return (
           <Step6
@@ -2343,7 +2633,7 @@ export function PreparationSheet({
             </button>
             <span className="mx-3 h-[18px] w-px bg-zinc-200" />
             <Image
-              src="/icon-grinta.svg"
+              src="/grinta-icon.svg"
               alt=""
               width={28}
               height={28}
@@ -2418,14 +2708,14 @@ export function PreparationSheet({
           <aside className="hidden w-[232px] shrink-0 flex-col overflow-hidden border-r border-zinc-200 bg-white md:flex">
             <div className="flex items-center gap-2 px-4 pb-3 pt-4">
               <Image
-                src="/icon-grinta.svg"
+                src="/grinta-icon.svg"
                 alt=""
                 width={20}
                 height={20}
                 className="h-5 w-5"
               />
               <Image
-                src="/text-grinta.svg"
+                src="/grinta-wordmark.svg"
                 alt="Grinta"
                 width={72}
                 height={20}

@@ -5,15 +5,67 @@ import { Button } from "@/components/ui/Button";
 import { Link } from "@/i18n/navigation";
 import { requireUser } from "@/lib/auth/getUser";
 
-const THEMES = [
+// Exercise libraries seeded from different PDFs.
+// `phases` = clubcorner_2026 (tactical phases of play)
+// `gestes` = asf_te_2026     (technical-gesture booklets, Base TE)
+// `co`     = asf_co_2026     (physical conditioning booklets, Base CO)
+type LibraryFamily = "phases" | "gestes" | "co";
+
+const PHASE_THEMES = [
   "Mon équipe possède le ballon",
   "Mon équipe perd le ballon",
   "Mon équipe ne possède pas le ballon",
   "Mon équipe récupère le ballon",
 ] as const;
 
-const TRACKS = ["Base TA", "Développement TA", "Stratégie Team"] as const;
-const LEVELS = [1, 2, 3, 4, 5, 6] as const;
+const GESTE_THEMES = [
+  "Passe et prise de balle",
+  "Conduite du ballon et dribble",
+  "Tir au but",
+  "Techniques aériennes",
+] as const;
+
+const CO_THEMES = ["Explosivité", "Stabilité corporelle"] as const;
+
+const PHASE_TRACKS = ["Base TA", "Développement TA", "Stratégie Team"] as const;
+// CO tracks depend on the selected theme. When no theme is active we show
+// the union so users see what's available without committing to a theme.
+const CO_TRACKS_BY_THEME: Record<string, readonly string[]> = {
+  Explosivité: ["Accélérations", "Changements de direction", "Sauts"],
+  "Stabilité corporelle": [
+    "Coordination et TE",
+    "Coordination et TE en salle",
+    "Duels",
+  ],
+};
+const CO_TRACKS_ALL = [
+  ...CO_TRACKS_BY_THEME["Explosivité"],
+  ...CO_TRACKS_BY_THEME["Stabilité corporelle"],
+] as const;
+const PHASE_LEVELS = [1, 2, 3, 4, 5, 6] as const;
+const GESTE_LEVELS = [1, 2, 3] as const;
+const CO_LEVELS = [1, 2, 3, 4, 5, 6, 7, 8] as const;
+
+const LIBRARY_TABS: { id: LibraryFamily; label: string; source: string; hint: string }[] = [
+  {
+    id: "phases",
+    label: "Phases de jeu",
+    source: "clubcorner_2026",
+    hint: "ASF / clubcorner — filtres par phase de jeu, track et niveau",
+  },
+  {
+    id: "gestes",
+    label: "Gestes techniques",
+    source: "asf_te_2026",
+    hint: "ASF Base TE — passe, conduite & dribble, tir au but, techniques aériennes, niveaux 1 à 3",
+  },
+  {
+    id: "co",
+    label: "Condition physique",
+    source: "asf_co_2026",
+    hint: "ASF Base CO — explosivité, stabilité corporelle (niveaux 1 à 8)",
+  },
+];
 
 type Family = "PE" | "TA" | "AT" | "TE";
 const FAMILIES: { id: Family; label: string; column: "forme_physique" | "tactique" | "mentalite" | "technique" }[] = [
@@ -43,6 +95,7 @@ type ExerciseRow = {
 };
 
 type SearchParams = {
+  family?: string;
   theme?: string;
   track?: string;
   level?: string;
@@ -67,6 +120,14 @@ function chipHref(current: SearchParams, key: keyof SearchParams, value: string 
   return qs ? `/exercises?${qs}` : "/exercises";
 }
 
+// Switching family resets the family-specific filters (theme/track/level)
+// since their domains differ. Focus coaching survives — it's family-agnostic.
+function familyHref(current: SearchParams, family: LibraryFamily) {
+  const next: Record<string, string> = { family };
+  if (current.focus) next.focus = current.focus;
+  return `/exercises?${new URLSearchParams(next).toString()}`;
+}
+
 export default async function ExercisesPage({
   params,
   searchParams,
@@ -79,17 +140,42 @@ export default async function ExercisesPage({
   setRequestLocale(locale);
   const { supabase } = await requireUser(locale);
 
+  const activeTab =
+    LIBRARY_TABS.find((t) => t.id === sp.family) ?? LIBRARY_TABS[0];
+  const themes =
+    activeTab.id === "phases"
+      ? PHASE_THEMES
+      : activeTab.id === "co"
+        ? CO_THEMES
+        : GESTE_THEMES;
+  const levels =
+    activeTab.id === "phases"
+      ? PHASE_LEVELS
+      : activeTab.id === "co"
+        ? CO_LEVELS
+        : GESTE_LEVELS;
+  const tracks: readonly string[] | null =
+    activeTab.id === "phases"
+      ? PHASE_TRACKS
+      : activeTab.id === "co"
+        ? sp.theme && CO_TRACKS_BY_THEME[sp.theme]
+          ? CO_TRACKS_BY_THEME[sp.theme]
+          : CO_TRACKS_ALL
+        : null;
+  const showTracks = tracks !== null;
+
   let query = supabase
     .from("exercises")
     .select(
       "id, code, titre, name, theme, track, level, niveau, duree, description, duration_minutes, forme_physique, tactique, mentalite, technique, main_image",
     )
+    .eq("source", activeTab.source)
     .order("theme", { ascending: true, nullsFirst: false })
     .order("track", { ascending: true, nullsFirst: false })
     .order("level", { ascending: true, nullsFirst: false });
 
   if (sp.theme) query = query.eq("theme", sp.theme);
-  if (sp.track) query = query.eq("track", sp.track);
+  if (sp.track && showTracks) query = query.eq("track", sp.track);
   if (sp.level) query = query.eq("level", Number(sp.level));
 
   const { data } = await query;
@@ -105,9 +191,7 @@ export default async function ExercisesPage({
           <h1 className="text-2xl font-semibold tracking-tight text-zinc-900">
             Exercise library
           </h1>
-          <p className="mt-1 text-sm text-zinc-500">
-            ASF / clubcorner library — filter by phase de jeu, niveau, and coaching focus.
-          </p>
+          <p className="mt-1 text-sm text-zinc-500">{activeTab.hint}.</p>
         </div>
         <Link href="/exercises/new">
           <Button>
@@ -117,13 +201,33 @@ export default async function ExercisesPage({
         </Link>
       </div>
 
+      {/* Family tabs — switch between the two seeded libraries. */}
+      <div className="flex w-fit gap-1 rounded-[10px] bg-zinc-100 p-1">
+        {LIBRARY_TABS.map((tab) => {
+          const isActive = activeTab.id === tab.id;
+          return (
+            <Link
+              key={tab.id}
+              href={familyHref(sp, tab.id)}
+              className={`rounded-[8px] px-4 py-1.5 text-[13px] font-medium transition ${
+                isActive
+                  ? "bg-white text-zinc-900 shadow-[0_1px_3px_rgb(0_0_0/0.1)]"
+                  : "text-zinc-500 hover:text-zinc-800"
+              }`}
+            >
+              {tab.label}
+            </Link>
+          );
+        })}
+      </div>
+
       {/* Filter bar */}
       <div className="flex flex-col gap-3 rounded-xl border border-zinc-200 bg-white p-4 shadow-sm">
-        <FilterRow label="Phase de jeu">
+        <FilterRow label={activeTab.id === "phases" ? "Phase de jeu" : "Thème"}>
           <Link href={chipHref(sp, "theme", null)} className={chipStyle(!sp.theme)}>
             All
           </Link>
-          {THEMES.map((t) => (
+          {themes.map((t) => (
             <Link key={t} href={chipHref(sp, "theme", t)} className={chipStyle(sp.theme === t)}>
               {t}
             </Link>
@@ -131,19 +235,23 @@ export default async function ExercisesPage({
         </FilterRow>
 
         <FilterRow label="Niveau">
-          <Link href={chipHref(sp, "track", null)} className={chipStyle(!sp.track)}>
-            All tracks
-          </Link>
-          {TRACKS.map((t) => (
-            <Link key={t} href={chipHref(sp, "track", t)} className={chipStyle(sp.track === t)}>
-              {t}
-            </Link>
-          ))}
-          <span className="mx-2 h-4 w-px self-center bg-zinc-200" />
+          {showTracks && tracks && (
+            <>
+              <Link href={chipHref(sp, "track", null)} className={chipStyle(!sp.track)}>
+                All tracks
+              </Link>
+              {tracks.map((t) => (
+                <Link key={t} href={chipHref(sp, "track", t)} className={chipStyle(sp.track === t)}>
+                  {t}
+                </Link>
+              ))}
+              <span className="mx-2 h-4 w-px self-center bg-zinc-200" />
+            </>
+          )}
           <Link href={chipHref(sp, "level", null)} className={chipStyle(!sp.level)}>
             All
           </Link>
-          {LEVELS.map((n) => (
+          {levels.map((n) => (
             <Link
               key={n}
               href={chipHref(sp, "level", String(n))}
