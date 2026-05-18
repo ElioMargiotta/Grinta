@@ -1,6 +1,6 @@
 import { notFound } from "next/navigation";
 import { ChevronLeft } from "lucide-react";
-import { setRequestLocale } from "next-intl/server";
+import { getTranslations, setRequestLocale } from "next-intl/server";
 import { Card } from "@/components/ui/Card";
 import { ExerciseForm } from "@/components/exercises/ExerciseForm";
 import { ExerciseLibraryView } from "@/components/exercises/ExerciseLibraryView";
@@ -15,6 +15,7 @@ export default async function ExerciseDetailPage({
 }) {
   const { locale, exerciseId } = await params;
   setRequestLocale(locale);
+  const t = await getTranslations("exercises.page");
   const { supabase } = await requireUser(locale);
 
   const { data: exercise } = await supabase
@@ -36,7 +37,7 @@ export default async function ExerciseDetailPage({
           className="inline-flex items-center gap-1 text-[12px] font-medium text-zinc-500 transition hover:text-zinc-900"
         >
           <ChevronLeft className="h-3.5 w-3.5" />
-          Back to library
+          {t("backToLibrary")}
         </Link>
         {!isLibrary && <DeleteExerciseButton id={exercise.id} />}
       </div>

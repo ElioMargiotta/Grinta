@@ -20,6 +20,7 @@ type ArchivedTeam = {
 export function ArchivedTeamCard({ team }: { team: ArchivedTeam }) {
   const locale = useLocale();
   const t = useTranslations("teams.archived");
+  const tc = useTranslations("common");
   const [purging, setPurging] = useState(false);
   const [typed, setTyped] = useState("");
   const [error, setError] = useState<string | null>(null);
@@ -37,7 +38,7 @@ export function ArchivedTeamCard({ team }: { team: ArchivedTeam }) {
       try {
         await restoreTeamAction(fd);
       } catch (e) {
-        const msg = e instanceof Error ? e.message : "Unknown error";
+        const msg = e instanceof Error ? e.message : tc("unknownError");
         if (!msg.includes("NEXT_REDIRECT")) setError(msg);
       }
     });
@@ -53,7 +54,7 @@ export function ArchivedTeamCard({ team }: { team: ArchivedTeam }) {
       try {
         await permanentlyDeleteTeamAction(fd);
       } catch (e) {
-        const msg = e instanceof Error ? e.message : "Unknown error";
+        const msg = e instanceof Error ? e.message : tc("unknownError");
         if (!msg.includes("NEXT_REDIRECT")) setError(msg);
       }
     });

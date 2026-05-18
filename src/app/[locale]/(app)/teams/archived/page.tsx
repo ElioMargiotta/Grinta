@@ -1,5 +1,5 @@
 import { redirect } from "next/navigation";
-import { setRequestLocale } from "next-intl/server";
+import { getTranslations, setRequestLocale } from "next-intl/server";
 import { ArrowLeft } from "lucide-react";
 import { Card } from "@/components/ui/Card";
 import { Link } from "@/i18n/navigation";
@@ -14,6 +14,7 @@ export default async function ArchivedTeamsPage({
 }) {
   const { locale } = await params;
   setRequestLocale(locale);
+  const t = await getTranslations("teams.archived");
   const { supabase } = await requireUser(locale);
 
   const membership = await resolveCurrentMembership();
@@ -36,22 +37,22 @@ export default async function ArchivedTeamsPage({
           className="mb-3 inline-flex items-center gap-1 text-xs font-medium text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100"
         >
           <ArrowLeft className="h-3.5 w-3.5" />
-          Retour aux équipes
+          {t("backToTeams")}
         </Link>
         <h1 className="text-2xl font-semibold tracking-tight text-zinc-900 dark:text-zinc-100">
-          Équipes archivées
+          {t("pageTitle")}
         </h1>
         <p className="mt-1 text-sm text-zinc-600 dark:text-zinc-400">
-          Une équipe archivée ne compte plus dans ta facturation à partir du
-          prochain cycle. Tu peux la <strong>restaurer</strong> à tout moment,
-          ou la <strong>supprimer définitivement</strong> (irréversible).
+          {t.rich("pageDesc", {
+            strong: (chunks) => <strong>{chunks}</strong>,
+          })}
         </p>
       </div>
 
       {rows.length === 0 ? (
         <Card>
           <p className="text-sm text-zinc-600 dark:text-zinc-400">
-            Aucune équipe archivée.
+            {t("empty")}
           </p>
         </Card>
       ) : (

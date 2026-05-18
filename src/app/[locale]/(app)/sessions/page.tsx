@@ -1,4 +1,4 @@
-import { setRequestLocale } from "next-intl/server";
+import { getTranslations, setRequestLocale } from "next-intl/server";
 import { PreparationSheet } from "@/components/sheet/PreparationSheet";
 import type { LibraryExercise } from "@/components/sheet/ExerciseLibraryPicker";
 import { mergePreparation, type PreparationData } from "@/components/sheet/types";
@@ -15,6 +15,7 @@ export default async function SoloWizardPage({
 }) {
   const { locale } = await params;
   setRequestLocale(locale);
+  const t = await getTranslations("sessions");
   const { supabase, user } = await requireUser(locale);
 
   // Find or pre-create the user's solo session.
@@ -55,7 +56,7 @@ export default async function SoloWizardPage({
       .select("id, date, theme, start_time, duration_minutes")
       .single();
     if (error || !inserted) {
-      throw new Error(error?.message ?? "Impossible de créer la session.");
+      throw new Error(error?.message ?? t("cannotCreate"));
     }
     sessionId = inserted.id;
     sessionRow = inserted;

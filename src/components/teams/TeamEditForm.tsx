@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useTransition } from "react";
-import { useLocale } from "next-intl";
+import { useTranslations, useLocale } from "next-intl";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 import { Textarea } from "@/components/ui/Textarea";
@@ -17,6 +17,7 @@ type Team = {
 };
 
 export function TeamEditForm({ team }: { team: Team }) {
+  const t = useTranslations("teams.editForm");
   const locale = useLocale();
   const [error, setError] = useState<string | null>(null);
   const [saved, setSaved] = useState(false);
@@ -40,7 +41,7 @@ export function TeamEditForm({ team }: { team: Team }) {
       <Input
         id="name"
         name="name"
-        label="Nom de l'équipe"
+        label={t("name")}
         required
         defaultValue={team.name}
       />
@@ -49,15 +50,15 @@ export function TeamEditForm({ team }: { team: Team }) {
         <Input
           id="season"
           name="season"
-          label="Saison"
-          placeholder="2025-2026"
+          label={t("season")}
+          placeholder={t("seasonPlaceholder")}
           defaultValue={team.season ?? ""}
         />
         <Input
           id="ageGroup"
           name="ageGroup"
-          label="Catégorie"
-          placeholder="U13"
+          label={t("ageGroup")}
+          placeholder={t("ageGroupPlaceholder")}
           defaultValue={team.age_group ?? ""}
         />
       </div>
@@ -65,32 +66,32 @@ export function TeamEditForm({ team }: { team: Team }) {
       <Input
         id="photoUrl"
         name="photoUrl"
-        label="Photo d'équipe"
+        label={t("photoUrl")}
         type="url"
         inputMode="url"
-        placeholder="https://..."
+        placeholder={t("photoUrlPlaceholder")}
         defaultValue={team.photo_url ?? ""}
-        hint="URL https pour l'instant. L'upload direct peut venir ensuite."
+        hint={t("photoUrlHint")}
       />
 
       <Textarea
         id="description"
         name="description"
-        label="Description"
+        label={t("description")}
         rows={3}
-        placeholder="Notes, objectifs, identité de l'équipe…"
+        placeholder={t("descriptionPlaceholder")}
         defaultValue={team.description ?? ""}
       />
 
       {error && <p className="text-sm text-red-600">{error}</p>}
       {saved && !error && (
         <p className="text-sm text-emerald-700 dark:text-emerald-300">
-          Enregistré.
+          {t("saved")}
         </p>
       )}
 
       <Button type="submit" disabled={isPending} className="self-start">
-        {isPending ? "Enregistrement…" : "Enregistrer"}
+        {isPending ? t("saving") : t("save")}
       </Button>
     </form>
   );

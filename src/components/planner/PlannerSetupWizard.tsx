@@ -14,11 +14,7 @@ type MesocycleDraft = {
   color: string;
 };
 
-const DEFAULT_MESOS: () => MesocycleDraft[] = () => [
-  { id: "m1", name: "Préparation", kind: "preparation", weekCount: 3, color: "#0ea5e9" },
-  { id: "m2", name: "Compétition", kind: "competition", weekCount: 12, color: "#dc2626" },
-  { id: "m3", name: "Transition", kind: "transition", weekCount: 3, color: "#f59e0b" },
-];
+
 
 function mondayOfISO(iso: string): Date | null {
   if (!iso) return null;
@@ -43,12 +39,17 @@ export function PlannerSetupWizard({
 }) {
   const locale = useLocale();
   const t = useTranslations("planner.setup");
+  const tPlannerTour = useTranslations("planner.tour");
 
   const [name, setName] = useState(defaultName);
   const [preseasonStart, setPreseasonStart] = useState("");
   const [firstMatch, setFirstMatch] = useState("");
   const [endDate, setEndDate] = useState("");
-  const [mesos, setMesos] = useState<MesocycleDraft[]>(DEFAULT_MESOS);
+  const [mesos, setMesos] = useState<MesocycleDraft[]>(() => [
+    { id: "m1", name: t("kind.preparation"), kind: "preparation", weekCount: 3, color: "#0ea5e9" },
+    { id: "m2", name: t("kind.competition"), kind: "competition", weekCount: 12, color: "#dc2626" },
+    { id: "m3", name: t("kind.transition"), kind: "transition", weekCount: 3, color: "#f59e0b" },
+  ]);
   const [error, setError] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
 
@@ -142,7 +143,7 @@ export function PlannerSetupWizard({
           label={t("name")}
           value={name}
           onChange={(e) => setName(e.target.value)}
-          placeholder="1er tour"
+          placeholder={t("tourNamePlaceholder")}
         />
         <div /> {/* spacer */}
         <Input
@@ -202,7 +203,7 @@ export function PlannerSetupWizard({
                 value={m.color}
                 onChange={(e) => updateMeso(m.id, { color: e.target.value })}
                 className="h-10 w-10 cursor-pointer rounded-md border border-zinc-200 bg-transparent dark:border-zinc-700"
-                aria-label="color"
+                aria-label={tPlannerTour("colorAriaLabel")}
               />
               <Input
                 id={`meso-name-${m.id}`}

@@ -35,7 +35,7 @@ export function LoginForm() {
           type="email"
           autoComplete="email"
           required
-          placeholder="you@example.com"
+          placeholder={t("emailPlaceholder")}
           className={inputClass}
         />
       </AuthField>
@@ -51,6 +51,7 @@ export function LoginForm() {
           name="password"
           autoComplete="current-password"
           required
+          placeholder={t("passwordPlaceholder")}
         />
       </AuthField>
 

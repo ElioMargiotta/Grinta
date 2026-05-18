@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useTranslations } from "next-intl";
 import Image from "next/image";
 
 export type ExerciseLibrary = {
@@ -26,25 +27,18 @@ export type ExerciseLibrary = {
 
 type Family = "PE" | "TA" | "AT" | "TE";
 
-const FAMILIES: {
-  id: Family;
-  label: string;
-  column: keyof Pick<
-    ExerciseLibrary,
-    "forme_physique" | "tactique" | "mentalite" | "technique"
-  >;
-  hint: string;
-}[] = [
-  { id: "PE", label: "Forme physique", column: "forme_physique", hint: "Aspects physiques" },
-  { id: "TA", label: "Tactique",       column: "tactique",       hint: "Lecture de jeu" },
-  { id: "AT", label: "Mentalité",      column: "mentalite",      hint: "Attitude" },
-  { id: "TE", label: "Technique",      column: "technique",      hint: "Gestes techniques" },
+const FAMILY_IDS: { id: Family; column: keyof Pick<ExerciseLibrary, "forme_physique" | "tactique" | "mentalite" | "technique"> }[] = [
+  { id: "PE", column: "forme_physique" },
+  { id: "TA", column: "tactique" },
+  { id: "AT", column: "mentalite" },
+  { id: "TE", column: "technique" },
 ];
 
 export function ExerciseLibraryView({ ex }: { ex: ExerciseLibrary }) {
   const [activeFamily, setActiveFamily] = useState<Family>("TE");
   const titre = ex.titre ?? ex.name;
-  const active = FAMILIES.find((f) => f.id === activeFamily) ?? FAMILIES[0];
+  const t = useTranslations("libraries");
+  const active = FAMILY_IDS.find((f) => f.id === activeFamily) ?? FAMILY_IDS[0];
   const activeTags = ex[active.column] ?? [];
 
   return (
@@ -91,20 +85,20 @@ export function ExerciseLibraryView({ ex }: { ex: ExerciseLibrary }) {
           </div>
         ) : (
           <div className="flex aspect-[4/3] w-full items-center justify-center rounded-xl border border-zinc-200 bg-zinc-50 text-sm text-zinc-400 shadow-sm">
-            No diagram
+            {t("noDiagram")}
           </div>
         )}
 
         <div className="flex flex-col gap-4">
           {ex.description && (
-            <Section title="Description">
+            <Section title={t("description")}>
               <p className="whitespace-pre-line text-[13px] leading-relaxed text-zinc-700">
                 {ex.description}
               </p>
             </Section>
           )}
           {ex.organisation && (
-            <Section title="Organisation">
+            <Section title={t("organisation")}>
               <p className="whitespace-pre-line text-[13px] leading-relaxed text-zinc-700">
                 {ex.organisation}
               </p>
@@ -114,9 +108,9 @@ export function ExerciseLibraryView({ ex }: { ex: ExerciseLibrary }) {
       </div>
 
       {/* Coaching tabs */}
-      <Section title="Points de coaching">
+      <Section title={t("coachingPoints")}>
         <div className="flex flex-wrap gap-1 rounded-[10px] bg-zinc-100 p-1">
-          {FAMILIES.map((f) => {
+          {FAMILY_IDS.map((f) => {
             const count = (ex[f.column] ?? []).length;
             const isActive = activeFamily === f.id;
             return (
@@ -133,7 +127,7 @@ export function ExerciseLibraryView({ ex }: { ex: ExerciseLibrary }) {
                 <span className="font-mono text-[10px] tabular-nums opacity-70">
                   {f.id}
                 </span>
-                <span>{f.label}</span>
+                <span>{t(`families.${f.id}`)}</span>
                 <span
                   className={`rounded-full px-1.5 text-[10px] tabular-nums ${
                     isActive ? "bg-zinc-100 text-zinc-700" : "bg-zinc-200 text-zinc-600"
@@ -145,11 +139,11 @@ export function ExerciseLibraryView({ ex }: { ex: ExerciseLibrary }) {
             );
           })}
         </div>
-        <div className="mt-1 text-[11px] text-zinc-400">{active.hint}</div>
+        <div className="mt-1 text-[11px] text-zinc-400">{t(`familyHints.${active.id}`)}</div>
         <ul className="mt-3 flex flex-col gap-1.5">
           {activeTags.length === 0 ? (
             <li className="text-[12px] italic text-zinc-400">
-              No coaching points in this family.
+              {t("noCoachingPoints")}
             </li>
           ) : (
             activeTags.map((t, i) => (
@@ -167,16 +161,16 @@ export function ExerciseLibraryView({ ex }: { ex: ExerciseLibrary }) {
 
       {/* Variations */}
       {(ex.variation_less_text || ex.variation_more_text) && (
-        <Section title="Variations">
+        <Section title={t("variations")}>
           <div className="grid gap-3 sm:grid-cols-2">
             <VariationCard
               kind="less"
-              label="Variation Moins"
+              label={t("variationLess")}
               text={ex.variation_less_text}
             />
             <VariationCard
               kind="more"
-              label="Variation Plus"
+              label={t("variationMore")}
               text={ex.variation_more_text}
             />
           </div>

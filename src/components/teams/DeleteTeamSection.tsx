@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useTransition } from "react";
-import { useLocale } from "next-intl";
+import { useTranslations, useLocale } from "next-intl";
 import { AlertTriangle, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { archiveTeamAction } from "@/app/[locale]/(app)/teams/actions";
@@ -13,6 +13,8 @@ export function DeleteTeamSection({
   teamId: string;
   teamName: string;
 }) {
+  const t = useTranslations("teams.deleteSection");
+  const tc = useTranslations("common");
   const locale = useLocale();
   const [confirming, setConfirming] = useState(false);
   const [typed, setTyped] = useState("");
@@ -31,7 +33,7 @@ export function DeleteTeamSection({
       try {
         await archiveTeamAction(fd);
       } catch (e) {
-        const msg = e instanceof Error ? e.message : "Unknown error";
+        const msg = e instanceof Error ? e.message : tc("unknownError");
         if (!msg.includes("NEXT_REDIRECT")) setError(msg);
       }
     });
@@ -43,17 +45,13 @@ export function DeleteTeamSection({
         <AlertTriangle className="mt-0.5 h-5 w-5 shrink-0 text-red-600 dark:text-red-400" />
         <div className="flex-1">
           <div className="text-base font-semibold text-red-900 dark:text-red-100">
-            Supprimer l&apos;équipe
+            {t("title")}
           </div>
           <p className="mt-1 text-sm text-red-800 dark:text-red-300">
-            L&apos;équipe est archivée immédiatement et disparaît des listes,
-            mais ses données (joueurs, séances, planning) restent
-            consultables si tu la restaures plus tard.
+            {t("description")}
           </p>
           <p className="mt-2 text-sm font-medium text-red-900 dark:text-red-100">
-            Côté facturation : tu paies cette équipe jusqu&apos;à la fin du
-            cycle de facturation en cours. Le mois prochain, elle disparaît
-            du calcul (12 CHF/équipe).
+            {t("billing")}
           </p>
 
           {!confirming ? (
@@ -64,13 +62,13 @@ export function DeleteTeamSection({
               onClick={() => setConfirming(true)}
             >
               <Trash2 className="h-4 w-4" />
-              Supprimer l&apos;équipe
+            {t("deleteButton")}
             </Button>
           ) : (
             <div className="mt-4 flex flex-col gap-3 rounded-md border border-red-200 bg-white p-4 dark:border-red-500/30 dark:bg-zinc-950">
               <label className="flex flex-col gap-1 text-sm">
                 <span className="text-zinc-700 dark:text-zinc-300">
-                  Tape le nom <strong>{teamName}</strong> pour confirmer :
+                  {t.rich("confirmLabel", { name: teamName, strong: (chunks) => <strong>{chunks}</strong> })}
                 </span>
                 <input
                   type="text"
@@ -90,7 +88,7 @@ export function DeleteTeamSection({
                   onClick={handleDelete}
                   disabled={!canConfirm || isPending}
                 >
-                  {isPending ? "Suppression…" : "Confirmer la suppression"}
+                  {isPending ? t("deleting") : t("confirmButton")}
                 </Button>
                 <Button
                   variant="ghost"
@@ -102,7 +100,7 @@ export function DeleteTeamSection({
                   }}
                   disabled={isPending}
                 >
-                  Annuler
+                  {t("cancel")}
                 </Button>
               </div>
             </div>

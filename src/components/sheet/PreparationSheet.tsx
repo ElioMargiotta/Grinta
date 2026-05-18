@@ -636,6 +636,7 @@ function FitTextarea({
   maxChars?: number;
   className?: string;
 }) {
+  const t = useTranslations("sheet.preparation");
   const fits = useFits(value, area.w, area.h);
 
   function handleChange(e: ChangeEvent<HTMLTextAreaElement>) {
@@ -711,7 +712,7 @@ function FitTextarea({
       {showFooter ? (
         <div className="flex items-center justify-between text-[10px]">
           <span className={fits ? "text-transparent" : "text-red-600"}>
-            {fits ? "OK" : "Trop long pour le PDF"}
+            {fits ? t("fits") : t("tooLong")}
           </span>
           {maxChars !== undefined && (
             <span
@@ -955,14 +956,13 @@ function Step1({
         <div>
           <div>
             <div className="text-[10px] font-semibold uppercase tracking-[0.14em] text-red-600">
-              Brief guidé
+              {t("guidedBrief")}
             </div>
             <h2 className="mt-1 text-[22px] font-semibold tracking-[-0.02em] text-[#0c0c0d]">
-              Construire le fil conducteur
+              {t("buildThread")}
             </h2>
             <p className="mt-0.5 max-w-[640px] text-[12px] leading-4 text-zinc-500">
-              On garde la logique terrain : point de départ, situation exacte,
-              comportements attendus, puis questions qui guident les joueurs.
+              {t("keepFieldLogic")}
             </p>
           </div>
         </div>
@@ -1407,7 +1407,7 @@ function Step2({
                         : "border-zinc-200 text-zinc-500 hover:border-zinc-400 hover:text-zinc-900"
                     }`}
                   >
-                    Phase {idx + 1}
+                    {t("phaseLabel", { n: idx + 1 })}
                   </button>
                 ))}
               </div>
@@ -1510,8 +1510,8 @@ function Step2({
 
                 <div>
                   <div className="mb-1.5 flex items-center justify-between text-[10px] font-semibold uppercase tracking-[0.1em] text-zinc-400">
-                    <span>Prévention</span>
-                    <span>25&quot; / rep</span>
+                    <span>{t("preventionLabel")}</span>
+                    <span>{t("preventionDuration")}</span>
                   </div>
                   <div className="grid gap-x-4 gap-y-2 md:grid-cols-2">
                     {prevRows.map(
@@ -1747,7 +1747,7 @@ function Step2({
                 focusFamilies={["PE"]}
                 onPick={importPhase3}
                 title={t("phase3LibraryTitle")}
-                subtitle={`${phase3Exercises.length} exercices Base CO explosivité · cliquer pour exporter dans la phase 3`}
+                subtitle={t("explosivityImportHint", { count: phase3Exercises.length })}
                 phaseFiltering={false}
               />
             </div>
@@ -2728,7 +2728,7 @@ export function PreparationSheet({
             </nav>
             <div className="border-t border-zinc-200 px-4 py-3.5">
               <div className="mb-1.5 flex justify-between">
-                <span className="text-[10px] text-zinc-400">Progress</span>
+                <span className="text-[10px] text-zinc-400">{t("progress")}</span>
                 <span className="text-[10px] font-semibold text-zinc-600">
                   {pct}%
                 </span>
@@ -2798,7 +2798,7 @@ export function PreparationSheet({
                   className="inline-flex h-8 items-center gap-1.5 rounded-[9px] border border-zinc-200 bg-white px-3 text-[12px] font-medium text-zinc-900 shadow-[0_1px_2px_rgb(0_0_0/0.05)] transition hover:bg-zinc-50 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-40"
                 >
                   <ChevronLeft className="h-3.5 w-3.5" strokeWidth={2} />
-                  Retour
+                  {t("back")}
                 </button>
                 <button
                   type="button"
@@ -2806,7 +2806,7 @@ export function PreparationSheet({
                   disabled={step === STEPS.length - 1}
                   className="inline-flex h-8 items-center gap-1.5 rounded-[9px] bg-[#0c0c0d] px-3 text-[12px] font-medium text-white shadow-[0_1px_3px_rgb(0_0_0/0.15)] transition hover:bg-[#1a1a1d] active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-40"
                 >
-                  Suivant
+                  {t("next")}
                   <ChevronRight className="h-3.5 w-3.5" strokeWidth={2} />
                 </button>
               </div>

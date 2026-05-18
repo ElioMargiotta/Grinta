@@ -26,6 +26,7 @@ export function PlannerTourEditor({
   const locale = useLocale();
   const t = useTranslations("planner.setup");
   const tEdit = useTranslations("planner.edit");
+  const tTour = useTranslations("planner.tour");
 
   const [name, setName] = useState(macrocycle.name);
   const [preseasonStart, setPreseasonStart] = useState(macrocycle.preseason_start_date);
@@ -132,7 +133,7 @@ export function PlannerTourEditor({
                 value={m.color}
                 onChange={(e) => updateMeso(m.id, { color: e.target.value })}
                 className="h-9 w-9 cursor-pointer rounded-md border border-zinc-200 dark:border-zinc-700"
-                aria-label="color"
+                aria-label={tTour("colorAriaLabel")}
               />
               <Input
                 id={`edit-meso-name-${m.id}`}

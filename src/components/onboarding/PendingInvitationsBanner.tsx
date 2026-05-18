@@ -1,6 +1,7 @@
 "use client";
 
 import { useTransition } from "react";
+import { useTranslations } from "next-intl";
 import { Mail, Check } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { acceptMyInvitationAction } from "@/app/[locale]/(app)/invitations-actions";
@@ -17,6 +18,7 @@ export function PendingInvitationsBanner({
 }: {
   invitations: PendingInvitation[];
 }) {
+  const t = useTranslations("onboarding.invitations");
   const [isPending, startTransition] = useTransition();
   if (invitations.length === 0) return null;
 
@@ -41,12 +43,10 @@ export function PendingInvitationsBanner({
             </div>
             <div className="leading-tight">
               <div className="text-sm font-medium text-emerald-900 dark:text-emerald-100">
-                Tu as été invité à{" "}
-                <strong>{inv.club_name}</strong>
-                {inv.invited_by_name ? ` par ${inv.invited_by_name}` : ""}
+                {t.rich("invitedTo", { club: inv.club_name, strong: (chunks) => <strong>{chunks}</strong> })}{inv.invited_by_name ? ` ${t("invitedBy", { name: inv.invited_by_name })}` : ""}
               </div>
               <div className="text-xs text-emerald-700 dark:text-emerald-300">
-                Rôle proposé : {inv.role_name}
+                {t("proposedRole", { role: inv.role_name })}
               </div>
             </div>
           </div>
@@ -56,7 +56,7 @@ export function PendingInvitationsBanner({
             disabled={isPending}
           >
             <Check className="h-4 w-4" />
-            Accepter
+            {t("accept")}
           </Button>
         </div>
       ))}

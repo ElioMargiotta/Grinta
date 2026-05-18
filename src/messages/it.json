@@ -1,7 +1,8 @@
 {
   "app": {
     "name": "Grinta",
-    "tagline": "Pianifica la tua stagione di calcio."
+    "tagline": "Pianifica la tua stagione di calcio.",
+    "description": "Pianifica la tua stagione calcistica."
   },
   "landing": {
     "nav": {
@@ -99,7 +100,12 @@
           "price": "Gratis",
           "priceSuffix": "",
           "sub": "Per un allenatore, una squadra.",
-          "features": ["1 squadra", "Libreria illimitata", "Pianificatore stagione", "Esportazione PDF"],
+          "features": [
+            "1 squadra",
+            "Libreria illimitata",
+            "Pianificatore stagione",
+            "Esportazione PDF"
+          ],
           "cta": "Crea il mio account"
         },
         {
@@ -107,7 +113,13 @@
           "price": "12 €",
           "priceSuffix": "/ squadra / mese",
           "sub": "Tutte le categorie, un unico metodo.",
-          "features": ["Squadre illimitate", "Visione globale del club", "Principi di gioco condivisi", "Ruoli staff & DTN", "Supporto prioritario"],
+          "features": [
+            "Squadre illimitate",
+            "Visione globale del club",
+            "Principi di gioco condivisi",
+            "Ruoli staff & DTN",
+            "Supporto prioritario"
+          ],
           "cta": "Avvia la stagione"
         },
         {
@@ -115,7 +127,12 @@
           "price": "Su preventivo",
           "priceSuffix": "",
           "sub": "Per strutture pro e accademie.",
-          "features": ["Tutto del piano Club", "SSO e onboarding staff", "Dati di gara", "Supporto metodologico"],
+          "features": [
+            "Tutto del piano Club",
+            "SSO e onboarding staff",
+            "Dati di gara",
+            "Supporto metodologico"
+          ],
           "cta": "Contattaci"
         }
       ]
@@ -133,10 +150,43 @@
       "tagline": "Lo strumento per allenatori e club di calcio per pianificare la stagione, costruire i microcicli e preparare gli allenamenti.",
       "copyright": "© 2026 Grinta · Made avec grinta.",
       "cols": [
-        { "title": "Prodotto", "links": ["Pianificatore", "Libreria", "Preparazione", "Vista club", "Prezzi"] },
-        { "title": "Metodo", "links": ["Principi di gioco", "Microcicli", "Mesocicli", "Pedagogia"] },
-        { "title": "Risorse", "links": ["Blog", "Modelli", "Centro assistenza", "API"] },
-        { "title": "Azienda", "links": ["Chi siamo", "Lavora con noi", "Contatto", "Note legali"] }
+        {
+          "title": "Prodotto",
+          "links": [
+            "Pianificatore",
+            "Libreria",
+            "Preparazione",
+            "Vista club",
+            "Prezzi"
+          ]
+        },
+        {
+          "title": "Metodo",
+          "links": [
+            "Principi di gioco",
+            "Microcicli",
+            "Mesocicli",
+            "Pedagogia"
+          ]
+        },
+        {
+          "title": "Risorse",
+          "links": [
+            "Blog",
+            "Modelli",
+            "Centro assistenza",
+            "API"
+          ]
+        },
+        {
+          "title": "Azienda",
+          "links": [
+            "Chi siamo",
+            "Lavora con noi",
+            "Contatto",
+            "Note legali"
+          ]
+        }
       ]
     }
   },
@@ -176,7 +226,10 @@
     "checkEmailTitle": "Controlla la tua casella di posta",
     "checkEmail": "Ti abbiamo inviato un link di conferma. Cliccalo per attivare il tuo account.",
     "invalidCredentials": "Email o password non corretti.",
-    "genericError": "Qualcosa è andato storto. Riprova."
+    "genericError": "Qualcosa è andato storto. Riprova.",
+    "emailPlaceholder": "you@example.com",
+    "namePlaceholder": "Jane Doe",
+    "passwordPlaceholder": "••••••••"
   },
   "dashboard": {
     "title": "Cruscotto",
@@ -211,13 +264,19 @@
       "purgeTitle": "Eliminazione definitiva — irreversibile",
       "purgeWarning": "Tutti i giocatori, le sedute e le preparazioni collegati a questa squadra saranno eliminati senza possibilità di recupero.",
       "typeNameToConfirm": "Digita il nome <strong>{name}</strong> per confermare:",
-      "cancel": "Annulla"
+      "cancel": "Annulla",
+      "backToTeams": "Torna alle squadre",
+      "pageTitle": "Squadre archiviate",
+      "pageDesc": "Una squadra archiviata non conta più nella fatturazione a partire dal prossimo ciclo. Puoi <strong>ripristinarla</strong> in qualsiasi momento o <strong>eliminarla definitivamente</strong> (irreversibile).",
+      "empty": "Nessuna squadra archiviata."
     },
     "form": {
       "name": "Nome della squadra",
       "season": "Stagione",
       "ageGroup": "Fascia d'età",
-      "submit": "Crea la squadra"
+      "submit": "Crea la squadra",
+      "seasonPlaceholder": "2025-2026",
+      "ageGroupPlaceholder": "U13"
     },
     "players": {
       "title": "Giocatori",
@@ -229,7 +288,46 @@
       "position": "Posizione",
       "jersey": "Numero",
       "notes": "Note",
-      "submit": "Aggiungi il giocatore"
+      "submit": "Aggiungi il giocatore",
+      "positionPlaceholder": "GK / DF / MF / FW"
+    },
+    "editForm": {
+      "name": "Nome della squadra",
+      "season": "Stagione",
+      "seasonPlaceholder": "2025-2026",
+      "ageGroup": "Categoria",
+      "ageGroupPlaceholder": "U13",
+      "photoUrl": "Foto della squadra",
+      "photoUrlPlaceholder": "https://...",
+      "photoUrlHint": "URL HTTPS per ora. Il caricamento diretto arriverà in seguito.",
+      "description": "Descrizione",
+      "descriptionPlaceholder": "Note, obiettivi, identità della squadra…",
+      "saved": "Salvato.",
+      "saving": "Salvataggio…",
+      "save": "Salva"
+    },
+    "deleteSection": {
+      "title": "Elimina squadra",
+      "description": "La squadra viene archiviata immediatamente e scompare dalle liste, ma i suoi dati (giocatori, sessioni, pianificazione) rimangono consultabili se la ripristini in seguito.",
+      "billing": "Fatturazione: paghi questa squadra fino alla fine del ciclo di fatturazione corrente. Il mese prossimo scompare dal calcolo (12 CHF/squadra).",
+      "deleteButton": "Elimina squadra",
+      "confirmLabel": "Digita il nome <strong>{name}</strong> per confermare:",
+      "confirmButton": "Conferma eliminazione",
+      "deleting": "Eliminazione…",
+      "cancel": "Annulla"
+    },
+    "detail": {
+      "unsetCategory": "Categoria da definire",
+      "unsetSeason": "Stagione da definire",
+      "noPhotoTitle": "Foto della squadra",
+      "noPhotoHint": "Aggiungi un URL nelle impostazioni qui sotto.",
+      "playersInRoster": "{count, plural, =0 {0 giocatori} one {1 giocatore} other {{count} giocatori}} nella rosa",
+      "plannerDesc": "Pianificazione, cicli e sessioni",
+      "infoTitle": "Informazioni squadra",
+      "infoDesc": "Nome, stagione, categoria, descrizione e foto di riferimento.",
+      "categoryLabel": "Categoria",
+      "seasonLabel": "Stagione",
+      "emptyDescHint": "Aggiungi una breve descrizione per inquadrare l'identità, gli obiettivi o le note importanti di questa squadra."
     }
   },
   "exercises": {
@@ -244,7 +342,8 @@
       "duration": "Durata (minuti)",
       "intensity": "Intensità",
       "equipment": "Materiale (separato da virgole)",
-      "submit": "Salva l'esercizio"
+      "submit": "Salva l'esercizio",
+      "equipmentPlaceholder": "palloni, coni, casacche"
     },
     "categories": {
       "warmup": "Riscaldamento",
@@ -257,6 +356,30 @@
       "low": "Bassa",
       "medium": "Media",
       "high": "Alta"
+    },
+    "delete": {
+      "confirmTitle": "Eliminare questo esercizio?",
+      "delete": "Elimina"
+    },
+    "filters": {
+      "all": "Tutti",
+      "allTracks": "Tutti i percorsi",
+      "noMatch": "Nessun esercizio corrisponde a questi filtri.",
+      "level": "Livello",
+      "phaseOfPlay": "Fase di gioco",
+      "theme": "Tema",
+      "focusCoaching": "Focus coaching"
+    },
+    "page": {
+      "pageTitle": "Libreria esercizi",
+      "newExercise": "Nuovo esercizio",
+      "backToLibrary": "Torna alla libreria",
+      "phasesTab": "Fasi di gioco",
+      "phasesTabHint": "ASF / clubcorner — filtri per fase di gioco, percorso e livello",
+      "gesturesTab": "Gesti tecnici",
+      "gesturesTabHint": "ASF Base TE — passaggio, conduzione e dribbling, tiro in porta, tecniche aeree, livelli da 1 a 3",
+      "coTab": "Condizione fisica",
+      "coTabHint": "ASF Base CO — esplosività, stabilità corporea (livelli da 1 a 8)"
     }
   },
   "planner": {
@@ -299,7 +422,8 @@
         "datesRequired": "Le tre date sono obbligatorie.",
         "invalidDates": "La data di fine deve essere successiva all'inizio della preparazione.",
         "weekMismatch": "Le settimane dei mesocicli ({sum}) devono corrispondere al totale ({total})."
-      }
+      },
+      "tourNamePlaceholder": "1° turno"
     },
     "tour": {
       "firstMatch": "prima partita",
@@ -326,7 +450,8 @@
         "competition": "Competizione",
         "transition": "Transizione",
         "custom": "Personalizzato"
-      }
+      },
+      "colorAriaLabel": "Colore"
     },
     "edit": {
       "endDateHint": "È richiesto lo stesso totale di settimane — per aggiungerne o rimuoverne, usa la vista Ciclo (in arrivo).",
@@ -421,7 +546,8 @@
   "common": {
     "cancel": "Annulla",
     "save": "Salva",
-    "loading": "Caricamento…"
+    "loading": "Caricamento…",
+    "unknownError": "Errore sconosciuto"
   },
   "sheet": {
     "preparation": {
@@ -684,7 +810,18 @@
           "eyebrow": "Revisione finale",
           "desc": "Controlla ogni sezione, poi esporta la scheda di preparazione ufficiale."
         }
-      ]
+      ],
+      "fits": "OK",
+      "tooLong": "Troppo lungo per il PDF",
+      "guidedBrief": "Brief guidato",
+      "buildThread": "Costruisci il filo conduttore",
+      "keepFieldLogic": "Mantieni la logica del campo, traducila in contenuto della sessione.",
+      "phaseLabel": "Fase {n}",
+      "preventionLabel": "Prevenzione",
+      "preventionDuration": "25\" / rip.",
+      "explosivityImportHint": "{count} esercizi Base CO esplosività · clicca per esportare nella fase 3",
+      "progress": "Progresso",
+      "next": "Avanti"
     },
     "schema": {
       "zones": {
@@ -762,6 +899,21 @@
       "namePlaceholder": "Il mio club",
       "submit": "Crea il mio club",
       "submitting": "Creazione…"
+    },
+    "clubPage": {
+      "title": "Nuovo club",
+      "description": "Un club raggruppa le tue squadre, i tuoi allenatori e la tua fatturazione. Puoi invitare membri appena creato. Puoi appartenere a più club.",
+      "pricing": "14 giorni di prova gratuita · 12 CHF/squadra/mese poi · Nessuna carta richiesta per iniziare."
+    },
+    "invitations": {
+      "invitedTo": "Sei stato invitato a {club}",
+      "invitedBy": "da {name}",
+      "proposedRole": "Ruolo proposto: {role}",
+      "accept": "Accetta"
+    },
+    "acceptForm": {
+      "accepting": "Accettazione…",
+      "accept": "Accetta e unisciti al club"
     }
   },
   "settings": {
@@ -820,6 +972,10 @@
         "team_readonly": "Squadra in sola lettura",
         "team_readonlyHelp": "Sola lettura su una o più squadre."
       }
+    },
+    "clubPage": {
+      "title": "Impostazioni del club",
+      "subtitle": "Gestisci i membri, i ruoli e gli inviti di {club}."
     }
   },
   "invite": {
@@ -830,6 +986,95 @@
     "haveTokenTitle": "Ho un link o un token di invito",
     "haveTokenSubtitle": "Incolla il link completo o solo il token.",
     "tokenPlaceholder": "https://grinta.app/invite/… o abc123…",
-    "continue": "Continua"
+    "continue": "Continua",
+    "page": {
+      "notFound": "Invito non trovato",
+      "notFoundDesc": "Il link non è valido o è già stato revocato.",
+      "expired": "Invito scaduto",
+      "expiredDesc": "Chiedi alla persona che ti ha invitato di inviartene uno nuovo.",
+      "alreadyAccepted": "Invito già accettato",
+      "alreadyAcceptedDesc": "Accedi per entrare in {club}.",
+      "goToLogin": "Vai al login",
+      "invitedToJoinWithRole": "Ruolo: {role} · {access}",
+      "invitationSentTo": "Invito inviato a {email}.",
+      "connectOrCreate": "Accedi (o crea un account con questa email) per accettare.",
+      "login": "Accedi",
+      "createAccount": "Crea account",
+      "wrongAccount": "Account sbagliato",
+      "wrongAccountDesc1": "Questo invito è stato inviato a {invitedEmail}, ma sei connesso come {currentEmail}.",
+      "wrongAccountDesc2": "Esci e riaccedi con l'account corretto.",
+      "joinClub": "Unisciti a {club}",
+      "accessLabels": {
+        "full": "Accesso completo",
+        "extended": "Accesso esteso (tutte le squadre)",
+        "team": "Accesso alla squadra assegnata",
+        "team_readonly": "Sola lettura sulla squadra assegnata"
+      }
+    }
+  },
+  "libraries": {
+    "noDiagram": "Nessun diagramma",
+    "description": "Descrizione",
+    "organisation": "Organizzazione",
+    "coachingPoints": "Punti di coaching",
+    "noCoachingPoints": "Nessun punto di coaching in questa famiglia.",
+    "variations": "Variazioni",
+    "variationLess": "Variante più facile",
+    "variationMore": "Variante più difficile",
+    "families": {
+      "PE": "Forma fisica",
+      "TA": "Tattica",
+      "AT": "Mentalità",
+      "TE": "Tecnica"
+    },
+    "familyHints": {
+      "PE": "Aspetti fisici",
+      "TA": "Lettura del gioco",
+      "AT": "Atteggiamento",
+      "TE": "Gesti tecnici"
+    },
+    "picker": {
+      "title": "Libreria esercizi",
+      "subtitle": "{count} esercizi · pre-filtrati per fase di gioco e focus",
+      "clickToImport": "Clicca per importare",
+      "searchPlaceholder": "Cerca per titolo, codice…",
+      "phases": "Fasi:",
+      "noneSelected": "nessuna selezionata",
+      "focus": "Focus:",
+      "none": "nessuno",
+      "filterByPhase": "Filtra per fase:",
+      "autoSession": "Auto (sessione)",
+      "noMatch": "Nessun esercizio corrisponde. Modifica i filtri o la ricerca.",
+      "close": "Chiudi",
+      "closePicker": "Chiudi selettore",
+      "phasesThemes": {
+        "possession": "La mia squadra ha il possesso",
+        "losing": "La mia squadra perde palla",
+        "noPossession": "La mia squadra non ha il possesso",
+        "recovering": "La mia squadra recupera palla"
+      }
+    }
+  },
+  "topbar": {
+    "freePlan": "Piano gratuito",
+    "teamSingular": "squadra",
+    "teamPlural": "squadre",
+    "trial": "Prova",
+    "trialDays": "Prova · {days}g rimanenti",
+    "planPerTeam": "{count} {teams} · {amount} CHF/mese",
+    "planStatus": "{status} · {count} {teams}",
+    "fallbackName": "Coach"
+  },
+  "sidebar": {
+    "fallbackClubName": "Club",
+    "fallbackOrgName": "Grinta",
+    "footerText": "workspace di allenamento"
+  },
+  "pitch": {
+    "halfPitch": "Metà campo",
+    "fullPitch": "Campo intero"
+  },
+  "sessions": {
+    "cannotCreate": "Impossibile creare la sessione."
   }
 }
