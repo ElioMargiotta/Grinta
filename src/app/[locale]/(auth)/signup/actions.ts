@@ -21,7 +21,20 @@ export async function signupAction(formData: FormData) {
   });
 
   if (error) {
+    // Surfaced when email confirmations are disabled.
+    if (
+      error.code === "user_already_exists" ||
+      /already registered|already exists/i.test(error.message)
+    ) {
+      return { errorCode: "emailExists" as const };
+    }
     return { error: error.message };
+  }
+
+  // With email confirmations enabled, Supabase obfuscates an existing account:
+  // it returns a user with an empty identities array and no error.
+  if (data.user && (data.user.identities?.length ?? 0) === 0) {
+    return { errorCode: "emailExists" as const };
   }
 
   if (data.session) {

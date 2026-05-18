@@ -196,6 +196,8 @@
     "checkEmailTitle": "Vérifiez votre boîte de réception",
     "checkEmail": "Nous avons envoyé un lien de confirmation à votre email. Cliquez dessus pour activer votre compte.",
     "invalidCredentials": "Email ou mot de passe incorrect.",
+    "emailAlreadyExists": "Cette adresse email a déjà un compte. Connectez-vous plutôt.",
+    "emailNotConfirmed": "Veuillez confirmer votre email avant de vous connecter. Vérifiez votre boîte de réception.",
     "genericError": "Quelque chose s'est mal passé. Veuillez réessayer."
   },
   "dashboard": {
