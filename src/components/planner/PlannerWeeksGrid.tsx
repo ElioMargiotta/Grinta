@@ -640,7 +640,7 @@ export function PlannerWeeksGrid({
             label: string
           ) => {
 	              if (session) {
-	                const t = timeOf(session.start);
+	                const time = timeOf(session.start);
 	                const isCopied = copiedSessionId === session.id;
 	                return (
 	                  <div
@@ -675,7 +675,7 @@ export function PlannerWeeksGrid({
 	                  >
 	                    <span className="flex items-center justify-between gap-2">
 	                      <span className="text-[10px] font-semibold tabular-nums text-zinc-500 dark:text-zinc-400">
-	                        {t ?? ""}
+	                        {time ?? ""}
 	                      </span>
 	                      {session.durationMinutes ? (
 	                        <span className="text-[10px] font-medium tabular-nums text-zinc-400 dark:text-zinc-500">
@@ -691,8 +691,8 @@ export function PlannerWeeksGrid({
                   <div className="absolute right-1 top-1 flex items-center gap-1 rounded-lg bg-white/90 p-0.5 opacity-0 shadow-sm ring-1 ring-zinc-200 transition-opacity group-hover/session:opacity-100 dark:bg-zinc-900/90 dark:ring-zinc-700">
                     <button
 	                      type="button"
-	                      title="Dupliquer"
-	                      aria-label="Dupliquer la séance"
+	                      title={t("duplicate")}
+	                      aria-label={t("duplicateSessionAria")}
 	                        disabled={isSessionActionPending}
 	                        onClick={(e) => {
 	                          e.stopPropagation();
@@ -710,12 +710,12 @@ export function PlannerWeeksGrid({
 	                    </button>
 	                    <button
 	                      type="button"
-	                      title="Supprimer"
-	                      aria-label="Supprimer la séance"
+	                      title={t("delete")}
+	                      aria-label={t("deleteSessionAria")}
 	                      disabled={isSessionActionPending}
 	                      onClick={(e) => {
 	                        e.stopPropagation();
-	                        if (!window.confirm("Supprimer cette séance ?")) return;
+	                        if (!window.confirm(t("confirmDeleteSession"))) return;
 	                        runSessionAction(() =>
 	                          deletePlannerSessionAction({
 	                            teamId,
@@ -767,7 +767,7 @@ export function PlannerWeeksGrid({
 		                }`}
 		              >
 	                <span className="font-semibold uppercase tracking-wide">
-	                  {copiedSessionId ? "Coller ici" : label}
+	                  {copiedSessionId ? t("pasteHere") : label}
 	                </span>
 	                <span>{copiedSessionId ? <Copy size={11} /> : "+"}</span>
               </button>

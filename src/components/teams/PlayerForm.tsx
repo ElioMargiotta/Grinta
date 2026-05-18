@@ -32,7 +32,7 @@ export function PlayerForm({ teamId }: { teamId: string }) {
       <Input id="firstName" name="firstName" label={t("firstName")} required />
       <Input id="lastName" name="lastName" label={t("lastName")} required />
       <Input id="birthDate" name="birthDate" type="date" label={t("birthDate")} />
-      <Input id="position" name="position" label={t("position")} placeholder="GK / DF / MF / FW" />
+      <Input id="position" name="position" label={t("position")} placeholder={t("positionPlaceholder")} />
       <Input
         id="jerseyNumber"
         name="jerseyNumber"

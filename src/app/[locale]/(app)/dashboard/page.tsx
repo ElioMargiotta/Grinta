@@ -134,7 +134,7 @@ export default async function DashboardPage({
 
       {hasMembership && (
         <div className="rounded-2xl border border-zinc-200 bg-white p-5 text-sm text-zinc-500 shadow-sm dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-400">
-          {memberships.length} club{memberships.length > 1 ? "s" : ""}
+          {memberships.length}
           {" · "}
           <Link href="/teams" className="font-medium text-zinc-900 underline-offset-2 hover:underline dark:text-zinc-100">
             {t("teamsCard")}

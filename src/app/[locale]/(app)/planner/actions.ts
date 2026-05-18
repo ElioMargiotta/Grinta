@@ -349,7 +349,7 @@ export async function deletePlannerSessionAction({
 
 export async function createSessionAction(formData: FormData) {
   const fields = readSessionFields(formData);
-  const locale = String(formData.get("locale") ?? "en");
+  const locale = String(formData.get("locale") ?? "fr");
 
   if (!fields.teamId || !fields.date) return { error: "Missing fields" };
 
@@ -401,7 +401,7 @@ export async function createSessionAction(formData: FormData) {
 export async function updateSessionAction(formData: FormData) {
   const id = String(formData.get("id") ?? "");
   const fields = readSessionFields(formData);
-  const locale = String(formData.get("locale") ?? "en");
+  const locale = String(formData.get("locale") ?? "fr");
   if (!id) return { error: "Missing id" };
 
   const supabase = await createClient();

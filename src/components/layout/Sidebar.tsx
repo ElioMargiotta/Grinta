@@ -31,6 +31,7 @@ export function Sidebar({
   currentMembership: ClubMembership | null;
 }) {
   const t = useTranslations("nav");
+  const ts = useTranslations("sidebar");
   const pathname = usePathname();
   const items = hasMembership ? CLUB_ITEMS : FREE_ITEMS;
   const logoUrl = currentMembership?.logo_url;
@@ -46,7 +47,7 @@ export function Sidebar({
             // eslint-disable-next-line @next/next/no-img-element
             <img
               src={logoUrl}
-              alt={currentMembership?.club_name ?? "Club"}
+              alt={currentMembership?.club_name ?? ts("fallbackClubName")}
               className="h-10 w-10 shrink-0 rounded-md object-contain"
             />
           ) : (
@@ -61,7 +62,7 @@ export function Sidebar({
           )}
           <div className="min-w-0">
             <div className="truncate text-sm font-semibold text-zinc-950 dark:text-zinc-100">
-              {currentMembership?.club_name ?? "Grinta"}
+              {currentMembership?.club_name ?? ts("fallbackOrgName")}
             </div>
             <Image
               src="/grinta-wordmark.svg"
@@ -98,8 +99,8 @@ export function Sidebar({
         })}
       </nav>
       <div className="mt-auto border-t border-[var(--club-line)] px-5 py-5 text-[11px] leading-relaxed text-zinc-500 dark:text-zinc-500">
-        <span className="font-medium text-[var(--club-primary)]">Grinta</span>{" "}
-        training workspace
+        <span className="font-medium text-[var(--club-primary)]">{ts("fallbackOrgName")}</span>{" "}
+        {ts("footerText")}
       </div>
     </aside>
   );

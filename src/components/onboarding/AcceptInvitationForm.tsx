@@ -1,12 +1,13 @@
 "use client";
 
 import { useState, useTransition } from "react";
-import { useLocale } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import { Button } from "@/components/ui/Button";
 import { acceptInvitationAction } from "@/app/[locale]/(auth)/invite/[token]/actions";
 
 export function AcceptInvitationForm({ token }: { token: string }) {
   const locale = useLocale();
+  const t = useTranslations("onboarding.acceptForm");
   const [error, setError] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
 
@@ -29,7 +30,7 @@ export function AcceptInvitationForm({ token }: { token: string }) {
         </div>
       )}
       <Button type="submit" disabled={isPending} className="w-full">
-        {isPending ? "Acceptation…" : "Accepter et rejoindre le club"}
+        {isPending ? t("accepting") : t("accept")}
       </Button>
     </form>
   );

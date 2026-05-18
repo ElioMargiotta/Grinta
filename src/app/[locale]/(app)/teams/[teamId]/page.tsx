@@ -16,6 +16,7 @@ export default async function TeamPage({
   setRequestLocale(locale);
   const { supabase } = await requireUser(locale);
   const t = await getTranslations();
+  const td = await getTranslations("teams.detail");
 
   const { data: team } = await supabase
     .from("teams")
@@ -37,9 +38,9 @@ export default async function TeamPage({
           <div className="flex min-h-[260px] flex-col justify-between p-5 md:p-8">
             <div>
               <div className="flex flex-wrap items-center gap-2 text-xs font-semibold uppercase tracking-wider text-[var(--club-primary)]">
-                <span>{team.age_group || "Catégorie à définir"}</span>
+                <span>{team.age_group || td("unsetCategory")}</span>
                 <span className="h-1 w-1 rounded-full bg-zinc-300" />
-                <span>{team.season || "Saison à définir"}</span>
+                <span>{team.season || td("unsetSeason")}</span>
               </div>
               <h1 className="mt-3 text-3xl font-semibold tracking-tight text-zinc-950 md:text-5xl dark:text-zinc-100">
                 {team.name}
@@ -50,8 +51,7 @@ export default async function TeamPage({
                 </p>
               ) : (
                 <p className="mt-4 max-w-2xl text-sm leading-6 text-zinc-500 dark:text-zinc-400">
-                  Ajoute une courte description pour cadrer l&apos;identité,
-                  les objectifs ou les notes importantes de cette équipe.
+                  {td("emptyDescHint")}
                 </p>
               )}
             </div>
@@ -64,12 +64,12 @@ export default async function TeamPage({
               />
               <TeamMetric
                 icon={Shirt}
-                label="Catégorie"
+                label={td("categoryLabel")}
                 value={team.age_group || "—"}
               />
               <TeamMetric
                 icon={CalendarDays}
-                label="Saison"
+                label={td("seasonLabel")}
                 value={team.season || "—"}
               />
             </div>
@@ -90,10 +90,10 @@ export default async function TeamPage({
                 </div>
                 <div>
                   <div className="text-sm font-semibold text-zinc-900">
-                    Photo d&apos;équipe
+                    {td("noPhotoTitle")}
                   </div>
                   <div className="mt-1 text-xs text-zinc-500">
-                    Ajoute une URL dans les réglages ci-dessous.
+                    {td("noPhotoHint")}
                   </div>
                 </div>
               </div>
@@ -107,13 +107,13 @@ export default async function TeamPage({
           href={`/teams/${team.id}/players`}
           icon={Users}
           title={t("teams.players.title")}
-          description={`${playerCount ?? 0} joueur${(playerCount ?? 0) > 1 ? "s" : ""} dans l'effectif`}
+          description={td("playersInRoster", { count: playerCount ?? 0 })}
         />
         <TeamAction
           href={`/planner/${team.id}`}
           icon={CalendarDays}
           title={t("planner.title")}
-          description="Planification, cycles et séances"
+          description={td("plannerDesc")}
         />
       </section>
 
@@ -121,10 +121,10 @@ export default async function TeamPage({
         <div className="mb-5 flex flex-col gap-2 md:flex-row md:items-end md:justify-between">
           <div>
             <div className="text-base font-semibold text-zinc-900 dark:text-zinc-100">
-              Informations équipe
+              {td("infoTitle")}
             </div>
             <p className="mt-1 text-sm text-zinc-600 dark:text-zinc-400">
-              Nom, saison, catégorie, description et photo de référence.
+              {td("infoDesc")}
             </p>
           </div>
           <Link href={`/teams/${team.id}/players`}>

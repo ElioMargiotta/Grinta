@@ -17,7 +17,7 @@ import {
   Users,
   X,
 } from "lucide-react";
-import { useLocale } from "next-intl";
+import { useLocale, useMessages, useTranslations } from "next-intl";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import {
@@ -504,12 +504,11 @@ function FieldUl({
   );
 }
 
-const FOCUS_FAMILY_LABELS: Record<FocusFamily, string> = {
-  TE: "Technique",
-  TA: "Tactique",
-  PE: "Forme physique",
-  AT: "Mentalité",
-};
+type PrepT = ReturnType<typeof useTranslations<"sheet.preparation">>;
+
+function focusFamilyLabel(t: PrepT, f: FocusFamily): string {
+  return t(`focusFamily.${f}`);
+}
 
 const FOCUS_FAMILY_COLORS: Record<FocusFamily, string> = {
   TA: "#2563eb",
@@ -518,9 +517,9 @@ const FOCUS_FAMILY_COLORS: Record<FocusFamily, string> = {
   AT: "#7c3aed",
 };
 
-function formatFocusFamilies(families: FocusFamily[]): string {
+function formatFocusFamilies(t: PrepT, families: FocusFamily[]): string {
   return families
-    .map((f) => `${f} - ${FOCUS_FAMILY_LABELS[f]}`)
+    .map((f) => `${f} - ${focusFamilyLabel(t, f)}`)
     .join(" ; ");
 }
 
@@ -531,6 +530,7 @@ function FocusFamilyChips({
   value: FocusFamily[];
   onChange: (next: FocusFamily[]) => void;
 }) {
+  const t = useTranslations("sheet.preparation");
   function toggle(f: FocusFamily) {
     if (value.includes(f)) onChange(value.filter((x) => x !== f));
     else onChange([...value, f]);
@@ -560,7 +560,7 @@ function FocusFamilyChips({
               {f}
             </span>
             <span className="truncate text-[10px] font-medium">
-              {FOCUS_FAMILY_LABELS[f]}
+              {focusFamilyLabel(t, f)}
             </span>
           </button>
         );
@@ -636,6 +636,7 @@ function FitTextarea({
   maxChars?: number;
   className?: string;
 }) {
+  const t = useTranslations("sheet.preparation");
   const fits = useFits(value, area.w, area.h);
 
   function handleChange(e: ChangeEvent<HTMLTextAreaElement>) {
@@ -711,7 +712,7 @@ function FitTextarea({
       {showFooter ? (
         <div className="flex items-center justify-between text-[10px]">
           <span className={fits ? "text-transparent" : "text-red-600"}>
-            {fits ? "OK" : "Trop long pour le PDF"}
+            {fits ? t("fits") : t("tooLong")}
           </span>
           {maxChars !== undefined && (
             <span
@@ -848,15 +849,19 @@ const WEEK_THEME_ALLOWED: Record<string, PhaseKey[]> = {
   jeux_polysport: [],
 };
 
-const WEEK_THEME_LABEL: Record<string, string> = {
-  possede_ballon: "Mon équipe possède",
-  ne_possede_pas: "Sans possession",
-  recupere: "Récupération",
-  perd: "Mon équipe perd",
-  recupere_perd: "Récupération + perd",
-  decharge: "Décharge",
-  jeux_polysport: "Jeux + polysport",
-};
+const WEEK_THEME_KEYS = new Set([
+  "possede_ballon",
+  "ne_possede_pas",
+  "recupere",
+  "perd",
+  "recupere_perd",
+  "decharge",
+  "jeux_polysport",
+]);
+
+function weekThemeLabel(t: PrepT, key: string): string {
+  return t(`weekThemeLabel.${key}` as Parameters<PrepT>[0]);
+}
 
 const SLOT_BOUNDS: Record<
   "morning" | "afternoon",
@@ -906,6 +911,7 @@ function Step1({
   isCancelling: boolean;
   weekTheme: string | null;
 }) {
+  const t = useTranslations("sheet.preparation");
   const bounds = SLOT_BOUNDS[slot];
 
   const allowedPhases =
@@ -913,8 +919,8 @@ function Step1({
       ? WEEK_THEME_ALLOWED[weekTheme]
       : null;
   const weekLabel =
-    weekTheme && weekTheme in WEEK_THEME_LABEL
-      ? WEEK_THEME_LABEL[weekTheme]
+    weekTheme && WEEK_THEME_KEYS.has(weekTheme)
+      ? weekThemeLabel(t, weekTheme)
       : null;
   const selectedPhases = (Object.keys(data.phases) as PhaseKey[]).filter(
     (k) => data.phases[k],
@@ -922,32 +928,13 @@ function Step1({
   const offThemeSelected =
     allowedPhases !== null &&
     selectedPhases.some((k) => !allowedPhases.includes(k));
-  const phaseOptions = [
-    {
-      key: "possession" as const,
-      label: "On a le ballon",
-      fr: "Mon équipe possède",
-      cue: "Installer, progresser, fixer.",
-    },
-    {
-      key: "losing" as const,
-      label: "On l'a perdu",
-      fr: "Transition défensive",
-      cue: "Réagir, cadrer, ralentir.",
-    },
-    {
-      key: "noPossession" as const,
-      label: "Ils ont le ballon",
-      fr: "Sans possession",
-      cue: "Orienter, fermer, presser.",
-    },
-    {
-      key: "recovering" as const,
-      label: "On le récupère",
-      fr: "Transition offensive",
-      cue: "Sortir, trouver l'avant, finir.",
-    },
-  ];
+  const phaseOptions = (["possession", "losing", "noPossession", "recovering"] as const).map(
+    (key) => ({
+      key,
+      label: t(`step1.phaseOptionLabel.${key}`),
+      fr: t(`step1.phaseOptionTheme.${key}`),
+    }),
+  );
   const selectedPhase =
     phaseOptions.find((ph) => data.phases[ph.key]) ?? null;
 
@@ -969,14 +956,13 @@ function Step1({
         <div>
           <div>
             <div className="text-[10px] font-semibold uppercase tracking-[0.14em] text-red-600">
-              Brief guidé
+              {t("guidedBrief")}
             </div>
             <h2 className="mt-1 text-[22px] font-semibold tracking-[-0.02em] text-[#0c0c0d]">
-              Construire le fil conducteur
+              {t("buildThread")}
             </h2>
             <p className="mt-0.5 max-w-[640px] text-[12px] leading-4 text-zinc-500">
-              On garde la logique terrain : point de départ, situation exacte,
-              comportements attendus, puis questions qui guident les joueurs.
+              {t("keepFieldLogic")}
             </p>
           </div>
         </div>
@@ -984,7 +970,7 @@ function Step1({
         <div className="self-center border-l border-zinc-200 pl-5 text-[12px] text-zinc-500">
           <div className="mb-2 flex items-center justify-between gap-3">
             <div className="text-[10px] font-semibold uppercase tracking-[0.12em] text-zinc-400">
-              Séance
+              {t("step1.sectionLabel")}
             </div>
           </div>
           <div className="space-y-1.5">
@@ -993,7 +979,7 @@ function Step1({
               <input
                 className={inpUlClass}
                 maxLength={SESSION_TITLE_MAX}
-                placeholder="Titre séance"
+                placeholder={t("step1.sessionTitlePlaceholder")}
                 value={meta.title.slice(0, SESSION_TITLE_MAX)}
                 onChange={(e) =>
                   patchMeta((m) => ({
@@ -1041,7 +1027,7 @@ function Step1({
                   type="number"
                   min={1}
                   className={inpUlClass}
-                  placeholder="90"
+                  placeholder={t("step1.durationPlaceholder")}
                   value={meta.durationMinutes ?? ""}
                   onChange={(e) =>
                     patchMeta((m) => ({
@@ -1058,7 +1044,7 @@ function Step1({
               <Users className="h-3.5 w-3.5 text-zinc-400" />
               <input
                 className={inpUlClass}
-                placeholder="Équipe"
+                placeholder={t("step1.teamPlaceholder")}
                 value={data.team}
                 onChange={(e) =>
                   patch((d) => ({ ...d, team: e.target.value }))
@@ -1069,7 +1055,7 @@ function Step1({
               <User className="h-3.5 w-3.5 text-zinc-400" />
               <input
                 className={inpUlClass}
-                placeholder="Entraîneur"
+                placeholder={t("step1.coachPlaceholder")}
                 value={data.coach}
                 onChange={(e) =>
                   patch((d) => ({ ...d, coach: e.target.value }))
@@ -1083,7 +1069,7 @@ function Step1({
       <section className="grid gap-4 lg:grid-cols-[190px_minmax(0,1fr)]">
         <div className="text-[12px] text-zinc-500">
           <div className="mb-1.5 text-[10px] font-semibold uppercase tracking-[0.12em] text-zinc-400">
-            Moment du jeu
+            {t("step1.momentLabel")}
           </div>
           <div className="space-y-0.5">
             {phaseOptions.map((ph) => {
@@ -1126,7 +1112,7 @@ function Step1({
           </div>
           {offThemeSelected ? (
             <p className="mt-3 text-[11px] leading-4 text-amber-700">
-              Hors thème semaine{weekLabel ? ` : ${weekLabel}` : ""}.
+              {t("step1.offTheme")}{weekLabel ? ` : ${weekLabel}` : ""}.
             </p>
           ) : null}
         </div>
@@ -1139,12 +1125,12 @@ function Step1({
                 1
               </span>
               <div className="text-[11px] font-semibold uppercase tracking-[0.1em] text-zinc-400">
-                Point de départ
+                {t("step1.startingPoint")}
               </div>
               <div className="mt-0.5 text-[16px] font-semibold tracking-[-0.015em] text-zinc-950">
-                Aujourd&apos;hui, on démarre quand{" "}
+                {t("step1.startingPointPrefix")}{" "}
                 <span className="text-red-600">
-                  {selectedPhase?.label.toLowerCase() ?? "le moment est choisi"}
+                  {selectedPhase?.label.toLowerCase() ?? t("step1.startingPointFallback")}
                 </span>
                 .
               </div>
@@ -1154,12 +1140,12 @@ function Step1({
               <span className="absolute -left-[34px] top-1 flex h-4 w-4 items-center justify-center rounded-full bg-white text-[9px] font-semibold text-zinc-500 ring-1 ring-zinc-200">
                 2
               </span>
-              <FieldUl label="Forme caractéristique">
+              <FieldUl label={t("step1.field.characteristicForm")}>
                 <FitTextarea
                   area={Z_GLOBAL.characteristicForm}
                   rows={2}
                   maxChars={230}
-                  placeholder="Dans quelle situation exacte veut-on placer les joueurs ?"
+                  placeholder={t("step1.fieldPlaceholder.characteristicForm")}
                   value={data.characteristicForm}
                   onChange={(v) =>
                     patch((d) => ({ ...d, characteristicForm: v }))
@@ -1173,12 +1159,12 @@ function Step1({
               <span className="absolute -left-[34px] top-1 flex h-4 w-4 items-center justify-center rounded-full bg-white text-[9px] font-semibold text-zinc-500 ring-1 ring-zinc-200">
                 3
               </span>
-              <FieldUl label="Focus">
+              <FieldUl label={t("step1.field.focus")}>
                 <div className="mb-1.5">
 	                  <FocusFamilyChips
 	                    value={data.focusFamilies}
 	                    onChange={(v) => {
-	                      const autoFocus = formatFocusFamilies(v);
+	                      const autoFocus = formatFocusFamilies(t, v);
 	                      patch((d) => ({
 	                        ...d,
 	                        focusFamilies: v,
@@ -1191,7 +1177,7 @@ function Step1({
                   area={Z_GLOBAL.focus}
                   rows={1}
                   maxChars={115}
-                  placeholder="Quels comportements veut-on observer en priorité ?"
+                  placeholder={t("step1.fieldPlaceholder.focus")}
                   value={data.focus}
                   onChange={(v) => patch((d) => ({ ...d, focus: v }))}
                   className={txtaUlClass}
@@ -1203,12 +1189,12 @@ function Step1({
               <span className="absolute -left-[34px] top-1 flex h-4 w-4 items-center justify-center rounded-full bg-white text-[9px] font-semibold text-zinc-500 ring-1 ring-zinc-200">
                 4
               </span>
-              <FieldUl label="Objectif">
+              <FieldUl label={t("step1.field.objective")}>
                 <FitTextarea
                   area={Z_GLOBAL.objectives}
                   rows={2}
                   maxChars={230}
-                  placeholder="À la fin, les joueurs doivent être capables de..."
+                  placeholder={t("step1.fieldPlaceholder.objective")}
                   value={data.objectives}
                   onChange={(v) => patch((d) => ({ ...d, objectives: v }))}
                   className={txtaUlClass}
@@ -1220,12 +1206,12 @@ function Step1({
               <span className="absolute -left-[34px] top-1 flex h-4 w-4 items-center justify-center rounded-full bg-white text-[9px] font-semibold text-zinc-500 ring-1 ring-zinc-200">
                 5
               </span>
-              <FieldUl label="Questions coach">
+              <FieldUl label={t("step1.field.coachQuestions")}>
                 <FitTextarea
                   area={Z_GLOBAL.developmentQuestions}
                   rows={2}
                   maxChars={260}
-                  placeholder="Quelles questions vont guider l'apprentissage ?"
+                  placeholder={t("step1.fieldPlaceholder.coachQuestions")}
                   value={data.developmentQuestions}
                   onChange={(v) =>
                     patch((d) => ({ ...d, developmentQuestions: v }))
@@ -1246,7 +1232,7 @@ function Step1({
           className="inline-flex items-center gap-1.5 rounded-md px-2 py-1 text-[12px] font-medium text-zinc-500 transition hover:text-red-600 disabled:opacity-60"
         >
           <Trash2 className="h-3.5 w-3.5" strokeWidth={1.75} />
-          {isCancelling ? "Annulation…" : "Annuler la séance"}
+          {isCancelling ? t("cancellingSession") : t("cancelSession")}
         </button>
       </div>
     </div>
@@ -1308,6 +1294,7 @@ function Step2({
   patch: Patcher;
   library: LibraryExercise[];
 }) {
+  const t = useTranslations("sheet.preparation");
   const [tab, setTab] = useState<"p1" | "p2" | "p3">("p1");
   const [phase3PickerOpen, setPhase3PickerOpen] = useState(false);
   const pv = data.initial.phase1.prevention;
@@ -1324,40 +1311,35 @@ function Step2({
   const prevRows = [
     {
       k: "ankle" as const,
-      l: "Cheville",
+      l: t("step2.bodyPart.ankle"),
       descriptionArea: Z_INITIAL.ankleDescription,
       coachingArea: Z_INITIAL.ankleCoaching,
     },
     {
       k: "knee" as const,
-      l: "Genou",
+      l: t("step2.bodyPart.knee"),
       descriptionArea: Z_INITIAL.kneeDescription,
       coachingArea: Z_INITIAL.kneeCoaching,
     },
     {
       k: "hip" as const,
-      l: "Hanche",
+      l: t("step2.bodyPart.hip"),
       descriptionArea: Z_INITIAL.hipDescription,
       coachingArea: Z_INITIAL.hipCoaching,
     },
     {
       k: "hamstring" as const,
-      l: "Ischios",
+      l: t("step2.bodyPart.hamstring"),
       descriptionArea: Z_INITIAL.hamstringDescription,
       coachingArea: Z_INITIAL.hamstringCoaching,
     },
   ];
   const tabs: Array<["p1" | "p2" | "p3", string, string]> = [
-    ["p1", "Activer", "Mobilité + prévention"],
-    ["p2", "Connecter", "TE / TA / PE"],
-    ["p3", "Accélérer", "Explosivité"],
+    ["p1", t("step2.tabName.p1"), t("step2.tabHint.p1")],
+    ["p2", t("step2.tabName.p2"), t("step2.tabHint.p2")],
+    ["p3", t("step2.tabName.p3"), t("step2.tabHint.p3")],
   ];
-  const activePhaseTitle =
-    tab === "p1"
-      ? "Phase 1 - Échauffement"
-      : tab === "p2"
-        ? "Phase 2 - Échauffement (TE/TA/PE)"
-        : "Phase 3 - Explosivité";
+  const activePhaseTitle = t(`step2.phaseTitle.${tab}`);
 
   function importPhase3(picked: LibraryExercise) {
     const fill = buildPhase3Import(picked);
@@ -1396,14 +1378,13 @@ function Step2({
       <section className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_500px]">
         <div>
           <div className="text-[10px] font-semibold uppercase tracking-[0.14em] text-red-600">
-            Warm-up & prep
+            {t("step2.eyebrow")}
           </div>
           <h2 className="mt-1 text-[22px] font-semibold tracking-[-0.02em] text-[#0c0c0d]">
-            Préparer le corps, puis le thème
+            {t("step2.title")}
           </h2>
           <p className="mt-0.5 max-w-[620px] text-[12px] leading-4 text-zinc-500">
-            Le début de séance installe l&apos;intensité, connecte les joueurs
-            au problème du jour, puis finit par une courte accélération.
+            {t("step2.subtitle")}
           </p>
         </div>
         <div className="self-center border-l border-zinc-200 pl-5">
@@ -1411,7 +1392,7 @@ function Step2({
             <div className="min-w-0">
               <div className="mb-1.5 flex items-center justify-between gap-3">
                 <div className="text-[10px] font-semibold uppercase tracking-[0.12em] text-zinc-400">
-                  3 parties
+                  {t("step2.threeParts")}
                 </div>
               </div>
               <div className="grid grid-cols-3 gap-1">
@@ -1426,12 +1407,12 @@ function Step2({
                         : "border-zinc-200 text-zinc-500 hover:border-zinc-400 hover:text-zinc-900"
                     }`}
                   >
-                    Phase {idx + 1}
+                    {t("phaseLabel", { n: idx + 1 })}
                   </button>
                 ))}
               </div>
             </div>
-            <FieldUl label="Durée totale">
+            <FieldUl label={t("step2.totalDuration")}>
               <div className="flex items-center gap-2">
                 <Timer className="h-3.5 w-3.5 text-zinc-400" />
                 <input
@@ -1442,7 +1423,7 @@ function Step2({
                       initial: { ...d.initial, duration: e.target.value },
                     }))
                   }
-                  placeholder="25 min"
+                  placeholder={t("step2.totalDurationPlaceholder")}
                   className={inpUlClass}
                 />
               </div>
@@ -1481,7 +1462,7 @@ function Step2({
 
               <div className="flex min-w-0 flex-col gap-3">
                 <div className="grid gap-3 md:grid-cols-2">
-                  <FieldUl label="Contenu">
+                  <FieldUl label={t("stepMain.field.content")}>
                     <FitTextarea
                       rows={6}
                       maxChars={420}
@@ -1499,11 +1480,11 @@ function Step2({
                           },
                         }))
                       }
-                      placeholder="Activation, ballon, mobilité, rythme."
+                      placeholder={t("step2.p1ContentPlaceholder")}
                       className={txtaUlClass}
                     />
                   </FieldUl>
-                  <FieldUl label="Coaching">
+                  <FieldUl label={t("stepMain.field.coaching")}>
                     <FitTextarea
                       rows={6}
                       maxChars={420}
@@ -1521,7 +1502,7 @@ function Step2({
                           },
                         }))
                       }
-                      placeholder="Qualité technique, posture, scanning."
+                      placeholder={t("step2.p1CoachingPlaceholder")}
                       className={txtaUlClass}
                     />
                   </FieldUl>
@@ -1529,8 +1510,8 @@ function Step2({
 
                 <div>
                   <div className="mb-1.5 flex items-center justify-between text-[10px] font-semibold uppercase tracking-[0.1em] text-zinc-400">
-                    <span>Prévention</span>
-                    <span>25&quot; / rep</span>
+                    <span>{t("preventionLabel")}</span>
+                    <span>{t("preventionDuration")}</span>
                   </div>
                   <div className="grid gap-x-4 gap-y-2 md:grid-cols-2">
                     {prevRows.map(
@@ -1544,7 +1525,7 @@ function Step2({
                               rows={2}
                               maxChars={90}
                               area={descriptionArea}
-                              placeholder="Exercice"
+                              placeholder={t("placeholder.exercise")}
                               value={pv[k].description}
                               onChange={(v) =>
                                 patch((d) => ({
@@ -1570,7 +1551,7 @@ function Step2({
                               rows={2}
                               maxChars={120}
                               area={coachingArea}
-                              placeholder="Consigne"
+                              placeholder={t("placeholder.instruction")}
                               value={pv[k].coaching}
                               onChange={(v) =>
                                 patch((d) => ({
@@ -1623,7 +1604,7 @@ function Step2({
                 </div>
               </div>
               <div className="grid min-w-0 gap-4 md:grid-cols-2">
-                <FieldUl label="Contenu">
+                <FieldUl label={t("stepMain.field.content")}>
                   <FitTextarea
                     rows={9}
                     maxChars={420}
@@ -1638,11 +1619,11 @@ function Step2({
                         },
                       }))
                     }
-                    placeholder="Rondo, conservation, contrainte liée au thème."
+                    placeholder={t("step2.p2ContentPlaceholder")}
                     className={txtaUlClass}
                   />
                 </FieldUl>
-                <FieldUl label="Coaching">
+                <FieldUl label={t("stepMain.field.coaching")}>
                   <FitTextarea
                     rows={9}
                     maxChars={560}
@@ -1657,7 +1638,7 @@ function Step2({
                         },
                       }))
                     }
-                    placeholder="Déclencheurs, orientation, rythme de décision."
+                    placeholder={t("step2.p2CoachingPlaceholder")}
                     className={txtaUlClass}
                   />
                 </FieldUl>
@@ -1670,12 +1651,12 @@ function Step2({
               <div className="flex items-center justify-between gap-4 border-b border-zinc-200 pb-2">
                 <div className="min-w-0">
                   <div className="text-[12px] font-semibold text-zinc-900">
-                    Explosivité
+                    {t("phase3Header")}
                   </div>
                   <div className="mt-0.5 truncate text-[11px] text-zinc-500">
                     {data.initial.phase3.exerciseId
-                      ? "Exercice importé dans les champs exportés du PDF"
-                      : "Importer un exercice Base CO explosivité"}
+                      ? t("importedHint")
+                      : t("phase3ImportHint")}
                   </div>
                 </div>
                 <div className="flex shrink-0 items-center gap-2">
@@ -1686,7 +1667,7 @@ function Step2({
                       className="inline-flex h-7 items-center gap-1.5 border-b border-zinc-300 px-1 text-[11px] font-semibold text-zinc-500 transition hover:border-zinc-900 hover:text-zinc-900"
                     >
                       <X className="h-3.5 w-3.5" strokeWidth={2} />
-                      Retirer
+                      {t("removeBtn")}
                     </button>
                   )}
                   <button
@@ -1695,7 +1676,7 @@ function Step2({
                     className="inline-flex h-7 items-center gap-1.5 border-b border-zinc-900 px-1 text-[11px] font-semibold text-zinc-950 transition hover:border-red-500 hover:text-red-600"
                   >
                     <BookOpen className="h-3.5 w-3.5" strokeWidth={2} />
-                    Importer
+                    {t("importBtn")}
                   </button>
                 </div>
               </div>
@@ -1704,7 +1685,7 @@ function Step2({
                   <div className="relative aspect-[4/3] w-full">
                     <Image
                       src={data.initial.phase3.imageUrl}
-                      alt="Exercice explosivité importé"
+                      alt={t("alt.explosivityImported")}
                       fill
                       sizes="360px"
                       className="object-contain"
@@ -1713,7 +1694,7 @@ function Step2({
                 </div>
               )}
               <div className="grid min-w-0 gap-4 md:grid-cols-2">
-                <FieldUl label="Contenu">
+                <FieldUl label={t("stepMain.field.content")}>
                   <FitTextarea
                     rows={10}
                     maxChars={420}
@@ -1731,11 +1712,11 @@ function Step2({
                         },
                       }))
                     }
-                    placeholder="Sprints, changements de direction, réaction."
+                    placeholder={t("step2.p3ContentPlaceholder")}
                     className={txtaUlClass}
                   />
                 </FieldUl>
-                <FieldUl label="Coaching">
+                <FieldUl label={t("stepMain.field.coaching")}>
                   <FitTextarea
                     rows={10}
                     maxChars={420}
@@ -1753,7 +1734,7 @@ function Step2({
                         },
                       }))
                     }
-                    placeholder="Intensité maximale, récupération, posture."
+                    placeholder={t("step2.p3CoachingPlaceholder")}
                     className={txtaUlClass}
                   />
                 </FieldUl>
@@ -1765,8 +1746,8 @@ function Step2({
                 phases={data.phases}
                 focusFamilies={["PE"]}
                 onPick={importPhase3}
-                title="Bibliothèque explosivité"
-                subtitle={`${phase3Exercises.length} exercices Base CO explosivité · cliquer pour exporter dans la phase 3`}
+                title={t("phase3LibraryTitle")}
+                subtitle={t("explosivityImportHint", { count: phase3Exercises.length })}
                 phaseFiltering={false}
               />
             </div>
@@ -1802,6 +1783,7 @@ function StepMain({
   zones: MainZones;
   library: LibraryExercise[];
 }) {
+  const t = useTranslations("sheet.preparation");
   const [pickerOpen, setPickerOpen] = useState(false);
   const ex = data.main[slot];
   function upd<K extends keyof PreparationData["main"][number]>(
@@ -1853,26 +1835,25 @@ function StepMain({
       <section className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_430px]">
         <div>
           <div className="text-[10px] font-semibold uppercase tracking-[0.14em] text-red-600">
-            Main block {slot + 1}
+            {t("stepMain.eyebrow", { n: slot + 1 })}
           </div>
           <h2 className="mt-0.5 text-[20px] font-semibold tracking-[-0.02em] text-[#0c0c0d]">
-            Mettre le problème sur le terrain
+            {t("stepMain.title")}
           </h2>
           <p className="mt-0.5 max-w-[620px] text-[12px] leading-4 text-zinc-500">
-            Le bloc central doit rendre visible le comportement attendu, puis
-            donner au coach des repères précis pour intervenir.
+            {t("stepMain.subtitle")}
           </p>
         </div>
         <div className="self-center border-l border-zinc-200 pl-5">
           <div className="grid items-end gap-3 lg:grid-cols-[minmax(0,1fr)_95px]">
             <div>
               <div className="mb-1.5 text-[10px] font-semibold uppercase tracking-[0.12em] text-zinc-400">
-                Format
+                {t("stepMain.format")}
               </div>
               <div className="grid grid-cols-2 gap-1">
                 {[
-                  ["playForm", "Forme jouée"],
-                  ["exercise", "Exercice"],
+                  ["playForm", t("stepMain.type.playForm")],
+                  ["exercise", t("stepMain.type.exercise")],
                 ].map(([id, label]) => (
                   <button
                     key={id}
@@ -1891,13 +1872,13 @@ function StepMain({
                 ))}
               </div>
             </div>
-            <FieldUl label="Durée">
+            <FieldUl label={t("stepMain.duration")}>
               <div className="flex items-center gap-2">
                 <Timer className="h-3.5 w-3.5 text-zinc-400" />
                 <input
                   value={ex.duration}
                   onChange={(e) => upd("duration", e.target.value)}
-                  placeholder="20 min"
+                  placeholder={t("stepMain.durationPlaceholder")}
                   className={inpUlClass}
                 />
               </div>
@@ -1910,7 +1891,7 @@ function StepMain({
         <div className="mb-1.5 flex items-center justify-between gap-4">
           <div>
             <div className="text-[13px] font-semibold text-zinc-900">
-              {ex.type === "playForm" ? "Forme jouée" : "Exercice"}
+              {ex.type === "playForm" ? t("stepMain.type.playForm") : t("stepMain.type.exercise")}
             </div>
           </div>
           <button
@@ -1919,7 +1900,7 @@ function StepMain({
             className="inline-flex h-7 shrink-0 items-center gap-1.5 border-b border-zinc-900 px-1 text-[11px] font-semibold text-zinc-950 transition hover:border-red-500 hover:text-red-600"
           >
             <BookOpen className="h-3.5 w-3.5" strokeWidth={2} />
-            Importer
+            {t("importBtn")}
           </button>
         </div>
 
@@ -1930,7 +1911,7 @@ function StepMain({
                 <div className="relative aspect-[4/3] w-full">
                   <Image
                     src={ex.imageUrl}
-                    alt="Imported exercise diagram"
+                    alt={t("alt.exerciseImported")}
                     fill
                     sizes="(max-width: 1024px) 100vw, 50vw"
                     className="object-contain"
@@ -1940,10 +1921,10 @@ function StepMain({
                   type="button"
                   onClick={clearImport}
                   className="absolute right-2 top-2 inline-flex items-center gap-1 rounded-md bg-white/95 px-2 py-1 text-[11px] font-medium text-zinc-700 shadow-sm ring-1 ring-zinc-200 transition hover:bg-white hover:text-zinc-900"
-                  title="Retirer l'image et revenir au schéma éditable"
+                  title={t("stepMain.removeImage")}
                 >
                   <X className="h-3 w-3" strokeWidth={2.5} />
-                  Retirer l&apos;image
+                  {t("stepMain.removeImageButton")}
                 </button>
               </div>
             ) : (
@@ -1958,47 +1939,47 @@ function StepMain({
           </div>
 
           <div className="grid min-w-0 gap-3 md:grid-cols-2">
-          <FieldUl label="Contenu">
+          <FieldUl label={t("stepMain.field.content")}>
             <FitTextarea
               rows={7}
               maxChars={520}
               area={{ w: zones.description.w, h: zones.description.h }}
               value={ex.description}
               onChange={(v) => upd("description", v)}
-              placeholder="Situation, règles, scoring, contraintes."
+              placeholder={t("stepMain.placeholder.content")}
               className={txtaUlClass}
             />
           </FieldUl>
-          <FieldUl label="Coaching">
+          <FieldUl label={t("stepMain.field.coaching")}>
             <FitTextarea
               rows={7}
               maxChars={520}
               area={{ w: zones.coaching.w, h: zones.coaching.h }}
               value={ex.coaching}
               onChange={(v) => upd("coaching", v)}
-              placeholder="Déclencheurs, comportements attendus, corrections."
+              placeholder={t("stepMain.placeholder.coaching")}
               className={txtaUlClass}
             />
           </FieldUl>
-          <FieldUl label="Organisation">
+          <FieldUl label={t("stepMain.field.organization")}>
               <FitTextarea
                 rows={3}
                 maxChars={300}
                 area={{ w: zones.organisation.w, h: zones.organisation.h }}
                 value={ex.organisation}
                 onChange={(v) => upd("organisation", v)}
-                placeholder="Espace, joueurs, matériel."
+                placeholder={t("stepMain.placeholder.organization")}
                 className={txtaUlClass}
               />
           </FieldUl>
-          <FieldUl label="Variations">
+          <FieldUl label={t("stepMain.field.variations")}>
               <FitTextarea
                 rows={3}
                 maxChars={300}
                 area={{ w: zones.variations.w, h: zones.variations.h }}
                 value={ex.variations}
                 onChange={(v) => upd("variations", v)}
-                placeholder="+ difficile / - difficile"
+                placeholder={t("stepMain.placeholder.variations")}
                 className={txtaUlClass}
               />
           </FieldUl>
@@ -2012,7 +1993,7 @@ function StepMain({
         phases={data.phases}
         focusFamilies={data.focusFamilies}
         onPick={importFromLibrary}
-        subtitle="Toute la bibliothèque · triée par pertinence avec le focus de séance"
+        subtitle={t("stepMain.librarySubtitle")}
         phaseFiltering={false}
       />
     </div>
@@ -2029,6 +2010,7 @@ function Step5({
   patch: Patcher;
   library: LibraryExercise[];
 }) {
+  const t = useTranslations("sheet.preparation");
   const [pickerOpen, setPickerOpen] = useState(false);
 
   function importFinalGame(picked: LibraryExercise) {
@@ -2062,19 +2044,18 @@ function Step5({
       <section className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_430px]">
         <div>
           <div className="text-[10px] font-semibold uppercase tracking-[0.14em] text-red-600">
-            Final game & wrap-up
+            {t("step5.eyebrow")}
           </div>
           <h2 className="mt-0.5 text-[20px] font-semibold tracking-[-0.02em] text-[#0c0c0d]">
-            Finir, redescendre, retenir
+            {t("step5.title")}
           </h2>
           <p className="mt-0.5 max-w-[620px] text-[12px] leading-4 text-zinc-500">
-            Le dernier temps vérifie le thème en situation libre, puis ferme la
-            séance avec un retour court et des notes utiles pour la suite.
+            {t("step5.subtitle")}
           </p>
         </div>
         <div className="self-center border-l border-zinc-200 pl-5">
           <div className="grid items-end gap-3 lg:grid-cols-2">
-            <FieldUl label="Jeu final">
+            <FieldUl label={t("step5.field.finalGame")}>
               <div className="flex items-center gap-2">
                 <Timer className="h-3.5 w-3.5 text-zinc-400" />
                 <input
@@ -2085,12 +2066,12 @@ function Step5({
                       game: { ...d.game, duration: e.target.value },
                     }))
                   }
-                  placeholder="15 min"
+                  placeholder={t("step5.placeholder.finalGameDuration")}
                   className={inpUlClass}
                 />
               </div>
             </FieldUl>
-            <FieldUl label="Retour au calme">
+            <FieldUl label={t("step5.field.coolDown")}>
               <div className="flex items-center gap-2">
                 <Timer className="h-3.5 w-3.5 text-zinc-400" />
                 <input
@@ -2101,7 +2082,7 @@ function Step5({
                       end: { ...d.end, duration: e.target.value },
                     }))
                   }
-                  placeholder="5 min"
+                  placeholder={t("step5.placeholder.coolDownDuration")}
                   className={inpUlClass}
                 />
               </div>
@@ -2113,7 +2094,7 @@ function Step5({
       <section className="border-t border-zinc-200 pt-1.5">
         <div className="mb-1.5 flex items-center justify-between gap-4">
           <div className="text-[13px] font-semibold text-zinc-900">
-            Jeu final
+            {t("step5.finalGameHeader")}
           </div>
           <button
             type="button"
@@ -2121,7 +2102,7 @@ function Step5({
             className="inline-flex h-7 shrink-0 items-center gap-1.5 border-b border-zinc-900 px-1 text-[11px] font-semibold text-zinc-950 transition hover:border-red-500 hover:text-red-600"
           >
             <BookOpen className="h-3.5 w-3.5" strokeWidth={2} />
-            Importer
+            {t("importBtn")}
           </button>
         </div>
         <div className="grid grid-cols-1 items-start gap-4 lg:grid-cols-[minmax(330px,0.78fr)_minmax(0,1.22fr)]">
@@ -2131,7 +2112,7 @@ function Step5({
                 <div className="relative aspect-[4/3] w-full">
                   <Image
                     src={data.game.imageUrl}
-                    alt="Exercice importé pour le jeu final"
+                    alt={t("alt.finalGameImported")}
                     fill
                     sizes="(max-width: 1024px) 100vw, 50vw"
                     className="object-contain"
@@ -2141,10 +2122,10 @@ function Step5({
                   type="button"
                   onClick={clearFinalGameImport}
                   className="absolute right-2 top-2 inline-flex items-center gap-1 rounded-md bg-white/95 px-2 py-1 text-[11px] font-medium text-zinc-700 shadow-sm ring-1 ring-zinc-200 transition hover:bg-white hover:text-zinc-900"
-                  title="Retirer l'image et revenir au schéma éditable"
+                  title={t("stepMain.removeImage")}
                 >
                   <X className="h-3 w-3" strokeWidth={2.5} />
-                  Retirer l&apos;image
+                  {t("stepMain.removeImageButton")}
                 </button>
               </div>
             ) : (
@@ -2161,7 +2142,7 @@ function Step5({
           </div>
 
           <div className="grid min-w-0 gap-3 md:grid-cols-2">
-            <FieldUl label="Format, contraintes, coaching">
+            <FieldUl label={t("step5.field.format")}>
               <FitTextarea
                 rows={7}
                 maxChars={360}
@@ -2170,11 +2151,11 @@ function Step5({
                 onChange={(v) =>
                   patch((d) => ({ ...d, game: { ...d.game, notes: v } }))
                 }
-                placeholder="Format, règles, contraintes, derniers points de coaching."
+                placeholder={t("step5.placeholder.format")}
                 className={txtaUlClass}
               />
             </FieldUl>
-            <FieldUl label="Retour au calme">
+            <FieldUl label={t("step5.field.coolDown")}>
               <FitTextarea
                 rows={7}
                 maxChars={360}
@@ -2183,19 +2164,19 @@ function Step5({
                 onChange={(v) =>
                   patch((d) => ({ ...d, end: { ...d.end, notes: v } }))
                 }
-                placeholder="Retour au calme, message final, mini débrief."
+                placeholder={t("step5.placeholder.coolDown")}
                 className={txtaUlClass}
               />
             </FieldUl>
             <div className="md:col-span-2">
-              <FieldUl label="Réflexion post-séance">
+              <FieldUl label={t("step5.field.reflection")}>
                 <FitTextarea
                   rows={3}
                   maxChars={360}
                   area={{ w: Z_END.reflection.w, h: Z_END.reflection.h }}
                   value={data.reflection}
                   onChange={(v) => patch((d) => ({ ...d, reflection: v }))}
-                  placeholder="Ce qui a fonctionné, ce qui doit être repris, joueurs à suivre."
+                  placeholder={t("step5.placeholder.reflection")}
                   className={txtaUlClass}
                 />
               </FieldUl>
@@ -2210,8 +2191,8 @@ function Step5({
         phases={data.phases}
         focusFamilies={data.focusFamilies}
         onPick={importFinalGame}
-        title="Bibliothèque jeu final"
-        subtitle="Toute la bibliothèque · cliquer pour importer dans le jeu final"
+        title={t("step5.libraryTitle")}
+        subtitle={t("step5.librarySubtitle")}
         phaseFiltering={false}
       />
     </div>
@@ -2225,6 +2206,7 @@ function ReviewValue({
   label: string;
   value: string;
 }) {
+  const t = useTranslations("sheet.preparation");
   const empty = !value.trim();
   return (
     <div className="border-b border-zinc-200 pb-1.5">
@@ -2236,7 +2218,7 @@ function ReviewValue({
           empty ? "text-zinc-300" : "text-zinc-950"
         }`}
       >
-        {empty ? "À compléter" : value}
+        {empty ? t("status.toFill") : value}
       </div>
     </div>
   );
@@ -2251,12 +2233,13 @@ function ReviewCheck({
   status: SectionStatus;
   onEdit: () => void;
 }) {
+  const t = useTranslations("sheet.preparation");
   const text =
     status === "complete"
-      ? "Complet"
+      ? t("status.complete")
       : status === "partial"
-        ? "À vérifier"
-        : "Vide";
+        ? t("status.partial")
+        : t("status.empty");
   return (
     <button
       type="button"
@@ -2290,11 +2273,12 @@ function Step6({
   onJumpTo: (i: number) => void;
   onExport: () => void;
 }) {
+  const t = useTranslations("sheet.preparation");
   const phaseLabels: Array<[keyof PreparationData["phases"], string]> = [
-    ["possession", "On a le ballon"],
-    ["losing", "On l'a perdu"],
-    ["noPossession", "Ils ont le ballon"],
-    ["recovering", "On le récupère"],
+    ["possession", t("step1.phaseOptionLabel.possession")],
+    ["losing", t("step1.phaseOptionLabel.losing")],
+    ["noPossession", t("step1.phaseOptionLabel.noPossession")],
+    ["recovering", t("step1.phaseOptionLabel.recovering")],
   ];
   const activePhases = phaseLabels
     .filter(([k]) => data.phases[k])
@@ -2303,10 +2287,10 @@ function Step6({
   const totalDuration =
     meta.durationMinutes !== null ? `${meta.durationMinutes} min` : "";
   const blockDurations = [
-    data.initial.duration && `Warm-up ${data.initial.duration}`,
-    data.main[0].duration && `B1 ${data.main[0].duration}`,
-    data.main[1].duration && `B2 ${data.main[1].duration}`,
-    data.game.duration && `Jeu ${data.game.duration}`,
+    data.initial.duration && `${t("step6.blockShort.warmup")} ${data.initial.duration}`,
+    data.main[0].duration && `${t("step6.blockShort.b1")} ${data.main[0].duration}`,
+    data.main[1].duration && `${t("step6.blockShort.b2")} ${data.main[1].duration}`,
+    data.game.duration && `${t("step6.blockShort.game")} ${data.game.duration}`,
   ]
     .filter(Boolean)
     .join(" · ");
@@ -2316,57 +2300,56 @@ function Step6({
       <section className="min-w-0">
         <div>
           <div className="text-[10px] font-semibold uppercase tracking-[0.14em] text-red-600">
-            Review & export
+            {t("step6.eyebrow")}
           </div>
           <h2 className="mt-0.5 text-[20px] font-semibold tracking-[-0.02em] text-[#0c0c0d]">
-            Dernier contrôle
+            {t("step6.title")}
           </h2>
           <p className="mt-0.5 max-w-[620px] text-[12px] leading-4 text-zinc-500">
-            Vérifie les informations qui structurent la séance avant de générer
-            la fiche PDF.
+            {t("step6.subtitle")}
           </p>
         </div>
 
         <div className="mt-5 grid gap-x-6 gap-y-3 md:grid-cols-2">
-          <ReviewValue label="Titre planning" value={meta.title} />
-          <ReviewValue label="Date" value={data.date} />
-          <ReviewValue label="Heure" value={meta.startTime} />
-          <ReviewValue label="Durée séance" value={totalDuration} />
-          <ReviewValue label="Équipe" value={data.team} />
-          <ReviewValue label="Coach" value={data.coach} />
-          <ReviewValue label="Moment du jeu" value={activePhases} />
-          <ReviewValue label="Focus" value={data.focus} />
-          <ReviewValue label="Objectif" value={data.objectives} />
-          <ReviewValue label="Durées blocs" value={blockDurations} />
+          <ReviewValue label={t("review.planningTitle")} value={meta.title} />
+          <ReviewValue label={t("review.date")} value={data.date} />
+          <ReviewValue label={t("review.startTime")} value={meta.startTime} />
+          <ReviewValue label={t("review.duration")} value={totalDuration} />
+          <ReviewValue label={t("review.team")} value={data.team} />
+          <ReviewValue label={t("review.coach")} value={data.coach} />
+          <ReviewValue label={t("review.gameMoment")} value={activePhases} />
+          <ReviewValue label={t("review.focus")} value={data.focus} />
+          <ReviewValue label={t("review.objective")} value={data.objectives} />
+          <ReviewValue label={t("review.blockDurations")} value={blockDurations} />
         </div>
 
         <div className="mt-6 border-t border-zinc-200 pt-3">
           <div className="mb-1.5 text-[10px] font-semibold uppercase tracking-[0.1em] text-zinc-400">
-            À vérifier rapidement
+            {t("step6.quickCheck")}
           </div>
           <div className="grid gap-x-6 md:grid-cols-2">
             <ReviewCheck
-              label="Session brief"
+              label={t("step6.section.brief")}
               status={statuses[0]}
               onEdit={() => onJumpTo(0)}
             />
             <ReviewCheck
-              label="Warm-up & prep"
+              label={t("step6.section.warmup")}
               status={statuses[1]}
               onEdit={() => onJumpTo(1)}
             />
             <ReviewCheck
-              label="Main block 1"
+              label={t("step6.section.main1")}
               status={statuses[2]}
               onEdit={() => onJumpTo(2)}
             />
             <ReviewCheck
-              label="Main block 2"
+              label={t("step6.section.main2")}
               status={statuses[3]}
               onEdit={() => onJumpTo(3)}
             />
             <ReviewCheck
-              label="Final game & wrap-up"
+              label={t("step6.section.finalGame")}
               status={statuses[4]}
               onEdit={() => onJumpTo(4)}
             />
@@ -2379,7 +2362,7 @@ function Step6({
           <div className="relative aspect-[210/297] overflow-hidden bg-white">
             <Image
               src="/page1.svg"
-              alt="Aperçu fiche PDF"
+              alt={t("alt.pdfPreview")}
               fill
               sizes="330px"
               className="object-contain"
@@ -2392,7 +2375,7 @@ function Step6({
           className="inline-flex h-10 items-center justify-center gap-2 rounded-[9px] bg-[#0c0c0d] px-4 text-[13px] font-semibold text-white shadow-[0_1px_3px_rgb(0_0_0/0.15)] transition hover:bg-[#1a1a1d] active:scale-[0.98]"
         >
           <Printer className="h-4 w-4" strokeWidth={2} />
-          Exporter PDF
+          {t("exportPdf")}
         </button>
       </aside>
     </div>
@@ -2403,38 +2386,8 @@ function Step6({
  * APP SHELL
  * ============================================================ */
 
-const STEPS = [
-  {
-    label: "Session brief",
-    eyebrow: "Step 1 of 5",
-    desc: "Set the date, team and game moment(s) this session is built around.",
-  },
-  {
-    label: "Warm-up & prep",
-    eyebrow: "Step 2 of 5",
-    desc: "Mobility, technical / tactical warmup, then a short explosive block.",
-  },
-  {
-    label: "Main block 1",
-    eyebrow: "Step 3 of 5",
-    desc: "Your first central training block — forme jouée or exercise.",
-  },
-  {
-    label: "Main block 2",
-    eyebrow: "Step 4 of 5",
-    desc: "Second central training block.",
-  },
-  {
-    label: "Final game & wrap-up",
-    eyebrow: "Step 5 of 5",
-    desc: "Match-style game, cool-down and post-session reflection.",
-  },
-  {
-    label: "Review & export",
-    eyebrow: "Final review",
-    desc: "Check each section, then export the official ASF preparation sheet.",
-  },
-] as const;
+type PreparationStep = { label: string; eyebrow: string; desc: string };
+const STEP_COUNT = 6;
 
 export function PreparationSheet({
   teamId,
@@ -2462,6 +2415,11 @@ export function PreparationSheet({
   const stepBodyRef = useRef<HTMLDivElement | null>(null);
   const locale = useLocale();
   const router = useRouter();
+  const t = useTranslations("sheet.preparation");
+  const messages = useMessages() as {
+    sheet: { preparation: { steps: PreparationStep[] } };
+  };
+  const STEPS = messages.sheet.preparation.steps;
 
   const slot = useMemo<"morning" | "afternoon">(
     () => slotFromStart(sessionMeta.startTime || meta.startTime || "10:00"),
@@ -2485,12 +2443,7 @@ export function PreparationSheet({
   const pct = Math.round((completeCount / 5) * 100);
 
   function cancelSession() {
-    if (
-      !confirm(
-        "Cancel this session? It will be removed from the planner.",
-      )
-    )
-      return;
+    if (!confirm(t("cancelConfirm"))) return;
     setError(null);
     startTransition(async () => {
       const result = await cancelSessionAction({
@@ -2536,10 +2489,7 @@ export function PreparationSheet({
   }, [stepKey]);
 
   function loadExample() {
-    if (
-      dirty &&
-      !confirm("This will replace the current sheet with an example. Continue?")
-    ) {
+    if (dirty && !confirm(t("loadExampleConfirm"))) {
       return;
     }
     patch(() => exampleSheet());
@@ -2629,7 +2579,7 @@ export function PreparationSheet({
               className="flex items-center gap-1 border-0 bg-transparent text-[12px] font-medium text-zinc-500 transition hover:text-zinc-950"
             >
               <ChevronLeft className="h-3.5 w-3.5" strokeWidth={2} />
-              Back
+              {t("back")}
             </button>
             <span className="mx-3 h-[18px] w-px bg-zinc-200" />
             <Image
@@ -2642,10 +2592,10 @@ export function PreparationSheet({
             />
             <div className="min-w-0 leading-none">
               <div className="text-[13px] font-semibold text-zinc-950">
-                Préparation d&apos;entraînement
+                {t("header")}
               </div>
               <div className="mt-0.5 truncate text-[10px] text-zinc-500">
-                {data.team || "No team set"} · {data.date || "No date"}
+                {data.team || t("noTeam")} · {data.date || t("noDate")}
               </div>
             </div>
           </div>
@@ -2665,10 +2615,10 @@ export function PreparationSheet({
               type="button"
               onClick={loadExample}
               className="hidden h-8 items-center gap-1.5 rounded-[8px] px-3 text-[12px] font-medium text-zinc-500 transition hover:bg-zinc-100 hover:text-zinc-950 sm:inline-flex"
-              title="Load example data"
+              title={t("loadExampleTitle")}
             >
               <FileText className="h-3.5 w-3.5" strokeWidth={2} />
-              Example
+              {t("example")}
             </button>
             <button
               type="button"
@@ -2682,7 +2632,7 @@ export function PreparationSheet({
                     className="h-3 w-3 animate-spin"
                     strokeWidth={2.5}
                   />
-                  Saving…
+                  {t("saving")}
                 </>
               ) : justSaved ? (
                 <>
@@ -2690,12 +2640,12 @@ export function PreparationSheet({
                     className="h-3 w-3 text-emerald-500"
                     strokeWidth={2.5}
                   />
-                  Saved
+                  {t("saved")}
                 </>
               ) : (
                 <>
                   <Save className="h-3 w-3" strokeWidth={2} />
-                  Save
+                  {t("save")}
                 </>
               )}
             </button>
@@ -2723,7 +2673,7 @@ export function PreparationSheet({
               />
             </div>
             <div className="px-4 pb-2 pt-2 text-[9px] font-semibold uppercase tracking-[0.1em] text-zinc-400">
-              Étapes de préparation
+              {t("stepsLabel")}
             </div>
             <nav className="flex flex-1 flex-col gap-0.5 overflow-y-auto px-2 pb-2">
               {STEPS.map((s, i) => {
@@ -2778,7 +2728,7 @@ export function PreparationSheet({
             </nav>
             <div className="border-t border-zinc-200 px-4 py-3.5">
               <div className="mb-1.5 flex justify-between">
-                <span className="text-[10px] text-zinc-400">Progress</span>
+                <span className="text-[10px] text-zinc-400">{t("progress")}</span>
                 <span className="text-[10px] font-semibold text-zinc-600">
                   {pct}%
                 </span>
@@ -2848,7 +2798,7 @@ export function PreparationSheet({
                   className="inline-flex h-8 items-center gap-1.5 rounded-[9px] border border-zinc-200 bg-white px-3 text-[12px] font-medium text-zinc-900 shadow-[0_1px_2px_rgb(0_0_0/0.05)] transition hover:bg-zinc-50 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-40"
                 >
                   <ChevronLeft className="h-3.5 w-3.5" strokeWidth={2} />
-                  Retour
+                  {t("back")}
                 </button>
                 <button
                   type="button"
@@ -2856,7 +2806,7 @@ export function PreparationSheet({
                   disabled={step === STEPS.length - 1}
                   className="inline-flex h-8 items-center gap-1.5 rounded-[9px] bg-[#0c0c0d] px-3 text-[12px] font-medium text-white shadow-[0_1px_3px_rgb(0_0_0/0.15)] transition hover:bg-[#1a1a1d] active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-40"
                 >
-                  Suivant
+                  {t("next")}
                   <ChevronRight className="h-3.5 w-3.5" strokeWidth={2} />
                 </button>
               </div>

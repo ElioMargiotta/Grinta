@@ -1,5 +1,5 @@
 import { redirect } from "next/navigation";
-import { setRequestLocale } from "next-intl/server";
+import { getTranslations, setRequestLocale } from "next-intl/server";
 import { Mail } from "lucide-react";
 
 // Landing for users who have an invitation token from outside the in-app
@@ -13,6 +13,7 @@ export default async function InviteLandingPage({
 }) {
   const { locale } = await params;
   setRequestLocale(locale);
+  const t = await getTranslations("invite");
 
   async function gotoTokenAction(formData: FormData) {
     "use server";
@@ -27,46 +28,43 @@ export default async function InviteLandingPage({
     <div className="mx-auto flex w-full max-w-xl flex-col gap-6">
       <div>
         <h1 className="text-2xl font-semibold tracking-tight text-zinc-900 dark:text-zinc-100">
-          Rejoindre un club
+          {t("title")}
         </h1>
         <p className="mt-1 text-sm text-zinc-600 dark:text-zinc-400">
-          Si tu as été invité, l&apos;invitation apparaît normalement sur ton
-          dashboard quand tu te connectes avec l&apos;adresse email invitée.
+          {t("subtitle")}
         </p>
       </div>
 
       <div className="rounded-2xl border border-emerald-200 bg-emerald-50 p-4 text-sm text-emerald-800 dark:border-emerald-500/30 dark:bg-emerald-950/30 dark:text-emerald-200">
         <div className="flex items-center gap-2 font-medium">
           <Mail className="h-4 w-4" />
-          Flow recommandé
+          {t("recommendedFlow")}
         </div>
         <p className="mt-1 text-emerald-700 dark:text-emerald-300">
-          Demande au propriétaire du club de t&apos;ajouter avec ton adresse
-          email. L&apos;invitation s&apos;affichera automatiquement sur ton
-          dashboard.
+          {t("recommendedFlowBody")}
         </p>
       </div>
 
       <div className="rounded-2xl border border-zinc-200 bg-white p-6 shadow-sm dark:border-zinc-800 dark:bg-zinc-900">
         <div className="text-sm font-medium text-zinc-900 dark:text-zinc-100">
-          J&apos;ai un lien ou un token d&apos;invitation
+          {t("haveTokenTitle")}
         </div>
         <p className="mt-1 text-sm text-zinc-600 dark:text-zinc-400">
-          Colle le lien complet ou juste le token.
+          {t("haveTokenSubtitle")}
         </p>
         <form action={gotoTokenAction} className="mt-4 flex flex-col gap-3">
           <input
             type="text"
             name="token"
             required
-            placeholder="https://grinta.app/invite/… ou abc123…"
+            placeholder={t("tokenPlaceholder")}
             className="w-full rounded-md border border-zinc-300 bg-white px-3 py-2 text-sm text-zinc-900 outline-none focus:border-zinc-900 dark:border-zinc-700 dark:bg-zinc-950 dark:text-zinc-100 dark:focus:border-zinc-100"
           />
           <button
             type="submit"
             className="self-start rounded-md bg-zinc-900 px-4 py-2 text-sm font-medium text-white hover:bg-zinc-800 dark:bg-white dark:text-zinc-900 dark:hover:bg-zinc-200"
           >
-            Continuer
+            {t("continue")}
           </button>
         </form>
       </div>

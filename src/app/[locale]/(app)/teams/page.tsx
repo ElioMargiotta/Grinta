@@ -44,10 +44,13 @@ export default async function TeamsPage({
     <div className="flex flex-col gap-6">
       {isOnboarding && (
         <div className="rounded-2xl border border-emerald-200 bg-emerald-50 p-4 text-sm text-emerald-900 dark:border-emerald-500/30 dark:bg-emerald-950/30 dark:text-emerald-100">
-          <div className="font-medium">Club créé · {membership.club_name}</div>
+          <div className="font-medium">
+            {t("clubCreated", { name: membership.club_name })}
+          </div>
           <p className="mt-1 text-emerald-800 dark:text-emerald-200">
-            Une équipe par défaut <strong>Actif</strong> a été créée. Clique
-            dessus pour la renommer ou ajouter d&apos;autres équipes.
+            {t.rich("defaultTeamCreated", {
+              strong: (chunks) => <strong>{chunks}</strong>,
+            })}
           </p>
         </div>
       )}
@@ -60,7 +63,7 @@ export default async function TeamsPage({
             <Link href="/teams/archived">
               <Button variant="ghost" size="sm">
                 <Archive className="h-4 w-4" />
-                Archivées ({archivedCount})
+                {t("archivedCount", { n: archivedCount ?? 0 })}
               </Button>
             </Link>
           )}
@@ -92,12 +95,12 @@ export default async function TeamsPage({
                     {team.name}
                   </div>
                   <div className="mt-0.5 text-sm text-zinc-500 dark:text-zinc-400">
-                    {team.age_group || "Catégorie non définie"}
+                    {team.age_group || t("unsetCategory")}
                   </div>
                 </div>
               </div>
               <div className="text-sm text-zinc-500 md:text-right">
-                {team.season || "Saison non définie"}
+                {team.season || t("unsetSeason")}
               </div>
               <div className="hidden justify-end md:flex">
                 <div className="flex h-9 w-9 items-center justify-center rounded-md text-zinc-400 transition group-hover:bg-white group-hover:text-[var(--club-primary)]">

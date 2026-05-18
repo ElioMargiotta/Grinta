@@ -2,6 +2,7 @@
 
 import { useMemo, useState } from "react";
 import Image from "next/image";
+import { useTranslations } from "next-intl";
 import { ChevronLeft, Search, Sparkles } from "lucide-react";
 import type { FocusFamily } from "./types";
 
@@ -63,7 +64,7 @@ export function ExerciseLibraryPicker({
   phases,
   focusFamilies,
   onPick,
-  title = "Bibliothèque d'exercices",
+  title,
   subtitle,
   phaseFiltering = true,
 }: {
@@ -77,8 +78,12 @@ export function ExerciseLibraryPicker({
   subtitle?: string;
   phaseFiltering?: boolean;
 }) {
+  const t = useTranslations("libraries.picker");
+  const tl = useTranslations("libraries");
   const [search, setSearch] = useState("");
   const [overridePhase, setOverridePhase] = useState<string | null>(null);
+
+  const displayTitle = title ?? t("title");
 
   const activeThemes = useMemo(() => {
     if (overridePhase) return [overridePhase];
@@ -130,22 +135,22 @@ export function ExerciseLibraryPicker({
               type="button"
               onClick={onClose}
               className="flex h-8 w-8 items-center justify-center rounded-lg text-zinc-500 hover:bg-zinc-100 hover:text-zinc-900"
-              aria-label="Close"
+              aria-label={t("close")}
             >
               <ChevronLeft className="h-4 w-4" />
             </button>
             <div>
               <div className="text-[14px] font-semibold text-zinc-900">
-                {title}
+                {displayTitle}
               </div>
               <div className="text-[11px] text-zinc-500">
                 {subtitle ??
-                  `${filtered.length} exercices · pré-filtrés par phase de jeu et focus`}
+                  t("subtitle", { count: filtered.length })}
               </div>
             </div>
           </div>
           <div className="text-[11px] text-zinc-400">
-            Cliquer pour importer
+            {t("clickToImport")}
           </div>
         </header>
 
@@ -156,7 +161,7 @@ export function ExerciseLibraryPicker({
             <input
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              placeholder="Rechercher par titre, code…"
+              placeholder={t("searchPlaceholder")}
               className="w-full border-0 bg-transparent p-0 outline-none placeholder:text-zinc-400"
             />
           </label>
@@ -164,24 +169,27 @@ export function ExerciseLibraryPicker({
           <div className="mt-2 flex flex-wrap items-center gap-1.5 text-[11px]">
             {phaseFiltering && (
               <>
-                <span className="text-zinc-400">Phases:</span>
+                <span className="text-zinc-400">{t("phases")}</span>
                 {activeThemes.length === 0 ? (
-                  <span className="italic text-zinc-400">aucune sélectionnée</span>
+                  <span className="italic text-zinc-400">{t("noneSelected")}</span>
                 ) : (
-                  activeThemes.map((t) => (
-                    <span
-                      key={t}
-                      className="rounded-full bg-zinc-900 px-2 py-0.5 font-medium text-white"
-                    >
-                      {t}
-                    </span>
-                  ))
+                  activeThemes.map((themeVal) => {
+                    const phaseKey = (Object.keys(PHASE_TO_THEME) as (keyof PreparationPhases)[]).find(k => PHASE_TO_THEME[k] === themeVal);
+                    return (
+                      <span
+                        key={themeVal}
+                        className="rounded-full bg-zinc-900 px-2 py-0.5 font-medium text-white"
+                      >
+                        {phaseKey ? t(`phasesThemes.${phaseKey}` as Parameters<typeof t>[0]) : themeVal}
+                      </span>
+                    );
+                  })
                 )}
               </>
             )}
-            <span className="ml-auto text-zinc-400">Focus:</span>
+            <span className="ml-auto text-zinc-400">{t("focus")}</span>
             {focusFamilies.length === 0 ? (
-              <span className="italic text-zinc-400">aucun</span>
+              <span className="italic text-zinc-400">{t("none")}</span>
             ) : (
               focusFamilies.map((f) => (
                 <span
@@ -196,7 +204,7 @@ export function ExerciseLibraryPicker({
 
           {/* Manual phase override */}
           {phaseFiltering && <div className="mt-2 flex flex-wrap items-center gap-1.5">
-            <span className="text-[11px] text-zinc-400">Filtrer par phase:</span>
+            <span className="text-[11px] text-zinc-400">{t("filterByPhase")}</span>
             <button
               type="button"
               onClick={() => setOverridePhase(null)}
@@ -206,22 +214,25 @@ export function ExerciseLibraryPicker({
                   : "border-zinc-200 bg-white text-zinc-600 hover:border-zinc-300"
               }`}
             >
-              Auto (session)
+              {t("autoSession")}
             </button>
-            {Object.values(PHASE_TO_THEME).map((t) => (
-              <button
-                key={t}
-                type="button"
-                onClick={() => setOverridePhase(t)}
-                className={`rounded-full border px-2 py-0.5 text-[11px] ${
-                  overridePhase === t
-                    ? "border-zinc-900 bg-zinc-900 text-white"
-                    : "border-zinc-200 bg-white text-zinc-600 hover:border-zinc-300"
-                }`}
-              >
-                {t.replace("Mon équipe ", "")}
-              </button>
-            ))}
+            {(Object.keys(PHASE_TO_THEME) as (keyof PreparationPhases)[]).map((phaseKey) => {
+              const phaseVal = PHASE_TO_THEME[phaseKey];
+              return (
+                <button
+                  key={phaseKey}
+                  type="button"
+                  onClick={() => setOverridePhase(phaseVal)}
+                  className={`rounded-full border px-2 py-0.5 text-[11px] ${
+                    overridePhase === phaseVal
+                      ? "border-zinc-900 bg-zinc-900 text-white"
+                      : "border-zinc-200 bg-white text-zinc-600 hover:border-zinc-300"
+                  }`}
+                >
+                  {t(`phasesThemes.${phaseKey}` as Parameters<typeof t>[0])}
+                </button>
+              );
+            })}
           </div>}
         </div>
 
@@ -229,8 +240,7 @@ export function ExerciseLibraryPicker({
         <div className="flex-1 overflow-y-auto px-5 py-4">
           {filtered.length === 0 ? (
             <div className="rounded-xl border border-dashed border-zinc-300 bg-white p-8 text-center text-[13px] text-zinc-500">
-              Aucun exercice ne correspond. Modifiez les filtres ou la
-              recherche.
+              {t("noMatch")}
             </div>
           ) : (
             <ul className="flex flex-col gap-2">
@@ -253,7 +263,7 @@ export function ExerciseLibraryPicker({
                       </div>
                     ) : (
                       <div className="flex h-20 w-28 shrink-0 items-center justify-center rounded-lg bg-zinc-100 text-[10px] text-zinc-400">
-                        No diagram
+                        {tl("noDiagram")}
                       </div>
                     )}
                     <div className="flex min-w-0 flex-1 flex-col gap-1">
@@ -308,7 +318,7 @@ export function ExerciseLibraryPicker({
       <button
         type="button"
         onClick={onClose}
-        aria-label="Close picker"
+        aria-label={t("closePicker")}
         className="absolute inset-0 -z-10"
       />
     </div>

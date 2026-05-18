@@ -1,4 +1,4 @@
-import { setRequestLocale } from "next-intl/server";
+import { getTranslations, setRequestLocale } from "next-intl/server";
 import { redirect } from "next/navigation";
 import { requireMembership } from "@/lib/auth/getUser";
 import { canManageClub } from "@/lib/club/types";
@@ -12,6 +12,7 @@ export default async function ClubSettingsPage({
 }) {
   const { locale } = await params;
   setRequestLocale(locale);
+  const t = await getTranslations("settings.clubPage");
   const { membership } = await requireMembership(locale);
 
   if (!canManageClub(membership.access_level)) {
@@ -25,11 +26,13 @@ export default async function ClubSettingsPage({
     <div className="mx-auto flex w-full max-w-5xl flex-col gap-8">
       <header>
         <h1 className="text-2xl font-semibold text-zinc-900">
-          Paramètres du club
+          {t("title")}
         </h1>
         <p className="mt-1 text-sm text-zinc-600">
-          Gère les membres, les rôles et les invitations de{" "}
-          <strong>{membership.club_name}</strong>.
+          {t.rich("subtitle", {
+            club: membership.club_name,
+            strong: (chunks) => <strong>{chunks}</strong>,
+          })}
         </p>
       </header>
 

@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { useMessages, useTranslations } from "next-intl";
 
 type Step = {
   kicker: string;
@@ -9,42 +10,6 @@ type Step = {
   badge?: string;
 };
 
-const STEPS: Step[] = [
-  {
-    kicker: "01",
-    title: "L'identité du club",
-    body: "Principes de jeu, formation, attendus. Une seule philosophie partagée par tout le staff.",
-    badge: "Identité",
-  },
-  {
-    kicker: "02",
-    title: "La saison, en 90 secondes",
-    body: "Trois dates suffisent. Grinta ancre le macrocycle et numérote les semaines (-3, -2, -1, +1…) automatiquement.",
-    badge: "Saison",
-  },
-  {
-    kicker: "03",
-    title: "Les microcycles",
-    body: "Thème de la semaine, format, charge. Chaque mésocycle prend la couleur que tu veux.",
-    badge: "Microcycle",
-  },
-  {
-    kicker: "04",
-    title: "Les séances",
-    body: "Importe un exercice depuis ta bibliothèque ou crée-le directement sur schéma. Les blocs s'empilent.",
-    badge: "Séance",
-  },
-  {
-    kicker: "05",
-    title: "La fiche, prête pour le terrain",
-    body: "Un PDF A4 propre, lisible pour le staff, exploitable sur le terrain. Voilà.",
-    badge: "PDF",
-  },
-];
-
-/* Anchors on a 1000×1100 viewBox. The path is a regular sine-style
- * serpentine: every segment uses the same vertical tangent length so the
- * curvature is even from top to bottom. */
 const ANCHORS = [
   { side: "left", x: 350, y: 110 },
   { side: "right", x: 650, y: 330 },
@@ -173,7 +138,6 @@ function Snake() {
       fill="none"
       style={{ ["--len" as string]: String(pathLen) }}
     >
-      {/* Dots at each anchor */}
       {ANCHORS.map((a, i) => (
         <circle
           key={i}
@@ -185,7 +149,6 @@ function Snake() {
           style={{ ["--dot-i" as string]: String(i) }}
         />
       ))}
-      {/* The serpentine line */}
       <path
         className="snake-line"
         d={SNAKE_D}
@@ -193,7 +156,6 @@ function Snake() {
         strokeWidth={1.25}
         strokeLinecap="round"
       />
-      {/* Single arrowhead at the very end, pointing down */}
       <g
         className="snake-head"
         transform={`translate(${SNAKE_END.x} ${SNAKE_END.y})`}
@@ -212,21 +174,25 @@ function Snake() {
 }
 
 export function FlowSection() {
+  const t = useTranslations("landing.flow");
+  const messages = useMessages() as { landing: { flow: { steps: Step[] } } };
+  const steps = messages.landing.flow.steps;
+
   return (
     <section id="flow" className="relative py-24 lg:py-32">
       <div className="mx-auto max-w-7xl px-6 lg:px-10">
         <div className="mx-auto max-w-2xl text-center">
-          <div className="eyebrow-mono">Comment ça marche</div>
+          <div className="eyebrow-mono">{t("eyebrow")}</div>
           <h2
             className="h-display mt-4 text-4xl sm:text-5xl font-semibold tracking-tight"
             style={{ textWrap: "balance" }}
           >
-            De l&apos;identité du club à la fiche du{" "}
-            <span className="text-accent-ink italic">mardi soir</span>.
+            {t("titlePrefix")}{" "}
+            <span className="text-accent-ink italic">{t("titleAccent")}</span>
+            {t("titleSuffix")}
           </h2>
         </div>
 
-        {/* Desktop / tablet: smooth serpentine with floating text */}
         <div className="hidden md:block relative mx-auto mt-24 w-full max-w-3xl aspect-[1000/1100]">
           <Snake />
           {ANCHORS.map((a, i) => {
@@ -235,7 +201,7 @@ export function FlowSection() {
             const side = a.side;
             return (
               <div
-                key={STEPS[i].kicker}
+                key={steps[i].kicker}
                 className="absolute"
                 style={{
                   top: `${yPct}%`,
@@ -244,13 +210,12 @@ export function FlowSection() {
                   transform: "translateY(-50%)",
                 }}
               >
-                <FlowText step={STEPS[i]} side={side} />
+                <FlowText step={steps[i]} side={side} />
               </div>
             );
           })}
         </div>
 
-        {/* Mobile: vertical thin line with anchor dots, no boxes */}
         <div className="md:hidden relative mx-auto mt-16 max-w-md pl-8">
           <div
             aria-hidden
@@ -258,7 +223,7 @@ export function FlowSection() {
             style={{ background: "color-mix(in oklch, var(--ink-3) 35%, transparent)" }}
           />
           <ol className="flex flex-col gap-12">
-            {STEPS.map((step) => (
+            {steps.map((step) => (
               <li key={step.kicker} className="relative">
                 <span
                   aria-hidden

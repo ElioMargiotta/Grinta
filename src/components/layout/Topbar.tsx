@@ -24,29 +24,6 @@ function daysUntil(iso: string | null): number | null {
   return Math.max(0, Math.ceil(diff / (1000 * 60 * 60 * 24)));
 }
 
-function planSubtitle(
-  membership: ClubMembership | null,
-  teamCount: number,
-): string {
-  if (!membership) return "Plan gratuit";
-
-  const team = teamCount === 1 ? "équipe" : "équipes";
-  const status = membership.subscription_status;
-
-  if (status === "trialing") {
-    const days = daysUntil(membership.trial_ends_at);
-    const trial = days === null ? "Essai" : `Essai · ${days}j restants`;
-    return `${trial} · ${teamCount} ${team}`;
-  }
-
-  if (status === "active") {
-    const monthly = teamCount * PRICE_PER_TEAM_CHF;
-    return `${teamCount} ${team} · ${monthly} CHF/mois`;
-  }
-
-  return `${status} · ${teamCount} ${team}`;
-}
-
 export function Topbar({
   userName,
   currentMembership,
@@ -59,8 +36,26 @@ export function Topbar({
   teamCount: number;
 }) {
   const t = useTranslations("nav");
+  const tp = useTranslations("topbar");
   const [isPending, startTransition] = useTransition();
-  const subtitle = planSubtitle(currentMembership, teamCount);
+
+  let subtitle: string;
+  if (!currentMembership) {
+    subtitle = tp("freePlan");
+  } else {
+    const teamWord = teamCount === 1 ? tp("teamSingular") : tp("teamPlural");
+    const status = currentMembership.subscription_status;
+    if (status === "trialing") {
+      const days = daysUntil(currentMembership.trial_ends_at);
+      subtitle = days === null ? tp("trial") : tp("trialDays", { days });
+      subtitle += ` · ${teamCount} ${teamWord}`;
+    } else if (status === "active") {
+      const monthly = teamCount * PRICE_PER_TEAM_CHF;
+      subtitle = tp("planPerTeam", { count: teamCount, teams: teamWord, amount: monthly });
+    } else {
+      subtitle = tp("planStatus", { status, count: teamCount, teams: teamWord });
+    }
+  }
 
   return (
     <header className="sticky top-0 z-30 flex h-14 items-center justify-between border-b border-[var(--club-line)] bg-white/[0.82] px-4 backdrop-blur md:px-6 dark:border-zinc-800 dark:bg-zinc-950/80">
@@ -70,7 +65,7 @@ export function Topbar({
         </span>
         <div className="leading-tight">
           <div className="text-sm font-medium text-zinc-900 dark:text-zinc-100">
-            {userName || "Coach"}
+            {userName || tp("fallbackName")}
           </div>
           <div className="text-[11px] text-zinc-500 dark:text-zinc-400">
             {subtitle}

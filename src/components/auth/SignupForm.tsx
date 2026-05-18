@@ -56,7 +56,7 @@ export function SignupForm() {
           name="fullName"
           autoComplete="name"
           required
-          placeholder="Jane Doe"
+          placeholder={t("namePlaceholder")}
           className={inputClass}
         />
       </AuthField>
@@ -68,7 +68,7 @@ export function SignupForm() {
           type="email"
           autoComplete="email"
           required
-          placeholder="you@example.com"
+          placeholder={t("emailPlaceholder")}
           className={inputClass}
         />
       </AuthField>
@@ -85,7 +85,7 @@ export function SignupForm() {
           autoComplete="new-password"
           required
           minLength={6}
-          placeholder="••••••••"
+          placeholder={t("passwordPlaceholder")}
         />
       </AuthField>
 

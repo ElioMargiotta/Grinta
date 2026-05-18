@@ -11,7 +11,7 @@ const geistMono = Geist_Mono({ variable: "--font-geist-mono", subsets: ["latin"]
 
 export const metadata: Metadata = {
   title: "Grinta",
-  description: "Plan your football season.",
+  description: "Grinta - Football season planning and training preparation tool.",
 };
 
 export function generateStaticParams() {

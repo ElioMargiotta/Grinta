@@ -1,5 +1,5 @@
 import Image from "next/image";
-import { setRequestLocale } from "next-intl/server";
+import { setRequestLocale, getTranslations } from "next-intl/server";
 import { Plus } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { Link } from "@/i18n/navigation";
@@ -46,34 +46,8 @@ const PHASE_LEVELS = [1, 2, 3, 4, 5, 6] as const;
 const GESTE_LEVELS = [1, 2, 3] as const;
 const CO_LEVELS = [1, 2, 3, 4, 5, 6, 7, 8] as const;
 
-const LIBRARY_TABS: { id: LibraryFamily; label: string; source: string; hint: string }[] = [
-  {
-    id: "phases",
-    label: "Phases de jeu",
-    source: "clubcorner_2026",
-    hint: "ASF / clubcorner — filtres par phase de jeu, track et niveau",
-  },
-  {
-    id: "gestes",
-    label: "Gestes techniques",
-    source: "asf_te_2026",
-    hint: "ASF Base TE — passe, conduite & dribble, tir au but, techniques aériennes, niveaux 1 à 3",
-  },
-  {
-    id: "co",
-    label: "Condition physique",
-    source: "asf_co_2026",
-    hint: "ASF Base CO — explosivité, stabilité corporelle (niveaux 1 à 8)",
-  },
-];
-
 type Family = "PE" | "TA" | "AT" | "TE";
-const FAMILIES: { id: Family; label: string; column: "forme_physique" | "tactique" | "mentalite" | "technique" }[] = [
-  { id: "PE", label: "Forme physique",  column: "forme_physique" },
-  { id: "TA", label: "Tactique",        column: "tactique" },
-  { id: "AT", label: "Mentalité",       column: "mentalite" },
-  { id: "TE", label: "Technique",       column: "technique" },
-];
+type FamilyItem = { id: Family; label: string; column: "forme_physique" | "tactique" | "mentalite" | "technique" };
 
 type ExerciseRow = {
   id: string;
@@ -138,10 +112,18 @@ export default async function ExercisesPage({
   const { locale } = await params;
   const sp = await searchParams;
   setRequestLocale(locale);
+  const t = await getTranslations("exercises");
+  const tl = await getTranslations("libraries");
   const { supabase } = await requireUser(locale);
 
+  const libraryTabs: { id: LibraryFamily; label: string; source: string; hint: string }[] = [
+    { id: "phases", label: t("page.phasesTab"), source: "clubcorner_2026", hint: t("page.phasesTabHint") },
+    { id: "gestes", label: t("page.gesturesTab"), source: "asf_te_2026", hint: t("page.gesturesTabHint") },
+    { id: "co", label: t("page.coTab"), source: "asf_co_2026", hint: t("page.coTabHint") },
+  ];
+
   const activeTab =
-    LIBRARY_TABS.find((t) => t.id === sp.family) ?? LIBRARY_TABS[0];
+    libraryTabs.find((tab) => tab.id === sp.family) ?? libraryTabs[0];
   const themes =
     activeTab.id === "phases"
       ? PHASE_THEMES
@@ -181,29 +163,36 @@ export default async function ExercisesPage({
   const { data } = await query;
   const exercises = (data ?? []) as ExerciseRow[];
 
+  const families: FamilyItem[] = [
+    { id: "PE" as Family, label: tl("families.PE"), column: "forme_physique" as const },
+    { id: "TA" as Family, label: tl("families.TA"), column: "tactique" as const },
+    { id: "AT" as Family, label: tl("families.AT"), column: "mentalite" as const },
+    { id: "TE" as Family, label: tl("families.TE"), column: "technique" as const },
+  ];
+
   const focus = (sp.focus as Family | undefined) ?? null;
-  const focusFamily = FAMILIES.find((f) => f.id === focus) ?? null;
+  const focusFamily = families.find((f) => f.id === focus) ?? null;
 
   return (
     <div className="flex flex-col gap-6">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
           <h1 className="text-2xl font-semibold tracking-tight text-zinc-900">
-            Exercise library
+            {t("title")}
           </h1>
           <p className="mt-1 text-sm text-zinc-500">{activeTab.hint}.</p>
         </div>
         <Link href="/exercises/new">
           <Button>
             <Plus className="h-4 w-4" />
-            New exercise
+            {t("new")}
           </Button>
         </Link>
       </div>
 
       {/* Family tabs — switch between the two seeded libraries. */}
       <div className="flex w-fit gap-1 rounded-[10px] bg-zinc-100 p-1">
-        {LIBRARY_TABS.map((tab) => {
+        {libraryTabs.map((tab) => {
           const isActive = activeTab.id === tab.id;
           return (
             <Link
@@ -223,9 +212,9 @@ export default async function ExercisesPage({
 
       {/* Filter bar */}
       <div className="flex flex-col gap-3 rounded-xl border border-zinc-200 bg-white p-4 shadow-sm">
-        <FilterRow label={activeTab.id === "phases" ? "Phase de jeu" : "Thème"}>
+        <FilterRow label={activeTab.id === "phases" ? t("filters.phaseOfPlay") : t("filters.theme")}>
           <Link href={chipHref(sp, "theme", null)} className={chipStyle(!sp.theme)}>
-            All
+            {t("filters.all")}
           </Link>
           {themes.map((t) => (
             <Link key={t} href={chipHref(sp, "theme", t)} className={chipStyle(sp.theme === t)}>
@@ -234,11 +223,11 @@ export default async function ExercisesPage({
           ))}
         </FilterRow>
 
-        <FilterRow label="Niveau">
+        <FilterRow label={t("filters.level")}>
           {showTracks && tracks && (
             <>
               <Link href={chipHref(sp, "track", null)} className={chipStyle(!sp.track)}>
-                All tracks
+                {t("filters.allTracks")}
               </Link>
               {tracks.map((t) => (
                 <Link key={t} href={chipHref(sp, "track", t)} className={chipStyle(sp.track === t)}>
@@ -249,7 +238,7 @@ export default async function ExercisesPage({
             </>
           )}
           <Link href={chipHref(sp, "level", null)} className={chipStyle(!sp.level)}>
-            All
+            {t("filters.all")}
           </Link>
           {levels.map((n) => (
             <Link
@@ -262,11 +251,11 @@ export default async function ExercisesPage({
           ))}
         </FilterRow>
 
-        <FilterRow label="Focus coaching">
+        <FilterRow label={t("filters.focusCoaching")}>
           <Link href={chipHref(sp, "focus", null)} className={chipStyle(!focus)}>
-            All
+            {t("filters.all")}
           </Link>
-          {FAMILIES.map((f) => (
+          {families.map((f) => (
             <Link key={f.id} href={chipHref(sp, "focus", f.id)} className={chipStyle(focus === f.id)}>
               <span className="mr-1 font-mono text-[10px] tabular-nums opacity-70">{f.id}</span>
               {f.label}
@@ -277,12 +266,12 @@ export default async function ExercisesPage({
 
       {exercises.length === 0 ? (
         <div className="rounded-xl border border-zinc-200 bg-white p-8 text-center text-sm text-zinc-500 shadow-sm">
-          No exercises match these filters.
+          {t("filters.noMatch")}
         </div>
       ) : (
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {exercises.map((ex) => (
-            <ExerciseCard key={ex.id} ex={ex} focusFamily={focusFamily} />
+            <ExerciseCard key={ex.id} ex={ex} focusFamily={focusFamily} noDiagramLabel={tl("noDiagram")} />
           ))}
         </div>
       )}
@@ -304,9 +293,11 @@ function FilterRow({ label, children }: { label: string; children: React.ReactNo
 function ExerciseCard({
   ex,
   focusFamily,
+  noDiagramLabel,
 }: {
   ex: ExerciseRow;
-  focusFamily: (typeof FAMILIES)[number] | null;
+  focusFamily: FamilyItem | null;
+  noDiagramLabel: string;
 }) {
   const titre = ex.titre ?? ex.name;
   const focusTags = focusFamily ? (ex[focusFamily.column] ?? []) : null;
@@ -336,7 +327,7 @@ function ExerciseCard({
         </div>
       ) : (
         <div className="flex aspect-[4/3] w-full items-center justify-center bg-zinc-100 text-xs text-zinc-400">
-          No diagram
+          {noDiagramLabel}
         </div>
       )}
 

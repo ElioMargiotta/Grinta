@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { useTranslations } from "next-intl";
 import {
   DEFAULT_SCHEMA_SETTINGS,
   type SchemaSettings,
@@ -8,6 +9,8 @@ import {
   useSchemaSettings,
 } from "./schemaSettings";
 import type { SchemaData, SchemaShape } from "./types";
+
+type SchemaT = ReturnType<typeof useTranslations<"sheet.schema">>;
 
 /* ============================================================
  * Schema editor — small SVG canvas where the coach drops players,
@@ -59,12 +62,9 @@ const CONE_R = 3;
 const GOAL_LONG = 14;
 const GOAL_SHORT = 3;
 
-const SETTINGS_LABELS: Record<SchemaSettingsKey, string> = {
-  warmup: "échauffement",
-  block: "bloc principal",
-  game: "jeu final",
-  default: "schémas",
-};
+function zoneLabel(t: SchemaT, key: SchemaSettingsKey): string {
+  return t(`zones.${key}`);
+}
 
 const SCHEMA_CLIPBOARD_KEY = "grinta.schemaClipboard.v1";
 
@@ -644,6 +644,7 @@ export function SchemaEditor({
   settingsKey?: SchemaSettingsKey;
   showHint?: boolean;
 }) {
+  const t = useTranslations("sheet.schema");
   const [settings, setSettings] = useSchemaSettings(settingsKey);
   const pitchCfg = PITCHES[pitch];
   const [tool, setTool] = useState<Tool>("select");
@@ -1089,8 +1090,7 @@ export function SchemaEditor({
       </div>
       {showHint ? (
         <div className="border-t border-zinc-200 px-3 py-2 text-xs text-zinc-500">
-          Astuce : avec Sélection, clique-glisse une zone puis déplace un des
-          éléments sélectionnés pour translater tout le groupe.
+          {t("hint")}
         </div>
       ) : null}
     </div>
@@ -1143,54 +1143,55 @@ function Toolbar({
   showSettings: boolean;
   onToggleSettings: () => void;
 }) {
+  const t = useTranslations("sheet.schema");
   return (
     <div className="flex flex-wrap items-center gap-0.5 border-b border-zinc-200 bg-zinc-50 px-1.5 py-1.5">
       <ToolButton
         active={tool === "select"}
         onClick={() => setTool("select")}
-        title="Sélection / déplacer une zone"
+        title={t("tools.select")}
       >
         <CursorIcon />
       </ToolButton>
       <Sep />
-      <ToolButton active={tool === "home"} onClick={() => setTool("home")} title="Joueur attaquant">
+      <ToolButton active={tool === "home"} onClick={() => setTool("home")} title={t("tools.home")}>
         <PlayerSwatch color={settings.colors.home} label="A" />
       </ToolButton>
-      <ToolButton active={tool === "away"} onClick={() => setTool("away")} title="Joueur défenseur">
+      <ToolButton active={tool === "away"} onClick={() => setTool("away")} title={t("tools.away")}>
         <PlayerSwatch color={settings.colors.away} label="D" />
       </ToolButton>
-      <ToolButton active={tool === "gk"} onClick={() => setTool("gk")} title="Gardien">
+      <ToolButton active={tool === "gk"} onClick={() => setTool("gk")} title={t("tools.gk")}>
         <PlayerSwatch color={settings.colors.gk} label="G" textColor="#111827" />
       </ToolButton>
-      <ToolButton active={tool === "ball"} onClick={() => setTool("ball")} title="Ballon">
+      <ToolButton active={tool === "ball"} onClick={() => setTool("ball")} title={t("tools.ball")}>
         <span
           className="inline-block h-3.5 w-3.5 rounded-full shadow-[0_1px_2px_rgb(0_0_0/0.16)] ring-1 ring-white/90"
           style={{ background: settings.colors.ball }}
         />
       </ToolButton>
-      <ToolButton active={tool === "cone"} onClick={() => setTool("cone")} title="Plot / cône">
+      <ToolButton active={tool === "cone"} onClick={() => setTool("cone")} title={t("tools.cone")}>
         <ConeSwatch color={settings.colors.cone} />
       </ToolButton>
-      <ToolButton active={tool === "goal-h"} onClick={() => setTool("goal-h")} title="But (horizontal)">
+      <ToolButton active={tool === "goal-h"} onClick={() => setTool("goal-h")} title={t("tools.goalH")}>
         <GoalSwatch orientation="h" />
       </ToolButton>
-      <ToolButton active={tool === "goal-v"} onClick={() => setTool("goal-v")} title="But (vertical)">
+      <ToolButton active={tool === "goal-v"} onClick={() => setTool("goal-v")} title={t("tools.goalV")}>
         <GoalSwatch orientation="v" />
       </ToolButton>
       <Sep />
-      <ToolButton active={tool === "line"} onClick={() => setTool("line")} title="Ligne / zone (clic-glisser)">
+      <ToolButton active={tool === "line"} onClick={() => setTool("line")} title={t("tools.line")}>
         <LineSwatch color={settings.colors.line} />
       </ToolButton>
-      <ToolButton active={tool === "arrow-run"} onClick={() => setTool("arrow-run")} title="Course (trait plein)">
+      <ToolButton active={tool === "arrow-run"} onClick={() => setTool("arrow-run")} title={t("tools.arrowRun")}>
         <ArrowSwatch variant="run" color={settings.colors.arrow} />
       </ToolButton>
-      <ToolButton active={tool === "arrow-pass"} onClick={() => setTool("arrow-pass")} title="Passe (pointillé)">
+      <ToolButton active={tool === "arrow-pass"} onClick={() => setTool("arrow-pass")} title={t("tools.arrowPass")}>
         <ArrowSwatch variant="pass" color={settings.colors.arrow} />
       </ToolButton>
-      <ToolButton active={tool === "arrow-dribble"} onClick={() => setTool("arrow-dribble")} title="Conduite (vague)">
+      <ToolButton active={tool === "arrow-dribble"} onClick={() => setTool("arrow-dribble")} title={t("tools.arrowDribble")}>
         <ArrowSwatch variant="wave" color={settings.colors.arrow} />
       </ToolButton>
-      <ToolButton active={tool === "arrow-long-ball"} onClick={() => setTool("arrow-long-ball")} title="Longue balle (courbe)">
+      <ToolButton active={tool === "arrow-long-ball"} onClick={() => setTool("arrow-long-ball")} title={t("tools.arrowLong")}>
         <ArrowSwatch variant="curve" color={settings.colors.arrow} />
       </ToolButton>
       <Sep />
@@ -1199,8 +1200,8 @@ function Toolbar({
         onClick={onUndo}
         disabled={!canUndo}
         className="flex h-7 w-7 items-center justify-center rounded-md border border-transparent text-zinc-700 transition hover:bg-white/80 hover:text-zinc-950 disabled:cursor-not-allowed disabled:opacity-35"
-        title="Retour"
-        aria-label="Retour"
+        title={t("actions.undo")}
+        aria-label={t("actions.undo")}
       >
         <UndoArrowIcon />
       </button>
@@ -1209,8 +1210,8 @@ function Toolbar({
         onClick={onCopy}
         disabled={!canCopy}
         className="flex h-7 w-7 items-center justify-center rounded-md border border-transparent text-zinc-700 transition hover:bg-white/80 hover:text-zinc-950 disabled:cursor-not-allowed disabled:opacity-35"
-        title="Copier le schéma"
-        aria-label="Copier le schéma"
+        title={t("actions.copy")}
+        aria-label={t("actions.copy")}
       >
         <CopyIcon />
       </button>
@@ -1219,8 +1220,8 @@ function Toolbar({
         onClick={onPaste}
         disabled={!canPaste}
         className="flex h-7 w-7 items-center justify-center rounded-md border border-transparent text-zinc-700 transition hover:bg-white/80 hover:text-zinc-950 disabled:cursor-not-allowed disabled:opacity-35"
-        title="Coller le schéma"
-        aria-label="Coller le schéma"
+        title={t("actions.paste")}
+        aria-label={t("actions.paste")}
       >
         <PasteIcon />
       </button>
@@ -1229,18 +1230,18 @@ function Toolbar({
         onClick={onDelete}
         disabled={!canDelete}
         className="rounded-md border border-transparent px-1.5 py-1 text-[11px] font-medium text-zinc-700 transition hover:bg-white/80 hover:text-zinc-950 disabled:cursor-not-allowed disabled:opacity-35"
-        title="Supprimer la sélection"
+        title={t("actions.deleteSelection")}
       >
-        Suppr.
+        {t("actions.deleteShort")}
       </button>
       <button
         type="button"
         onClick={onClear}
         disabled={!canClear}
         className="rounded-md border border-transparent px-1.5 py-1 text-[11px] font-medium text-red-600 transition hover:bg-white/80 disabled:cursor-not-allowed disabled:opacity-35"
-        title="Tout effacer"
+        title={t("actions.clearAll")}
       >
-        Tout effacer
+        {t("actions.clearAll")}
       </button>
       <button
         type="button"
@@ -1251,7 +1252,7 @@ function Toolbar({
             ? "border-zinc-900 bg-zinc-900 text-white"
             : "border-transparent text-zinc-700 hover:bg-white/80 hover:text-zinc-950"
         }`}
-        title="Réglages des symboles"
+        title={t("actions.settings")}
       >
         <GearIcon />
       </button>
@@ -1305,30 +1306,30 @@ function effectiveStrokeWidth(
   return null;
 }
 
-function shapeKindLabel(s: SchemaShape): string {
+function shapeKindLabel(t: SchemaT, s: SchemaShape): string {
   switch (s.kind) {
     case "player":
       return s.team === "home"
-        ? "Attaquant"
+        ? t("shapes.homePlayer")
         : s.team === "away"
-          ? "Défenseur"
-          : "Gardien";
+          ? t("shapes.awayPlayer")
+          : t("shapes.gk");
     case "ball":
-      return "Ballon";
+      return t("shapes.ball");
     case "cone":
-      return "Plot";
+      return t("shapes.cone");
     case "goal":
-      return "But";
+      return t("shapes.goal");
     case "line":
-      return "Trait";
+      return t("shapes.line");
     case "arrow":
       return s.style === "run"
-        ? "Flèche course"
+        ? t("shapes.arrowRun")
         : s.style === "pass"
-          ? "Flèche passe"
+          ? t("shapes.arrowPass")
           : s.style === "dribble"
-            ? "Flèche conduite"
-            : "Flèche longue balle";
+            ? t("shapes.arrowDribble")
+            : t("shapes.arrowLong");
   }
 }
 
@@ -1347,6 +1348,7 @@ function SelectionPanel({
   onReset: () => void;
   onClose: () => void;
 }) {
+  const t = useTranslations("sheet.schema");
   const color = effectiveColor(shape, settings);
   const strokeWidth = effectiveStrokeWidth(shape, settings);
   const hasOverride =
@@ -1358,21 +1360,23 @@ function SelectionPanel({
     <div className="border-b border-zinc-200 bg-sky-50/60 px-3 py-2 text-xs text-zinc-700">
       <div className="flex flex-wrap items-center gap-3">
         <span className="font-medium text-zinc-800">
-          {shapeKindLabel(shape)} sélectionné
+          {t("selectionPanel.selected", { shape: shapeKindLabel(t, shape) })}
         </span>
         <label className="flex items-center gap-1.5">
-          <span className="text-zinc-600">Couleur</span>
+          <span className="text-zinc-600">{t("selectionPanel.color")}</span>
           <input
             type="color"
             value={color}
             onChange={(e) => onColorChange(e.target.value)}
             className="h-5 w-7 cursor-pointer rounded border border-zinc-200 bg-white p-0"
-            aria-label="Couleur de l'élément"
+            aria-label={t("selectionPanel.colorAria")}
           />
         </label>
         {strokeWidth !== null && (
           <label className="flex flex-1 items-center gap-1.5 sm:max-w-[260px]">
-            <span className="whitespace-nowrap text-zinc-600">Épaisseur</span>
+            <span className="whitespace-nowrap text-zinc-600">
+              {t("selectionPanel.thickness")}
+            </span>
             <input
               type="range"
               min={0.2}
@@ -1392,15 +1396,15 @@ function SelectionPanel({
           onClick={onReset}
           disabled={!hasOverride}
           className="rounded-md border border-zinc-200 bg-white px-2 py-1 text-[11px] text-zinc-600 hover:bg-zinc-50 disabled:cursor-not-allowed disabled:opacity-40"
-          title="Revenir aux réglages par défaut pour cet élément"
+          title={t("actions.resetHint")}
         >
-          Réinitialiser
+          {t("actions.reset")}
         </button>
         <button
           type="button"
           onClick={onClose}
           className="rounded-md px-2 py-1 text-[11px] text-zinc-500 hover:bg-zinc-100"
-          aria-label="Désélectionner"
+          aria-label={t("actions.deselect")}
         >
           ✕
         </button>
@@ -1418,27 +1422,26 @@ function MultiSelectionPanel({
   onDelete: () => void;
   onClose: () => void;
 }) {
+  const t = useTranslations("sheet.schema");
   return (
     <div className="border-b border-zinc-200 bg-sky-50/60 px-3 py-2 text-xs text-zinc-700">
       <div className="flex flex-wrap items-center gap-3">
         <span className="font-medium text-zinc-800">
-          {count} éléments sélectionnés
+          {t("multi.count", { n: count })}
         </span>
-        <span className="text-zinc-500">
-          Glisser un élément sélectionné déplace tout le groupe.
-        </span>
+        <span className="text-zinc-500">{t("multi.hint")}</span>
         <button
           type="button"
           onClick={onDelete}
           className="ml-auto rounded-md border border-zinc-200 bg-white px-2 py-1 text-[11px] text-red-600 hover:bg-zinc-50"
         >
-          Supprimer
+          {t("actions.delete")}
         </button>
         <button
           type="button"
           onClick={onClose}
           className="rounded-md px-2 py-1 text-[11px] text-zinc-500 hover:bg-zinc-100"
-          aria-label="Désélectionner"
+          aria-label={t("actions.deselect")}
         >
           ✕
         </button>
@@ -1460,6 +1463,7 @@ function SettingsPanel({
   onChange: (next: SchemaSettings) => void;
   onClose: () => void;
 }) {
+  const t = useTranslations("sheet.schema");
   function patch(part: Partial<SchemaSettings>) {
     onChange({ ...settings, ...part });
   }
@@ -1470,7 +1474,7 @@ function SettingsPanel({
     <div className="border-b border-zinc-200 bg-zinc-50 px-3 py-3 text-xs text-zinc-700">
       <div className="mb-2 flex items-center justify-between">
         <span className="font-medium text-zinc-800">
-          Réglages par défaut — {SETTINGS_LABELS[settingsKey]}
+          {t("settings.title", { zone: zoneLabel(t, settingsKey) })}
         </span>
         <div className="flex items-center gap-2">
           <button
@@ -1478,13 +1482,13 @@ function SettingsPanel({
             onClick={() => onChange(DEFAULT_SCHEMA_SETTINGS)}
             className="rounded-md border border-zinc-200 bg-white px-2 py-1 text-[11px] text-zinc-600 hover:bg-zinc-50"
           >
-            Réinitialiser
+            {t("actions.reset")}
           </button>
           <button
             type="button"
             onClick={onClose}
             className="rounded-md px-2 py-1 text-[11px] text-zinc-500 hover:bg-zinc-100"
-            aria-label="Fermer"
+            aria-label={t("actions.close")}
           >
             ✕
           </button>
@@ -1493,7 +1497,7 @@ function SettingsPanel({
 
       <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
         <SliderField
-          label="Taille des symboles"
+          label={t("settings.symbolSize")}
           value={settings.symbolSize}
           min={0.6}
           max={1.6}
@@ -1502,7 +1506,7 @@ function SettingsPanel({
           onChange={(v) => patch({ symbolSize: v })}
         />
         <SliderField
-          label="Épaisseur du trait"
+          label={t("settings.lineWidth")}
           value={settings.lineWidth}
           min={0.2}
           max={2.4}
@@ -1511,7 +1515,7 @@ function SettingsPanel({
           onChange={(v) => patch({ lineWidth: v })}
         />
         <SliderField
-          label="Épaisseur des flèches"
+          label={t("settings.arrowWidth")}
           value={settings.arrowWidth}
           min={0.4}
           max={2.6}
@@ -1523,37 +1527,37 @@ function SettingsPanel({
 
       <div className="mt-3 grid grid-cols-2 gap-2 sm:grid-cols-4">
         <ColorField
-          label="Attaquant"
+          label={t("shapes.homePlayer")}
           value={settings.colors.home}
           onChange={(v) => patchColor("home", v)}
         />
         <ColorField
-          label="Défenseur"
+          label={t("shapes.awayPlayer")}
           value={settings.colors.away}
           onChange={(v) => patchColor("away", v)}
         />
         <ColorField
-          label="Gardien"
+          label={t("shapes.gk")}
           value={settings.colors.gk}
           onChange={(v) => patchColor("gk", v)}
         />
         <ColorField
-          label="Ballon"
+          label={t("shapes.ball")}
           value={settings.colors.ball}
           onChange={(v) => patchColor("ball", v)}
         />
         <ColorField
-          label="Plot"
+          label={t("shapes.cone")}
           value={settings.colors.cone}
           onChange={(v) => patchColor("cone", v)}
         />
         <ColorField
-          label="Trait"
+          label={t("shapes.line")}
           value={settings.colors.line}
           onChange={(v) => patchColor("line", v)}
         />
         <ColorField
-          label="Flèche"
+          label={t("shapes.arrow")}
           value={settings.colors.arrow}
           onChange={(v) => patchColor("arrow", v)}
         />

@@ -486,7 +486,7 @@ function AddCycleRow({
         value={color}
         onChange={(e) => setColor(e.target.value)}
         className="h-9 w-9 cursor-pointer rounded-md border border-zinc-200 dark:border-zinc-700"
-        aria-label="color"
+        aria-label={tTour("colorAriaLabel")}
       />
       <Input
         id={`add-cycle-name-${macroId}`}

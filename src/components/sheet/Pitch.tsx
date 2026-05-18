@@ -1,3 +1,7 @@
+"use client";
+
+import { useTranslations } from "next-intl";
+
 type PitchProps = { className?: string };
 
 const STROKE = "currentColor";
@@ -33,13 +37,14 @@ function GoalAndPenaltyBottom() {
 }
 
 export function HalfPitch({ className = "" }: PitchProps) {
+  const t = useTranslations("pitch");
   return (
     <svg
       viewBox="-2 -2 72 56.5"
       xmlns="http://www.w3.org/2000/svg"
       className={`text-zinc-700 ${className}`}
       role="img"
-      aria-label="Half pitch"
+      aria-label={t("halfPitch")}
     >
       {/* Boundary */}
       <rect
@@ -62,13 +67,14 @@ export function HalfPitch({ className = "" }: PitchProps) {
 }
 
 export function FullPitch({ className = "" }: PitchProps) {
+  const t = useTranslations("pitch");
   return (
     <svg
       viewBox="-2 -2 72 109"
       xmlns="http://www.w3.org/2000/svg"
       className={`text-zinc-700 ${className}`}
       role="img"
-      aria-label="Full pitch"
+      aria-label={t("fullPitch")}
     >
       <rect
         x={0}

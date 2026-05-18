@@ -97,7 +97,7 @@ export function ExerciseForm({ initial }: { initial?: Initial }) {
           id="equipment"
           name="equipment"
           label={t("form.equipment")}
-          placeholder="balls, cones, bibs"
+          placeholder={t("form.equipmentPlaceholder")}
           defaultValue={initial?.equipment?.join(", ") ?? ""}
         />
       </div>
