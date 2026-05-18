@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { useTranslations } from "next-intl";
 import { Link, useRouter } from "@/i18n/navigation";
 
-const REDIRECT_SECONDS = 5;
+const REDIRECT_SECONDS = 10;
 
 export function ConfirmedRedirect() {
   const t = useTranslations("auth");
