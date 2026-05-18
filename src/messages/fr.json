@@ -226,7 +226,6 @@
     "checkEmailTitle": "Vérifiez votre boîte de réception",
     "checkEmail": "Nous avons envoyé un lien de confirmation à votre email. Cliquez dessus pour activer votre compte.",
     "invalidCredentials": "Email ou mot de passe incorrect.",
-    "genericError": "Quelque chose s'est mal passé. Veuillez réessayer.",
     "emailPlaceholder": "you@example.com",
     "namePlaceholder": "Jane Doe",
     "passwordPlaceholder": "••••••••",

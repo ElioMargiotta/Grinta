@@ -226,10 +226,9 @@
     "checkEmailTitle": "Check your inbox",
     "checkEmail": "We sent a confirmation link to your email. Click it to activate your account.",
     "invalidCredentials": "Invalid email or password.",
-    "genericError": "Something went wrong. Try again.",
     "emailPlaceholder": "you@example.com",
     "namePlaceholder": "Jane Doe",
-    "passwordPlaceholder": "••••••••"
+    "passwordPlaceholder": "••••••••",
     "emailAlreadyExists": "This email already has an account. Log in instead.",
     "emailNotConfirmed": "Please confirm your email before logging in. Check your inbox.",
     "genericError": "Something went wrong. Try again.",
