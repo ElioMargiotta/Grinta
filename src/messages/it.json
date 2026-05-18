@@ -628,31 +628,31 @@
       },
       "weekThemeLabel": {
         "possede_ballon": "La mia squadra ha il pallone",
-        "ne_possede_pas": "Senza possesso",
-        "recupere": "Recupero",
-        "perd": "La mia squadra perde",
-        "recupere_perd": "Recupero + perde",
+        "ne_possede_pas": "La mia squadra non ha il pallone",
+        "recupere": "La mia squadra recupera il pallone",
+        "perd": "La mia squadra perde il pallone",
+        "recupere_perd": "Transizioni: la mia squadra recupera e perde il pallone",
         "decharge": "Scarico",
         "jeux_polysport": "Giochi + polisport"
       },
       "step1": {
         "sectionLabel": "Seduta",
-        "momentLabel": "Momento di gioco",
+        "momentLabel": "Fase di gioco",
         "phaseOptionLabel": {
-          "possession": "Abbiamo la palla",
-          "losing": "L'abbiamo persa",
-          "noPossession": "Hanno la palla loro",
-          "recovering": "La stiamo recuperando"
+          "possession": "La mia squadra ha il pallone",
+          "losing": "La mia squadra perde il pallone",
+          "noPossession": "La mia squadra non ha il pallone",
+          "recovering": "La mia squadra recupera il pallone"
         },
         "phaseOptionTheme": {
-          "possession": "Abbiamo la palla",
-          "losing": "Transizione difensiva",
-          "noPossession": "Senza possesso",
-          "recovering": "Transizione offensiva"
+          "possession": "Offensivo",
+          "losing": "Transizione DIF/OFF",
+          "noPossession": "Difensivo",
+          "recovering": "Transizione OFF/DIF"
         },
         "offTheme": "Fuori tema settimanale",
         "startingPoint": "Punto di partenza",
-        "startingPointPrefix": "Oggi partiamo quando",
+        "startingPointPrefix": "Oggi lavoriamo quando",
         "startingPointFallback": "il momento è scelto",
         "field": {
           "characteristicForm": "Forma caratteristica",
@@ -667,7 +667,7 @@
           "coachQuestions": "Quali domande guideranno l'apprendimento?"
         },
         "sessionTitlePlaceholder": "Titolo della seduta",
-        "durationPlaceholder": "90",
+        "durationPlaceholder": "90min",
         "teamPlaceholder": "Squadra",
         "coachPlaceholder": "Allenatore"
       },

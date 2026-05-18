@@ -633,32 +633,32 @@
         "AT": "Mental"
       },
       "weekThemeLabel": {
-        "possede_ballon": "We have the ball",
-        "ne_possede_pas": "No possession",
-        "recupere": "Recovering",
-        "perd": "We lose the ball",
-        "recupere_perd": "Recover + lose",
+        "possede_ballon": "My team has the ball",
+        "ne_possede_pas": "My team doesn't have the ball",
+        "recupere": "My team wins the ball back",
+        "perd": "My team loses the ball",
+        "recupere_perd": "Transitions: My team wins and loses the ball",
         "decharge": "Discharge",
         "jeux_polysport": "Games + polysport"
       },
       "step1": {
         "sectionLabel": "Session",
-        "momentLabel": "Game moment",
+        "momentLabel": "Game phase",
         "phaseOptionLabel": {
-          "possession": "We have the ball",
-          "losing": "We lost it",
-          "noPossession": "They have the ball",
-          "recovering": "We're winning it back"
+          "possession": "My team has the ball",
+          "losing": "My team loses the ball",
+          "noPossession": "My team doesn't have the ball",
+          "recovering": "My team wins the ball back"
         },
         "phaseOptionTheme": {
-          "possession": "We have the ball",
-          "losing": "Defensive transition",
-          "noPossession": "No possession",
-          "recovering": "Offensive transition"
+          "possession": "Offensive",
+          "losing": "Transition DEF/OFF",
+          "noPossession": "Defensive",
+          "recovering": "Transition OFF/DEF"
         },
         "offTheme": "Off weekly theme",
         "startingPoint": "Starting point",
-        "startingPointPrefix": "Today, we start when",
+        "startingPointPrefix": "Today, we work when",
         "startingPointFallback": "the moment is chosen",
         "field": {
           "characteristicForm": "Characteristic form",
@@ -673,7 +673,7 @@
           "coachQuestions": "Which questions will guide the learning?"
         },
         "sessionTitlePlaceholder": "Session title",
-        "durationPlaceholder": "90",
+        "durationPlaceholder": "90min",
         "teamPlaceholder": "Team",
         "coachPlaceholder": "Coach"
       },

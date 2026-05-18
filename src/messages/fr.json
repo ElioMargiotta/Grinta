@@ -633,32 +633,32 @@
         "AT": "Mentalité"
       },
       "weekThemeLabel": {
-        "possede_ballon": "Mon équipe possède",
-        "ne_possede_pas": "Sans possession",
-        "recupere": "Récupération",
-        "perd": "Mon équipe perd",
-        "recupere_perd": "Récupération + perd",
+        "possede_ballon": "Mon équipe possède le ballon",
+        "ne_possede_pas": "Mon équipe ne possède pas le ballon",
+        "recupere": "Mon équipe récupère le ballon",
+        "perd": "Mon équipe perd le ballon",
+        "recupere_perd": "Transitions : Mon équipe récupère et perd le ballon",
         "decharge": "Décharge",
         "jeux_polysport": "Jeux + polysport"
       },
       "step1": {
         "sectionLabel": "Séance",
-        "momentLabel": "Moment du jeu",
+        "momentLabel": "Phase de jeu",
         "phaseOptionLabel": {
-          "possession": "On a le ballon",
-          "losing": "On l'a perdu",
-          "noPossession": "Ils ont le ballon",
-          "recovering": "On le récupère"
+          "possession": "Mon équipe possède le ballon",
+          "losing": "Mon équipe perd le ballon",
+          "noPossession": "Mon équipe ne possède pas le ballon",
+          "recovering": "Mon équipe récupère le ballon"
         },
         "phaseOptionTheme": {
-          "possession": "Mon équipe possède",
-          "losing": "Transition défensive",
-          "noPossession": "Sans possession",
-          "recovering": "Transition offensive"
+          "possession": "Offensif",
+          "losing": "Transition DEF/OFF",
+          "noPossession": "Défensif",
+          "recovering": "Transition OFF/DEF"
         },
         "offTheme": "Hors thème semaine",
         "startingPoint": "Point de départ",
-        "startingPointPrefix": "Aujourd'hui, on démarre quand",
+        "startingPointPrefix": "Aujourd'hui, on travaille quand",
         "startingPointFallback": "le moment est choisi",
         "field": {
           "characteristicForm": "Forme caractéristique",
@@ -673,7 +673,7 @@
           "coachQuestions": "Quelles questions vont guider l'apprentissage ?"
         },
         "sessionTitlePlaceholder": "Titre séance",
-        "durationPlaceholder": "90",
+        "durationPlaceholder": "90min",
         "teamPlaceholder": "Équipe",
         "coachPlaceholder": "Entraîneur"
       },

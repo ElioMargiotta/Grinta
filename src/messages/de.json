@@ -627,32 +627,32 @@
         "AT": "Mental"
       },
       "weekThemeLabel": {
-        "possede_ballon": "Wir haben den Ball",
-        "ne_possede_pas": "Kein Ballbesitz",
-        "recupere": "Eroberung",
-        "perd": "Wir verlieren den Ball",
-        "recupere_perd": "Erobern + verlieren",
+        "possede_ballon": "Meine Mannschaft hat den Ball",
+        "ne_possede_pas": "Meine Mannschaft hat den Ball nicht",
+        "recupere": "Meine Mannschaft erobert den Ball",
+        "perd": "Meine Mannschaft verliert den Ball",
+        "recupere_perd": "Übergänge: Meine Mannschaft erobert und verliert den Ball",
         "decharge": "Entlastung",
         "jeux_polysport": "Spiele + Polysport"
       },
       "step1": {
         "sectionLabel": "Einheit",
-        "momentLabel": "Spielmoment",
+        "momentLabel": "Spielphase",
         "phaseOptionLabel": {
-          "possession": "Wir haben den Ball",
-          "losing": "Wir haben ihn verloren",
-          "noPossession": "Sie haben den Ball",
-          "recovering": "Wir erobern ihn zurück"
+          "possession": "Meine Mannschaft hat den Ball",
+          "losing": "Meine Mannschaft verliert den Ball",
+          "noPossession": "Meine Mannschaft hat den Ball nicht",
+          "recovering": "Meine Mannschaft erobert den Ball"
         },
         "phaseOptionTheme": {
-          "possession": "Wir haben den Ball",
-          "losing": "Defensive Umschaltsituation",
-          "noPossession": "Kein Ballbesitz",
-          "recovering": "Offensive Umschaltsituation"
+          "possession": "Offensiv",
+          "losing": "Umschalten DEF/OFF",
+          "noPossession": "Defensiv",
+          "recovering": "Umschalten OFF/DEF"
         },
         "offTheme": "Ausserhalb des Wochenthemas",
         "startingPoint": "Ausgangspunkt",
-        "startingPointPrefix": "Heute starten wir, wenn",
+        "startingPointPrefix": "Heute arbeiten wir, wenn",
         "startingPointFallback": "der Moment gewählt ist",
         "field": {
           "characteristicForm": "Charakteristische Form",
@@ -667,7 +667,7 @@
           "coachQuestions": "Welche Fragen werden das Lernen leiten?"
         },
         "sessionTitlePlaceholder": "Titel der Einheit",
-        "durationPlaceholder": "90",
+        "durationPlaceholder": "90 Min.",
         "teamPlaceholder": "Mannschaft",
         "coachPlaceholder": "Trainer"
       },
