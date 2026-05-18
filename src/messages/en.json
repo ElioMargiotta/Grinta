@@ -230,6 +230,13 @@
     "emailPlaceholder": "you@example.com",
     "namePlaceholder": "Jane Doe",
     "passwordPlaceholder": "••••••••"
+    "emailAlreadyExists": "This email already has an account. Log in instead.",
+    "emailNotConfirmed": "Please confirm your email before logging in. Check your inbox.",
+    "genericError": "Something went wrong. Try again.",
+    "confirmedTitle": "Email verified",
+    "confirmedBody": "Your email address has been confirmed and your account is now active.",
+    "confirmedRedirect": "Redirecting you to the login page…",
+    "confirmedCta": "Go to login now"
   },
   "dashboard": {
     "title": "Dashboard",

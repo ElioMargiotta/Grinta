@@ -24,7 +24,8 @@ export function LoginForm() {
         formData.set("locale", locale);
         startTransition(async () => {
           const result = await loginAction(formData);
-          if (result?.error) setError(result.error);
+          if (result?.errorCode) setError(t(result.errorCode));
+          else if (result?.error) setError(result.error);
         });
       }}
     >
