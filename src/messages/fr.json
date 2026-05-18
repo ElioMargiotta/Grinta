@@ -198,7 +198,11 @@
     "invalidCredentials": "Email ou mot de passe incorrect.",
     "emailAlreadyExists": "Cette adresse email a déjà un compte. Connectez-vous plutôt.",
     "emailNotConfirmed": "Veuillez confirmer votre email avant de vous connecter. Vérifiez votre boîte de réception.",
-    "genericError": "Quelque chose s'est mal passé. Veuillez réessayer."
+    "genericError": "Quelque chose s'est mal passé. Veuillez réessayer.",
+    "confirmedTitle": "Email vérifié",
+    "confirmedBody": "Votre adresse email a été confirmée et votre compte est maintenant actif.",
+    "confirmedRedirect": "Redirection vers la page de connexion…",
+    "confirmedCta": "Aller à la connexion"
   },
   "dashboard": {
     "title": "Tableau de bord",

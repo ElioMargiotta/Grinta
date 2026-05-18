@@ -158,17 +158,25 @@ In **Supabase dashboard → Authentication → URL Configuration**:
 
 | Project | Site URL | Redirect URLs (allow-list) |
 | ------- | -------- | -------------------------- |
-| **PRODUCTION** `mmttismftwmgyirzbjhs` | `https://grinta-staged.vercel.app` | `https://grinta-staged.vercel.app/**` |
-| **DEV COPY** `csnxaznrrojgvwjjpjvw`   | `http://localhost:3000`            | `http://localhost:3000/**` |
+| **PRODUCTION** `mmttismftwmgyirzbjhs` | `https://grintaclub.app` | `https://grintaclub.app/**` |
+| **DEV COPY** `csnxaznrrojgvwjjpjvw`   | `http://localhost:3000`  | `http://localhost:3000/**` |
+
+> ⚠️ Use the public custom domain **`grintaclub.app`**, NOT the Vercel
+> deployment URL. `grinta-staged.vercel.app` has Vercel Deployment Protection
+> enabled and returns **401** to anonymous requests, so confirmation-email
+> images and the post-confirm redirect (`/{locale}/confirm`) hit an auth wall
+> when they go through that domain.
 
 The app also builds some links itself from `NEXT_PUBLIC_SITE_URL`
-(e.g. club invitations). Set it to match each environment:
+(e.g. club invitations, auth email redirects). Set it to match each environment:
 
 - `.env.local` → `NEXT_PUBLIC_SITE_URL=http://localhost:3000`
-- Vercel (Production scope) → `NEXT_PUBLIC_SITE_URL=https://grinta-staged.vercel.app`
+- Vercel (Production scope) → `NEXT_PUBLIC_SITE_URL=https://grintaclub.app`
 
-So: sign up on the live site → confirmation email points to
-`grinta-staged.vercel.app`. Sign up while developing → it points to localhost.
+So: sign up on the live site → confirmation email link verifies, then
+redirects to `https://grintaclub.app/{locale}/confirm` ("Email verified")
+→ auto-redirect to the login page. Sign up while developing → it points to
+localhost.
 
 ---
 
