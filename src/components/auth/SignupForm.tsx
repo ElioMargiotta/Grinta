@@ -38,7 +38,9 @@ export function SignupForm() {
         formData.set("locale", locale);
         startTransition(async () => {
           const result = await signupAction(formData);
-          if (result?.error) setError(result.error);
+          if (result?.errorCode === "emailExists")
+            setError(t("emailAlreadyExists"));
+          else if (result?.error) setError(result.error);
           else if (result?.needsConfirmation) setConfirmed(true);
         });
       }}
