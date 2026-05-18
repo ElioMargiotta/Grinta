@@ -1,0 +1,425 @@
+{
+  "app": {
+    "name": "Grinta",
+    "tagline": "Plane deine Fussballsaison."
+  },
+  "landing": {
+    "navLogin": "Anmelden",
+    "eyebrow": "Der Verein im Zentrum der Entwicklung",
+    "heroTitle": "Gib deiner gesamten Struktur eine gemeinsame Spielphilosophie.",
+    "heroSubtitle": "Grinta hilft dem Verein, seine Spielidentität zu formalisieren und sie in Zyklen, Wochenthemen und konkrete Trainingseinheiten zu übersetzen. Jede Mannschaft folgt derselben Leitlinie, angepasst an Alter und Niveau.",
+    "primaryCta": "Konto erstellen",
+    "secondaryCta": "Ich habe bereits ein Konto",
+    "scrollLabel": "Funktionsweise von Grinta entdecken",
+    "mockupLabel": "Vereinsphilosophie",
+    "mockupTitle": "Ein gemeinsamer Rahmen",
+    "mockupBadge": "Grinta",
+    "mockupCenter": "Verein",
+    "mockupPillars": {
+      "training": "Training",
+      "identity": "Identität",
+      "players": "Spieler",
+      "match": "Spiel"
+    },
+    "mockupFocus": "Gemeinsames Prinzip",
+    "mockupTheme": "Ausbilden, vermitteln, spielen",
+    "principlesEyebrow": "Leitlinie",
+    "principlesTitle": "Eine Philosophie, die bis auf den Platz wirkt.",
+    "principles": {
+      "identity": {
+        "title": "Eine klare Identität",
+        "body": "Der Verein definiert seine Prinzipien: wie er ausbilden, spielen, sich entwickeln und bewerten will."
+      },
+      "continuity": {
+        "title": "Kontinuität pro Kategorie",
+        "body": "Jede Mannschaft behält dasselbe Grundgerüst, mit auf Alter und Niveau angepassten Inhalten."
+      },
+      "transmission": {
+        "title": "Klare Vermittlung",
+        "body": "Die Trainer teilen eine gemeinsame Sprache, gemeinsame Ziele und stimmige Trainingseinheiten."
+      }
+    },
+    "wizardEyebrow": "Demo der Trainingskarte",
+    "wizardTitle": "Der Wizard verwandelt eine Trainingsidee in ein platzfertiges PDF.",
+    "wizardBody": "Beim Scrollen zeigt die Vorbereitungskarte ihren echten Ablauf: geführtes Briefing, Aufwärmen, Platzblöcke und schliesslich PDF-Export im Grinta-Format.",
+    "wizardSteps": {
+      "brief": {
+        "short": "Briefing",
+        "kicker": "Schritt 1",
+        "title": "Den roten Faden festlegen",
+        "body": "Der Trainer wählt den Spielmoment, den Fokus, das Ziel und die Fragen, die die Spieler leiten sollen."
+      },
+      "warmup": {
+        "short": "Aufwärmen",
+        "kicker": "Schritt 2",
+        "title": "Körper und Thema vorbereiten",
+        "body": "Die Einheit beginnt mit Aktivierung, Anbindung an das Thema und einer kurzen Explosivphase."
+      },
+      "blocks": {
+        "short": "Platz",
+        "kicker": "Schritt 3",
+        "title": "Spielsituationen und Coachingpunkte gestalten",
+        "body": "Die Hauptblöcke kombinieren Skizze, Dauer, Organisation, Coaching und Varianten."
+      },
+      "pdf": {
+        "short": "PDF",
+        "kicker": "Schritt 4",
+        "title": "Eine saubere Karte exportieren",
+        "body": "Die Vorbereitung wird zu einem druckbaren A4-Blatt, gut lesbar für den Staff und einsetzbar auf dem Platz."
+      }
+    },
+    "wizardMock": {
+      "label": "Vorbereitungs-Wizard",
+      "title": "Trainingskarte",
+      "export": "PDF-Export",
+      "sessionLabel": "Titel der Einheit",
+      "sessionTitle": "Hoch erobern, schnell angreifen",
+      "pillars": {
+        "moment": "Spielmoment",
+        "focus": "Fokus TE / TA / PE",
+        "objective": "Ziel",
+        "questions": "Trainerfragen"
+      },
+      "warmup": {
+        "activate": {
+          "label": "Phase 1",
+          "duration": "8 Min.",
+          "title": "Aktivieren",
+          "hint": "Mobilität, Prävention, Ballarbeit und Rhythmus."
+        },
+        "connect": {
+          "label": "Phase 2",
+          "duration": "12 Min.",
+          "title": "Verbinden",
+          "hint": "Rondo oder Ballbesitzform mit themenbezogener Vorgabe."
+        },
+        "accelerate": {
+          "label": "Phase 3",
+          "duration": "5 Min.",
+          "title": "Beschleunigen",
+          "hint": "Explosivität, Reaktion, maximale Intensität."
+        }
+      },
+      "blocks": {
+        "main1": {
+          "title": "Hauptblock 1",
+          "duration": "20 Min.",
+          "hint": "Spielform mit klar sichtbarem erwartetem Verhalten."
+        },
+        "main2": {
+          "title": "Hauptblock 2",
+          "duration": "20 Min.",
+          "hint": "Übung oder Variante zur Festigung des Lernens."
+        },
+        "game": {
+          "title": "Abschlussspiel",
+          "duration": "18 Min.",
+          "hint": "Rückkehr ins Spiel mit Beobachtungskriterien."
+        }
+      },
+      "addExercise": "Übung importieren",
+      "pdfTitle": "Zwei strukturierte A4-Seiten",
+      "pdfBody": "Die Felder des Wizards werden mit Skizzen, Coachingpunkten, Dauer und Reflexionen in die PDF-Karte übertragen.",
+      "save": "Speichern",
+      "create": "PDF exportieren"
+    },
+    "flowEyebrow": "Prinzip",
+    "flowTitle": "Von der Vereinsphilosophie zur heutigen Einheit.",
+    "flow": {
+      "philosophy": {
+        "title": "Philosophie",
+        "body": "Der Verein definiert seine Leitideen: Spielabsichten, Ausbildungswerte und Entwicklungsprioritäten."
+      },
+      "category": {
+        "title": "Kategorien",
+        "body": "Die Prinzipien werden nach Altersstufen angepasst, um einen stimmigen Spielerweg zu schaffen."
+      },
+      "cycle": {
+        "title": "Zyklen",
+        "body": "Die Saison wird in lesbare Blöcke gegliedert, mit Themen, die die Entwicklung aufbauen."
+      },
+      "session": {
+        "title": "Trainingseinheit",
+        "body": "Jede Einheit wird zu einer konkreten Umsetzung der Philosophie, nicht zu isoliertem Inhalt."
+      }
+    },
+    "featuresEyebrow": "Was Grinta strukturiert",
+    "featuresTitle": "Ein stimmigerer Verein, ohne das Training zu starr zu machen.",
+    "features": {
+      "identity": {
+        "title": "Vereinsrahmen",
+        "body": "Halte gemeinsame Prinzipien fest, damit jedes Staff-Mitglied weiss, was vermittelt werden soll."
+      },
+      "planner": {
+        "title": "Durchgängige Planung",
+        "body": "Verbinde Kategorien, Zyklen, Wochen und Einheiten, damit die Entwicklung sichtbar bleibt."
+      },
+      "preparation": {
+        "title": "Vorbereitungskarte",
+        "body": "Erstelle klare, druckbare Einheiten im Einklang mit den Vereinsprinzipien."
+      }
+    }
+  },
+  "nav": {
+    "dashboard": "Übersicht",
+    "session": "Mein Training",
+    "teams": "Mannschaften",
+    "exercises": "Übungen",
+    "planner": "Planung",
+    "settings": "Einstellungen",
+    "logout": "Abmelden"
+  },
+  "auth": {
+    "tabLogin": "Anmelden",
+    "tabSignup": "Konto erstellen",
+    "loginTitle": "Schön, dich wiederzusehen",
+    "loginSubtitle": "Melde dich an, um die Trainings deiner Mannschaft zu planen.",
+    "signupTitle": "Konto erstellen",
+    "signupSubtitle": "Erstelle dein Konto in 30 Sekunden.",
+    "fullName": "Vollständiger Name",
+    "fullNameHelp": "Wird in der App und auf den Seiten deiner Mannschaft angezeigt.",
+    "email": "E-Mail",
+    "emailHelp": "Wir verwenden diese Adresse für deine Anmeldung.",
+    "password": "Passwort",
+    "passwordHelpSignup": "Mindestens 6 Zeichen.",
+    "passwordHelpLogin": "Das Passwort, das du bei der Registrierung gewählt hast.",
+    "showPassword": "Passwort anzeigen",
+    "hidePassword": "Passwort verbergen",
+    "submitLogin": "Anmelden",
+    "submittingLogin": "Anmeldung läuft…",
+    "submitSignup": "Konto erstellen",
+    "submittingSignup": "Konto wird erstellt…",
+    "noAccount": "Noch kein Konto?",
+    "haveAccount": "Schon ein Konto?",
+    "switchToSignup": "Konto erstellen",
+    "switchToLogin": "Anmelden",
+    "checkEmailTitle": "Prüfe deinen Posteingang",
+    "checkEmail": "Wir haben dir einen Bestätigungslink geschickt. Klicke darauf, um dein Konto zu aktivieren.",
+    "invalidCredentials": "E-Mail oder Passwort ist falsch.",
+    "genericError": "Etwas ist schiefgelaufen. Bitte versuche es erneut."
+  },
+  "dashboard": {
+    "title": "Übersicht",
+    "welcome": "Willkommen zurück, {name}.",
+    "teamsCard": "Mannschaften",
+    "exercisesCard": "Übungen",
+    "nextSession": "Nächste Einheit",
+    "noNextSession": "Keine bevorstehende Einheit.",
+    "ctaJoinClubTitle": "Verein beitreten",
+    "ctaJoinClubDesc": "Füge einen Einladungslink ein, um einem bestehenden Verein beizutreten.",
+    "ctaCreateClubTitle": "Verein erstellen",
+    "ctaCreateClubDesc": "Plane deine Saisons, verwalte Mannschaften, lade Staff ein. Kostenpflichtig.",
+    "ctaCreateSessionTitle": "Mein Training erstellen",
+    "ctaCreateSessionDesc": "Eine Trainingskarte in zwei Minuten bereit.",
+    "ctaLibraryTitle": "Übungsbibliothek",
+    "ctaLibraryDesc": "Durchstöbere 170+ erprobte Übungen."
+  },
+  "teams": {
+    "title": "Mannschaften",
+    "new": "Neue Mannschaft",
+    "empty": "Noch keine Mannschaft. Erstelle deine erste.",
+    "form": {
+      "name": "Mannschaftsname",
+      "season": "Saison",
+      "ageGroup": "Altersgruppe",
+      "submit": "Mannschaft erstellen"
+    },
+    "players": {
+      "title": "Spieler",
+      "new": "Spieler hinzufügen",
+      "empty": "Noch keine Spieler in dieser Mannschaft.",
+      "firstName": "Vorname",
+      "lastName": "Nachname",
+      "birthDate": "Geburtsdatum",
+      "position": "Position",
+      "jersey": "Trikotnummer",
+      "notes": "Notizen",
+      "submit": "Spieler hinzufügen"
+    }
+  },
+  "exercises": {
+    "title": "Übungsbibliothek",
+    "new": "Neue Übung",
+    "empty": "Deine Bibliothek ist leer. Füge deine erste Übung hinzu.",
+    "categoryAll": "Alle Kategorien",
+    "form": {
+      "name": "Name",
+      "description": "Beschreibung",
+      "category": "Kategorie",
+      "duration": "Dauer (Minuten)",
+      "intensity": "Intensität",
+      "equipment": "Material (durch Komma getrennt)",
+      "submit": "Übung speichern"
+    },
+    "categories": {
+      "warmup": "Aufwärmen",
+      "technical": "Technik",
+      "tactical": "Taktik",
+      "physical": "Physis",
+      "cooldown": "Abwärmen"
+    },
+    "intensities": {
+      "low": "Niedrig",
+      "medium": "Mittel",
+      "high": "Hoch"
+    }
+  },
+  "planner": {
+    "title": "Saisonplanung",
+    "pickTeam": "Wähle eine Mannschaft zum Planen",
+    "noTeams": "Erstelle zuerst eine Mannschaft.",
+    "view": {
+      "tour": "Saisonansicht",
+      "weekly": "Wöchentlich"
+    },
+    "setup": {
+      "title": "Richte deine Saison ein",
+      "subtitle": "Verankere deinen Makrozyklus an realen Daten, damit die Wochen korrekt nummeriert sind (-3, -2, -1, +1, +2…).",
+      "name": "Name der Tour",
+      "preseasonStart": "Beginn der Vorbereitung",
+      "preseasonStartHint": "Erster Montag der Woche -N (auf Montag gesetzt).",
+      "firstMatch": "Erstes Spiel",
+      "firstMatchHint": "Die Woche, die dieses Datum enthält, wird zur Woche +1.",
+      "endDate": "Enddatum",
+      "endDateHint": "Letzte Woche des Makrozyklus.",
+      "mesocycles": "Mesozyklen",
+      "mesoName": "Name",
+      "mesoKind": "Typ",
+      "mesoWeeks": "Wochen",
+      "kind": {
+        "preparation": "Vorbereitung",
+        "competition": "Wettkampf",
+        "transition": "Übergang",
+        "custom": "Individuell"
+      },
+      "addMesocycle": "Mesozyklus hinzufügen",
+      "remove": "Entfernen",
+      "customMesoName": "Neuer Mesozyklus",
+      "totalWeeksPending": "Wähle Daten, um die Gesamtanzahl Wochen zu sehen.",
+      "totalWeeksCount": "{sum} von {total} Wochen verteilt",
+      "create": "Saison erstellen",
+      "creating": "Wird erstellt…",
+      "err": {
+        "nameRequired": "Der Name der Tour ist erforderlich.",
+        "datesRequired": "Alle drei Daten sind erforderlich.",
+        "invalidDates": "Das Enddatum muss nach dem Beginn der Vorbereitung liegen.",
+        "weekMismatch": "Die Wochen der Mesozyklen ({sum}) müssen der Gesamtanzahl ({total}) entsprechen."
+      }
+    },
+    "tour": {
+      "firstMatch": "Erstes Spiel",
+      "edit": "Bearbeiten",
+      "close": "Schliessen",
+      "delete": "Tour löschen",
+      "confirmDelete": "Diese Tour löschen? Alle ihre Wochen gehen verloren.",
+      "weeksCount": "{n} Wochen",
+      "setTheme": "Thema festlegen",
+      "season": "Saison",
+      "seasonUnset": "Saison nicht festgelegt",
+      "newTour": "Neue Tour",
+      "addCycle": "Zyklus hinzufügen",
+      "addCycleSubmit": "Hinzufügen",
+      "adding": "Wird hinzugefügt…",
+      "cycleName": "Name des Zyklus",
+      "cycleKind": "Typ",
+      "cycleWeeks": "Wochen",
+      "removeCycle": "Letzten Zyklus entfernen",
+      "confirmRemoveCycle": "Diesen Zyklus entfernen? Seine Wochen und die zugehörigen Einheiten werden gelöst.",
+      "weekCountInvalid": "Die Anzahl der Wochen muss zwischen 1 und 26 liegen.",
+      "mesoKind": {
+        "preparation": "Vorbereitung",
+        "competition": "Wettkampf",
+        "transition": "Übergang",
+        "custom": "Individuell"
+      }
+    },
+    "edit": {
+      "endDateHint": "Gleiche Gesamtanzahl Wochen erforderlich — zum Hinzufügen oder Entfernen die Zyklus-Ansicht nutzen (in Kürze).",
+      "mesoCountHint": "Das Hinzufügen oder Entfernen von Mesozyklen kommt in die Zyklus-Ansicht. Vorerst kannst du nur umbenennen, umfärben und den Typ ändern.",
+      "save": "Speichern",
+      "saving": "Wird gespeichert…",
+      "cancel": "Abbrechen"
+    },
+    "theme": {
+      "quickFill": "Schnellausfüllen",
+      "format": "Format",
+      "notes": "Notizen",
+      "notesPlaceholder": "Optionale Notizen für diese Woche…",
+      "clear": "Löschen",
+      "save": "Speichern",
+      "saving": "Wird gespeichert…",
+      "option": {
+        "possede_ballon": "Meine Mannschaft hat den Ball",
+        "ne_possede_pas": "Meine Mannschaft hat den Ball nicht",
+        "recupere": "Meine Mannschaft erobert den Ball",
+        "perd": "Meine Mannschaft verliert den Ball",
+        "recupere_perd": "Meine Mannschaft erobert und verliert den Ball",
+        "decharge": "Entlastung",
+        "jeux_polysport": "Spiele + Polysport"
+      },
+      "formatOption": {
+        "1v1_2v2": "1:1 bis 2:2",
+        "3v3_5v5": "3:3 bis 5:5"
+      }
+    },
+    "weeks": {
+      "week": "Woche",
+      "weekN": "Woche {n}",
+      "prev": "Zurück",
+      "next": "Weiter",
+      "today": "Heute",
+      "addSession": "Einheit hinzufügen",
+      "summary": "Zusammenfassung",
+      "sessions": "Einheiten",
+      "totalTime": "Gesamtdauer",
+      "avgPerWeek": "Durchschnitt / Woche",
+      "typeDistribution": "Verteilung nach Typ",
+      "emptyMonth": "In diesen Wochen ist nichts geplant — füge einen Zyklus hinzu oder richte eine Saison ein, um sie zu füllen.",
+      "emptyMonthCta": "Saisonansicht öffnen",
+      "tag": {
+        "current": "Aktuell"
+      },
+      "type": {
+        "tactical": "Taktik",
+        "physical": "Physis",
+        "technical": "Technik",
+        "mental": "Mental",
+        "recovery": "Erholung",
+        "setpiece": "Standards",
+        "match": "Spiel"
+      },
+      "day": {
+        "mon": "Mo",
+        "tue": "Di",
+        "wed": "Mi",
+        "thu": "Do",
+        "fri": "Fr",
+        "sat": "Sa",
+        "sun": "So"
+      },
+      "slot": {
+        "morning": "Morgen",
+        "afternoon": "Nachmittag"
+      }
+    },
+    "session": {
+      "newTitle": "Neue Einheit",
+      "editTitle": "Einheit bearbeiten",
+      "date": "Datum",
+      "startTime": "Startzeit",
+      "duration": "Dauer (Minuten)",
+      "theme": "Thema",
+      "notes": "Notizen",
+      "exercises": "Übungen",
+      "addExercise": "Übung hinzufügen",
+      "noExercises": "Keine Übungen verknüpft. Füge welche aus deiner Bibliothek hinzu.",
+      "submit": "Einheit speichern",
+      "delete": "Einheit löschen"
+    }
+  },
+  "common": {
+    "cancel": "Abbrechen",
+    "save": "Speichern",
+    "loading": "Wird geladen…"
+  }
+}

@@ -22,7 +22,7 @@ export async function createExerciseAction(formData: FormData) {
   const duration = durationRaw ? Number(durationRaw) : null;
   const intensity = String(formData.get("intensity") ?? "").trim() || null;
   const equipment = parseEquipment(String(formData.get("equipment") ?? ""));
-  const locale = String(formData.get("locale") ?? "en");
+  const locale = String(formData.get("locale") ?? "fr");
 
   if (!name) return { error: "Name is required" };
 
@@ -62,7 +62,7 @@ export async function updateExerciseAction(formData: FormData) {
   const duration = durationRaw ? Number(durationRaw) : null;
   const intensity = String(formData.get("intensity") ?? "").trim() || null;
   const equipment = parseEquipment(String(formData.get("equipment") ?? ""));
-  const locale = String(formData.get("locale") ?? "en");
+  const locale = String(formData.get("locale") ?? "fr");
 
   if (!id || !name) return { error: "Missing fields" };
 
@@ -87,7 +87,7 @@ export async function updateExerciseAction(formData: FormData) {
 
 export async function deleteExerciseAction(formData: FormData) {
   const id = String(formData.get("id") ?? "");
-  const locale = String(formData.get("locale") ?? "en");
+  const locale = String(formData.get("locale") ?? "fr");
   if (!id) return { error: "Missing id" };
 
   const supabase = await createClient();

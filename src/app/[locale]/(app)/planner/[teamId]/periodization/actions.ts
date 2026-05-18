@@ -42,7 +42,7 @@ export async function createMacrocycleAction(formData: FormData) {
   const preseasonStart = String(formData.get("preseasonStart") ?? "");
   const firstMatch = String(formData.get("firstMatch") ?? "");
   const endDate = String(formData.get("endDate") ?? "");
-  const locale = String(formData.get("locale") ?? "en");
+  const locale = String(formData.get("locale") ?? "fr");
   let mesocycles: MesocycleInput[] = [];
   try {
     mesocycles = JSON.parse(String(formData.get("mesocycles") ?? "[]"));
@@ -147,7 +147,7 @@ export async function createMacrocycleAction(formData: FormData) {
 export async function updateMicrocycleAction(formData: FormData) {
   const id = String(formData.get("id") ?? "");
   const teamId = String(formData.get("teamId") ?? "");
-  const locale = String(formData.get("locale") ?? "en");
+  const locale = String(formData.get("locale") ?? "fr");
   const themeRaw = String(formData.get("theme") ?? "").trim();
   const formatRaw = String(formData.get("format") ?? "").trim();
   const notesRaw = String(formData.get("notes") ?? "").trim();
@@ -178,7 +178,7 @@ type MesocyclePatch = {
 export async function updateMacrocycleAction(formData: FormData) {
   const id = String(formData.get("id") ?? "");
   const teamId = String(formData.get("teamId") ?? "");
-  const locale = String(formData.get("locale") ?? "en");
+  const locale = String(formData.get("locale") ?? "fr");
   const name = String(formData.get("name") ?? "").trim();
   const preseasonStart = String(formData.get("preseasonStart") ?? "");
   const firstMatch = String(formData.get("firstMatch") ?? "");
@@ -277,7 +277,7 @@ export async function updateMacrocycleAction(formData: FormData) {
 export async function addMesocycleAction(formData: FormData) {
   const macroId = String(formData.get("macroId") ?? "");
   const teamId = String(formData.get("teamId") ?? "");
-  const locale = String(formData.get("locale") ?? "en");
+  const locale = String(formData.get("locale") ?? "fr");
   const name = String(formData.get("name") ?? "").trim();
   const kind = String(formData.get("kind") ?? "custom") as
     | "preparation"
@@ -386,7 +386,7 @@ export async function addMesocycleAction(formData: FormData) {
 export async function removeMesocycleAction(formData: FormData) {
   const mesoId = String(formData.get("mesoId") ?? "");
   const teamId = String(formData.get("teamId") ?? "");
-  const locale = String(formData.get("locale") ?? "en");
+  const locale = String(formData.get("locale") ?? "fr");
   if (!mesoId || !teamId) return { error: "Missing fields" };
 
   const supabase = await createClient();
@@ -448,7 +448,7 @@ export async function removeMesocycleAction(formData: FormData) {
 export async function deleteMacrocycleAction(formData: FormData) {
   const id = String(formData.get("id") ?? "");
   const teamId = String(formData.get("teamId") ?? "");
-  const locale = String(formData.get("locale") ?? "en");
+  const locale = String(formData.get("locale") ?? "fr");
   if (!id) return { error: "Missing id" };
 
   const supabase = await createClient();

@@ -9,7 +9,7 @@ export async function createTeamAction(formData: FormData) {
   const name = String(formData.get("name") ?? "").trim();
   const season = String(formData.get("season") ?? "").trim() || null;
   const ageGroup = String(formData.get("ageGroup") ?? "").trim() || null;
-  const locale = String(formData.get("locale") ?? "en");
+  const locale = String(formData.get("locale") ?? "fr");
 
   if (!name) return { error: "Name is required" };
 
@@ -48,7 +48,7 @@ export async function updateTeamAction(formData: FormData): Promise<{ error?: st
   const ageGroup = String(formData.get("ageGroup") ?? "").trim();
   const description = String(formData.get("description") ?? "").trim();
   const photoUrl = String(formData.get("photoUrl") ?? "").trim();
-  const locale = String(formData.get("locale") ?? "en");
+  const locale = String(formData.get("locale") ?? "fr");
 
   if (!teamId || !name) return { error: "Missing fields" };
   if (photoUrl) {
@@ -86,7 +86,7 @@ export async function updateTeamAction(formData: FormData): Promise<{ error?: st
 
 export async function archiveTeamAction(formData: FormData): Promise<void> {
   const teamId = String(formData.get("teamId") ?? "");
-  const locale = String(formData.get("locale") ?? "en");
+  const locale = String(formData.get("locale") ?? "fr");
   if (!teamId) throw new Error("Missing team id");
 
   const supabase = await createClient();
@@ -104,7 +104,7 @@ export async function archiveTeamAction(formData: FormData): Promise<void> {
 
 export async function restoreTeamAction(formData: FormData): Promise<void> {
   const teamId = String(formData.get("teamId") ?? "");
-  const locale = String(formData.get("locale") ?? "en");
+  const locale = String(formData.get("locale") ?? "fr");
   if (!teamId) throw new Error("Missing team id");
 
   const supabase = await createClient();
@@ -125,7 +125,7 @@ export async function permanentlyDeleteTeamAction(
   formData: FormData,
 ): Promise<void> {
   const teamId = String(formData.get("teamId") ?? "");
-  const locale = String(formData.get("locale") ?? "en");
+  const locale = String(formData.get("locale") ?? "fr");
   if (!teamId) throw new Error("Missing team id");
 
   const supabase = await createClient();
@@ -153,7 +153,7 @@ export async function createPlayerAction(formData: FormData) {
   const jerseyRaw = String(formData.get("jerseyNumber") ?? "").trim();
   const jerseyNumber = jerseyRaw ? Number(jerseyRaw) : null;
   const notes = String(formData.get("notes") ?? "").trim() || null;
-  const locale = String(formData.get("locale") ?? "en");
+  const locale = String(formData.get("locale") ?? "fr");
 
   if (!teamId || !firstName || !lastName) return { error: "Missing fields" };
 
