@@ -4,160 +4,140 @@
     "tagline": "Plan your football season."
   },
   "landing": {
-    "navLogin": "Log in",
-    "eyebrow": "Put the club at the center of progression",
-    "heroTitle": "Give your whole structure one shared philosophy.",
-    "heroSubtitle": "Grinta helps the club formalize its game identity, then translate it into cycles, weekly themes, and concrete sessions. Every team follows the same direction, adapted to its age and level.",
-    "primaryCta": "Create account",
-    "secondaryCta": "I already have an account",
-    "scrollLabel": "See how Grinta works",
-    "mockupLabel": "Club philosophy",
-    "mockupTitle": "One shared frame",
-    "mockupBadge": "Grinta",
-    "mockupCenter": "Club",
-    "mockupPillars": {
-      "training": "Training",
-      "identity": "Identity",
-      "players": "Players",
-      "match": "Match"
+    "nav": {
+      "login": "Log in",
+      "cta": "Start my season",
+      "method": "Method",
+      "how": "How it works",
+      "pricing": "Pricing"
     },
-    "mockupFocus": "Shared principle",
-    "mockupTheme": "Develop, transmit, play",
-    "principlesEyebrow": "Direction",
-    "principlesTitle": "A philosophy that reaches the pitch.",
-    "principles": {
-      "identity": {
-        "title": "A readable identity",
-        "body": "The club defines its principles: how it wants to develop, play, progress, and evaluate."
-      },
-      "continuity": {
-        "title": "Continuity by category",
-        "body": "Every team keeps the same backbone, with content adapted to its age and level."
-      },
-      "transmission": {
-        "title": "Clear transmission",
-        "body": "Coaches share one language, shared objectives, and coherent sessions."
-      }
+    "hero": {
+      "eyebrow": "For football coaches and clubs",
+      "title1": "One club.",
+      "title2Prefix": "One",
+      "title2Accent": "identity",
+      "title2Suffix": ".",
+      "title3": "One method.",
+      "subtitle": "Grinta gives coaches a single tool to plan the season, build microcycles, and prepare training — from youth academy to the first team, under one playing method.",
+      "ctaHow": "How it works",
+      "ctaPricing": "See pricing",
+      "stat1Label": "Categories",
+      "stat1Value": "U7 → Pro",
+      "stat2Label": "Microcycles",
+      "stat2Value": "+1 / -3",
+      "stat3Label": "Method",
+      "stat3Value": "1 club",
+      "tagline": "One club. One identity. One method."
     },
-    "wizardEyebrow": "Sheet demo",
-    "wizardTitle": "The wizard turns a session idea into a pitch-ready PDF.",
-    "wizardBody": "As you scroll, the preparation sheet shows its real flow: guided brief, warm-up, pitch blocks, then PDF export on the Grinta template.",
-    "wizardSteps": {
-      "brief": {
-        "short": "Brief",
-        "kicker": "Step 1",
-        "title": "Build the guiding thread",
-        "body": "The coach chooses the game moment, focus, objective, and questions that will guide the players."
-      },
-      "warmup": {
-        "short": "Warm-up",
-        "kicker": "Step 2",
-        "title": "Prepare the body and the theme",
-        "body": "The session starts with activation, connection to the theme, and a short explosive phase."
-      },
-      "blocks": {
-        "short": "Pitch",
-        "kicker": "Step 3",
-        "title": "Draw the situations and coaching points",
-        "body": "The main blocks combine diagram, duration, organization, coaching, and variations."
-      },
-      "pdf": {
-        "short": "PDF",
-        "kicker": "Step 4",
-        "title": "Export a clean sheet",
-        "body": "The preparation becomes a printable A4 sheet, clear for staff and usable on the pitch."
-      }
-    },
-    "wizardMock": {
-      "label": "Preparation wizard",
-      "title": "Session sheet",
-      "export": "PDF export",
-      "sessionLabel": "Session title",
-      "sessionTitle": "Win it high, attack fast",
-      "pillars": {
-        "moment": "Game moment",
-        "focus": "TE / TA / PE focus",
-        "objective": "Objective",
-        "questions": "Coach questions"
-      },
-      "warmup": {
-        "activate": {
-          "label": "Phase 1",
-          "duration": "8 min",
-          "title": "Activate",
-          "hint": "Mobility, prevention, ball work, and rhythm."
+    "manifesto": {
+      "eyebrow": "The manifesto",
+      "title": "Three words, etched on every screen.",
+      "body": "Grinta is not a shared calendar. It's the tool that forces alignment between the club's philosophy, the season plan, and Tuesday night's training.",
+      "pillars": [
+        {
+          "kicker": "01",
+          "title": "One club",
+          "body": "From youth academy to the first team, every category shares one single workspace."
         },
-        "connect": {
-          "label": "Phase 2",
-          "duration": "12 min",
-          "title": "Connect",
-          "hint": "Rondo or possession with a constraint linked to the theme."
+        {
+          "kicker": "02",
+          "title": "One identity",
+          "body": "Set the club's playing principles. Every coach finds them in their microcycles and sessions."
         },
-        "accelerate": {
-          "label": "Phase 3",
-          "duration": "5 min",
-          "title": "Accelerate",
-          "hint": "Explosiveness, reaction, maximum intensity."
+        {
+          "kicker": "03",
+          "title": "One method",
+          "body": "Macro, meso, microcycles, sessions: one continuous thread. Plan the season once, then break it down."
         }
-      },
-      "blocks": {
-        "main1": {
-          "title": "Main block 1",
-          "duration": "20 min",
-          "hint": "Game form with the expected behavior made visible."
-        },
-        "main2": {
-          "title": "Main block 2",
-          "duration": "20 min",
-          "hint": "Exercise or variation to stabilize the learning."
-        },
-        "game": {
-          "title": "Final game",
-          "duration": "18 min",
-          "hint": "Back to play with observation criteria."
-        }
-      },
-      "addExercise": "Import exercise",
-      "pdfTitle": "Two structured A4 pages",
-      "pdfBody": "The wizard fields are placed into the PDF sheet with diagrams, coaching points, durations, and reflections.",
-      "save": "Save",
-      "create": "Export PDF"
+      ]
     },
-    "flowEyebrow": "Principle",
-    "flowTitle": "From club philosophy to today's session.",
     "flow": {
-      "philosophy": {
-        "title": "Philosophy",
-        "body": "The club sets its strong ideas: game intentions, development values, and progression priorities."
-      },
-      "category": {
-        "title": "Categories",
-        "body": "Principles are adapted by age group to build a coherent player pathway."
-      },
-      "cycle": {
-        "title": "Cycles",
-        "body": "The season is organized into readable blocks, with themes that build progression."
-      },
-      "session": {
-        "title": "Session",
-        "body": "Each session becomes a concrete expression of the philosophy, not isolated content."
-      }
+      "eyebrow": "How it works",
+      "titlePrefix": "From the club's identity to",
+      "titleAccent": "Tuesday night",
+      "titleSuffix": "'s session.",
+      "steps": [
+        {
+          "kicker": "01",
+          "badge": "Identity",
+          "title": "The club's identity",
+          "body": "Playing principles, development, expectations. One philosophy shared across the whole staff."
+        },
+        {
+          "kicker": "02",
+          "badge": "Season",
+          "title": "The season, in 90 seconds",
+          "body": "Three dates are enough. Grinta anchors the macrocycle and numbers the weeks (-3, -2, -1, +1…) automatically."
+        },
+        {
+          "kicker": "03",
+          "badge": "Microcycle",
+          "title": "The microcycles",
+          "body": "Weekly theme, format, load. Every mesocycle takes whatever color you want."
+        },
+        {
+          "kicker": "04",
+          "badge": "Session",
+          "title": "The sessions",
+          "body": "Import an exercise from your library or build it right on the diagram. Blocks stack up."
+        },
+        {
+          "kicker": "05",
+          "badge": "PDF",
+          "title": "The sheet, pitch-ready",
+          "body": "A clean A4 PDF, readable for staff, usable on the pitch. That's it."
+        }
+      ]
     },
-    "featuresEyebrow": "What Grinta structures",
-    "featuresTitle": "A more coherent club, without rigid training.",
-    "features": {
-      "identity": {
-        "title": "Club frame",
-        "body": "Formalize shared principles so every staff member knows what should be transmitted."
-      },
-      "planner": {
-        "title": "Continuous planning",
-        "body": "Connect categories, cycles, weeks, and sessions so progression remains visible."
-      },
-      "preparation": {
-        "title": "Preparation sheet",
-        "body": "Prepare clear, printable sessions aligned with the club's principles."
-      }
+    "pricing": {
+      "eyebrow": "Pricing",
+      "title": "Free for a coach. Fair for a club.",
+      "recommended": "recommended",
+      "tiers": [
+        {
+          "name": "Coach",
+          "price": "Free",
+          "priceSuffix": "",
+          "sub": "For one coach, one team.",
+          "features": ["1 team", "Unlimited library", "Season planner", "PDF export"],
+          "cta": "Create my account"
+        },
+        {
+          "name": "Club",
+          "price": "€12",
+          "priceSuffix": "/ team / month",
+          "sub": "Every category, one method.",
+          "features": ["Unlimited teams", "Club-wide overview", "Shared playing principles", "Staff & DTN roles", "Priority support"],
+          "cta": "Start the season"
+        },
+        {
+          "name": "Academy",
+          "price": "On request",
+          "priceSuffix": "",
+          "sub": "For pro structures and academies.",
+          "features": ["Everything in Club", "SSO & staff onboarding", "Match data", "Methodology support"],
+          "cta": "Contact us"
+        }
+      ]
+    },
+    "finalCta": {
+      "eyebrow": "Ready to structure your season?",
+      "title1": "Give the club one voice.",
+      "title2Accent": "Set it",
+      "title2Suffix": "with Grinta.",
+      "body": "Account in 30 seconds. No credit card. You can import the current season and pick up where you left off.",
+      "cta": "Create my account",
+      "ctaSecondary": "How it works →"
+    },
+    "footer": {
+      "tagline": "The tool for football coaches and clubs to plan the season, build microcycles, and prepare training.",
+      "copyright": "© 2026 Grinta · Made with grinta.",
+      "cols": [
+        { "title": "Product", "links": ["Planner", "Library", "Preparation", "Club view", "Pricing"] },
+        { "title": "Method", "links": ["Playing principles", "Microcycles", "Mesocycles", "Pedagogy"] },
+        { "title": "Resources", "links": ["Blog", "Templates", "Help center", "API"] },
+        { "title": "Company", "links": ["About", "Careers", "Contact", "Legal"] }
+      ]
     }
   },
   "nav": {
@@ -218,6 +198,21 @@
     "title": "Teams",
     "new": "New team",
     "empty": "No teams yet. Create your first one.",
+    "clubCreated": "Club created · {name}",
+    "defaultTeamCreated": "A default team <strong>Active</strong> has been created. Click it to rename it or add more teams.",
+    "archivedCount": "Archived ({n})",
+    "unsetCategory": "Category not set",
+    "unsetSeason": "Season not set",
+    "archived": {
+      "archivedOn": "Archived on {date}",
+      "restore": "Restore",
+      "deletePermanently": "Delete permanently",
+      "purging": "Deleting…",
+      "purgeTitle": "Permanent deletion — irreversible",
+      "purgeWarning": "All players, sessions, and preparations linked to this team will be removed with no recovery possible.",
+      "typeNameToConfirm": "Type the name <strong>{name}</strong> to confirm:",
+      "cancel": "Cancel"
+    },
     "form": {
       "name": "Team name",
       "season": "Season",
@@ -400,7 +395,13 @@
       "slot": {
         "morning": "Morning",
         "afternoon": "Afternoon"
-      }
+      },
+      "confirmDeleteSession": "Delete this session?",
+      "pasteHere": "Paste here",
+      "delete": "Delete",
+      "deleteSessionAria": "Delete session",
+      "duplicate": "Duplicate",
+      "duplicateSessionAria": "Duplicate session"
     },
     "session": {
       "newTitle": "New session",
@@ -421,5 +422,414 @@
     "cancel": "Cancel",
     "save": "Save",
     "loading": "Loading…"
+  },
+  "sheet": {
+    "preparation": {
+      "header": "Training preparation",
+      "back": "Back",
+      "noTeam": "No team set",
+      "noDate": "No date",
+      "save": "Save",
+      "saving": "Saving…",
+      "saved": "Saved",
+      "example": "Example",
+      "loadExampleTitle": "Load example data",
+      "loadExampleConfirm": "This will replace the current sheet with an example. Continue?",
+      "stepsLabel": "Preparation steps",
+      "cancelSession": "Cancel session",
+      "cancellingSession": "Cancelling…",
+      "cancelConfirm": "Cancel this session? It will be removed from the planner.",
+      "exportPdf": "Export PDF",
+      "alt": {
+        "pdfPreview": "PDF sheet preview",
+        "exerciseImported": "Imported exercise",
+        "explosivityImported": "Imported explosiveness exercise",
+        "finalGameImported": "Imported exercise for final game"
+      },
+      "placeholder": {
+        "exercise": "Exercise",
+        "instruction": "Instruction",
+        "sessionTitle": "Session title",
+        "team": "Team",
+        "coach": "Coach"
+      },
+      "blockType": {
+        "playForm": "Play form",
+        "exercise": "Exercise"
+      },
+      "fields": {
+        "playingForm": "Characteristic form",
+        "focus": "Focus",
+        "objective": "Objective",
+        "coachQuestions": "Coach questions",
+        "totalDuration": "Total duration",
+        "content": "Content",
+        "coaching": "Coaching",
+        "organization": "Organization",
+        "variations": "Variations",
+        "duration": "Duration",
+        "finalGame": "Final game",
+        "coolDown": "Cool-down"
+      },
+      "library": {
+        "explosivity": "Explosiveness library",
+        "finalGame": "Final game library"
+      },
+      "importedHint": "Exercise imported into the PDF exported fields",
+      "status": {
+        "complete": "Complete",
+        "partial": "To check",
+        "empty": "Empty",
+        "toFill": "To fill in"
+      },
+      "review": {
+        "planningTitle": "Plan title",
+        "date": "Date",
+        "startTime": "Time",
+        "duration": "Session duration",
+        "team": "Team",
+        "coach": "Coach",
+        "gameMoment": "Game moment",
+        "focus": "Focus",
+        "objective": "Objective",
+        "blockDurations": "Block durations"
+      },
+      "focusFamily": {
+        "TE": "Technical",
+        "TA": "Tactical",
+        "PE": "Physical",
+        "AT": "Mental"
+      },
+      "weekThemeLabel": {
+        "possede_ballon": "We have the ball",
+        "ne_possede_pas": "No possession",
+        "recupere": "Recovering",
+        "perd": "We lose the ball",
+        "recupere_perd": "Recover + lose",
+        "decharge": "Discharge",
+        "jeux_polysport": "Games + polysport"
+      },
+      "step1": {
+        "sectionLabel": "Session",
+        "momentLabel": "Game moment",
+        "phaseOptionLabel": {
+          "possession": "We have the ball",
+          "losing": "We lost it",
+          "noPossession": "They have the ball",
+          "recovering": "We're winning it back"
+        },
+        "phaseOptionTheme": {
+          "possession": "We have the ball",
+          "losing": "Defensive transition",
+          "noPossession": "No possession",
+          "recovering": "Offensive transition"
+        },
+        "offTheme": "Off weekly theme",
+        "startingPoint": "Starting point",
+        "startingPointPrefix": "Today, we start when",
+        "startingPointFallback": "the moment is chosen",
+        "field": {
+          "characteristicForm": "Characteristic form",
+          "focus": "Focus",
+          "objective": "Objective",
+          "coachQuestions": "Coach questions"
+        },
+        "fieldPlaceholder": {
+          "characteristicForm": "In which exact situation do we want to place the players?",
+          "focus": "Which behaviors do we want to observe in priority?",
+          "objective": "By the end, players must be able to...",
+          "coachQuestions": "Which questions will guide the learning?"
+        },
+        "sessionTitlePlaceholder": "Session title",
+        "durationPlaceholder": "90",
+        "teamPlaceholder": "Team",
+        "coachPlaceholder": "Coach"
+      },
+      "step2": {
+        "eyebrow": "Warm-up & prep",
+        "title": "Prepare the body, then the theme",
+        "subtitle": "The start of the session sets the intensity, connects the players to today's problem, then ends with a short acceleration.",
+        "threeParts": "3 parts",
+        "totalDuration": "Total duration",
+        "totalDurationPlaceholder": "25 min",
+        "bodyPart": {
+          "ankle": "Ankle",
+          "knee": "Knee",
+          "hip": "Hip",
+          "hamstring": "Hamstrings"
+        },
+        "tabName": {
+          "p1": "Activate",
+          "p2": "Connect",
+          "p3": "Accelerate"
+        },
+        "tabHint": {
+          "p1": "Mobility + prevention",
+          "p2": "TE / TA / PE",
+          "p3": "Explosiveness"
+        },
+        "phaseTitle": {
+          "p1": "Phase 1 - Warm-up",
+          "p2": "Phase 2 - Warm-up (TE/TA/PE)",
+          "p3": "Phase 3 - Explosiveness"
+        },
+        "p1ContentPlaceholder": "Activation, ball, mobility, rhythm.",
+        "p1CoachingPlaceholder": "Technical quality, posture, scanning.",
+        "p2ContentPlaceholder": "Rondo, possession, constraint linked to the theme.",
+        "p2CoachingPlaceholder": "Triggers, orientation, decision pace.",
+        "p3ContentPlaceholder": "Sprints, change of direction, reaction.",
+        "p3CoachingPlaceholder": "Max intensity, recovery, posture."
+      },
+      "stepMain": {
+        "eyebrow": "Main block {n}",
+        "title": "Put the problem on the pitch",
+        "subtitle": "The central block must make the expected behavior visible, then give the coach precise cues to step in.",
+        "format": "Format",
+        "removeImageButton": "Remove image",
+        "type": {
+          "playForm": "Play form",
+          "exercise": "Exercise"
+        },
+        "duration": "Duration",
+        "durationPlaceholder": "20 min",
+        "field": {
+          "content": "Content",
+          "coaching": "Coaching",
+          "organization": "Organization",
+          "variations": "Variations"
+        },
+        "placeholder": {
+          "content": "Situation, rules, scoring, constraints.",
+          "coaching": "Triggers, expected behaviors, corrections.",
+          "organization": "Space, players, equipment.",
+          "variations": "+ harder / - easier"
+        },
+        "removeImage": "Remove the image and return to the editable diagram",
+        "librarySubtitle": "Whole library · sorted by relevance with the session focus"
+      },
+      "step5": {
+        "eyebrow": "Final game & wrap-up",
+        "title": "Finish, cool down, remember",
+        "subtitle": "The final moment checks the theme in a free situation, then closes the session with a short debrief and notes useful for next time.",
+        "finalGameHeader": "Final game",
+        "field": {
+          "finalGame": "Final game",
+          "coolDown": "Cool-down",
+          "format": "Format, constraints, coaching",
+          "reflection": "Post-session reflection"
+        },
+        "placeholder": {
+          "finalGameDuration": "15 min",
+          "coolDownDuration": "5 min",
+          "format": "Format, rules, constraints, last coaching points.",
+          "coolDown": "Cool-down, final message, mini debrief.",
+          "reflection": "What worked, what should be revisited, players to watch."
+        },
+        "libraryTitle": "Final game library",
+        "librarySubtitle": "Whole library · click to import into the final game"
+      },
+      "step6": {
+        "eyebrow": "Review & export",
+        "title": "Final check",
+        "subtitle": "Check the information that structures the session before generating the PDF sheet.",
+        "blockShort": {
+          "warmup": "Warm-up",
+          "b1": "B1",
+          "b2": "B2",
+          "game": "Game"
+        },
+        "quickCheck": "Quick check",
+        "section": {
+          "brief": "Session brief",
+          "warmup": "Warm-up & prep",
+          "main1": "Main block 1",
+          "main2": "Main block 2",
+          "finalGame": "Final game & wrap-up"
+        }
+      },
+      "phase3LibraryTitle": "Explosiveness library",
+      "phase3Header": "Explosiveness",
+      "phase3ImportHint": "Import an explosiveness exercise from the CO base",
+      "removeBtn": "Remove",
+      "importBtn": "Import",
+      "quickCheckTitle": "Quick check",
+      "steps": [
+        {
+          "label": "Session brief",
+          "eyebrow": "Step 1 of 5",
+          "desc": "Set the date, team and game moment(s) this session is built around."
+        },
+        {
+          "label": "Warm-up & prep",
+          "eyebrow": "Step 2 of 5",
+          "desc": "Mobility, technical / tactical warmup, then a short explosive block."
+        },
+        {
+          "label": "Main block 1",
+          "eyebrow": "Step 3 of 5",
+          "desc": "Your first central training block — play form or exercise."
+        },
+        {
+          "label": "Main block 2",
+          "eyebrow": "Step 4 of 5",
+          "desc": "Second central training block."
+        },
+        {
+          "label": "Final game & wrap-up",
+          "eyebrow": "Step 5 of 5",
+          "desc": "Match-style game, cool-down and post-session reflection."
+        },
+        {
+          "label": "Review & export",
+          "eyebrow": "Final review",
+          "desc": "Check each section, then export the official preparation sheet."
+        }
+      ]
+    },
+    "schema": {
+      "zones": {
+        "warmup": "warm-up",
+        "block": "main block",
+        "game": "final game",
+        "default": "diagrams"
+      },
+      "shapes": {
+        "homePlayer": "Attacker",
+        "awayPlayer": "Defender",
+        "gk": "Goalkeeper",
+        "ball": "Ball",
+        "cone": "Cone",
+        "goal": "Goal",
+        "line": "Line",
+        "arrow": "Arrow",
+        "arrowRun": "Run arrow",
+        "arrowPass": "Pass arrow",
+        "arrowDribble": "Dribble arrow",
+        "arrowLong": "Long ball arrow"
+      },
+      "tools": {
+        "select": "Select / move a zone",
+        "home": "Attacker",
+        "away": "Defender",
+        "gk": "Goalkeeper",
+        "ball": "Ball",
+        "cone": "Cone",
+        "goalH": "Goal (horizontal)",
+        "goalV": "Goal (vertical)",
+        "line": "Line / zone (click-drag)",
+        "arrowRun": "Run (solid)",
+        "arrowPass": "Pass (dashed)",
+        "arrowDribble": "Dribble (wave)",
+        "arrowLong": "Long ball (curve)"
+      },
+      "actions": {
+        "undo": "Undo",
+        "copy": "Copy diagram",
+        "paste": "Paste diagram",
+        "deleteSelection": "Delete selection",
+        "deleteShort": "Del.",
+        "clearAll": "Clear all",
+        "settings": "Symbol settings",
+        "reset": "Reset",
+        "resetHint": "Reset this element to default settings",
+        "deselect": "Deselect",
+        "close": "Close",
+        "delete": "Delete"
+      },
+      "hint": "Tip: with Select, click-drag a zone then move one of the selected elements to translate the whole group.",
+      "multi": {
+        "count": "{n} elements selected",
+        "hint": "Dragging one selected element moves the whole group."
+      },
+      "settings": {
+        "title": "Default settings — {zone}",
+        "symbolSize": "Symbol size",
+        "lineWidth": "Line thickness",
+        "arrowWidth": "Arrow thickness"
+      },
+      "selectionPanel": {
+        "selected": "{shape} selected",
+        "color": "Color",
+        "colorAria": "Element color",
+        "thickness": "Thickness"
+      }
+    }
+  },
+  "onboarding": {
+    "club": {
+      "name": "Club name",
+      "nameHelp": "E.g. FC Lausanne, ASF training center, etc.",
+      "namePlaceholder": "My club",
+      "submit": "Create my club",
+      "submitting": "Creating…"
+    }
+  },
+  "settings": {
+    "club": {
+      "identity": {
+        "title": "Club identity",
+        "description": "These colors drive the menu, buttons, active states, and club screens. Night mode lets you test a darker identity without changing the day colors.",
+        "workspacePreview": "Workspace preview",
+        "clubName": "Club name",
+        "logoUrl": "Logo URL",
+        "logoUrlPlaceholder": "https://...",
+        "dayMode": "Day",
+        "nightMode": "Night",
+        "primaryColor": "Primary",
+        "secondaryColor": "Secondary",
+        "saveIdentity": "Save identity"
+      },
+      "invite": {
+        "title": "Invite a member",
+        "description": "The invitee will see the invitation on their dashboard the next time they sign in with this email.",
+        "email": "Email",
+        "emailPlaceholder": "coach@example.com",
+        "role": "Role",
+        "assignedTeams": "Assigned teams",
+        "noTeamsInClub": "No team in this club yet. Create a team first.",
+        "savedFor": "Invitation saved for <strong>{email}</strong>. It will appear on their dashboard at the next login.",
+        "sending": "Sending…",
+        "send": "Send invitation"
+      },
+      "pendingInvitations": {
+        "title": "Pending invitations ({n})",
+        "expiresOn": "expires on {date}",
+        "revoke": "Revoke"
+      },
+      "members": {
+        "title": "Members ({n})",
+        "unnamed": "(no name)",
+        "remove": "Remove"
+      },
+      "roles": {
+        "title": "Club roles",
+        "description": "Create custom labels (President, Head of training, etc.). The access level is fixed by the system.",
+        "label": "Label",
+        "labelPlaceholder": "Head of training",
+        "accessLevel": "Access level",
+        "addRole": "Add role",
+        "system": "system"
+      },
+      "access": {
+        "full": "Full",
+        "fullHelp": "Everything, including billing and members.",
+        "extended": "Extended",
+        "extendedHelp": "All teams in write mode, no billing.",
+        "team": "Assigned team",
+        "teamHelp": "One or more specific teams.",
+        "team_readonly": "Team read-only",
+        "team_readonlyHelp": "Read-only on one or more teams."
+      }
+    }
+  },
+  "invite": {
+    "title": "Join a club",
+    "subtitle": "If you've been invited, the invitation usually shows up on your dashboard when you log in with the invited email address.",
+    "recommendedFlow": "Recommended flow",
+    "recommendedFlowBody": "Ask the club owner to add you with your email address. The invitation will appear automatically on your dashboard.",
+    "haveTokenTitle": "I have an invitation link or token",
+    "haveTokenSubtitle": "Paste the full link or just the token.",
+    "tokenPlaceholder": "https://grinta.app/invite/… or abc123…",
+    "continue": "Continue"
   }
 }

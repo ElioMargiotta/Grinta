@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useTransition } from "react";
-import { useLocale } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import { Button } from "@/components/ui/Button";
 import { AuthField } from "@/components/auth/AuthField";
 import { createClubAction } from "@/app/[locale]/(app)/onboarding/club/actions";
@@ -11,6 +11,7 @@ const inputClass =
 
 export function OnboardingClubForm() {
   const locale = useLocale();
+  const t = useTranslations("onboarding.club");
   const [error, setError] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
 
@@ -27,9 +28,9 @@ export function OnboardingClubForm() {
       }}
     >
       <AuthField
-        label="Nom du club"
+        label={t("name")}
         htmlFor="name"
-        help="Ex. FC Lausanne, ASF Centre formation, etc."
+        help={t("nameHelp")}
         required
       >
         <input
@@ -37,7 +38,7 @@ export function OnboardingClubForm() {
           name="name"
           required
           maxLength={80}
-          placeholder="Mon club"
+          placeholder={t("namePlaceholder")}
           className={inputClass}
         />
       </AuthField>
@@ -49,7 +50,7 @@ export function OnboardingClubForm() {
       )}
 
       <Button type="submit" disabled={isPending} className="w-full">
-        {isPending ? "Création…" : "Créer mon club"}
+        {isPending ? t("submitting") : t("submit")}
       </Button>
     </form>
   );

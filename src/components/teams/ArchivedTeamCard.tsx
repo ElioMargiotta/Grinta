@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useTransition } from "react";
-import { useLocale } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import { RotateCcw, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import {
@@ -19,13 +19,14 @@ type ArchivedTeam = {
 
 export function ArchivedTeamCard({ team }: { team: ArchivedTeam }) {
   const locale = useLocale();
+  const t = useTranslations("teams.archived");
   const [purging, setPurging] = useState(false);
   const [typed, setTyped] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
 
   const canPurge = typed.trim() === team.name.trim();
-  const archivedDate = new Date(team.archived_at).toLocaleDateString();
+  const archivedDate = new Date(team.archived_at).toLocaleDateString(locale);
 
   const restore = () => {
     setError(null);
@@ -69,7 +70,7 @@ export function ArchivedTeamCard({ team }: { team: ArchivedTeam }) {
             {[team.age_group, team.season].filter(Boolean).join(" · ") || "—"}
           </div>
           <div className="mt-2 text-xs text-zinc-500 dark:text-zinc-400">
-            Archivée le {archivedDate}
+            {t("archivedOn", { date: archivedDate })}
           </div>
         </div>
         <div className="flex flex-col items-end gap-2">
@@ -80,7 +81,7 @@ export function ArchivedTeamCard({ team }: { team: ArchivedTeam }) {
             disabled={isPending}
           >
             <RotateCcw className="h-4 w-4" />
-            Restaurer
+            {t("restore")}
           </Button>
           {!purging ? (
             <Button
@@ -91,7 +92,7 @@ export function ArchivedTeamCard({ team }: { team: ArchivedTeam }) {
               className="text-red-600 hover:text-red-700"
             >
               <Trash2 className="h-4 w-4" />
-              Supprimer définitivement
+              {t("deletePermanently")}
             </Button>
           ) : null}
         </div>
@@ -100,15 +101,17 @@ export function ArchivedTeamCard({ team }: { team: ArchivedTeam }) {
       {purging && (
         <div className="rounded-md border border-red-200 bg-red-50 p-4 text-sm dark:border-red-500/30 dark:bg-red-950/30">
           <div className="font-medium text-red-900 dark:text-red-100">
-            Suppression définitive — irréversible
+            {t("purgeTitle")}
           </div>
           <p className="mt-1 text-red-800 dark:text-red-300">
-            Tous les joueurs, séances et préparations liés à cette équipe
-            seront supprimés sans possibilité de récupération.
+            {t("purgeWarning")}
           </p>
           <label className="mt-3 flex flex-col gap-1 text-zinc-900 dark:text-zinc-100">
             <span>
-              Tape le nom <strong>{team.name}</strong> pour confirmer :
+              {t.rich("typeNameToConfirm", {
+                name: team.name,
+                strong: (chunks) => <strong>{chunks}</strong>,
+              })}
             </span>
             <input
               type="text"
@@ -126,7 +129,7 @@ export function ArchivedTeamCard({ team }: { team: ArchivedTeam }) {
               onClick={purge}
               disabled={!canPurge || isPending}
             >
-              {isPending ? "Suppression…" : "Supprimer définitivement"}
+              {isPending ? t("purging") : t("deletePermanently")}
             </Button>
             <Button
               variant="ghost"
@@ -138,7 +141,7 @@ export function ArchivedTeamCard({ team }: { team: ArchivedTeam }) {
               }}
               disabled={isPending}
             >
-              Annuler
+              {t("cancel")}
             </Button>
           </div>
         </div>

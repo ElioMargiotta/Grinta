@@ -4,160 +4,140 @@
     "tagline": "Plane deine Fussballsaison."
   },
   "landing": {
-    "navLogin": "Anmelden",
-    "eyebrow": "Der Verein im Zentrum der Entwicklung",
-    "heroTitle": "Gib deiner gesamten Struktur eine gemeinsame Spielphilosophie.",
-    "heroSubtitle": "Grinta hilft dem Verein, seine Spielidentität zu formalisieren und sie in Zyklen, Wochenthemen und konkrete Trainingseinheiten zu übersetzen. Jede Mannschaft folgt derselben Leitlinie, angepasst an Alter und Niveau.",
-    "primaryCta": "Konto erstellen",
-    "secondaryCta": "Ich habe bereits ein Konto",
-    "scrollLabel": "Funktionsweise von Grinta entdecken",
-    "mockupLabel": "Vereinsphilosophie",
-    "mockupTitle": "Ein gemeinsamer Rahmen",
-    "mockupBadge": "Grinta",
-    "mockupCenter": "Verein",
-    "mockupPillars": {
-      "training": "Training",
-      "identity": "Identität",
-      "players": "Spieler",
-      "match": "Spiel"
+    "nav": {
+      "login": "Anmelden",
+      "cta": "Saison starten",
+      "method": "Methode",
+      "how": "Funktionsweise",
+      "pricing": "Preise"
     },
-    "mockupFocus": "Gemeinsames Prinzip",
-    "mockupTheme": "Ausbilden, vermitteln, spielen",
-    "principlesEyebrow": "Leitlinie",
-    "principlesTitle": "Eine Philosophie, die bis auf den Platz wirkt.",
-    "principles": {
-      "identity": {
-        "title": "Eine klare Identität",
-        "body": "Der Verein definiert seine Prinzipien: wie er ausbilden, spielen, sich entwickeln und bewerten will."
-      },
-      "continuity": {
-        "title": "Kontinuität pro Kategorie",
-        "body": "Jede Mannschaft behält dasselbe Grundgerüst, mit auf Alter und Niveau angepassten Inhalten."
-      },
-      "transmission": {
-        "title": "Klare Vermittlung",
-        "body": "Die Trainer teilen eine gemeinsame Sprache, gemeinsame Ziele und stimmige Trainingseinheiten."
-      }
+    "hero": {
+      "eyebrow": "Für Fussballtrainer und -vereine",
+      "title1": "Ein Verein.",
+      "title2Prefix": "Eine",
+      "title2Accent": "Identität",
+      "title2Suffix": ".",
+      "title3": "Eine Methode.",
+      "subtitle": "Grinta gibt Trainern ein einziges Werkzeug, um die Saison zu planen, Mikrozyklen aufzubauen und Trainings vorzubereiten — vom Nachwuchs bis zur ersten Mannschaft, unter einer einzigen Spielmethode.",
+      "ctaHow": "Funktionsweise",
+      "ctaPricing": "Preise ansehen",
+      "stat1Label": "Kategorien",
+      "stat1Value": "U7 → Pro",
+      "stat2Label": "Mikrozyklen",
+      "stat2Value": "+1 / -3",
+      "stat3Label": "Methode",
+      "stat3Value": "1 Verein",
+      "tagline": "One club. One identity. One method."
     },
-    "wizardEyebrow": "Demo der Trainingskarte",
-    "wizardTitle": "Der Wizard verwandelt eine Trainingsidee in ein platzfertiges PDF.",
-    "wizardBody": "Beim Scrollen zeigt die Vorbereitungskarte ihren echten Ablauf: geführtes Briefing, Aufwärmen, Platzblöcke und schliesslich PDF-Export im Grinta-Format.",
-    "wizardSteps": {
-      "brief": {
-        "short": "Briefing",
-        "kicker": "Schritt 1",
-        "title": "Den roten Faden festlegen",
-        "body": "Der Trainer wählt den Spielmoment, den Fokus, das Ziel und die Fragen, die die Spieler leiten sollen."
-      },
-      "warmup": {
-        "short": "Aufwärmen",
-        "kicker": "Schritt 2",
-        "title": "Körper und Thema vorbereiten",
-        "body": "Die Einheit beginnt mit Aktivierung, Anbindung an das Thema und einer kurzen Explosivphase."
-      },
-      "blocks": {
-        "short": "Platz",
-        "kicker": "Schritt 3",
-        "title": "Spielsituationen und Coachingpunkte gestalten",
-        "body": "Die Hauptblöcke kombinieren Skizze, Dauer, Organisation, Coaching und Varianten."
-      },
-      "pdf": {
-        "short": "PDF",
-        "kicker": "Schritt 4",
-        "title": "Eine saubere Karte exportieren",
-        "body": "Die Vorbereitung wird zu einem druckbaren A4-Blatt, gut lesbar für den Staff und einsetzbar auf dem Platz."
-      }
-    },
-    "wizardMock": {
-      "label": "Vorbereitungs-Wizard",
-      "title": "Trainingskarte",
-      "export": "PDF-Export",
-      "sessionLabel": "Titel der Einheit",
-      "sessionTitle": "Hoch erobern, schnell angreifen",
-      "pillars": {
-        "moment": "Spielmoment",
-        "focus": "Fokus TE / TA / PE",
-        "objective": "Ziel",
-        "questions": "Trainerfragen"
-      },
-      "warmup": {
-        "activate": {
-          "label": "Phase 1",
-          "duration": "8 Min.",
-          "title": "Aktivieren",
-          "hint": "Mobilität, Prävention, Ballarbeit und Rhythmus."
+    "manifesto": {
+      "eyebrow": "Das Manifest",
+      "title": "Drei Wörter, in jedem Bildschirm verankert.",
+      "body": "Grinta ist kein geteilter Kalender. Es ist das Werkzeug, das den Einklang zwischen Vereinsphilosophie, Saisonplanung und Dienstagabend-Training erzwingt.",
+      "pillars": [
+        {
+          "kicker": "01",
+          "title": "Ein Verein",
+          "body": "Vom Nachwuchs bis zur ersten Mannschaft teilen sich alle Kategorien einen einzigen Arbeitsbereich."
         },
-        "connect": {
-          "label": "Phase 2",
-          "duration": "12 Min.",
-          "title": "Verbinden",
-          "hint": "Rondo oder Ballbesitzform mit themenbezogener Vorgabe."
+        {
+          "kicker": "02",
+          "title": "Eine Identität",
+          "body": "Lege die Spielprinzipien des Vereins fest. Jeder Trainer findet sie in seinen Mikrozyklen und Einheiten wieder."
         },
-        "accelerate": {
-          "label": "Phase 3",
-          "duration": "5 Min.",
-          "title": "Beschleunigen",
-          "hint": "Explosivität, Reaktion, maximale Intensität."
+        {
+          "kicker": "03",
+          "title": "Eine Methode",
+          "body": "Makro, Meso, Mikrozyklen, Einheiten: ein roter Faden. Plane die Saison einmal, dann brich sie herunter."
         }
-      },
-      "blocks": {
-        "main1": {
-          "title": "Hauptblock 1",
-          "duration": "20 Min.",
-          "hint": "Spielform mit klar sichtbarem erwartetem Verhalten."
-        },
-        "main2": {
-          "title": "Hauptblock 2",
-          "duration": "20 Min.",
-          "hint": "Übung oder Variante zur Festigung des Lernens."
-        },
-        "game": {
-          "title": "Abschlussspiel",
-          "duration": "18 Min.",
-          "hint": "Rückkehr ins Spiel mit Beobachtungskriterien."
-        }
-      },
-      "addExercise": "Übung importieren",
-      "pdfTitle": "Zwei strukturierte A4-Seiten",
-      "pdfBody": "Die Felder des Wizards werden mit Skizzen, Coachingpunkten, Dauer und Reflexionen in die PDF-Karte übertragen.",
-      "save": "Speichern",
-      "create": "PDF exportieren"
+      ]
     },
-    "flowEyebrow": "Prinzip",
-    "flowTitle": "Von der Vereinsphilosophie zur heutigen Einheit.",
     "flow": {
-      "philosophy": {
-        "title": "Philosophie",
-        "body": "Der Verein definiert seine Leitideen: Spielabsichten, Ausbildungswerte und Entwicklungsprioritäten."
-      },
-      "category": {
-        "title": "Kategorien",
-        "body": "Die Prinzipien werden nach Altersstufen angepasst, um einen stimmigen Spielerweg zu schaffen."
-      },
-      "cycle": {
-        "title": "Zyklen",
-        "body": "Die Saison wird in lesbare Blöcke gegliedert, mit Themen, die die Entwicklung aufbauen."
-      },
-      "session": {
-        "title": "Trainingseinheit",
-        "body": "Jede Einheit wird zu einer konkreten Umsetzung der Philosophie, nicht zu isoliertem Inhalt."
-      }
+      "eyebrow": "Funktionsweise",
+      "titlePrefix": "Von der Vereinsidentität zur Karte vom",
+      "titleAccent": "Dienstagabend",
+      "titleSuffix": ".",
+      "steps": [
+        {
+          "kicker": "01",
+          "badge": "Identität",
+          "title": "Die Vereinsidentität",
+          "body": "Spielprinzipien, Ausbildung, Anforderungen. Eine Philosophie, geteilt vom gesamten Staff."
+        },
+        {
+          "kicker": "02",
+          "badge": "Saison",
+          "title": "Die Saison in 90 Sekunden",
+          "body": "Drei Daten genügen. Grinta verankert den Makrozyklus und nummeriert die Wochen automatisch (-3, -2, -1, +1…)."
+        },
+        {
+          "kicker": "03",
+          "badge": "Mikrozyklus",
+          "title": "Die Mikrozyklen",
+          "body": "Wochenthema, Format, Belastung. Jeder Mesozyklus bekommt die Farbe, die du willst."
+        },
+        {
+          "kicker": "04",
+          "badge": "Einheit",
+          "title": "Die Trainingseinheiten",
+          "body": "Importiere eine Übung aus deiner Bibliothek oder erstelle sie direkt auf dem Plan. Die Blöcke stapeln sich."
+        },
+        {
+          "kicker": "05",
+          "badge": "PDF",
+          "title": "Die Karte, platzbereit",
+          "body": "Ein sauberes A4-PDF, lesbar für den Staff, einsetzbar auf dem Platz. Fertig."
+        }
+      ]
     },
-    "featuresEyebrow": "Was Grinta strukturiert",
-    "featuresTitle": "Ein stimmigerer Verein, ohne das Training zu starr zu machen.",
-    "features": {
-      "identity": {
-        "title": "Vereinsrahmen",
-        "body": "Halte gemeinsame Prinzipien fest, damit jedes Staff-Mitglied weiss, was vermittelt werden soll."
-      },
-      "planner": {
-        "title": "Durchgängige Planung",
-        "body": "Verbinde Kategorien, Zyklen, Wochen und Einheiten, damit die Entwicklung sichtbar bleibt."
-      },
-      "preparation": {
-        "title": "Vorbereitungskarte",
-        "body": "Erstelle klare, druckbare Einheiten im Einklang mit den Vereinsprinzipien."
-      }
+    "pricing": {
+      "eyebrow": "Preise",
+      "title": "Gratis für einen Trainer. Fair für einen Verein.",
+      "recommended": "empfohlen",
+      "tiers": [
+        {
+          "name": "Coach",
+          "price": "Gratis",
+          "priceSuffix": "",
+          "sub": "Für einen Trainer, eine Mannschaft.",
+          "features": ["1 Mannschaft", "Unbegrenzte Bibliothek", "Saisonplaner", "PDF-Export"],
+          "cta": "Konto erstellen"
+        },
+        {
+          "name": "Verein",
+          "price": "12 €",
+          "priceSuffix": "/ Mannschaft / Monat",
+          "sub": "Alle Kategorien, eine Methode.",
+          "features": ["Unbegrenzte Mannschaften", "Vereinsweite Sicht", "Geteilte Spielprinzipien", "Staff- & DTN-Rollen", "Priorisierter Support"],
+          "cta": "Saison starten"
+        },
+        {
+          "name": "Ausbildungszentrum",
+          "price": "Auf Anfrage",
+          "priceSuffix": "",
+          "sub": "Für Profistrukturen und Akademien.",
+          "features": ["Alles aus dem Vereinsplan", "SSO & Staff-Onboarding", "Spieldaten", "Methodische Begleitung"],
+          "cta": "Kontakt aufnehmen"
+        }
+      ]
+    },
+    "finalCta": {
+      "eyebrow": "Bereit, deine Saison zu strukturieren?",
+      "title1": "Gib dem Verein eine einzige Stimme.",
+      "title2Accent": "Setze sie",
+      "title2Suffix": "mit Grinta.",
+      "body": "Konto in 30 Sekunden. Keine Kreditkarte. Du kannst die laufende Saison importieren und dort weitermachen, wo du aufgehört hast.",
+      "cta": "Konto erstellen",
+      "ctaSecondary": "Funktionsweise →"
+    },
+    "footer": {
+      "tagline": "Das Werkzeug für Fussballtrainer und -vereine zur Saisonplanung, Mikrozyklenaufbau und Trainingsvorbereitung.",
+      "copyright": "© 2026 Grinta · Made avec grinta.",
+      "cols": [
+        { "title": "Produkt", "links": ["Planer", "Bibliothek", "Vorbereitung", "Vereinssicht", "Preise"] },
+        { "title": "Methode", "links": ["Spielprinzipien", "Mikrozyklen", "Mesozyklen", "Pädagogik"] },
+        { "title": "Ressourcen", "links": ["Blog", "Vorlagen", "Hilfecenter", "API"] },
+        { "title": "Unternehmen", "links": ["Über uns", "Karriere", "Kontakt", "Impressum"] }
+      ]
     }
   },
   "nav": {
@@ -218,6 +198,21 @@
     "title": "Mannschaften",
     "new": "Neue Mannschaft",
     "empty": "Noch keine Mannschaft. Erstelle deine erste.",
+    "clubCreated": "Verein erstellt · {name}",
+    "defaultTeamCreated": "Eine Standardmannschaft <strong>Aktiv</strong> wurde erstellt. Klicke darauf, um sie umzubenennen oder weitere Mannschaften hinzuzufügen.",
+    "archivedCount": "Archiviert ({n})",
+    "unsetCategory": "Kategorie nicht festgelegt",
+    "unsetSeason": "Saison nicht festgelegt",
+    "archived": {
+      "archivedOn": "Archiviert am {date}",
+      "restore": "Wiederherstellen",
+      "deletePermanently": "Endgültig löschen",
+      "purging": "Wird gelöscht…",
+      "purgeTitle": "Endgültige Löschung — unumkehrbar",
+      "purgeWarning": "Alle Spieler, Einheiten und Vorbereitungen dieser Mannschaft werden ohne Wiederherstellungsmöglichkeit entfernt.",
+      "typeNameToConfirm": "Gib den Namen <strong>{name}</strong> zur Bestätigung ein:",
+      "cancel": "Abbrechen"
+    },
     "form": {
       "name": "Mannschaftsname",
       "season": "Saison",
@@ -400,7 +395,13 @@
       "slot": {
         "morning": "Morgen",
         "afternoon": "Nachmittag"
-      }
+      },
+      "confirmDeleteSession": "Diese Einheit löschen?",
+      "pasteHere": "Hier einfügen",
+      "delete": "Löschen",
+      "deleteSessionAria": "Einheit löschen",
+      "duplicate": "Duplizieren",
+      "duplicateSessionAria": "Einheit duplizieren"
     },
     "session": {
       "newTitle": "Neue Einheit",
@@ -421,5 +422,414 @@
     "cancel": "Abbrechen",
     "save": "Speichern",
     "loading": "Wird geladen…"
+  },
+  "sheet": {
+    "preparation": {
+      "header": "Trainingsvorbereitung",
+      "back": "Zurück",
+      "noTeam": "Keine Mannschaft festgelegt",
+      "noDate": "Kein Datum",
+      "save": "Speichern",
+      "saving": "Wird gespeichert…",
+      "saved": "Gespeichert",
+      "example": "Beispiel",
+      "loadExampleTitle": "Beispieldaten laden",
+      "loadExampleConfirm": "Damit wird die aktuelle Karte durch ein Beispiel ersetzt. Fortfahren?",
+      "stepsLabel": "Vorbereitungsschritte",
+      "cancelSession": "Einheit absagen",
+      "cancellingSession": "Wird abgesagt…",
+      "cancelConfirm": "Diese Einheit absagen? Sie wird aus dem Planer entfernt.",
+      "exportPdf": "PDF exportieren",
+      "alt": {
+        "pdfPreview": "PDF-Vorschau",
+        "exerciseImported": "Übung importiert",
+        "explosivityImported": "Explosivitätsübung importiert",
+        "finalGameImported": "Importierte Übung für das Abschlussspiel"
+      },
+      "placeholder": {
+        "exercise": "Übung",
+        "instruction": "Anweisung",
+        "sessionTitle": "Titel der Einheit",
+        "team": "Mannschaft",
+        "coach": "Trainer"
+      },
+      "blockType": {
+        "playForm": "Spielform",
+        "exercise": "Übung"
+      },
+      "fields": {
+        "playingForm": "Charakteristische Form",
+        "focus": "Fokus",
+        "objective": "Ziel",
+        "coachQuestions": "Trainerfragen",
+        "totalDuration": "Gesamtdauer",
+        "content": "Inhalt",
+        "coaching": "Coaching",
+        "organization": "Organisation",
+        "variations": "Varianten",
+        "duration": "Dauer",
+        "finalGame": "Abschlussspiel",
+        "coolDown": "Auslaufen"
+      },
+      "library": {
+        "explosivity": "Explosivitäts-Bibliothek",
+        "finalGame": "Abschlussspiel-Bibliothek"
+      },
+      "importedHint": "Übung in die exportierten PDF-Felder importiert",
+      "status": {
+        "complete": "Vollständig",
+        "partial": "Zu prüfen",
+        "empty": "Leer",
+        "toFill": "Auszufüllen"
+      },
+      "review": {
+        "planningTitle": "Plan-Titel",
+        "date": "Datum",
+        "startTime": "Zeit",
+        "duration": "Dauer der Einheit",
+        "team": "Mannschaft",
+        "coach": "Trainer",
+        "gameMoment": "Spielmoment",
+        "focus": "Fokus",
+        "objective": "Ziel",
+        "blockDurations": "Blockdauer"
+      },
+      "focusFamily": {
+        "TE": "Technik",
+        "TA": "Taktik",
+        "PE": "Physis",
+        "AT": "Mental"
+      },
+      "weekThemeLabel": {
+        "possede_ballon": "Wir haben den Ball",
+        "ne_possede_pas": "Kein Ballbesitz",
+        "recupere": "Eroberung",
+        "perd": "Wir verlieren den Ball",
+        "recupere_perd": "Erobern + verlieren",
+        "decharge": "Entlastung",
+        "jeux_polysport": "Spiele + Polysport"
+      },
+      "step1": {
+        "sectionLabel": "Einheit",
+        "momentLabel": "Spielmoment",
+        "phaseOptionLabel": {
+          "possession": "Wir haben den Ball",
+          "losing": "Wir haben ihn verloren",
+          "noPossession": "Sie haben den Ball",
+          "recovering": "Wir erobern ihn zurück"
+        },
+        "phaseOptionTheme": {
+          "possession": "Wir haben den Ball",
+          "losing": "Defensive Umschaltsituation",
+          "noPossession": "Kein Ballbesitz",
+          "recovering": "Offensive Umschaltsituation"
+        },
+        "offTheme": "Ausserhalb des Wochenthemas",
+        "startingPoint": "Ausgangspunkt",
+        "startingPointPrefix": "Heute starten wir, wenn",
+        "startingPointFallback": "der Moment gewählt ist",
+        "field": {
+          "characteristicForm": "Charakteristische Form",
+          "focus": "Fokus",
+          "objective": "Ziel",
+          "coachQuestions": "Trainerfragen"
+        },
+        "fieldPlaceholder": {
+          "characteristicForm": "In welche genaue Situation wollen wir die Spieler bringen?",
+          "focus": "Welche Verhaltensweisen wollen wir vorrangig beobachten?",
+          "objective": "Am Ende müssen die Spieler in der Lage sein...",
+          "coachQuestions": "Welche Fragen werden das Lernen leiten?"
+        },
+        "sessionTitlePlaceholder": "Titel der Einheit",
+        "durationPlaceholder": "90",
+        "teamPlaceholder": "Mannschaft",
+        "coachPlaceholder": "Trainer"
+      },
+      "step2": {
+        "eyebrow": "Aufwärmen & Vorb.",
+        "title": "Erst den Körper, dann das Thema vorbereiten",
+        "subtitle": "Der Einheitsstart legt die Intensität fest, verbindet die Spieler mit dem heutigen Problem und endet mit einer kurzen Beschleunigung.",
+        "threeParts": "3 Teile",
+        "totalDuration": "Gesamtdauer",
+        "totalDurationPlaceholder": "25 Min.",
+        "bodyPart": {
+          "ankle": "Sprunggelenk",
+          "knee": "Knie",
+          "hip": "Hüfte",
+          "hamstring": "Ischiokrurale"
+        },
+        "tabName": {
+          "p1": "Aktivieren",
+          "p2": "Verbinden",
+          "p3": "Beschleunigen"
+        },
+        "tabHint": {
+          "p1": "Mobilität + Prävention",
+          "p2": "TE / TA / PE",
+          "p3": "Explosivität"
+        },
+        "phaseTitle": {
+          "p1": "Phase 1 - Aufwärmen",
+          "p2": "Phase 2 - Aufwärmen (TE/TA/PE)",
+          "p3": "Phase 3 - Explosivität"
+        },
+        "p1ContentPlaceholder": "Aktivierung, Ball, Mobilität, Rhythmus.",
+        "p1CoachingPlaceholder": "Technische Qualität, Haltung, Scanning.",
+        "p2ContentPlaceholder": "Rondo, Ballbesitz, themenbezogene Vorgabe.",
+        "p2CoachingPlaceholder": "Auslöser, Orientierung, Entscheidungsrhythmus.",
+        "p3ContentPlaceholder": "Sprints, Richtungswechsel, Reaktion.",
+        "p3CoachingPlaceholder": "Maximale Intensität, Erholung, Haltung."
+      },
+      "stepMain": {
+        "eyebrow": "Hauptblock {n}",
+        "title": "Das Problem auf den Platz bringen",
+        "subtitle": "Der zentrale Block muss das erwartete Verhalten sichtbar machen und dem Trainer klare Eingriffspunkte geben.",
+        "format": "Format",
+        "removeImageButton": "Bild entfernen",
+        "type": {
+          "playForm": "Spielform",
+          "exercise": "Übung"
+        },
+        "duration": "Dauer",
+        "durationPlaceholder": "20 Min.",
+        "field": {
+          "content": "Inhalt",
+          "coaching": "Coaching",
+          "organization": "Organisation",
+          "variations": "Varianten"
+        },
+        "placeholder": {
+          "content": "Situation, Regeln, Punktevergabe, Vorgaben.",
+          "coaching": "Auslöser, erwartete Verhaltensweisen, Korrekturen.",
+          "organization": "Raum, Spieler, Material.",
+          "variations": "+ schwerer / - leichter"
+        },
+        "removeImage": "Bild entfernen und zur bearbeitbaren Skizze zurück",
+        "librarySubtitle": "Gesamte Bibliothek · sortiert nach Relevanz zum Sitzungsfokus"
+      },
+      "step5": {
+        "eyebrow": "Abschlussspiel & Abschluss",
+        "title": "Beenden, herunterfahren, behalten",
+        "subtitle": "Die letzte Phase prüft das Thema in freier Situation und schliesst die Einheit mit einem kurzen Rückblick und Notizen für die Zukunft ab.",
+        "finalGameHeader": "Abschlussspiel",
+        "field": {
+          "finalGame": "Abschlussspiel",
+          "coolDown": "Auslaufen",
+          "format": "Format, Vorgaben, Coaching",
+          "reflection": "Reflexion nach der Einheit"
+        },
+        "placeholder": {
+          "finalGameDuration": "15 Min.",
+          "coolDownDuration": "5 Min.",
+          "format": "Format, Regeln, Vorgaben, letzte Coachingpunkte.",
+          "coolDown": "Auslaufen, Abschlussbotschaft, Mini-Debrief.",
+          "reflection": "Was funktionierte, was muss aufgegriffen werden, Spieler im Blick."
+        },
+        "libraryTitle": "Abschlussspiel-Bibliothek",
+        "librarySubtitle": "Gesamte Bibliothek · klicken, um ins Abschlussspiel zu importieren"
+      },
+      "step6": {
+        "eyebrow": "Überprüfen & exportieren",
+        "title": "Letzte Kontrolle",
+        "subtitle": "Prüfe die Informationen, die die Einheit strukturieren, bevor du das PDF erstellst.",
+        "blockShort": {
+          "warmup": "Aufw.",
+          "b1": "B1",
+          "b2": "B2",
+          "game": "Spiel"
+        },
+        "quickCheck": "Schnellprüfung",
+        "section": {
+          "brief": "Briefing der Einheit",
+          "warmup": "Aufwärmen & Vorb.",
+          "main1": "Hauptblock 1",
+          "main2": "Hauptblock 2",
+          "finalGame": "Abschlussspiel & Abschluss"
+        }
+      },
+      "phase3LibraryTitle": "Explosivitäts-Bibliothek",
+      "phase3Header": "Explosivität",
+      "phase3ImportHint": "Eine Explosivitätsübung aus der CO-Basis importieren",
+      "removeBtn": "Entfernen",
+      "importBtn": "Importieren",
+      "quickCheckTitle": "Schnellprüfung",
+      "steps": [
+        {
+          "label": "Briefing der Einheit",
+          "eyebrow": "Schritt 1 von 5",
+          "desc": "Lege Datum, Mannschaft und die Spielmomente fest, um die diese Einheit gebaut ist."
+        },
+        {
+          "label": "Aufwärmen & Vorb.",
+          "eyebrow": "Schritt 2 von 5",
+          "desc": "Mobilität, TE-/TA-Aufwärmen und ein kurzer Explosivblock."
+        },
+        {
+          "label": "Hauptblock 1",
+          "eyebrow": "Schritt 3 von 5",
+          "desc": "Dein erster zentraler Trainingsblock — Spielform oder Übung."
+        },
+        {
+          "label": "Hauptblock 2",
+          "eyebrow": "Schritt 4 von 5",
+          "desc": "Zweiter zentraler Trainingsblock."
+        },
+        {
+          "label": "Abschlussspiel & Abschluss",
+          "eyebrow": "Schritt 5 von 5",
+          "desc": "Spielform, Auslaufen und Reflexion nach der Einheit."
+        },
+        {
+          "label": "Überprüfen & exportieren",
+          "eyebrow": "Endgültige Überprüfung",
+          "desc": "Prüfe jeden Abschnitt und exportiere die offizielle Vorbereitungskarte."
+        }
+      ]
+    },
+    "schema": {
+      "zones": {
+        "warmup": "Aufwärmen",
+        "block": "Hauptblock",
+        "game": "Abschlussspiel",
+        "default": "Skizzen"
+      },
+      "shapes": {
+        "homePlayer": "Angreifer",
+        "awayPlayer": "Verteidiger",
+        "gk": "Torwart",
+        "ball": "Ball",
+        "cone": "Hütchen",
+        "goal": "Tor",
+        "line": "Linie",
+        "arrow": "Pfeil",
+        "arrowRun": "Lauf-Pfeil",
+        "arrowPass": "Pass-Pfeil",
+        "arrowDribble": "Dribbling-Pfeil",
+        "arrowLong": "Langer-Ball-Pfeil"
+      },
+      "tools": {
+        "select": "Auswahl / Zone verschieben",
+        "home": "Angreifer",
+        "away": "Verteidiger",
+        "gk": "Torwart",
+        "ball": "Ball",
+        "cone": "Hütchen",
+        "goalH": "Tor (horizontal)",
+        "goalV": "Tor (vertikal)",
+        "line": "Linie / Zone (Klick-Ziehen)",
+        "arrowRun": "Lauf (durchgezogen)",
+        "arrowPass": "Pass (gestrichelt)",
+        "arrowDribble": "Dribbling (Welle)",
+        "arrowLong": "Langer Ball (Kurve)"
+      },
+      "actions": {
+        "undo": "Zurück",
+        "copy": "Skizze kopieren",
+        "paste": "Skizze einfügen",
+        "deleteSelection": "Auswahl löschen",
+        "deleteShort": "Lösch.",
+        "clearAll": "Alles löschen",
+        "settings": "Symbol-Einstellungen",
+        "reset": "Zurücksetzen",
+        "resetHint": "Dieses Element auf Standard zurücksetzen",
+        "deselect": "Abwählen",
+        "close": "Schliessen",
+        "delete": "Löschen"
+      },
+      "hint": "Tipp: Mit Auswahl eine Zone aufziehen, dann ein ausgewähltes Element bewegen, um die ganze Gruppe zu verschieben.",
+      "multi": {
+        "count": "{n} Elemente ausgewählt",
+        "hint": "Beim Ziehen eines ausgewählten Elements bewegt sich die ganze Gruppe."
+      },
+      "settings": {
+        "title": "Standardeinstellungen — {zone}",
+        "symbolSize": "Symbolgrösse",
+        "lineWidth": "Liniendicke",
+        "arrowWidth": "Pfeildicke"
+      },
+      "selectionPanel": {
+        "selected": "{shape} ausgewählt",
+        "color": "Farbe",
+        "colorAria": "Elementfarbe",
+        "thickness": "Dicke"
+      }
+    }
+  },
+  "onboarding": {
+    "club": {
+      "name": "Vereinsname",
+      "nameHelp": "Z. B. FC Lausanne, ASF Ausbildungszentrum, usw.",
+      "namePlaceholder": "Mein Verein",
+      "submit": "Verein erstellen",
+      "submitting": "Wird erstellt…"
+    }
+  },
+  "settings": {
+    "club": {
+      "identity": {
+        "title": "Vereinsidentität",
+        "description": "Diese Farben steuern das Menü, die Buttons, aktive Zustände und die Vereinsbildschirme. Der Nachtmodus erlaubt es, eine dunklere Identität zu testen, ohne die Tagesfarben zu ändern.",
+        "workspacePreview": "Workspace-Vorschau",
+        "clubName": "Vereinsname",
+        "logoUrl": "Logo-URL",
+        "logoUrlPlaceholder": "https://...",
+        "dayMode": "Tag",
+        "nightMode": "Nacht",
+        "primaryColor": "Primär",
+        "secondaryColor": "Sekundär",
+        "saveIdentity": "Identität speichern"
+      },
+      "invite": {
+        "title": "Mitglied einladen",
+        "description": "Der Eingeladene sieht die Einladung beim nächsten Login mit dieser E-Mail-Adresse auf seinem Dashboard.",
+        "email": "E-Mail",
+        "emailPlaceholder": "trainer@beispiel.ch",
+        "role": "Rolle",
+        "assignedTeams": "Zugewiesene Mannschaften",
+        "noTeamsInClub": "Noch keine Mannschaft in diesem Verein. Erstelle zuerst eine.",
+        "savedFor": "Einladung gespeichert für <strong>{email}</strong>. Sie erscheint beim nächsten Login auf dem Dashboard.",
+        "sending": "Wird gesendet…",
+        "send": "Einladung senden"
+      },
+      "pendingInvitations": {
+        "title": "Ausstehende Einladungen ({n})",
+        "expiresOn": "läuft ab am {date}",
+        "revoke": "Widerrufen"
+      },
+      "members": {
+        "title": "Mitglieder ({n})",
+        "unnamed": "(ohne Namen)",
+        "remove": "Entfernen"
+      },
+      "roles": {
+        "title": "Vereinsrollen",
+        "description": "Erstelle eigene Bezeichnungen (Präsident, Ausbildungsverantwortliche/r usw.). Die Zugriffsstufe ist vom System vorgegeben.",
+        "label": "Bezeichnung",
+        "labelPlaceholder": "Ausbildungsverantwortliche/r",
+        "accessLevel": "Zugriffsstufe",
+        "addRole": "Rolle hinzufügen",
+        "system": "System"
+      },
+      "access": {
+        "full": "Vollständig",
+        "fullHelp": "Alles, inklusive Abrechnung und Mitglieder.",
+        "extended": "Erweitert",
+        "extendedHelp": "Alle Mannschaften mit Schreibrecht, keine Abrechnung.",
+        "team": "Zugewiesene Mannschaft",
+        "teamHelp": "Eine oder mehrere spezifische Mannschaften.",
+        "team_readonly": "Mannschaft schreibgeschützt",
+        "team_readonlyHelp": "Nur Lesezugriff auf eine oder mehrere Mannschaften."
+      }
+    }
+  },
+  "invite": {
+    "title": "Verein beitreten",
+    "subtitle": "Wenn du eingeladen wurdest, erscheint die Einladung normalerweise auf deinem Dashboard, sobald du dich mit der eingeladenen E-Mail anmeldest.",
+    "recommendedFlow": "Empfohlener Ablauf",
+    "recommendedFlowBody": "Bitte den Vereinsbesitzer, dich mit deiner E-Mail-Adresse hinzuzufügen. Die Einladung erscheint dann automatisch auf deinem Dashboard.",
+    "haveTokenTitle": "Ich habe einen Einladungslink oder Token",
+    "haveTokenSubtitle": "Füge den vollständigen Link oder nur das Token ein.",
+    "tokenPlaceholder": "https://grinta.app/invite/… oder abc123…",
+    "continue": "Weiter"
   }
 }

@@ -1,17 +1,13 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useTranslations } from "next-intl";
 import { ArrowRight } from "lucide-react";
 import { Link } from "@/i18n/navigation";
 import { GrintaLogoIcon, GrintaLogoType } from "./BrandSeal";
 
-export function NavBar({
-  loginLabel,
-  ctaLabel,
-}: {
-  loginLabel: string;
-  ctaLabel: string;
-}) {
+export function NavBar() {
+  const t = useTranslations("landing.nav");
   const [scrolled, setScrolled] = useState(false);
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 8);
@@ -21,9 +17,9 @@ export function NavBar({
   }, []);
 
   const links = [
-    { label: "Méthode", href: "#methode" },
-    { label: "Comment ça marche", href: "#flow" },
-    { label: "Tarifs", href: "#tarifs" },
+    { label: t("method"), href: "#methode" },
+    { label: t("how"), href: "#flow" },
+    { label: t("pricing"), href: "#tarifs" },
   ];
 
   return (
@@ -57,13 +53,13 @@ export function NavBar({
             href="/login"
             className="hidden sm:inline-flex text-[13px] font-medium px-3 py-2 text-[var(--ink-2)] hover:text-[var(--ink)]"
           >
-            {loginLabel}
+            {t("login")}
           </Link>
           <Link
             href="/signup"
             className="inline-flex items-center gap-1.5 text-[13px] font-medium px-3.5 py-2 rounded-lg btn-ink"
           >
-            {ctaLabel}
+            {t("cta")}
             <ArrowRight className="h-3.5 w-3.5" />
           </Link>
         </div>

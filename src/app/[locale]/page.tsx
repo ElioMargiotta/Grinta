@@ -1,6 +1,7 @@
 import { Link, redirect } from "@/i18n/navigation";
 import { createClient } from "@/lib/supabase/server";
-import { setRequestLocale } from "next-intl/server";
+import { getTranslations, setRequestLocale } from "next-intl/server";
+import { getMessages } from "next-intl/server";
 import { ArrowRight, Check } from "lucide-react";
 import { NavBar } from "@/components/landing/NavBar";
 import { Reveal } from "@/components/landing/Reveal";
@@ -11,6 +12,17 @@ import {
 } from "@/components/landing/BrandSeal";
 import { FlowSection } from "@/components/landing/FlowSection";
 import { ManifestoLine } from "@/components/landing/ManifestoLine";
+
+type Pillar = { kicker: string; title: string; body: string };
+type Tier = {
+  name: string;
+  price: string;
+  priceSuffix: string;
+  sub: string;
+  features: string[];
+  cta: string;
+};
+type FooterCol = { title: string; links: string[] };
 
 export default async function LocaleHome({
   params,
@@ -28,28 +40,37 @@ export default async function LocaleHome({
     redirect({ href: "/dashboard", locale });
   }
 
+  const messages = (await getMessages()) as {
+    landing: {
+      manifesto: { pillars: Pillar[] };
+      pricing: { tiers: Tier[] };
+      footer: { cols: FooterCol[] };
+    };
+  };
+
   return (
     <div
       className="min-h-screen"
       style={{ background: "var(--bg)", color: "var(--ink)" }}
     >
-      <NavBar loginLabel="Se connecter" ctaLabel="Démarrer ma saison" />
+      <NavBar />
 
       <main>
         <Hero />
-        <Manifesto />
+        <Manifesto pillars={messages.landing.manifesto.pillars} />
         <FlowSection />
-        <PricingSection />
+        <PricingSection tiers={messages.landing.pricing.tiers} />
         <FinalCTA />
       </main>
 
-      <FooterBar />
+      <FooterBar cols={messages.landing.footer.cols} />
     </div>
   );
 }
 
 // ── Hero ────────────────────────────────────────────────────────────────
-function Hero() {
+async function Hero() {
+  const t = await getTranslations("landing.hero");
   return (
     <section className="relative overflow-hidden">
       <div
@@ -67,17 +88,18 @@ function Hero() {
             <Reveal>
               <div className="eyebrow-mono flex items-center gap-2">
                 <span className="w-1.5 h-1.5 rounded-full dot-accent" />
-                Pour les entraîneurs et les clubs de football
+                {t("eyebrow")}
               </div>
             </Reveal>
             <Reveal delay={80}>
               <h1 className="h-display mt-5 text-5xl sm:text-6xl lg:text-7xl font-semibold">
-                Un club.
+                {t("title1")}
                 <br />
-                Une{" "}
-                <span className="text-accent-ink italic">identité</span>.
+                {t("title2Prefix")}{" "}
+                <span className="text-accent-ink italic">{t("title2Accent")}</span>
+                {t("title2Suffix")}
                 <br />
-                Une méthode.
+                {t("title3")}
               </h1>
             </Reveal>
             <Reveal delay={160}>
@@ -85,10 +107,7 @@ function Hero() {
                 className="mt-6 max-w-xl text-[16px] leading-relaxed"
                 style={{ color: "var(--ink-2)", textWrap: "pretty" }}
               >
-                Grinta donne aux entraîneurs un outil unique pour planifier la
-                saison, construire les microcycles et préparer les entraînements
-                — de la pré-formation à l&apos;équipe première, sous une seule
-                méthode de jeu.
+                {t("subtitle")}
               </p>
             </Reveal>
             <Reveal delay={240}>
@@ -97,7 +116,7 @@ function Hero() {
                   href="#flow"
                   className="inline-flex items-center gap-2 text-[14px] font-medium px-5 py-3 rounded-lg btn-accent"
                 >
-                  Comment ça marche
+                  {t("ctaHow")}
                   <ArrowRight className="h-4 w-4" />
                 </a>
                 <a
@@ -105,7 +124,7 @@ function Hero() {
                   className="inline-flex items-center gap-2 text-[14px] font-medium px-5 py-3 rounded-lg border"
                   style={{ borderColor: "var(--line-2)" }}
                 >
-                  Voir les tarifs
+                  {t("ctaPricing")}
                 </a>
               </div>
             </Reveal>
@@ -116,10 +135,10 @@ function Hero() {
                     className="text-[11px] font-mono uppercase tracking-widest"
                     style={{ color: "var(--ink-3)" }}
                   >
-                    Catégories
+                    {t("stat1Label")}
                   </dt>
                   <dd className="mt-1 text-2xl font-semibold tracking-tight">
-                    U7 → Pro
+                    {t("stat1Value")}
                   </dd>
                 </div>
                 <div>
@@ -127,10 +146,10 @@ function Hero() {
                     className="text-[11px] font-mono uppercase tracking-widest"
                     style={{ color: "var(--ink-3)" }}
                   >
-                    Microcycles
+                    {t("stat2Label")}
                   </dt>
                   <dd className="mt-1 text-2xl font-semibold tracking-tight">
-                    +1 / -3
+                    {t("stat2Value")}
                   </dd>
                 </div>
                 <div>
@@ -138,10 +157,10 @@ function Hero() {
                     className="text-[11px] font-mono uppercase tracking-widest"
                     style={{ color: "var(--ink-3)" }}
                   >
-                    Méthode
+                    {t("stat3Label")}
                   </dt>
                   <dd className="mt-1 text-2xl font-semibold tracking-tight">
-                    1 club
+                    {t("stat3Value")}
                   </dd>
                 </div>
               </dl>
@@ -163,7 +182,7 @@ function Hero() {
                   />
                   <GrintaLogoTagline
                     height={18}
-                    title="One club. One identity. One method."
+                    title={t("tagline")}
                     className="h-auto w-auto max-w-[320px] opacity-80"
                   />
                 </div>
@@ -181,43 +200,25 @@ function Hero() {
 }
 
 // ── Manifesto ─────────────────────────────────────────────────────────────
-function Manifesto() {
-  const pillars = [
-    {
-      kicker: "01",
-      title: "Un club",
-      body: "De la pré-formation à l'équipe première, toutes les catégories partagent un seul espace de travail.",
-    },
-    {
-      kicker: "02",
-      title: "Une identité",
-      body: "Pose les principes de jeu du club. Chaque entraîneur les retrouve dans ses microcycles et ses séances.",
-    },
-    {
-      kicker: "03",
-      title: "Une méthode",
-      body: "Macro, méso, microcycles, séances : un seul fil conducteur. Tu planifies la saison une fois, puis tu la déclines.",
-    },
-  ];
+async function Manifesto({ pillars }: { pillars: Pillar[] }) {
+  const t = await getTranslations("landing.manifesto");
   return (
     <section id="methode" className="relative py-20 lg:py-24">
       <div className="mx-auto max-w-7xl px-6 lg:px-10">
         <Reveal>
           <div className="max-w-3xl">
-            <div className="eyebrow-mono">Le manifeste</div>
+            <div className="eyebrow-mono">{t("eyebrow")}</div>
             <h2
               className="h-display mt-4 text-4xl sm:text-5xl font-semibold tracking-tight"
               style={{ textWrap: "balance" }}
             >
-              Trois mots, gravés dans chaque écran.
+              {t("title")}
             </h2>
             <p
               className="mt-5 text-[15px] leading-relaxed"
               style={{ color: "var(--ink-2)", textWrap: "pretty" }}
             >
-              Grinta n&apos;est pas un agenda partagé. C&apos;est l&apos;outil
-              qui force l&apos;alignement entre la philosophie du club, la
-              planification de la saison et la séance de mardi soir.
+              {t("body")}
             </p>
           </div>
         </Reveal>
@@ -251,7 +252,6 @@ function Manifesto() {
           </div>
         </div>
 
-        {/* Mobile: simple stacked pillars without horizontal line */}
         <div className="md:hidden mt-12 flex flex-col gap-10">
           {pillars.map((p, i) => (
             <Reveal key={p.kicker} delay={i * 80}>
@@ -290,125 +290,85 @@ function Manifesto() {
 }
 
 // ── Pricing ──────────────────────────────────────────────────────────────
-function PricingSection() {
-  const tiers = [
-    {
-      name: "Coach",
-      price: "Gratuit",
-      sub: "Pour un entraîneur, une équipe.",
-      features: [
-        "1 équipe",
-        "Bibliothèque illimitée",
-        "Planificateur saison",
-        "Export PDF",
-      ],
-      cta: "Créer mon compte",
-      featured: false,
-    },
-    {
-      name: "Club",
-      price: "12 €",
-      priceSuffix: "/ équipe / mois",
-      sub: "Toutes les catégories, une seule méthode.",
-      features: [
-        "Équipes illimitées",
-        "Vision globale du club",
-        "Principes de jeu partagés",
-        "Rôles staff & DTN",
-        "Support prioritaire",
-      ],
-      cta: "Démarrer la saison",
-      featured: true,
-    },
-    {
-      name: "Centre de formation",
-      price: "Sur devis",
-      sub: "Pour les structures pro et académies.",
-      features: [
-        "Tout du plan Club",
-        "SSO & onboarding staff",
-        "Données de match",
-        "Accompagnement méthodologique",
-      ],
-      cta: "Nous contacter",
-      featured: false,
-    },
-  ] as const;
-
+async function PricingSection({ tiers }: { tiers: Tier[] }) {
+  const t = await getTranslations("landing.pricing");
   return (
     <section id="tarifs" className="relative py-20 lg:py-24">
       <div className="mx-auto max-w-7xl px-6 lg:px-10">
         <Reveal>
           <div className="max-w-2xl">
-            <div className="eyebrow-mono">Tarifs</div>
+            <div className="eyebrow-mono">{t("eyebrow")}</div>
             <h2 className="h-display mt-4 text-4xl sm:text-5xl font-semibold">
-              Gratuit pour un coach. Juste pour un club.
+              {t("title")}
             </h2>
           </div>
         </Reveal>
         <div className="mt-12 grid md:grid-cols-3 gap-5">
-          {tiers.map((tier, i) => (
-            <Reveal key={tier.name} delay={i * 80}>
-              <div
-                className={
-                  "h-full rounded-2xl border p-7 flex flex-col gap-5 transition-transform hover:-translate-y-1 " +
-                  (tier.featured ? "border-accent" : "")
-                }
-                style={{
-                  borderColor: tier.featured ? undefined : "var(--line)",
-                  background: tier.featured ? "var(--paper)" : "transparent",
-                }}
-              >
-                <div className="flex items-center justify-between">
-                  <span className="text-[13px] font-medium">{tier.name}</span>
-                  {tier.featured && (
-                    <span className="text-[10px] font-mono uppercase tracking-widest px-2 py-0.5 rounded-full bg-accent-soft text-accent-ink">
-                      recommandé
-                    </span>
-                  )}
-                </div>
-                <div className="flex items-baseline gap-1.5">
-                  <span className="text-4xl font-semibold tracking-tight">
-                    {tier.price}
-                  </span>
-                  {"priceSuffix" in tier && tier.priceSuffix && (
-                    <span
-                      className="text-[12px] font-mono"
-                      style={{ color: "var(--ink-3)" }}
-                    >
-                      {tier.priceSuffix}
-                    </span>
-                  )}
-                </div>
-                <p className="text-[13px]" style={{ color: "var(--ink-3)" }}>
-                  {tier.sub}
-                </p>
-                <ul
-                  className="flex flex-col gap-2 text-[13px]"
-                  style={{ color: "var(--ink-2)" }}
-                >
-                  {tier.features.map((f) => (
-                    <li key={f} className="flex items-center gap-2">
-                      <Check
-                        className="h-3.5 w-3.5"
-                        style={{ color: "var(--accent-ink)" }}
-                      />
-                      {f}
-                    </li>
-                  ))}
-                </ul>
-                <Link
-                  href="/signup"
+          {tiers.map((tier, i) => {
+            const featured = i === 1;
+            return (
+              <Reveal key={tier.name} delay={i * 80}>
+                <div
                   className={
-                    "mt-auto inline-flex justify-center items-center gap-1.5 text-[13px] font-medium px-4 py-2.5 rounded-lg " +
-                    (tier.featured ? "btn-accent" : "btn-ink")
+                    "h-full rounded-2xl border p-7 flex flex-col gap-5 transition-transform hover:-translate-y-1 " +
+                    (featured ? "border-accent" : "")
                   }
+                  style={{
+                    borderColor: featured ? undefined : "var(--line)",
+                    background: featured ? "var(--paper)" : "transparent",
+                  }}
                 >
-                  {tier.cta}
-                </Link>
-              </div>
-            </Reveal>
-          ))}
+                  <div className="flex items-center justify-between">
+                    <span className="text-[13px] font-medium">{tier.name}</span>
+                    {featured && (
+                      <span className="text-[10px] font-mono uppercase tracking-widest px-2 py-0.5 rounded-full bg-accent-soft text-accent-ink">
+                        {t("recommended")}
+                      </span>
+                    )}
+                  </div>
+                  <div className="flex items-baseline gap-1.5">
+                    <span className="text-4xl font-semibold tracking-tight">
+                      {tier.price}
+                    </span>
+                    {tier.priceSuffix && (
+                      <span
+                        className="text-[12px] font-mono"
+                        style={{ color: "var(--ink-3)" }}
+                      >
+                        {tier.priceSuffix}
+                      </span>
+                    )}
+                  </div>
+                  <p className="text-[13px]" style={{ color: "var(--ink-3)" }}>
+                    {tier.sub}
+                  </p>
+                  <ul
+                    className="flex flex-col gap-2 text-[13px]"
+                    style={{ color: "var(--ink-2)" }}
+                  >
+                    {tier.features.map((f) => (
+                      <li key={f} className="flex items-center gap-2">
+                        <Check
+                          className="h-3.5 w-3.5"
+                          style={{ color: "var(--accent-ink)" }}
+                        />
+                        {f}
+                      </li>
+                    ))}
+                  </ul>
+                  <Link
+                    href="/signup"
+                    className={
+                      "mt-auto inline-flex justify-center items-center gap-1.5 text-[13px] font-medium px-4 py-2.5 rounded-lg " +
+                      (featured ? "btn-accent" : "btn-ink")
+                    }
+                  >
+                    {tier.cta}
+                  </Link>
+                </div>
+              </Reveal>
+            );
+          })}
         </div>
       </div>
     </section>
@@ -416,7 +376,8 @@ function PricingSection() {
 }
 
 // ── Final CTA ────────────────────────────────────────────────────────────
-function FinalCTA() {
+async function FinalCTA() {
+  const t = await getTranslations("landing.finalCta");
   return (
     <section id="cta" className="py-20 lg:py-24">
       <div className="mx-auto max-w-7xl px-6 lg:px-10">
@@ -439,21 +400,21 @@ function FinalCTA() {
                   className="eyebrow-mono"
                   style={{ color: "rgba(250,250,247,.55)" }}
                 >
-                  Prêt à structurer ta saison ?
+                  {t("eyebrow")}
                 </div>
                 <h2
                   className="h-display mt-4 text-4xl sm:text-5xl lg:text-6xl font-semibold"
                   style={{ textWrap: "balance" }}
                 >
-                  Donne au club une seule voix.
+                  {t("title1")}
                   <br />
                   <span
                     className="italic"
                     style={{ color: "var(--accent)" }}
                   >
-                    Pose-la
+                    {t("title2Accent")}
                   </span>{" "}
-                  avec Grinta.
+                  {t("title2Suffix")}
                 </h2>
                 <p
                   className="mt-6 max-w-xl text-[15px] leading-relaxed"
@@ -462,9 +423,7 @@ function FinalCTA() {
                     textWrap: "pretty",
                   }}
                 >
-                  Création de compte en 30 secondes. Pas de carte bancaire. Tu
-                  peux importer la saison en cours et reprendre là où tu
-                  t&apos;es arrêté.
+                  {t("body")}
                 </p>
               </div>
               <div className="lg:col-span-4 flex flex-col gap-3 lg:items-end">
@@ -472,7 +431,7 @@ function FinalCTA() {
                   href="/signup"
                   className="w-full lg:w-auto inline-flex justify-center items-center gap-2 text-[14px] font-medium px-6 py-3.5 rounded-lg btn-accent"
                 >
-                  Créer mon compte
+                  {t("cta")}
                   <ArrowRight className="h-4 w-4" />
                 </Link>
                 <a
@@ -480,7 +439,7 @@ function FinalCTA() {
                   className="text-[13px] font-medium"
                   style={{ color: "rgba(250,250,247,.7)" }}
                 >
-                  Comment ça marche →
+                  {t("ctaSecondary")}
                 </a>
               </div>
             </div>
@@ -492,25 +451,8 @@ function FinalCTA() {
 }
 
 // ── Footer ───────────────────────────────────────────────────────────────
-function FooterBar() {
-  const cols = [
-    {
-      title: "Produit",
-      links: ["Planificateur", "Bibliothèque", "Préparation", "Vision club", "Tarifs"],
-    },
-    {
-      title: "Méthode",
-      links: ["Principes de jeu", "Microcycles", "Mésocycles", "Pédagogie"],
-    },
-    {
-      title: "Ressources",
-      links: ["Blog", "Templates", "Centre d'aide", "API"],
-    },
-    {
-      title: "Société",
-      links: ["À propos", "Carrières", "Contact", "Mentions légales"],
-    },
-  ];
+async function FooterBar({ cols }: { cols: FooterCol[] }) {
+  const t = await getTranslations("landing.footer");
   return (
     <footer
       className="pt-16 pb-10"
@@ -527,15 +469,13 @@ function FooterBar() {
               className="mt-4 text-[13px] leading-relaxed max-w-xs"
               style={{ color: "var(--ink-3)", textWrap: "pretty" }}
             >
-              L&apos;outil des entraîneurs et des clubs de football pour
-              planifier la saison, construire les microcycles et préparer les
-              entraînements.
+              {t("tagline")}
             </p>
             <div
               className="mt-6 text-[11px] font-mono"
               style={{ color: "var(--ink-3)" }}
             >
-              © 2026 Grinta · Made avec grinta.
+              {t("copyright")}
             </div>
           </div>
           <div className="lg:col-span-8 grid grid-cols-2 sm:grid-cols-4 gap-8">
