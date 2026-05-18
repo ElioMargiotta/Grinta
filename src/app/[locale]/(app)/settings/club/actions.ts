@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 import { resolveCurrentMembership } from "@/lib/club/context";
+import { getSiteUrl } from "@/lib/site-url";
 import { canManageClub } from "@/lib/club/types";
 import type { AccessLevel, ClubThemeMode } from "@/lib/club/types";
 
@@ -113,10 +114,7 @@ export async function inviteMemberAction(formData: FormData): Promise<InviteResu
     return { error: error?.message ?? "Échec de la création de l'invitation." };
   }
 
-  const origin = process.env.NEXT_PUBLIC_SITE_URL ?? "";
-  const url = origin
-    ? `${origin}/invite/${token as string}`
-    : `/invite/${token as string}`;
+  const url = `${getSiteUrl()}/invite/${token as string}`;
 
   revalidatePath("/settings/club");
   return { ok: true, token: token as string, url };

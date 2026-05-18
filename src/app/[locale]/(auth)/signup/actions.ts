@@ -2,6 +2,7 @@
 
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
+import { getSiteUrl } from "@/lib/site-url";
 
 export async function signupAction(formData: FormData) {
   const email = String(formData.get("email") ?? "");
@@ -15,6 +16,7 @@ export async function signupAction(formData: FormData) {
     password,
     options: {
       data: { full_name: fullName },
+      emailRedirectTo: `${getSiteUrl()}/${locale}/dashboard`,
     },
   });
 
