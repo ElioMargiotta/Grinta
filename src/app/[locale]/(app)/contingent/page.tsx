@@ -5,6 +5,7 @@ import {
   type ContingentPlayer,
 } from "@/components/contingent/ContingentList";
 import { ClubPlayerForm } from "@/components/contingent/ClubPlayerForm";
+import { ImportClubCornerWizard } from "@/components/contingent/ImportClubCornerWizard";
 import { requireMembership } from "@/lib/auth/getUser";
 
 type AssignmentRow = {
@@ -67,12 +68,23 @@ export default async function ContingentPage({
         </p>
       </div>
 
-      <Card>
-        <h2 className="mb-4 text-base font-semibold text-zinc-900 dark:text-zinc-100">
-          {t("addTitle")}
-        </h2>
-        <ClubPlayerForm />
-      </Card>
+      <div className="grid gap-4 lg:grid-cols-2">
+        <Card>
+          <h2 className="mb-1 text-base font-semibold text-zinc-900 dark:text-zinc-100">
+            {t("importTitle")}
+          </h2>
+          <p className="mb-4 text-xs text-zinc-500 dark:text-zinc-400">
+            {t("importSubtitle")}
+          </p>
+          <ImportClubCornerWizard />
+        </Card>
+        <Card>
+          <h2 className="mb-4 text-base font-semibold text-zinc-900 dark:text-zinc-100">
+            {t("addTitle")}
+          </h2>
+          <ClubPlayerForm />
+        </Card>
+      </div>
 
       <ContingentList players={players} />
     </div>

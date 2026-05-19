@@ -23,7 +23,11 @@ export default async function ContingentPlayerPage({
   const { data: player } = await supabase
     .from("players")
     .select(
-      "id, first_name, last_name, birth_date, position, jersey_number, notes",
+      `id, first_name, last_name, birth_date, position, jersey_number, notes,
+       strong_foot, license_number, js_number, email, phone, nationality,
+       address, postal_code, city, canton,
+       guardian_name, guardian_email, guardian_phone,
+       guardian2_name, guardian2_email, guardian2_phone`,
     )
     .eq("id", playerId)
     .single<EditablePlayer>();
