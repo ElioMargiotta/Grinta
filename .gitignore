@@ -17,6 +17,9 @@
 /.next/
 /out/
 
+# trailer recordings (large binary artifacts)
+/scripts/trailer/out/
+
 # production
 /build
 
