@@ -4,6 +4,7 @@ import { useMemo, useState, useTransition } from "react";
 import { useTranslations, useLocale } from "next-intl";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
+import { useLoading } from "@/components/ui/LoadingProvider";
 import { createMacrocycleAction } from "@/app/[locale]/(app)/planner/[teamId]/periodization/actions";
 
 type MesocycleDraft = {
@@ -52,6 +53,8 @@ export function PlannerSetupWizard({
   ]);
   const [error, setError] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
+  const tCommon = useTranslations("common");
+  const { run } = useLoading();
 
   const totalWeeks = useMemo(() => {
     const a = mondayOfISO(preseasonStart);
@@ -125,7 +128,10 @@ export function PlannerSetupWizard({
     );
 
     startTransition(async () => {
-      const r = await createMacrocycleAction(fd);
+      const r = await run(() => createMacrocycleAction(fd), {
+        label: t("creating"),
+        message: tCommon("pleaseWait"),
+      });
       if (r?.error) setError(r.error);
     });
   };
@@ -269,8 +275,8 @@ export function PlannerSetupWizard({
       ) : null}
 
       <div className="mt-6 flex justify-end">
-        <Button onClick={submit} disabled={isPending}>
-          {isPending ? t("creating") : t("create")}
+        <Button onClick={submit} loading={isPending} loadingLabel={t("creating")}>
+          {t("create")}
         </Button>
       </div>
     </div>

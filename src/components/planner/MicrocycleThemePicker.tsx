@@ -208,8 +208,14 @@ export function MicrocycleThemePicker({
         >
           {t("clear")}
         </Button>
-        <Button type="button" size="sm" onClick={() => submit()} disabled={isPending}>
-          {isPending ? t("saving") : t("save")}
+        <Button
+          type="button"
+          size="sm"
+          onClick={() => submit()}
+          loading={isPending}
+          loadingLabel={t("saving")}
+        >
+          {t("save")}
         </Button>
       </div>
     </div>

@@ -1,8 +1,10 @@
 "use client";
 
 import { useState, useTransition } from "react";
+import { useTranslations } from "next-intl";
 import { Check, ChevronDown, Building2 } from "lucide-react";
 import { switchClubAction } from "@/app/[locale]/(app)/club-actions";
+import { useLoading } from "@/components/ui/LoadingProvider";
 import type { ClubMembership } from "@/lib/club/types";
 
 function ClubMark({ membership }: { membership: ClubMembership }) {
@@ -29,6 +31,8 @@ export function ClubSwitcher({
 }) {
   const [open, setOpen] = useState(false);
   const [isPending, startTransition] = useTransition();
+  const { run } = useLoading();
+  const tCommon = useTranslations("common");
 
   const handleSelect = (clubId: string) => {
     if (clubId === current.club_id) {
@@ -38,7 +42,10 @@ export function ClubSwitcher({
     const fd = new FormData();
     fd.set("clubId", clubId);
     startTransition(async () => {
-      await switchClubAction(fd);
+      await run(() => switchClubAction(fd), {
+        label: tCommon("loading"),
+        message: tCommon("pleaseWait"),
+      });
       setOpen(false);
     });
   };

@@ -547,6 +547,10 @@
     "cancel": "Abbrechen",
     "save": "Speichern",
     "loading": "Wird geladen…",
+    "pleaseWait": "Bitte einen Moment Geduld…",
+    "saving": "Wird gespeichert…",
+    "deleting": "Wird gelöscht…",
+    "preparing": "Wird vorbereitet…",
     "unknownError": "Unbekannter Fehler"
   },
   "sheet": {

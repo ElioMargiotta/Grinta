@@ -35,6 +35,7 @@ import {
 } from "react";
 import { cancelSessionAction } from "@/app/[locale]/(app)/planner/actions";
 import { savePreparationAction } from "@/app/[locale]/(app)/planner/[teamId]/sessions/[sessionId]/preparation/actions";
+import { useLoading } from "@/components/ui/LoadingProvider";
 import { exampleSheet } from "./example";
 import {
   ExerciseLibraryPicker,
@@ -2416,6 +2417,8 @@ export function PreparationSheet({
   const locale = useLocale();
   const router = useRouter();
   const t = useTranslations("sheet.preparation");
+  const tCommon = useTranslations("common");
+  const { run } = useLoading();
   const messages = useMessages() as {
     sheet: { preparation: { steps: PreparationStep[] } };
   };
@@ -2446,11 +2449,15 @@ export function PreparationSheet({
     if (!confirm(t("cancelConfirm"))) return;
     setError(null);
     startTransition(async () => {
-      const result = await cancelSessionAction({
-        teamId,
-        sessionId,
-        locale,
-      });
+      const result = await run(
+        () =>
+          cancelSessionAction({
+            teamId,
+            sessionId,
+            locale,
+          }),
+        { label: t("cancellingSession"), message: tCommon("pleaseWait") },
+      );
       if (result?.error) setError(result.error);
     });
   }
@@ -2459,17 +2466,21 @@ export function PreparationSheet({
     setError(null);
     const durationMinutes = meta.durationMinutes ?? 90;
     startTransition(async () => {
-      const result = await savePreparationAction({
-        teamId,
-        sessionId,
-        locale,
-        data,
-        sessionMeta: {
-          title: meta.title.trim().slice(0, SESSION_TITLE_MAX),
-          startTime: meta.startTime || null,
-          durationMinutes,
-        },
-      });
+      const result = await run(
+        () =>
+          savePreparationAction({
+            teamId,
+            sessionId,
+            locale,
+            data,
+            sessionMeta: {
+              title: meta.title.trim().slice(0, SESSION_TITLE_MAX),
+              startTime: meta.startTime || null,
+              durationMinutes,
+            },
+          }),
+        { label: t("saving"), message: tCommon("pleaseWait") },
+      );
       if (result?.error) setError(result.error);
       else {
         setDirty(false);

@@ -62,8 +62,13 @@ export function LoginForm() {
         </div>
       )}
 
-      <Button type="submit" disabled={isPending} className="w-full">
-        {isPending ? t("submittingLogin") : t("submitLogin")}
+      <Button
+        type="submit"
+        loading={isPending}
+        loadingLabel={t("submittingLogin")}
+        className="w-full"
+      >
+        {t("submitLogin")}
       </Button>
     </form>
   );

@@ -4,6 +4,7 @@ import { NextIntlClientProvider, hasLocale } from "next-intl";
 import { getMessages, setRequestLocale } from "next-intl/server";
 import { notFound } from "next/navigation";
 import { routing } from "@/i18n/routing";
+import { LoadingProvider } from "@/components/ui/LoadingProvider";
 import "../globals.css";
 
 const geistSans = Geist({ variable: "--font-geist-sans", subsets: ["latin"] });
@@ -30,6 +31,8 @@ export default async function LocaleLayout({
 
   setRequestLocale(locale);
   const messages = await getMessages();
+  const loadingLabel =
+    (messages as { common?: { loading?: string } })?.common?.loading ?? "Loading";
 
   return (
     <html
@@ -38,7 +41,9 @@ export default async function LocaleLayout({
     >
       <body className="min-h-full flex flex-col font-sans">
         <NextIntlClientProvider locale={locale} messages={messages}>
-          {children}
+          <LoadingProvider defaultLabel={loadingLabel}>
+            {children}
+          </LoadingProvider>
         </NextIntlClientProvider>
       </body>
     </html>

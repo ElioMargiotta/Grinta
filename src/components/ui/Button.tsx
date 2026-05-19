@@ -1,4 +1,5 @@
 import { forwardRef, type ButtonHTMLAttributes } from "react";
+import { Spinner } from "@/components/ui/Spinner";
 
 type Variant = "primary" | "secondary" | "ghost" | "danger";
 type Size = "sm" | "md";
@@ -6,6 +7,8 @@ type Size = "sm" | "md";
 export interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   variant?: Variant;
   size?: Size;
+  loading?: boolean;
+  loadingLabel?: string;
 }
 
 const base =
@@ -28,12 +31,38 @@ const sizes: Record<Size, string> = {
 };
 
 export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
-  ({ className = "", variant = "primary", size = "md", ...props }, ref) => (
-    <button
-      ref={ref}
-      className={`${base} ${variants[variant]} ${sizes[size]} ${className}`}
-      {...props}
-    />
-  ),
+  (
+    {
+      className = "",
+      variant = "primary",
+      size = "md",
+      loading = false,
+      loadingLabel,
+      disabled,
+      children,
+      ...props
+    },
+    ref,
+  ) => {
+    const isDisabled = disabled || loading;
+    return (
+      <button
+        ref={ref}
+        aria-busy={loading || undefined}
+        disabled={isDisabled}
+        className={`${base} ${variants[variant]} ${sizes[size]} ${className} relative`}
+        {...props}
+      >
+        {loading ? (
+          <>
+            <Spinner size={size === "sm" ? "xs" : "sm"} tone="current" />
+            <span>{loadingLabel ?? children}</span>
+          </>
+        ) : (
+          children
+        )}
+      </button>
+    );
+  },
 );
 Button.displayName = "Button";

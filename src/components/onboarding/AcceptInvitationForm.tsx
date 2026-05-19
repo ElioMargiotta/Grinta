@@ -29,8 +29,13 @@ export function AcceptInvitationForm({ token }: { token: string }) {
           {error}
         </div>
       )}
-      <Button type="submit" disabled={isPending} className="w-full">
-        {isPending ? t("accepting") : t("accept")}
+      <Button
+        type="submit"
+        loading={isPending}
+        loadingLabel={t("accepting")}
+        className="w-full"
+      >
+        {t("accept")}
       </Button>
     </form>
   );

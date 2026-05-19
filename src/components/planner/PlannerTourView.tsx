@@ -519,8 +519,14 @@ function AddCycleRow({
         className="w-24"
       />
       <div className="flex items-center gap-2">
-        <Button type="button" size="sm" onClick={submit} disabled={isPending}>
-          {isPending ? tTour("adding") : tTour("addCycleSubmit")}
+        <Button
+          type="button"
+          size="sm"
+          onClick={submit}
+          loading={isPending}
+          loadingLabel={tTour("adding")}
+        >
+          {tTour("addCycleSubmit")}
         </Button>
         <Button
           type="button"

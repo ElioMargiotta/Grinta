@@ -4,6 +4,7 @@ import { useState, useTransition } from "react";
 import { useLocale, useTranslations } from "next-intl";
 import { RotateCcw, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/Button";
+import { useLoading } from "@/components/ui/LoadingProvider";
 import {
   restoreTeamAction,
   permanentlyDeleteTeamAction,
@@ -25,6 +26,7 @@ export function ArchivedTeamCard({ team }: { team: ArchivedTeam }) {
   const [typed, setTyped] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
+  const { run } = useLoading();
 
   const canPurge = typed.trim() === team.name.trim();
   const archivedDate = new Date(team.archived_at).toLocaleDateString(locale);
@@ -36,7 +38,10 @@ export function ArchivedTeamCard({ team }: { team: ArchivedTeam }) {
     fd.set("locale", locale);
     startTransition(async () => {
       try {
-        await restoreTeamAction(fd);
+        await run(() => restoreTeamAction(fd), {
+          label: t("restore"),
+          message: tc("pleaseWait"),
+        });
       } catch (e) {
         const msg = e instanceof Error ? e.message : tc("unknownError");
         if (!msg.includes("NEXT_REDIRECT")) setError(msg);
@@ -52,7 +57,10 @@ export function ArchivedTeamCard({ team }: { team: ArchivedTeam }) {
     fd.set("locale", locale);
     startTransition(async () => {
       try {
-        await permanentlyDeleteTeamAction(fd);
+        await run(() => permanentlyDeleteTeamAction(fd), {
+          label: t("purging"),
+          message: tc("pleaseWait"),
+        });
       } catch (e) {
         const msg = e instanceof Error ? e.message : tc("unknownError");
         if (!msg.includes("NEXT_REDIRECT")) setError(msg);
@@ -79,7 +87,7 @@ export function ArchivedTeamCard({ team }: { team: ArchivedTeam }) {
             variant="secondary"
             size="sm"
             onClick={restore}
-            disabled={isPending}
+            loading={isPending}
           >
             <RotateCcw className="h-4 w-4" />
             {t("restore")}
@@ -128,9 +136,11 @@ export function ArchivedTeamCard({ team }: { team: ArchivedTeam }) {
               variant="danger"
               size="sm"
               onClick={purge}
-              disabled={!canPurge || isPending}
+              disabled={!canPurge}
+              loading={isPending}
+              loadingLabel={t("purging")}
             >
-              {isPending ? t("purging") : t("deletePermanently")}
+              {t("deletePermanently")}
             </Button>
             <Button
               variant="ghost"

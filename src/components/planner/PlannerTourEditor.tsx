@@ -175,8 +175,14 @@ export function PlannerTourEditor({
         <Button type="button" variant="secondary" size="sm" onClick={onClose}>
           {tEdit("cancel")}
         </Button>
-        <Button type="button" size="sm" onClick={submit} disabled={isPending}>
-          {isPending ? tEdit("saving") : tEdit("save")}
+        <Button
+          type="button"
+          size="sm"
+          onClick={submit}
+          loading={isPending}
+          loadingLabel={tEdit("saving")}
+        >
+          {tEdit("save")}
         </Button>
       </div>
     </div>

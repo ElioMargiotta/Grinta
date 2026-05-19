@@ -91,7 +91,7 @@ export function SessionForm({
         defaultValue={initial?.notes ?? ""}
       />
       {error && <p className="text-sm text-red-600">{error}</p>}
-      <Button type="submit" disabled={isPending}>
+      <Button type="submit" loading={isPending}>
         {t("submit")}
       </Button>
     </form>

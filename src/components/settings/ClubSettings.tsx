@@ -200,7 +200,7 @@ export function ClubSettings({ data }: { data: Data }) {
                 </label>
               ))}
             </fieldset>
-            <Button type="submit" disabled={isPending}>
+            <Button type="submit" loading={isPending}>
               {t("identity.saveIdentity")}
             </Button>
           </div>
@@ -295,8 +295,13 @@ export function ClubSettings({ data }: { data: Data }) {
             </div>
           )}
 
-          <Button type="submit" disabled={isPending} className="self-start">
-            {isPending ? t("invite.sending") : t("invite.send")}
+          <Button
+            type="submit"
+            loading={isPending}
+            loadingLabel={t("invite.sending")}
+            className="self-start"
+          >
+            {t("invite.send")}
           </Button>
         </form>
       </section>
@@ -429,7 +434,7 @@ export function ClubSettings({ data }: { data: Data }) {
               </option>
             </select>
           </label>
-          <Button type="submit" disabled={isPending}>
+          <Button type="submit" loading={isPending}>
             {t("roles.addRole")}
           </Button>
         </form>

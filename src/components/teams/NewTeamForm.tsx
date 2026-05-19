@@ -35,7 +35,7 @@ export function NewTeamForm() {
       <Input id="season" name="season" label={t("season")} placeholder={t("seasonPlaceholder")} />
       <Input id="ageGroup" name="ageGroup" label={t("ageGroup")} placeholder={t("ageGroupPlaceholder")} />
       {error && <p className="text-sm text-red-600">{error}</p>}
-      <Button type="submit" disabled={isPending}>
+      <Button type="submit" loading={isPending}>
         {t("submit")}
       </Button>
     </form>

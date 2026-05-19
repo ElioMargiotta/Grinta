@@ -95,8 +95,13 @@ export function SignupForm() {
         </div>
       )}
 
-      <Button type="submit" disabled={isPending} className="w-full">
-        {isPending ? t("submittingSignup") : t("submitSignup")}
+      <Button
+        type="submit"
+        loading={isPending}
+        loadingLabel={t("submittingSignup")}
+        className="w-full"
+      >
+        {t("submitSignup")}
       </Button>
     </form>
   );

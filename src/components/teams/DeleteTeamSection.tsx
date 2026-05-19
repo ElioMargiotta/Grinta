@@ -4,6 +4,7 @@ import { useState, useTransition } from "react";
 import { useTranslations, useLocale } from "next-intl";
 import { AlertTriangle, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/Button";
+import { useLoading } from "@/components/ui/LoadingProvider";
 import { archiveTeamAction } from "@/app/[locale]/(app)/teams/actions";
 
 export function DeleteTeamSection({
@@ -20,6 +21,7 @@ export function DeleteTeamSection({
   const [typed, setTyped] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
+  const { run } = useLoading();
 
   const canConfirm = typed.trim() === teamName.trim();
 
@@ -31,7 +33,10 @@ export function DeleteTeamSection({
     fd.set("locale", locale);
     startTransition(async () => {
       try {
-        await archiveTeamAction(fd);
+        await run(() => archiveTeamAction(fd), {
+          label: t("deleting"),
+          message: tc("pleaseWait"),
+        });
       } catch (e) {
         const msg = e instanceof Error ? e.message : tc("unknownError");
         if (!msg.includes("NEXT_REDIRECT")) setError(msg);
@@ -86,9 +91,11 @@ export function DeleteTeamSection({
                   variant="danger"
                   size="sm"
                   onClick={handleDelete}
-                  disabled={!canConfirm || isPending}
+                  disabled={!canConfirm}
+                  loading={isPending}
+                  loadingLabel={t("deleting")}
                 >
-                  {isPending ? t("deleting") : t("confirmButton")}
+                  {t("confirmButton")}
                 </Button>
                 <Button
                   variant="ghost"

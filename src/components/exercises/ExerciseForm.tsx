@@ -102,7 +102,7 @@ export function ExerciseForm({ initial }: { initial?: Initial }) {
         />
       </div>
       {error && <p className="text-sm text-red-600">{error}</p>}
-      <Button type="submit" disabled={isPending}>
+      <Button type="submit" loading={isPending}>
         {t("form.submit")}
       </Button>
     </form>
