@@ -1,0 +1,13 @@
+import { getTranslations } from "next-intl/server";
+import { LoadingOverlay } from "@/components/ui/LoadingOverlay";
+
+export default async function AppRouteLoading() {
+  const t = await getTranslations("common");
+  return (
+    <LoadingOverlay
+      fullscreen
+      label={t("loading")}
+      message={t("pleaseWait")}
+    />
+  );
+}
