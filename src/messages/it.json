@@ -90,6 +90,38 @@
         }
       ]
     },
+    "playerFlow": {
+      "eyebrow": "Visione giocatore",
+      "titlePrefix": "Dalla rosa al",
+      "titleAccent": "monitoraggio individuale",
+      "titleSuffix": ".",
+      "steps": [
+        {
+          "kicker": "01",
+          "badge": "Presenze",
+          "title": "Presenze e disponibilità",
+          "body": "Monitora presenze, assenze e disponibilità per mantenere una visione chiara di ogni rosa."
+        },
+        {
+          "kicker": "02",
+          "badge": "TIPS",
+          "title": "Monitoraggio TIPS",
+          "body": "Centralizza osservazioni tecniche, intelligenti, personali e sociali per accompagnare ogni giocatore nel tempo."
+        },
+        {
+          "kicker": "03",
+          "badge": "Rosa",
+          "title": "Gestione della rosa",
+          "body": "Mantieni schede giocatore pulite, assegna i giocatori alle squadre e ritrova rapidamente le informazioni importanti."
+        },
+        {
+          "kicker": "04",
+          "badge": "BDNS",
+          "title": "Export BDNS",
+          "body": "Prepara i dati necessari per l'amministrazione e risparmia tempo sugli export ricorrenti."
+        }
+      ]
+    },
     "pricing": {
       "eyebrow": "Prezzi",
       "title": "Gratis per un allenatore. Equo per un club.",

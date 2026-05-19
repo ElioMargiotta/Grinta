@@ -90,6 +90,38 @@
         }
       ]
     },
+    "playerFlow": {
+      "eyebrow": "Player view",
+      "titlePrefix": "From roster to",
+      "titleAccent": "individual follow-up",
+      "titleSuffix": ".",
+      "steps": [
+        {
+          "kicker": "01",
+          "badge": "Attendance",
+          "title": "Attendance and availability",
+          "body": "Track attendance, absences and availability to keep a clear view of every squad."
+        },
+        {
+          "kicker": "02",
+          "badge": "TIPS",
+          "title": "TIPS follow-up",
+          "body": "Centralize technical, intelligent, personal and social observations to support each player over time."
+        },
+        {
+          "kicker": "03",
+          "badge": "Roster",
+          "title": "Roster management",
+          "body": "Keep clean player records, assign players to teams and quickly find important information."
+        },
+        {
+          "kicker": "04",
+          "badge": "BDNS",
+          "title": "BDNS export",
+          "body": "Prepare the data needed for administration and save time on recurring exports."
+        }
+      ]
+    },
     "pricing": {
       "eyebrow": "Pricing",
       "title": "Free for a coach. Fair for a club.",

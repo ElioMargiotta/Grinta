@@ -10,7 +10,10 @@ import {
   GrintaLogoType,
   GrintaLogoTagline,
 } from "@/components/landing/BrandSeal";
-import { FlowSection } from "@/components/landing/FlowSection";
+import {
+  FlowSection,
+  PlayerFlowSection,
+} from "@/components/landing/FlowSection";
 import { ManifestoLine } from "@/components/landing/ManifestoLine";
 
 type Pillar = { kicker: string; title: string; body: string };
@@ -61,6 +64,7 @@ export default async function LocaleHome({
         <Hero />
         <Manifesto pillars={messages.landing.manifesto.pillars} />
         <FlowSection />
+        <PlayerFlowSection />
         <PricingSection tiers={messages.landing.pricing.tiers} />
         <FinalCTA />
       </main>

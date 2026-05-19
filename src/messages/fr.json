@@ -90,6 +90,38 @@
         }
       ]
     },
+    "playerFlow": {
+      "eyebrow": "Vision joueur",
+      "titlePrefix": "Du contingent au suivi",
+      "titleAccent": "individuel",
+      "titleSuffix": ".",
+      "steps": [
+        {
+          "kicker": "01",
+          "badge": "Présence",
+          "title": "Présences et disponibilité",
+          "body": "Suis les présences, absences et disponibilités des joueurs pour garder une vision claire de chaque effectif."
+        },
+        {
+          "kicker": "02",
+          "badge": "TIPS",
+          "title": "Suivi TIPS",
+          "body": "Centralise les observations techniques, intelligentes, personnelles et sociales pour accompagner chaque joueur dans la durée."
+        },
+        {
+          "kicker": "03",
+          "badge": "Contingent",
+          "title": "Gestion du contingent",
+          "body": "Garde une base joueurs propre, rattache les joueurs aux équipes et retrouve rapidement les informations importantes."
+        },
+        {
+          "kicker": "04",
+          "badge": "BDNS",
+          "title": "Export BDNS",
+          "body": "Prépare les données nécessaires aux démarches administratives et gagne du temps sur les exports récurrents."
+        }
+      ]
+    },
     "pricing": {
       "eyebrow": "Tarifs",
       "title": "Gratuit pour un coach. Juste pour un club.",

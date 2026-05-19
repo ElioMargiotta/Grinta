@@ -90,6 +90,38 @@
         }
       ]
     },
+    "playerFlow": {
+      "eyebrow": "Spielerblick",
+      "titlePrefix": "Vom Kader zur",
+      "titleAccent": "individuellen Begleitung",
+      "titleSuffix": ".",
+      "steps": [
+        {
+          "kicker": "01",
+          "badge": "Präsenz",
+          "title": "Präsenzen und Verfügbarkeit",
+          "body": "Verfolge Präsenzen, Absenzen und Verfügbarkeiten, damit jeder Kader klar überschaubar bleibt."
+        },
+        {
+          "kicker": "02",
+          "badge": "TIPS",
+          "title": "TIPS-Begleitung",
+          "body": "Bündle technische, intelligente, persönliche und soziale Beobachtungen, um jeden Spieler langfristig zu begleiten."
+        },
+        {
+          "kicker": "03",
+          "badge": "Kader",
+          "title": "Kadermanagement",
+          "body": "Halte saubere Spielerprofile, ordne Spieler Teams zu und finde wichtige Informationen schnell wieder."
+        },
+        {
+          "kicker": "04",
+          "badge": "BDNS",
+          "title": "BDNS-Export",
+          "body": "Bereite administrative Daten vor und spare Zeit bei wiederkehrenden Exporten."
+        }
+      ]
+    },
     "pricing": {
       "eyebrow": "Preise",
       "title": "Gratis für einen Trainer. Fair für einen Verein.",
