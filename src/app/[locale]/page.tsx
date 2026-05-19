@@ -16,6 +16,8 @@ import { ManifestoLine } from "@/components/landing/ManifestoLine";
 type Pillar = { kicker: string; title: string; body: string };
 type Tier = {
   name: string;
+  originalPrice?: string;
+  discountLabel?: string;
   price: string;
   priceSuffix: string;
   sub: string;
@@ -303,7 +305,7 @@ async function PricingSection({ tiers }: { tiers: Tier[] }) {
             </h2>
           </div>
         </Reveal>
-        <div className="mt-12 grid md:grid-cols-3 gap-5">
+        <div className="mx-auto mt-12 grid max-w-4xl gap-5 md:grid-cols-2">
           {tiers.map((tier, i) => {
             const featured = i === 1;
             return (
@@ -326,18 +328,37 @@ async function PricingSection({ tiers }: { tiers: Tier[] }) {
                       </span>
                     )}
                   </div>
-                  <div className="flex items-baseline gap-1.5">
-                    <span className="text-4xl font-semibold tracking-tight">
-                      {tier.price}
-                    </span>
-                    {tier.priceSuffix && (
-                      <span
-                        className="text-[12px] font-mono"
-                        style={{ color: "var(--ink-3)" }}
-                      >
-                        {tier.priceSuffix}
-                      </span>
+                  <div className="space-y-1.5">
+                    {(tier.originalPrice || tier.discountLabel) && (
+                      <div className="flex flex-wrap items-center gap-2">
+                        {tier.originalPrice && (
+                          <span
+                            className="text-sm font-medium line-through"
+                            style={{ color: "var(--ink-3)" }}
+                          >
+                            {tier.originalPrice}
+                          </span>
+                        )}
+                        {tier.discountLabel && (
+                          <span className="text-[10px] font-mono uppercase tracking-widest px-2 py-0.5 rounded-full bg-accent-soft text-accent-ink">
+                            {tier.discountLabel}
+                          </span>
+                        )}
+                      </div>
                     )}
+                    <div className="flex items-baseline gap-1.5">
+                      <span className="text-4xl font-semibold tracking-tight">
+                        {tier.price}
+                      </span>
+                      {tier.priceSuffix && (
+                        <span
+                          className="text-[12px] font-mono"
+                          style={{ color: "var(--ink-3)" }}
+                        >
+                          {tier.priceSuffix}
+                        </span>
+                      )}
+                    </div>
                   </div>
                   <p className="text-[13px]" style={{ color: "var(--ink-3)" }}>
                     {tier.sub}

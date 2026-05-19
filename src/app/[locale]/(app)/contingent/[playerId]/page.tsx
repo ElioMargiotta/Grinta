@@ -9,6 +9,8 @@ import {
   type EditablePlayer,
 } from "@/components/contingent/ClubPlayerForm";
 import { DeletePlayerSection } from "@/components/contingent/DeletePlayerSection";
+import { TeamAssignmentsBlock } from "@/components/contingent/TeamAssignmentsBlock";
+import { listClubTeams } from "@/lib/contingent/teams";
 
 export default async function ContingentPlayerPage({
   params,
@@ -17,7 +19,7 @@ export default async function ContingentPlayerPage({
 }) {
   const { locale, playerId } = await params;
   setRequestLocale(locale);
-  const { supabase } = await requireMembership(locale);
+  const { supabase, membership } = await requireMembership(locale);
   const t = await getTranslations("contingent");
 
   const { data: player } = await supabase
@@ -33,6 +35,18 @@ export default async function ContingentPlayerPage({
     .single<EditablePlayer>();
 
   if (!player) notFound();
+
+  // Affectations actuelles (saison NULL = "courante"), pour pré-cocher le
+  // picker du bloc dédié (#39).
+  const [{ data: assignments }, teams] = await Promise.all([
+    supabase
+      .from("player_team_assignments")
+      .select("team_id")
+      .eq("player_id", playerId)
+      .is("season", null),
+    listClubTeams(membership.club_id),
+  ]);
+  const currentTeamIds = (assignments ?? []).map((a) => a.team_id as string);
 
   const fullName = `${player.first_name} ${player.last_name}`;
 
@@ -57,6 +71,12 @@ export default async function ContingentPlayerPage({
         </h2>
         <ClubPlayerForm player={player} />
       </Card>
+
+      <TeamAssignmentsBlock
+        playerId={player.id}
+        teams={teams}
+        currentTeamIds={currentTeamIds}
+      />
 
       <DeletePlayerSection playerId={player.id} playerName={fullName} />
     </div>

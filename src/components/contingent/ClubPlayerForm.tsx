@@ -7,10 +7,12 @@ import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 import { Select } from "@/components/ui/Select";
 import { Textarea } from "@/components/ui/Textarea";
+import { TeamMultiSelect } from "@/components/contingent/TeamMultiSelect";
 import {
   createClubPlayerAction,
   updateClubPlayerAction,
 } from "@/app/[locale]/(app)/contingent/actions";
+import type { ClubTeamOption } from "@/lib/contingent/teams";
 
 export type EditablePlayer = {
   id: string;
@@ -41,10 +43,16 @@ export type EditablePlayer = {
 export function ClubPlayerForm({
   player,
   redirectOnCreate,
+  teams = [],
+  preselectedTeamIds = [],
 }: {
   player?: EditablePlayer;
   /** Where to navigate after a successful create. Reset-in-place if absent. */
   redirectOnCreate?: string;
+  /** Équipes disponibles du club, pour le picker affiché à la création (#39). */
+  teams?: ClubTeamOption[];
+  /** Équipes pré-cochées (route /contingent/new?teamId=...). */
+  preselectedTeamIds?: string[];
 }) {
   const t = useTranslations("contingent.form");
   const locale = useLocale();
@@ -129,6 +137,20 @@ export function ClubPlayerForm({
           defaultValue={player?.notes ?? ""}
         />
       </div>
+
+      {/* Picker équipes : uniquement à la création (#39). En édition, les
+          affectations sont gérées par <TeamAssignmentsBlock /> pour éviter
+          un double picker sur la fiche joueur. */}
+      {!isEdit && teams.length > 0 && (
+        <div className="sm:col-span-2">
+          <TeamMultiSelect
+            teams={teams}
+            name="teamIds"
+            defaultValue={preselectedTeamIds}
+            label={t("teamsLabel")}
+          />
+        </div>
+      )}
 
       <details
         className="sm:col-span-2 rounded-lg border border-zinc-200 px-3 py-2 dark:border-zinc-800"

@@ -110,8 +110,10 @@
         },
         {
           "name": "Club",
-          "price": "€12",
-          "priceSuffix": "/ team / month",
+          "originalPrice": "25 CHF",
+          "discountLabel": "Early bakers discount",
+          "price": "12 CHF",
+          "priceSuffix": "/ month",
           "sub": "Every category, one method.",
           "features": [
             "Unlimited teams",
@@ -121,19 +123,6 @@
             "Priority support"
           ],
           "cta": "Start the season"
-        },
-        {
-          "name": "Academy",
-          "price": "On request",
-          "priceSuffix": "",
-          "sub": "For pro structures and academies.",
-          "features": [
-            "Everything in Club",
-            "SSO & staff onboarding",
-            "Match data",
-            "Methodology support"
-          ],
-          "cta": "Contact us"
         }
       ]
     },

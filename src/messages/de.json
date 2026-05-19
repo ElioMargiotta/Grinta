@@ -110,8 +110,10 @@
         },
         {
           "name": "Verein",
-          "price": "12 €",
-          "priceSuffix": "/ Mannschaft / Monat",
+          "originalPrice": "25 CHF",
+          "discountLabel": "Early-Bakers-Rabatt",
+          "price": "12 CHF",
+          "priceSuffix": "/ Monat",
           "sub": "Alle Kategorien, eine Methode.",
           "features": [
             "Unbegrenzte Mannschaften",
@@ -121,19 +123,6 @@
             "Priorisierter Support"
           ],
           "cta": "Saison starten"
-        },
-        {
-          "name": "Ausbildungszentrum",
-          "price": "Auf Anfrage",
-          "priceSuffix": "",
-          "sub": "Für Profistrukturen und Akademien.",
-          "features": [
-            "Alles aus dem Vereinsplan",
-            "SSO & Staff-Onboarding",
-            "Spieldaten",
-            "Methodische Begleitung"
-          ],
-          "cta": "Kontakt aufnehmen"
         }
       ]
     },

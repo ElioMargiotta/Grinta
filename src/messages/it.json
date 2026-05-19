@@ -110,8 +110,10 @@
         },
         {
           "name": "Club",
-          "price": "12 €",
-          "priceSuffix": "/ squadra / mese",
+          "originalPrice": "25 CHF",
+          "discountLabel": "Sconto early bakers",
+          "price": "12 CHF",
+          "priceSuffix": "/ mese",
           "sub": "Tutte le categorie, un unico metodo.",
           "features": [
             "Squadre illimitate",
@@ -121,19 +123,6 @@
             "Supporto prioritario"
           ],
           "cta": "Avvia la stagione"
-        },
-        {
-          "name": "Centro di formazione",
-          "price": "Su preventivo",
-          "priceSuffix": "",
-          "sub": "Per strutture pro e accademie.",
-          "features": [
-            "Tutto del piano Club",
-            "SSO e onboarding staff",
-            "Dati di gara",
-            "Supporto metodologico"
-          ],
-          "cta": "Contattaci"
         }
       ]
     },

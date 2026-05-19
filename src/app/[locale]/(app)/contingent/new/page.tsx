@@ -4,16 +4,25 @@ import { Card } from "@/components/ui/Card";
 import { Link } from "@/i18n/navigation";
 import { ClubPlayerForm } from "@/components/contingent/ClubPlayerForm";
 import { requireMembership } from "@/lib/auth/getUser";
+import { listClubTeams } from "@/lib/contingent/teams";
 
 export default async function NewContingentPlayerPage({
   params,
+  searchParams,
 }: {
   params: Promise<{ locale: string }>;
+  searchParams: Promise<{ teamId?: string }>;
 }) {
   const { locale } = await params;
+  const { teamId } = await searchParams;
   setRequestLocale(locale);
-  await requireMembership(locale);
+  const { membership } = await requireMembership(locale);
   const t = await getTranslations("contingent");
+  const teams = await listClubTeams(membership.club_id);
+  // ?teamId=... vient typiquement du bouton "Ajouter un joueur" depuis la
+  // fiche d'une équipe (#39) — on pré-coche l'équipe correspondante.
+  const preselected =
+    teamId && teams.some((tm) => tm.id === teamId) ? [teamId] : [];
 
   return (
     <div className="mx-auto flex w-full max-w-3xl flex-col gap-6">
@@ -31,7 +40,11 @@ export default async function NewContingentPlayerPage({
       </div>
 
       <Card>
-        <ClubPlayerForm redirectOnCreate="/contingent" />
+        <ClubPlayerForm
+          redirectOnCreate="/contingent"
+          teams={teams}
+          preselectedTeamIds={preselected}
+        />
       </Card>
     </div>
   );

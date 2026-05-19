@@ -62,31 +62,31 @@
           "kicker": "01",
           "badge": "Identité",
           "title": "L'identité du club",
-          "body": "Principes de jeu, formation, attendus. Une seule philosophie partagée par tout le staff."
+          "body": "Principes de jeu, objectifs, attentes. Une seule philosophie partagée par tout le staff."
         },
         {
           "kicker": "02",
           "badge": "Saison",
-          "title": "La saison, en 90 secondes",
-          "body": "Trois dates suffisent. Grinta ancre le macrocycle et numérote les semaines (-3, -2, -1, +1…) automatiquement."
+          "title": "Planifier la saison",
+          "body": "Customise tes mésocycles selon tes besoins."
         },
         {
           "kicker": "03",
           "badge": "Microcycle",
           "title": "Les microcycles",
-          "body": "Thème de la semaine, format, charge. Chaque mésocycle prend la couleur que tu veux."
+          "body": "Thème de la semaine, format, charge. Chaque microcycle prend la couleur que tu veux."
         },
         {
           "kicker": "04",
           "badge": "Séance",
           "title": "Les séances",
-          "body": "Importe un exercice depuis ta bibliothèque ou crée-le directement sur schéma. Les blocs s'empilent."
+          "body": "Importe un exercice depuis notre bibliothèque ou crée-le directement."
         },
         {
           "kicker": "05",
           "badge": "PDF",
           "title": "La fiche, prête pour le terrain",
-          "body": "Un PDF A4 propre, lisible pour le staff, exploitable sur le terrain. Voilà."
+          "body": "Un PDF A4 propre, lisible pour le staff, exploitable sur le terrain."
         }
       ]
     },
@@ -103,37 +103,25 @@
           "features": [
             "1 équipe",
             "Bibliothèque illimitée",
-            "Planificateur saison",
             "Export PDF"
           ],
           "cta": "Créer mon compte"
         },
         {
           "name": "Club",
-          "price": "12 €",
+          "originalPrice": "25 CHF",
+          "discountLabel": "Offre de lancement",
+          "price": "12 CHF",
           "priceSuffix": "/ équipe / mois",
           "sub": "Toutes les catégories, une seule méthode.",
           "features": [
             "Équipes illimitées",
-            "Vision globale du club",
-            "Principes de jeu partagés",
-            "Rôles staff & DTN",
-            "Support prioritaire"
+            "Planification saison & microcycles",
+            "Création de séances illimitée",
+            "Suivi des joueurs",
+            "Automatisation export CDP J+S"
           ],
           "cta": "Démarrer la saison"
-        },
-        {
-          "name": "Centre de formation",
-          "price": "Sur devis",
-          "priceSuffix": "",
-          "sub": "Pour les structures pro et académies.",
-          "features": [
-            "Tout du plan Club",
-            "SSO & onboarding staff",
-            "Données de match",
-            "Accompagnement méthodologique"
-          ],
-          "cta": "Nous contacter"
         }
       ]
     },
@@ -148,7 +136,7 @@
     },
     "footer": {
       "tagline": "L'outil des entraîneurs et des clubs de football pour planifier la saison, construire les microcycles et préparer les entraînements.",
-      "copyright": "© 2026 Grinta · Made avec grinta.",
+      "copyright": "© 2026 Grinta.",
       "cols": [
         {
           "title": "Produit",
