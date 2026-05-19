@@ -252,7 +252,7 @@ const Z_END = {
 function PdfExport({ data }: { data: PreparationData }) {
   return (
     <div className="prep-export hidden print:block">
-      <ExportPage bg="/page1.svg">
+      <ExportPage bg="/documents/svg/page1.svg">
         {/* Global */}
         <ExportText value={data.date} area={Z_GLOBAL.date} />
         <ExportText value={data.team} area={Z_GLOBAL.team} />
@@ -362,7 +362,7 @@ function PdfExport({ data }: { data: PreparationData }) {
         />
       </ExportPage>
 
-      <ExportPage bg="/page2.svg">
+      <ExportPage bg="/documents/svg/page2.svg">
         {/* Main exercise 1 */}
         <ExportCheck
           checked={data.main[0].type === "playForm"}
@@ -2361,7 +2361,7 @@ function Step6({
         <div className="overflow-hidden rounded-[10px] border border-zinc-200 bg-white p-2 shadow-[0_8px_28px_rgb(0_0_0/0.08)]">
           <div className="relative aspect-[210/297] overflow-hidden bg-white">
             <Image
-              src="/page1.svg"
+              src="/documents/svg/page1.svg"
               alt={t("alt.pdfPreview")}
               fill
               sizes="330px"
@@ -2583,7 +2583,7 @@ export function PreparationSheet({
             </button>
             <span className="mx-3 h-[18px] w-px bg-zinc-200" />
             <Image
-              src="/grinta-icon.svg"
+              src="/documents/svg/grinta-icon.svg"
               alt=""
               width={28}
               height={28}
@@ -2658,14 +2658,14 @@ export function PreparationSheet({
           <aside className="hidden w-[232px] shrink-0 flex-col overflow-hidden border-r border-zinc-200 bg-white md:flex">
             <div className="flex items-center gap-2 px-4 pb-3 pt-4">
               <Image
-                src="/grinta-icon.svg"
+                src="/documents/svg/grinta-icon.svg"
                 alt=""
                 width={20}
                 height={20}
                 className="h-5 w-5"
               />
               <Image
-                src="/grinta-wordmark.svg"
+                src="/documents/svg/grinta-wordmark.svg"
                 alt="Grinta"
                 width={72}
                 height={20}

@@ -43,3 +43,7 @@ supabase/.temp/
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# keep root clean — source PDFs belong in public/documents/
+/*.pdf
+/*.svg
