@@ -197,7 +197,8 @@
     "exercises": "Übungen",
     "planner": "Planung",
     "settings": "Einstellungen",
-    "logout": "Abmelden"
+    "logout": "Abmelden",
+    "contingent": "Kader"
   },
   "auth": {
     "tabLogin": "Anmelden",
@@ -1080,5 +1081,25 @@
   },
   "sessions": {
     "cannotCreate": "Einheit konnte nicht erstellt werden."
+  },
+  "contingent": {
+    "title": "Kader",
+    "subtitle": "Alle Spieler von {club}",
+    "search": "Suchen",
+    "searchPlaceholder": "Spieler suchen…",
+    "filterTeam": "Mannschaft",
+    "filterCategory": "Kategorie",
+    "filterStatus": "Status",
+    "allTeams": "Alle Mannschaften",
+    "allCategories": "Alle Kategorien",
+    "allStatuses": "Alle Status",
+    "statusAssigned": "Zugeordnet",
+    "statusUnassigned": "Ohne Mannschaft",
+    "count": "{n} / {total} Spieler",
+    "empty": "Kein Spieler entspricht diesen Filtern.",
+    "name": "Name",
+    "position": "Position",
+    "teams": "Mannschaften",
+    "birthDate": "Geburtsdatum"
   }
 }

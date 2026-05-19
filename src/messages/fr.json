@@ -197,7 +197,8 @@
     "exercises": "Exercices",
     "planner": "Planning",
     "settings": "Paramètres",
-    "logout": "Quitter"
+    "logout": "Quitter",
+    "contingent": "Contingent"
   },
   "auth": {
     "tabLogin": "S'identifier",
@@ -1086,5 +1087,25 @@
   },
   "sessions": {
     "cannotCreate": "Impossible de créer la session."
+  },
+  "contingent": {
+    "title": "Contingent",
+    "subtitle": "Tous les joueurs de {club}",
+    "search": "Rechercher",
+    "searchPlaceholder": "Rechercher un joueur…",
+    "filterTeam": "Équipe",
+    "filterCategory": "Catégorie",
+    "filterStatus": "Statut",
+    "allTeams": "Toutes les équipes",
+    "allCategories": "Toutes les catégories",
+    "allStatuses": "Tous les statuts",
+    "statusAssigned": "Affecté",
+    "statusUnassigned": "Sans équipe",
+    "count": "{n} / {total} joueur(s)",
+    "empty": "Aucun joueur ne correspond à ces critères.",
+    "name": "Nom",
+    "position": "Poste",
+    "teams": "Équipes",
+    "birthDate": "Date de naissance"
   }
 }

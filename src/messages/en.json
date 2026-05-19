@@ -197,7 +197,8 @@
     "exercises": "Exercises",
     "planner": "Planner",
     "settings": "Settings",
-    "logout": "Log out"
+    "logout": "Log out",
+    "contingent": "Squad"
   },
   "auth": {
     "tabLogin": "Log in",
@@ -1086,5 +1087,25 @@
   },
   "sessions": {
     "cannotCreate": "Unable to create the session."
+  },
+  "contingent": {
+    "title": "Squad",
+    "subtitle": "All players of {club}",
+    "search": "Search",
+    "searchPlaceholder": "Search a player…",
+    "filterTeam": "Team",
+    "filterCategory": "Category",
+    "filterStatus": "Status",
+    "allTeams": "All teams",
+    "allCategories": "All categories",
+    "allStatuses": "All statuses",
+    "statusAssigned": "Assigned",
+    "statusUnassigned": "Unassigned",
+    "count": "{n} / {total} player(s)",
+    "empty": "No player matches these filters.",
+    "name": "Name",
+    "position": "Position",
+    "teams": "Teams",
+    "birthDate": "Date of birth"
   }
 }
