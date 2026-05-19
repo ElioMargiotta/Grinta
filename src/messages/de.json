@@ -1169,7 +1169,15 @@
       "doneSkipped": "{n} übersprungen",
       "doneErrors": "{n} Fehler",
       "detailsToggle": "Details",
-      "again": "Neuer Import"
+      "again": "Neuer Import",
+      "backToList": "Kader anzeigen"
+    },
+    "addMenu": {
+      "trigger": "Hinzufügen",
+      "manual": "Manuell hinzufügen",
+      "manualHint": "Spielerprofil ausfüllen",
+      "import": "Aus ClubCorner importieren",
+      "importHint": "Aus exportierter CSV"
     }
   }
 }

@@ -38,7 +38,14 @@ export type EditablePlayer = {
   guardian2_phone: string | null;
 };
 
-export function ClubPlayerForm({ player }: { player?: EditablePlayer }) {
+export function ClubPlayerForm({
+  player,
+  redirectOnCreate,
+}: {
+  player?: EditablePlayer;
+  /** Where to navigate after a successful create. Reset-in-place if absent. */
+  redirectOnCreate?: string;
+}) {
   const t = useTranslations("contingent.form");
   const locale = useLocale();
   const router = useRouter();
@@ -67,6 +74,9 @@ export function ClubPlayerForm({ player }: { player?: EditablePlayer }) {
           }
           if (isEdit) {
             setSaved(true);
+            router.refresh();
+          } else if (redirectOnCreate) {
+            router.push(redirectOnCreate);
             router.refresh();
           } else {
             formRef.current?.reset();

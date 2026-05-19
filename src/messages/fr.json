@@ -1175,7 +1175,15 @@
       "doneSkipped": "{n} ignoré(s)",
       "doneErrors": "{n} erreur(s)",
       "detailsToggle": "Voir le détail",
-      "again": "Nouvel import"
+      "again": "Nouvel import",
+      "backToList": "Voir le contingent"
+    },
+    "addMenu": {
+      "trigger": "Ajouter",
+      "manual": "Ajouter manuellement",
+      "manualHint": "Saisir une fiche joueur",
+      "import": "Importer depuis ClubCorner",
+      "importHint": "Depuis un CSV exporté"
     }
   }
 }

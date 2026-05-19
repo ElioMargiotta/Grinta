@@ -1175,7 +1175,15 @@
       "doneSkipped": "{n} skipped",
       "doneErrors": "{n} error(s)",
       "detailsToggle": "Show details",
-      "again": "New import"
+      "again": "New import",
+      "backToList": "View squad"
+    },
+    "addMenu": {
+      "trigger": "Add",
+      "manual": "Add manually",
+      "manualHint": "Fill out a player form",
+      "import": "Import from ClubCorner",
+      "importHint": "From an exported CSV"
     }
   }
 }

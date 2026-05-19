@@ -2,7 +2,7 @@
 
 import { useRef, useState, useTransition } from "react";
 import { useLocale, useTranslations } from "next-intl";
-import { useRouter } from "@/i18n/navigation";
+import { Link, useRouter } from "@/i18n/navigation";
 import { CheckCircle2, FileUp, Upload, XCircle } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import {
@@ -252,7 +252,10 @@ export function ImportClubCornerWizard() {
                 </details>
               )}
 
-              <div>
+              <div className="flex flex-wrap items-center gap-2">
+                <Link href="/contingent">
+                  <Button size="sm">{t("backToList")}</Button>
+                </Link>
                 <Button variant="ghost" size="sm" onClick={reset}>
                   {t("again")}
                 </Button>

@@ -1169,7 +1169,15 @@
       "doneSkipped": "{n} ignorati",
       "doneErrors": "{n} errori",
       "detailsToggle": "Dettagli",
-      "again": "Nuovo import"
+      "again": "Nuovo import",
+      "backToList": "Vedi la rosa"
+    },
+    "addMenu": {
+      "trigger": "Aggiungi",
+      "manual": "Aggiungi manualmente",
+      "manualHint": "Compila la scheda giocatore",
+      "import": "Importa da ClubCorner",
+      "importHint": "Da un CSV esportato"
     }
   }
 }

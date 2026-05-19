@@ -1,11 +1,9 @@
 import { getTranslations, setRequestLocale } from "next-intl/server";
-import { Card } from "@/components/ui/Card";
 import {
   ContingentList,
   type ContingentPlayer,
 } from "@/components/contingent/ContingentList";
-import { ClubPlayerForm } from "@/components/contingent/ClubPlayerForm";
-import { ImportClubCornerWizard } from "@/components/contingent/ImportClubCornerWizard";
+import { AddPlayerMenu } from "@/components/contingent/AddPlayerMenu";
 import { requireMembership } from "@/lib/auth/getUser";
 
 type AssignmentRow = {
@@ -59,31 +57,16 @@ export default async function ContingentPage({
 
   return (
     <div className="flex flex-col gap-6">
-      <div>
-        <h1 className="text-2xl font-semibold text-zinc-900 dark:text-zinc-100">
-          {t("title")}
-        </h1>
-        <p className="mt-1 text-sm text-zinc-500 dark:text-zinc-400">
-          {t("subtitle", { club: membership.club_name })}
-        </p>
-      </div>
-
-      <div className="grid gap-4 lg:grid-cols-2">
-        <Card>
-          <h2 className="mb-1 text-base font-semibold text-zinc-900 dark:text-zinc-100">
-            {t("importTitle")}
-          </h2>
-          <p className="mb-4 text-xs text-zinc-500 dark:text-zinc-400">
-            {t("importSubtitle")}
+      <div className="flex flex-wrap items-start justify-between gap-3">
+        <div>
+          <h1 className="text-2xl font-semibold text-zinc-900 dark:text-zinc-100">
+            {t("title")}
+          </h1>
+          <p className="mt-1 text-sm text-zinc-500 dark:text-zinc-400">
+            {t("subtitle", { club: membership.club_name })}
           </p>
-          <ImportClubCornerWizard />
-        </Card>
-        <Card>
-          <h2 className="mb-4 text-base font-semibold text-zinc-900 dark:text-zinc-100">
-            {t("addTitle")}
-          </h2>
-          <ClubPlayerForm />
-        </Card>
+        </div>
+        <AddPlayerMenu />
       </div>
 
       <ContingentList players={players} />
