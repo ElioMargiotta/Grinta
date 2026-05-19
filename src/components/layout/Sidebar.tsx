@@ -1,6 +1,6 @@
 "use client";
 
-import { CalendarDays, Dumbbell, LayoutDashboard, PenSquare, Settings, Users } from "lucide-react";
+import { CalendarDays, ContactRound, Dumbbell, LayoutDashboard, PenSquare, Settings, Users } from "lucide-react";
 import { useTranslations } from "next-intl";
 import Image from "next/image";
 import { Link, usePathname } from "@/i18n/navigation";
@@ -18,6 +18,7 @@ const CLUB_ITEMS = [
   { href: "/dashboard", key: "dashboard", icon: LayoutDashboard },
   { href: "/sessions", key: "session", icon: PenSquare },
   { href: "/teams", key: "teams", icon: Users },
+  { href: "/contingent", key: "contingent", icon: ContactRound },
   { href: "/exercises", key: "exercises", icon: Dumbbell },
   { href: "/planner", key: "planner", icon: CalendarDays },
   { href: "/settings/club", key: "settings", icon: Settings },

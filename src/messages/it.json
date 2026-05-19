@@ -197,7 +197,8 @@
     "exercises": "Esercizi",
     "planner": "Pianificazione",
     "settings": "Impostazioni",
-    "logout": "Esci"
+    "logout": "Esci",
+    "contingent": "Rosa"
   },
   "auth": {
     "tabLogin": "Accedi",
@@ -1080,5 +1081,25 @@
   },
   "sessions": {
     "cannotCreate": "Impossibile creare la sessione."
+  },
+  "contingent": {
+    "title": "Rosa",
+    "subtitle": "Tutti i giocatori di {club}",
+    "search": "Cerca",
+    "searchPlaceholder": "Cerca un giocatore…",
+    "filterTeam": "Squadra",
+    "filterCategory": "Categoria",
+    "filterStatus": "Stato",
+    "allTeams": "Tutte le squadre",
+    "allCategories": "Tutte le categorie",
+    "allStatuses": "Tutti gli stati",
+    "statusAssigned": "Assegnato",
+    "statusUnassigned": "Senza squadra",
+    "count": "{n} / {total} giocatori",
+    "empty": "Nessun giocatore corrisponde a questi filtri.",
+    "name": "Nome",
+    "position": "Ruolo",
+    "teams": "Squadre",
+    "birthDate": "Data di nascita"
   }
 }
