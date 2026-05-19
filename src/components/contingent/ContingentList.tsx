@@ -2,6 +2,7 @@
 
 import { useMemo, useState } from "react";
 import { useTranslations } from "next-intl";
+import { Link } from "@/i18n/navigation";
 import { Card } from "@/components/ui/Card";
 import { Input } from "@/components/ui/Input";
 import { Select } from "@/components/ui/Select";
@@ -154,7 +155,12 @@ export function ContingentList({ players }: { players: ContingentPlayer[] }) {
                     {p.jersey_number ?? "—"}
                   </td>
                   <td className="px-4 py-2">
-                    {p.first_name} {p.last_name}
+                    <Link
+                      href={`/contingent/${p.id}`}
+                      className="font-medium text-[var(--club-primary)] hover:underline"
+                    >
+                      {p.first_name} {p.last_name}
+                    </Link>
                   </td>
                   <td className="px-4 py-2 text-zinc-500">
                     {p.position ?? "—"}
