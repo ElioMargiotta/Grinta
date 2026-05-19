@@ -85,7 +85,7 @@ export function Topbar({
             await logoutAction();
           })
         }
-        disabled={isPending}
+        loading={isPending}
       >
         <LogOut className="h-4 w-4" />
         {t("logout")}

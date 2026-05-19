@@ -49,8 +49,13 @@ export function OnboardingClubForm() {
         </div>
       )}
 
-      <Button type="submit" disabled={isPending} className="w-full">
-        {isPending ? t("submitting") : t("submit")}
+      <Button
+        type="submit"
+        loading={isPending}
+        loadingLabel={t("submitting")}
+        className="w-full"
+      >
+        {t("submit")}
       </Button>
     </form>
   );

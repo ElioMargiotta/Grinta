@@ -90,8 +90,13 @@ export function TeamEditForm({ team }: { team: Team }) {
         </p>
       )}
 
-      <Button type="submit" disabled={isPending} className="self-start">
-        {isPending ? t("saving") : t("save")}
+      <Button
+        type="submit"
+        loading={isPending}
+        loadingLabel={t("saving")}
+        className="self-start"
+      >
+        {t("save")}
       </Button>
     </form>
   );

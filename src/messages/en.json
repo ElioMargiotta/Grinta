@@ -553,6 +553,10 @@
     "cancel": "Cancel",
     "save": "Save",
     "loading": "Loading…",
+    "pleaseWait": "Please wait a moment…",
+    "saving": "Saving…",
+    "deleting": "Deleting…",
+    "preparing": "Preparing…",
     "unknownError": "Unknown error"
   },
   "sheet": {

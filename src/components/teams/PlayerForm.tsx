@@ -46,7 +46,7 @@ export function PlayerForm({ teamId }: { teamId: string }) {
       </div>
       {error && <p className="sm:col-span-2 text-sm text-red-600">{error}</p>}
       <div className="sm:col-span-2">
-        <Button type="submit" disabled={isPending}>
+        <Button type="submit" loading={isPending}>
           {t("submit")}
         </Button>
       </div>
