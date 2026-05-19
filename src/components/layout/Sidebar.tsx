@@ -52,7 +52,7 @@ export function Sidebar({
             />
           ) : (
             <Image
-              src="/grinta-icon.svg"
+              src="/documents/svg/grinta-icon.svg"
               alt="Grinta"
               width={36}
               height={36}
@@ -65,7 +65,7 @@ export function Sidebar({
               {currentMembership?.club_name ?? ts("fallbackOrgName")}
             </div>
             <Image
-              src="/grinta-wordmark.svg"
+              src="/documents/svg/grinta-wordmark.svg"
               alt="Grinta"
               width={86}
               height={20}

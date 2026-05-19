@@ -18,7 +18,7 @@ export default async function AuthLayout({
       <div className="w-full max-w-md">
         <div className="mb-6 flex flex-col items-center text-center">
           <Image
-            src="/grinta-icon.svg"
+            src="/documents/svg/grinta-icon.svg"
             alt={t("name")}
             width={64}
             height={64}
@@ -26,7 +26,7 @@ export default async function AuthLayout({
             className="mb-3 h-16 w-16"
           />
           <Image
-            src="/grinta-wordmark.svg"
+            src="/documents/svg/grinta-wordmark.svg"
             alt={t("name")}
             width={192}
             height={192}

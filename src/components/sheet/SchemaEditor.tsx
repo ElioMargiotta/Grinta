@@ -21,7 +21,7 @@ type SchemaT = ReturnType<typeof useTranslations<"sheet.schema">>;
  * <svg viewBox="..."> — so scaling stays clean.
  * ============================================================ */
 
-/* viewBox aligned with public/demi-terrain.svg (147 × 105) so the on-screen
+/* viewBox aligned with public/documents/svg/demi-terrain.svg (147 × 105) so the on-screen
  * editor and the printed pitch share exactly the same aspect ratio. */
 export const VB_W = 147;
 export const VB_H = 105;
@@ -38,15 +38,15 @@ export type Pitch = {
 };
 
 const PITCHES: Record<PitchKind, Pitch> = {
-  half: { src: "/demi-terrain.svg", vbW: 147, vbH: 105, maxWidth: 460 },
+  half: { src: "/documents/svg/demi-terrain.svg", vbW: 147, vbH: 105, maxWidth: 460 },
   "full-vertical": {
-    src: "/terrain-vertical.svg",
+    src: "/documents/svg/terrain-vertical.svg",
     vbW: 142.5,
     vbH: 201,
     maxWidth: 320,
   },
   "full-horizontal": {
-    src: "/terrain-horizontale.svg",
+    src: "/documents/svg/terrain-horizontale.svg",
     vbW: 126.75,
     vbH: 90,
     maxWidth: 520,

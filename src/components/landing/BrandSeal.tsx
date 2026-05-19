@@ -1,4 +1,4 @@
-// Auto-generated from public/grinta-icon.svg, grinta-wordmark.svg, grinta-tagline.svg.
+// Auto-generated from public/documents/svg/grinta-icon.svg, grinta-wordmark.svg, grinta-tagline.svg.
 // Navy paths use currentColor (parent sets color: var(--ink));
 // gold accent paths use var(--accent) so the mark harmonises with the site palette.
 
