@@ -1100,6 +1100,29 @@
     "name": "Name",
     "position": "Position",
     "teams": "Mannschaften",
-    "birthDate": "Geburtsdatum"
+    "birthDate": "Geburtsdatum",
+    "addTitle": "Spieler hinzufügen",
+    "editTitle": "Spieler bearbeiten",
+    "form": {
+      "firstName": "Vorname",
+      "lastName": "Nachname",
+      "birthDate": "Geburtsdatum",
+      "position": "Position",
+      "positionPlaceholder": "GK / DF / MF / FW",
+      "jersey": "Nummer",
+      "notes": "Notizen",
+      "create": "Spieler hinzufügen",
+      "save": "Speichern",
+      "saving": "Speichern…",
+      "saved": "Änderungen gespeichert."
+    },
+    "deleteSection": {
+      "title": "Spieler löschen",
+      "description": "Dies kann nicht rückgängig gemacht werden. <strong>{name}</strong> wird endgültig aus dem Kader entfernt.",
+      "deleteButton": "Löschen",
+      "confirmButton": "Löschen bestätigen",
+      "deleting": "Löschen…",
+      "cancel": "Abbrechen"
+    }
   }
 }

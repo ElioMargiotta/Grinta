@@ -1106,6 +1106,29 @@
     "name": "Nom",
     "position": "Poste",
     "teams": "Équipes",
-    "birthDate": "Date de naissance"
+    "birthDate": "Date de naissance",
+    "addTitle": "Ajouter un joueur",
+    "editTitle": "Modifier le joueur",
+    "form": {
+      "firstName": "Prénom",
+      "lastName": "Nom",
+      "birthDate": "Date de naissance",
+      "position": "Poste",
+      "positionPlaceholder": "GK / DF / MF / FW",
+      "jersey": "Numéro",
+      "notes": "Notes",
+      "create": "Ajouter le joueur",
+      "save": "Enregistrer",
+      "saving": "Enregistrement…",
+      "saved": "Modifications enregistrées."
+    },
+    "deleteSection": {
+      "title": "Supprimer le joueur",
+      "description": "Cette action est irréversible. <strong>{name}</strong> sera définitivement supprimé du contingent.",
+      "deleteButton": "Supprimer",
+      "confirmButton": "Confirmer la suppression",
+      "deleting": "Suppression…",
+      "cancel": "Annuler"
+    }
   }
 }

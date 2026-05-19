@@ -1,8 +1,10 @@
 import { getTranslations, setRequestLocale } from "next-intl/server";
+import { Card } from "@/components/ui/Card";
 import {
   ContingentList,
   type ContingentPlayer,
 } from "@/components/contingent/ContingentList";
+import { ClubPlayerForm } from "@/components/contingent/ClubPlayerForm";
 import { requireMembership } from "@/lib/auth/getUser";
 
 type AssignmentRow = {
@@ -64,6 +66,13 @@ export default async function ContingentPage({
           {t("subtitle", { club: membership.club_name })}
         </p>
       </div>
+
+      <Card>
+        <h2 className="mb-4 text-base font-semibold text-zinc-900 dark:text-zinc-100">
+          {t("addTitle")}
+        </h2>
+        <ClubPlayerForm />
+      </Card>
 
       <ContingentList players={players} />
     </div>

@@ -1106,6 +1106,29 @@
     "name": "Name",
     "position": "Position",
     "teams": "Teams",
-    "birthDate": "Date of birth"
+    "birthDate": "Date of birth",
+    "addTitle": "Add a player",
+    "editTitle": "Edit player",
+    "form": {
+      "firstName": "First name",
+      "lastName": "Last name",
+      "birthDate": "Date of birth",
+      "position": "Position",
+      "positionPlaceholder": "GK / DF / MF / FW",
+      "jersey": "Number",
+      "notes": "Notes",
+      "create": "Add player",
+      "save": "Save",
+      "saving": "Saving…",
+      "saved": "Changes saved."
+    },
+    "deleteSection": {
+      "title": "Delete player",
+      "description": "This cannot be undone. <strong>{name}</strong> will be permanently removed from the squad.",
+      "deleteButton": "Delete",
+      "confirmButton": "Confirm deletion",
+      "deleting": "Deleting…",
+      "cancel": "Cancel"
+    }
   }
 }

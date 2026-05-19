@@ -1100,6 +1100,29 @@
     "name": "Nome",
     "position": "Ruolo",
     "teams": "Squadre",
-    "birthDate": "Data di nascita"
+    "birthDate": "Data di nascita",
+    "addTitle": "Aggiungi un giocatore",
+    "editTitle": "Modifica giocatore",
+    "form": {
+      "firstName": "Nome",
+      "lastName": "Cognome",
+      "birthDate": "Data di nascita",
+      "position": "Ruolo",
+      "positionPlaceholder": "GK / DF / MF / FW",
+      "jersey": "Numero",
+      "notes": "Note",
+      "create": "Aggiungi giocatore",
+      "save": "Salva",
+      "saving": "Salvataggio…",
+      "saved": "Modifiche salvate."
+    },
+    "deleteSection": {
+      "title": "Elimina giocatore",
+      "description": "Questa azione è irreversibile. <strong>{name}</strong> verrà rimosso definitivamente dalla rosa.",
+      "deleteButton": "Elimina",
+      "confirmButton": "Conferma eliminazione",
+      "deleting": "Eliminazione…",
+      "cancel": "Annulla"
+    }
   }
 }
