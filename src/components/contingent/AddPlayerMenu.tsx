@@ -15,6 +15,20 @@ export function AddPlayerMenu() {
   const t = useTranslations("contingent.addMenu");
   const [open, setOpen] = useState(false);
   const wrapperRef = useRef<HTMLDivElement>(null);
+  const closeTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const cancelClose = () => {
+    if (closeTimerRef.current) {
+      clearTimeout(closeTimerRef.current);
+      closeTimerRef.current = null;
+    }
+  };
+  const scheduleClose = () => {
+    cancelClose();
+    // Small delay so the cursor can travel from button to menu items
+    // without the menu disappearing under it.
+    closeTimerRef.current = setTimeout(() => setOpen(false), 120);
+  };
 
   useEffect(() => {
     if (!open) return;
@@ -32,12 +46,17 @@ export function AddPlayerMenu() {
     };
   }, [open]);
 
+  useEffect(() => () => cancelClose(), []);
+
   return (
     <div
       ref={wrapperRef}
       className="group relative"
-      onMouseEnter={() => setOpen(true)}
-      onMouseLeave={() => setOpen(false)}
+      onMouseEnter={() => {
+        cancelClose();
+        setOpen(true);
+      }}
+      onMouseLeave={scheduleClose}
     >
       <button
         type="button"
@@ -56,8 +75,13 @@ export function AddPlayerMenu() {
       {open && (
         <div
           role="menu"
-          className="absolute right-0 z-20 mt-1 w-72 overflow-hidden rounded-xl border border-zinc-200 bg-white shadow-lg dark:border-zinc-800 dark:bg-zinc-950"
+          onMouseEnter={cancelClose}
+          onMouseLeave={scheduleClose}
+          // pt-2 acts as an invisible "bridge" so the cursor never lands
+          // in dead space between the button and the first menu item.
+          className="absolute right-0 z-20 w-72 pt-2"
         >
+        <div className="overflow-hidden rounded-xl border border-zinc-200 bg-white shadow-lg dark:border-zinc-800 dark:bg-zinc-950">
           <Link
             href="/contingent/new"
             role="menuitem"
@@ -90,6 +114,7 @@ export function AddPlayerMenu() {
               </span>
             </span>
           </Link>
+        </div>
         </div>
       )}
     </div>
