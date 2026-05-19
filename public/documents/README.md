@@ -39,5 +39,7 @@ may be linked from the app in the future.
 ---
 
 > **Note:** These files are not imported directly by application code. They are
-> served as static assets from `/documents/<filename>` and are referenced only
-> in the legacy SQL seed comments that built the exercise library.
+> served as static assets from `/documents/<collection>/<filename>` (for example,
+> `/documents/clubcorner_2026/<filename>` or `/documents/asf_te_2026/<filename>`)
+> and are referenced only in the legacy SQL seed comments that built the
+> exercise library.
