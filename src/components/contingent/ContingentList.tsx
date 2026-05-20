@@ -27,6 +27,8 @@ export type ContingentPlayer = {
   position: string | null;
   jersey_number: number | null;
   birth_date: string | null;
+  /** True iff `players.dual_licence_club IS NOT NULL` — drives the "DL" badge (EPIC #34). */
+  has_dual_licence: boolean;
   assignments: ContingentAssignment[];
 };
 
@@ -46,6 +48,7 @@ export function ContingentList({
 }) {
   const t = useTranslations("contingent");
   const tBulk = useTranslations("contingent.bulk");
+  const tDual = useTranslations("contingent.dualLicence");
   const locale = useLocale();
   const router = useRouter();
   const [query, setQuery] = useState("");
@@ -384,12 +387,22 @@ export function ContingentList({
                       {p.jersey_number ?? "—"}
                     </td>
                     <td className="px-4 py-2">
-                      <Link
-                        href={`/contingent/${p.id}`}
-                        className="font-medium text-[var(--club-primary)] hover:underline"
-                      >
-                        {p.first_name} {p.last_name}
-                      </Link>
+                      <div className="flex items-center gap-2">
+                        <Link
+                          href={`/contingent/${p.id}`}
+                          className="font-medium text-[var(--club-primary)] hover:underline"
+                        >
+                          {p.first_name} {p.last_name}
+                        </Link>
+                        {p.has_dual_licence && (
+                          <span
+                            title={tDual("badgeTitle")}
+                            className="inline-flex items-center rounded-full border border-amber-300 bg-amber-100 px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-amber-800 dark:border-amber-500/40 dark:bg-amber-900/40 dark:text-amber-200"
+                          >
+                            {tDual("badge")}
+                          </span>
+                        )}
+                      </div>
                     </td>
                     <td className="px-4 py-2 text-zinc-500">
                       {p.position ?? "—"}

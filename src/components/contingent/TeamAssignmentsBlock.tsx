@@ -3,22 +3,22 @@
 import { useState, useTransition } from "react";
 import { useLocale, useTranslations } from "next-intl";
 import { useRouter } from "@/i18n/navigation";
-import { Users } from "lucide-react";
+import { Users, X } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
 import { TeamMultiSelect } from "@/components/contingent/TeamMultiSelect";
-import { setPlayerAssignmentsAction } from "@/app/[locale]/(app)/contingent/actions";
+import {
+  removePlayerFromTeamAction,
+  setPlayerAssignmentsAction,
+} from "@/app/[locale]/(app)/contingent/actions";
 import type { ClubTeamOption } from "@/lib/contingent/teams";
 
 /**
- * Bloc d'affectations équipes sur la fiche joueur (#39). Submit séparé du
- * formulaire de métadonnées du joueur pour deux raisons :
- *  - les deux saves ont une cardinalité différente (1 row vs N rows)
- *  - permet de modifier les équipes sans risquer d'écraser une saisie en
- *    cours dans le formulaire principal
- *
- * Replace-set : la sélection courante remplace l'ensemble des affectations
- * "saison actuelle" du joueur (cf. `setPlayerAssignmentsAction`).
+ * Bloc d'affectations équipes sur la fiche joueur (#39, #40).
+ * - Chips en haut : affectations courantes avec × pour retirer une équipe en
+ *   un clic (action ciblée `removePlayerFromTeamAction`).
+ * - Picker en bas : édition complète de l'ensemble via le replace-set
+ *   `setPlayerAssignmentsAction`. Submit séparé du formulaire de métadonnées.
  */
 export function TeamAssignmentsBlock({
   playerId,
@@ -35,6 +35,31 @@ export function TeamAssignmentsBlock({
   const [error, setError] = useState<string | null>(null);
   const [saved, setSaved] = useState(false);
   const [isPending, startTransition] = useTransition();
+  const [removingId, setRemovingId] = useState<string | null>(null);
+  const [isRemoving, startRemoveTransition] = useTransition();
+
+  const currentTeams = currentTeamIds
+    .map((id) => teams.find((tm) => tm.id === id))
+    .filter((tm): tm is ClubTeamOption => Boolean(tm));
+
+  const removeTeam = (teamId: string) => {
+    setError(null);
+    setSaved(false);
+    setRemovingId(teamId);
+    const fd = new FormData();
+    fd.set("locale", locale);
+    fd.set("playerId", playerId);
+    fd.set("teamId", teamId);
+    startRemoveTransition(async () => {
+      const result = await removePlayerFromTeamAction(fd);
+      setRemovingId(null);
+      if (result?.error) {
+        setError(result.error);
+        return;
+      }
+      router.refresh();
+    });
+  };
 
   return (
     <Card>
@@ -44,6 +69,44 @@ export function TeamAssignmentsBlock({
           {t("title")}
         </h2>
       </div>
+
+      {currentTeams.length > 0 && (
+        <div className="mb-4 flex flex-col gap-2">
+          <span className="text-xs font-medium uppercase tracking-wider text-zinc-500 dark:text-zinc-400">
+            {t("currentLabel")}
+          </span>
+          <div className="flex flex-wrap gap-2">
+            {currentTeams.map((tm) => {
+              const isBusy = isRemoving && removingId === tm.id;
+              return (
+                <span
+                  key={tm.id}
+                  className={`inline-flex items-center gap-1.5 rounded-full border border-[var(--club-primary)] bg-[var(--club-primary-soft)] px-3 py-1 text-xs font-medium text-[var(--club-primary)] ${
+                    isBusy ? "opacity-60" : ""
+                  }`}
+                >
+                  <span>{tm.name}</span>
+                  {tm.age_group && (
+                    <span className="text-[10px] uppercase tracking-wider text-zinc-500">
+                      {tm.age_group}
+                    </span>
+                  )}
+                  <button
+                    type="button"
+                    onClick={() => removeTeam(tm.id)}
+                    disabled={isRemoving}
+                    aria-label={t("removeFromTeam", { team: tm.name })}
+                    className="-mr-1 inline-flex h-4 w-4 items-center justify-center rounded-full text-[var(--club-primary)] transition hover:bg-[var(--club-primary)] hover:text-[var(--club-primary-foreground)] disabled:cursor-not-allowed disabled:opacity-50"
+                  >
+                    <X className="h-3 w-3" />
+                  </button>
+                </span>
+              );
+            })}
+          </div>
+        </div>
+      )}
+
       <form
         className="flex flex-col gap-4"
         action={(formData) => {
@@ -63,6 +126,7 @@ export function TeamAssignmentsBlock({
         }}
       >
         <TeamMultiSelect
+          key={[...currentTeamIds].sort().join("|")}
           teams={teams}
           name="teamIds"
           defaultValue={currentTeamIds}

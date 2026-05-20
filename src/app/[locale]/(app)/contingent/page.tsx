@@ -19,6 +19,7 @@ type PlayerRow = {
   position: string | null;
   jersey_number: number | null;
   birth_date: string | null;
+  dual_licence_club: string | null;
   player_team_assignments: AssignmentRow[] | null;
 };
 
@@ -40,6 +41,7 @@ export default async function ContingentPage({
       .from("players")
       .select(
         `id, first_name, last_name, position, jersey_number, birth_date,
+       dual_licence_club,
        player_team_assignments ( team_id, teams ( name, age_group ) )`,
       )
       .eq("club_id", membership.club_id)
@@ -55,6 +57,7 @@ export default async function ContingentPage({
     position: p.position,
     jersey_number: p.jersey_number,
     birth_date: p.birth_date,
+    has_dual_licence: Boolean(p.dual_licence_club),
     assignments: (p.player_team_assignments ?? []).map((a) => ({
       team_id: a.team_id,
       team_name: a.teams?.name ?? null,

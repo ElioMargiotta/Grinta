@@ -302,16 +302,7 @@
     },
     "players": {
       "title": "Giocatori",
-      "new": "Aggiungi un giocatore",
-      "empty": "Nessun giocatore in questa squadra per ora.",
-      "firstName": "Nome",
-      "lastName": "Cognome",
-      "birthDate": "Data di nascita",
-      "position": "Posizione",
-      "jersey": "Numero",
-      "notes": "Note",
-      "submit": "Aggiungi il giocatore",
-      "positionPlaceholder": "GK / DF / MF / FW"
+      "new": "Aggiungi un giocatore"
     },
     "editForm": {
       "name": "Nome della squadra",
@@ -1163,11 +1154,38 @@
     },
     "assignments": {
       "title": "Squadre del giocatore",
+      "currentLabel": "Assegnazioni attuali",
+      "removeFromTeam": "Rimuovi da {team}",
       "noTeamsYet": "Nessuna squadra disponibile — creane una dal tab Squadre.",
       "helper": "Seleziona le squadre a cui appartiene questo giocatore per la stagione corrente.",
       "save": "Salva assegnazioni",
       "saving": "Salvataggio…",
       "saved": "Assegnazioni aggiornate."
+    },
+    "dualLicence": {
+      "title": "Doppio tesseramento",
+      "badge": "DL",
+      "badgeTitle": "Giocatore con doppio tesseramento ASF",
+      "emptyHint": "Il giocatore è tesserato solo qui. Aggiungi un secondo club ASF se applicabile (es. élite + amatoriale).",
+      "add": "Aggiungi un doppio tesseramento",
+      "edit": "Modifica",
+      "remove": "Rimuovi",
+      "removing": "Rimozione…",
+      "save": "Salva",
+      "saving": "Salvataggio…",
+      "cancel": "Annulla",
+      "helper": "Annotazione locale, visibile solo a questo club. L'altro club gestisce la propria scheda in modo indipendente.",
+      "clubLabel": "Club secondario",
+      "clubPlaceholder": "Es. Neuchâtel Xamax FCS",
+      "levelLabel": "Livello",
+      "teamLabel": "Squadra (opzionale)",
+      "teamPlaceholder": "Es. U18 Promotion",
+      "teamPrefix": "Squadra:",
+      "level": {
+        "elite": "Élite",
+        "amateur": "Amatoriale",
+        "other": "Altro"
+      }
     },
     "bulk": {
       "selected": "{n} giocatore/i selezionato/i",
