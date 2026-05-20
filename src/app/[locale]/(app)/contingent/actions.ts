@@ -203,6 +203,36 @@ export async function setPlayerAssignmentsAction(formData: FormData) {
 }
 
 /**
+ * Retire un seul rattachement (#40). Idempotent : si l'affectation n'existe
+ * pas (déjà supprimée, mauvais teamId), on renvoie un succès silencieux.
+ * Saison NULL = "courante" — les saisons archivées ne sont pas touchées.
+ */
+export async function removePlayerFromTeamAction(formData: FormData) {
+  const locale = String(formData.get("locale") ?? "fr");
+  const playerId = String(formData.get("playerId") ?? "");
+  const teamId = String(formData.get("teamId") ?? "");
+  if (!playerId || !teamId) return { error: "Missing fields" };
+
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) redirect(`/${locale}/login`);
+
+  const { error } = await supabase
+    .from("player_team_assignments")
+    .delete()
+    .eq("player_id", playerId)
+    .eq("team_id", teamId)
+    .is("season", null);
+  if (error) return { error: error.message };
+
+  revalidatePath(`/${locale}/contingent`);
+  revalidatePath(`/${locale}/contingent/${playerId}`);
+  return {};
+}
+
+/**
  * Affecte en masse une liste de joueurs à une équipe (#39). Idempotent :
  * les joueurs déjà rattachés (saison NULL) sont ignorés silencieusement.
  */

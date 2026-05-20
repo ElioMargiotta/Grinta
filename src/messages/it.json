@@ -302,16 +302,7 @@
     },
     "players": {
       "title": "Giocatori",
-      "new": "Aggiungi un giocatore",
-      "empty": "Nessun giocatore in questa squadra per ora.",
-      "firstName": "Nome",
-      "lastName": "Cognome",
-      "birthDate": "Data di nascita",
-      "position": "Posizione",
-      "jersey": "Numero",
-      "notes": "Note",
-      "submit": "Aggiungi il giocatore",
-      "positionPlaceholder": "GK / DF / MF / FW"
+      "new": "Aggiungi un giocatore"
     },
     "editForm": {
       "name": "Nome della squadra",
@@ -1163,6 +1154,8 @@
     },
     "assignments": {
       "title": "Squadre del giocatore",
+      "currentLabel": "Assegnazioni attuali",
+      "removeFromTeam": "Rimuovi da {team}",
       "noTeamsYet": "Nessuna squadra disponibile — creane una dal tab Squadre.",
       "helper": "Seleziona le squadre a cui appartiene questo giocatore per la stagione corrente.",
       "save": "Salva assegnazioni",

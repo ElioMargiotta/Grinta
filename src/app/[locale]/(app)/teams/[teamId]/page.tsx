@@ -108,7 +108,7 @@ export default async function TeamPage({
 
       <section className="grid gap-3 md:grid-cols-2">
         <TeamAction
-          href={`/teams/${team.id}/players`}
+          href={`/contingent?team=${team.id}`}
           icon={Users}
           title={t("teams.players.title")}
           description={td("playersInRoster", { count: playerCount ?? 0 })}

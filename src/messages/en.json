@@ -308,16 +308,7 @@
     },
     "players": {
       "title": "Players",
-      "new": "Add player",
-      "empty": "No players in this team yet.",
-      "firstName": "First name",
-      "lastName": "Last name",
-      "birthDate": "Birth date",
-      "position": "Position",
-      "jersey": "Jersey #",
-      "notes": "Notes",
-      "submit": "Add player",
-      "positionPlaceholder": "GK / DF / MF / FW"
+      "new": "Add player"
     },
     "editForm": {
       "name": "Team name",
@@ -1169,6 +1160,8 @@
     },
     "assignments": {
       "title": "Player's teams",
+      "currentLabel": "Current assignments",
+      "removeFromTeam": "Remove from {team}",
       "noTeamsYet": "No team available yet — create one from the Teams tab.",
       "helper": "Pick the teams this player belongs to for the current season.",
       "save": "Save assignments",
