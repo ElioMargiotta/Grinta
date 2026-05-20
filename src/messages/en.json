@@ -1168,6 +1168,31 @@
       "saving": "Saving…",
       "saved": "Assignments updated."
     },
+    "dualLicence": {
+      "title": "Dual licence",
+      "badge": "DL",
+      "badgeTitle": "Player holds an ASF dual licence",
+      "emptyHint": "This player is only registered here. Add a second ASF club if applicable (e.g. elite + amateur).",
+      "add": "Add a dual licence",
+      "edit": "Edit",
+      "remove": "Remove",
+      "removing": "Removing…",
+      "save": "Save",
+      "saving": "Saving…",
+      "cancel": "Cancel",
+      "helper": "Local annotation, visible only to this club. The other club manages its own record independently.",
+      "clubLabel": "Secondary club",
+      "clubPlaceholder": "e.g. Neuchâtel Xamax FCS",
+      "levelLabel": "Level",
+      "teamLabel": "Team (optional)",
+      "teamPlaceholder": "e.g. U18 Promotion",
+      "teamPrefix": "Team:",
+      "level": {
+        "elite": "Elite",
+        "amateur": "Amateur",
+        "other": "Other"
+      }
+    },
     "bulk": {
       "selected": "{n} player(s) selected",
       "hint": "Assign selected players to a team — existing memberships are not duplicated.",

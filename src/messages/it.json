@@ -1162,6 +1162,31 @@
       "saving": "Salvataggio…",
       "saved": "Assegnazioni aggiornate."
     },
+    "dualLicence": {
+      "title": "Doppio tesseramento",
+      "badge": "DL",
+      "badgeTitle": "Giocatore con doppio tesseramento ASF",
+      "emptyHint": "Il giocatore è tesserato solo qui. Aggiungi un secondo club ASF se applicabile (es. élite + amatoriale).",
+      "add": "Aggiungi un doppio tesseramento",
+      "edit": "Modifica",
+      "remove": "Rimuovi",
+      "removing": "Rimozione…",
+      "save": "Salva",
+      "saving": "Salvataggio…",
+      "cancel": "Annulla",
+      "helper": "Annotazione locale, visibile solo a questo club. L'altro club gestisce la propria scheda in modo indipendente.",
+      "clubLabel": "Club secondario",
+      "clubPlaceholder": "Es. Neuchâtel Xamax FCS",
+      "levelLabel": "Livello",
+      "teamLabel": "Squadra (opzionale)",
+      "teamPlaceholder": "Es. U18 Promotion",
+      "teamPrefix": "Squadra:",
+      "level": {
+        "elite": "Élite",
+        "amateur": "Amatoriale",
+        "other": "Altro"
+      }
+    },
     "bulk": {
       "selected": "{n} giocatore/i selezionato/i",
       "hint": "Assegna i giocatori selezionati a una squadra — le assegnazioni esistenti non vengono duplicate.",

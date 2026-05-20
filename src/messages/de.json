@@ -1162,6 +1162,31 @@
       "saving": "Speichern…",
       "saved": "Zuordnungen aktualisiert."
     },
+    "dualLicence": {
+      "title": "Doppellizenz",
+      "badge": "DL",
+      "badgeTitle": "Spieler mit ASF-Doppellizenz",
+      "emptyHint": "Der Spieler ist nur hier registriert. Trage einen zweiten ASF-Verein ein, falls zutreffend (z. B. Elite + Amateur).",
+      "add": "Doppellizenz hinzufügen",
+      "edit": "Bearbeiten",
+      "remove": "Entfernen",
+      "removing": "Entfernen…",
+      "save": "Speichern",
+      "saving": "Speichern…",
+      "cancel": "Abbrechen",
+      "helper": "Lokale Notiz, nur für diesen Verein sichtbar. Der andere Verein verwaltet seinen Datensatz unabhängig.",
+      "clubLabel": "Zweitverein",
+      "clubPlaceholder": "z. B. Neuchâtel Xamax FCS",
+      "levelLabel": "Niveau",
+      "teamLabel": "Team (optional)",
+      "teamPlaceholder": "z. B. U18 Promotion",
+      "teamPrefix": "Team:",
+      "level": {
+        "elite": "Elite",
+        "amateur": "Amateur",
+        "other": "Andere"
+      }
+    },
     "bulk": {
       "selected": "{n} Spieler ausgewählt",
       "hint": "Ausgewählte Spieler einem Team zuordnen — bestehende Zuordnungen werden nicht dupliziert.",

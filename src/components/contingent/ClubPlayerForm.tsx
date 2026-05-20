@@ -38,6 +38,9 @@ export type EditablePlayer = {
   guardian2_name: string | null;
   guardian2_email: string | null;
   guardian2_phone: string | null;
+  dual_licence_club: string | null;
+  dual_licence_level: string | null;
+  dual_licence_team: string | null;
 };
 
 export function ClubPlayerForm({

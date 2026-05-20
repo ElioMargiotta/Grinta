@@ -1167,6 +1167,31 @@
       "saving": "Enregistrement…",
       "saved": "Affectations mises à jour."
     },
+    "dualLicence": {
+      "title": "Double licence",
+      "badge": "DL",
+      "badgeTitle": "Joueur en double licence ASF",
+      "emptyHint": "Le joueur n'est licencié qu'ici. Renseignez un éventuel second club ASF (ex. élite + amateur).",
+      "add": "Ajouter une double licence",
+      "edit": "Modifier",
+      "remove": "Retirer",
+      "removing": "Suppression…",
+      "save": "Enregistrer",
+      "saving": "Enregistrement…",
+      "cancel": "Annuler",
+      "helper": "Information locale visible uniquement par ce club. L'autre club gère sa propre fiche indépendamment.",
+      "clubLabel": "Club secondaire",
+      "clubPlaceholder": "Ex. Neuchâtel Xamax FCS",
+      "levelLabel": "Niveau",
+      "teamLabel": "Équipe (optionnel)",
+      "teamPlaceholder": "Ex. U18 Promotion",
+      "teamPrefix": "Équipe :",
+      "level": {
+        "elite": "Élite",
+        "amateur": "Amateur",
+        "other": "Autre"
+      }
+    },
     "bulk": {
       "selected": "{n} joueur(s) sélectionné(s)",
       "hint": "Affectez les joueurs sélectionnés à une équipe — les rattachements existants ne sont pas dupliqués.",

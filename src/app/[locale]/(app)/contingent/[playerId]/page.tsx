@@ -9,6 +9,7 @@ import {
   type EditablePlayer,
 } from "@/components/contingent/ClubPlayerForm";
 import { DeletePlayerSection } from "@/components/contingent/DeletePlayerSection";
+import { DualLicenceBlock } from "@/components/contingent/DualLicenceBlock";
 import { TeamAssignmentsBlock } from "@/components/contingent/TeamAssignmentsBlock";
 import { listClubTeams } from "@/lib/contingent/teams";
 
@@ -29,7 +30,8 @@ export default async function ContingentPlayerPage({
        strong_foot, license_number, js_number, email, phone, nationality,
        address, postal_code, city, canton,
        guardian_name, guardian_email, guardian_phone,
-       guardian2_name, guardian2_email, guardian2_phone`,
+       guardian2_name, guardian2_email, guardian2_phone,
+       dual_licence_club, dual_licence_level, dual_licence_team`,
     )
     .eq("id", playerId)
     .single<EditablePlayer>();
@@ -76,6 +78,15 @@ export default async function ContingentPlayerPage({
         playerId={player.id}
         teams={teams}
         currentTeamIds={currentTeamIds}
+      />
+
+      <DualLicenceBlock
+        playerId={player.id}
+        licence={{
+          club: player.dual_licence_club,
+          level: player.dual_licence_level,
+          team: player.dual_licence_team,
+        }}
       />
 
       <DeletePlayerSection playerId={player.id} playerName={fullName} />
