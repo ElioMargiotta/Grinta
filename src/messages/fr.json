@@ -354,7 +354,9 @@
       "infoDesc": "Nom, saison, catégorie, description et photo de référence.",
       "categoryLabel": "Catégorie",
       "seasonLabel": "Saison",
-      "emptyDescHint": "Ajoute une courte description pour cadrer l'identité, les objectifs ou les notes importantes de cette équipe."
+      "emptyDescHint": "Ajoute une courte description pour cadrer l'identité, les objectifs ou les notes importantes de cette équipe.",
+      "openContingent": "Voir dans le contingent",
+      "importClubCorner": "Importer ClubCorner"
     }
   },
   "exercises": {
@@ -1161,7 +1163,33 @@
       "guardianPhone": "Téléphone rep. légal",
       "guardian2Name": "Nom rep. légal 2",
       "guardian2Email": "E-mail rep. légal 2",
-      "guardian2Phone": "Téléphone rep. légal 2"
+      "guardian2Phone": "Téléphone rep. légal 2",
+      "teamsLabel": "Équipes"
+    },
+    "assignments": {
+      "title": "Équipes du joueur",
+      "noTeamsYet": "Aucune équipe disponible — créez-en une depuis l'onglet Équipes.",
+      "helper": "Sélectionnez les équipes auxquelles ce joueur appartient pour la saison en cours.",
+      "save": "Enregistrer les affectations",
+      "saving": "Enregistrement…",
+      "saved": "Affectations mises à jour."
+    },
+    "bulk": {
+      "selected": "{n} joueur(s) sélectionné(s)",
+      "hint": "Affectez les joueurs sélectionnés à une équipe — les rattachements existants ne sont pas dupliqués.",
+      "pickTeam": "Choisir une équipe…",
+      "assign": "Affecter",
+      "assigning": "Affectation…",
+      "clear": "Vider la sélection",
+      "selectAll": "Tout sélectionner",
+      "selectOne": "Sélectionner {name}",
+      "done": "{assigned} affecté(s), {skipped} déjà membre(s).",
+      "delete": "Supprimer",
+      "confirmDelete": "Supprimer {n} joueur(s)",
+      "confirmHint": "Action irréversible : {n} joueur(s) seront définitivement supprimés du contingent.",
+      "deleting": "Suppression…",
+      "deleted": "{deleted} joueur(s) supprimé(s).",
+      "cancel": "Annuler"
     },
     "deleteSection": {
       "title": "Supprimer le joueur",
@@ -1196,7 +1224,11 @@
       "doneErrors": "{n} erreur(s)",
       "detailsToggle": "Voir le détail",
       "again": "Nouvel import",
-      "backToList": "Voir le contingent"
+      "backToList": "Voir le contingent",
+      "targetTeamLabel": "Équipe cible",
+      "noTargetTeam": "Aucune équipe — importer dans le contingent uniquement",
+      "targetTeamHint": "Chaque joueur importé sera rattaché à cette équipe (saison en cours).",
+      "noTargetTeamHint": "Les joueurs seront ajoutés au contingent sans affectation. Vous pourrez les rattacher ensuite."
     },
     "addMenu": {
       "trigger": "Ajouter",

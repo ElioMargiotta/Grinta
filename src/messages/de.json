@@ -349,7 +349,9 @@
       "infoDesc": "Name, Saison, Kategorie, Beschreibung und Referenzfoto.",
       "categoryLabel": "Kategorie",
       "seasonLabel": "Saison",
-      "emptyDescHint": "Füge eine kurze Beschreibung hinzu, um die Identität, Ziele oder wichtige Notizen dieses Teams zu definieren."
+      "emptyDescHint": "Füge eine kurze Beschreibung hinzu, um die Identität, Ziele oder wichtige Notizen dieses Teams zu definieren.",
+      "openContingent": "Im Kader öffnen",
+      "importClubCorner": "ClubCorner importieren"
     }
   },
   "exercises": {
@@ -1156,7 +1158,33 @@
       "guardianPhone": "Telefon Erz.",
       "guardian2Name": "Name Erz. 2",
       "guardian2Email": "E-Mail Erz. 2",
-      "guardian2Phone": "Telefon Erz. 2"
+      "guardian2Phone": "Telefon Erz. 2",
+      "teamsLabel": "Teams"
+    },
+    "assignments": {
+      "title": "Teams des Spielers",
+      "noTeamsYet": "Noch kein Team verfügbar — erstelle eines im Tab Teams.",
+      "helper": "Wähle die Teams, zu denen dieser Spieler in der laufenden Saison gehört.",
+      "save": "Zuordnungen speichern",
+      "saving": "Speichern…",
+      "saved": "Zuordnungen aktualisiert."
+    },
+    "bulk": {
+      "selected": "{n} Spieler ausgewählt",
+      "hint": "Ausgewählte Spieler einem Team zuordnen — bestehende Zuordnungen werden nicht dupliziert.",
+      "pickTeam": "Team wählen…",
+      "assign": "Zuordnen",
+      "assigning": "Zuordnen…",
+      "clear": "Auswahl löschen",
+      "selectAll": "Alle auswählen",
+      "selectOne": "{name} auswählen",
+      "done": "{assigned} zugeordnet, {skipped} bereits im Team.",
+      "delete": "Löschen",
+      "confirmDelete": "{n} Spieler löschen",
+      "confirmHint": "Unwiderruflich: {n} Spieler werden endgültig aus dem Kader entfernt.",
+      "deleting": "Löschen…",
+      "deleted": "{deleted} Spieler gelöscht.",
+      "cancel": "Abbrechen"
     },
     "deleteSection": {
       "title": "Spieler löschen",
@@ -1191,7 +1219,11 @@
       "doneErrors": "{n} Fehler",
       "detailsToggle": "Details",
       "again": "Neuer Import",
-      "backToList": "Kader anzeigen"
+      "backToList": "Kader anzeigen",
+      "targetTeamLabel": "Ziel-Team",
+      "noTargetTeam": "Kein Team — nur in den Kader importieren",
+      "targetTeamHint": "Jeder importierte Spieler wird diesem Team zugeordnet (aktuelle Saison).",
+      "noTargetTeamHint": "Die Spieler werden ohne Zuordnung in den Kader übernommen. Du kannst sie später zuweisen."
     },
     "addMenu": {
       "trigger": "Hinzufügen",

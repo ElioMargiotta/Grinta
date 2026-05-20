@@ -26,10 +26,14 @@ export default async function TeamPage({
 
   if (!team) notFound();
 
+  // L'effectif "actuel" passe désormais par player_team_assignments (#39).
+  // L'ancienne colonne players.team_id est dépréciée depuis #35 et n'est plus
+  // renseignée pour les joueurs créés au niveau club.
   const { count: playerCount } = await supabase
-    .from("players")
+    .from("player_team_assignments")
     .select("id", { head: true, count: "exact" })
-    .eq("team_id", teamId);
+    .eq("team_id", teamId)
+    .is("season", null);
 
   return (
     <div className="mx-auto flex w-full max-w-6xl flex-col gap-8">
@@ -127,9 +131,21 @@ export default async function TeamPage({
               {td("infoDesc")}
             </p>
           </div>
-          <Link href={`/teams/${team.id}/players`}>
-            <Button variant="secondary" size="sm">{t("teams.players.new")}</Button>
-          </Link>
+          <div className="flex flex-wrap items-center gap-2">
+            <Link href={`/contingent?team=${team.id}`}>
+              <Button variant="ghost" size="sm">
+                {td("openContingent")}
+              </Button>
+            </Link>
+            <Link href={`/contingent/import?teamId=${team.id}`}>
+              <Button variant="ghost" size="sm">
+                {td("importClubCorner")}
+              </Button>
+            </Link>
+            <Link href={`/contingent/new?teamId=${team.id}`}>
+              <Button variant="secondary" size="sm">{t("teams.players.new")}</Button>
+            </Link>
+          </div>
         </div>
         <TeamEditForm team={team} />
       </section>

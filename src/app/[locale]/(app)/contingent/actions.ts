@@ -488,3 +488,33 @@ export async function deleteClubPlayerAction(formData: FormData) {
   revalidatePath(`/${locale}/contingent`);
   redirect(`/${locale}/contingent`);
 }
+
+/**
+ * Suppression en masse de joueurs depuis la liste contingent (#39).
+ * RLS gère le scope club ; `player_team_assignments` est supprimé en cascade
+ * via la FK ON DELETE CASCADE de la migration #35.
+ */
+export async function bulkDeletePlayersAction(formData: FormData) {
+  const locale = String(formData.get("locale") ?? "fr");
+  const playerIds = formData
+    .getAll("playerIds")
+    .map((v) => String(v).trim())
+    .filter((v) => v.length > 0);
+
+  if (playerIds.length === 0) return { error: "Missing players" };
+
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) redirect(`/${locale}/login`);
+
+  const { error, count } = await supabase
+    .from("players")
+    .delete({ count: "exact" })
+    .in("id", playerIds);
+  if (error) return { error: error.message };
+
+  revalidatePath(`/${locale}/contingent`);
+  return { deleted: count ?? 0 };
+}
