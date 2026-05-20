@@ -5,6 +5,7 @@ import { useLocale, useTranslations } from "next-intl";
 import { Link, useRouter } from "@/i18n/navigation";
 import { CheckCircle2, FileUp, Upload, XCircle } from "lucide-react";
 import { Button } from "@/components/ui/Button";
+import { Select } from "@/components/ui/Select";
 import {
   decodeCsv,
   parseClubCornerCsv,
@@ -14,10 +15,19 @@ import {
   importClubCornerCsvAction,
   type ImportSummary,
 } from "@/app/[locale]/(app)/contingent/actions";
+import type { ClubTeamOption } from "@/lib/contingent/teams";
 
 type Stage = "pick" | "preview" | "done";
 
-export function ImportClubCornerWizard() {
+export function ImportClubCornerWizard({
+  teams = [],
+  defaultTargetTeamId,
+}: {
+  /** Équipes actives du club, pour la sélection de l'équipe cible (#39). */
+  teams?: ClubTeamOption[];
+  /** Équipe pré-sélectionnée (route /contingent/import?teamId=...). */
+  defaultTargetTeamId?: string;
+}) {
   const t = useTranslations("contingent.import");
   const locale = useLocale();
   const router = useRouter();
@@ -28,6 +38,9 @@ export function ImportClubCornerWizard() {
   const [parsed, setParsed] = useState<ParseResult | null>(null);
   const [summary, setSummary] = useState<ImportSummary | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [targetTeamId, setTargetTeamId] = useState<string>(
+    defaultTargetTeamId ?? "",
+  );
   const [isPending, startTransition] = useTransition();
 
   const reset = () => {
@@ -37,6 +50,7 @@ export function ImportClubCornerWizard() {
     setParsed(null);
     setSummary(null);
     setError(null);
+    setTargetTeamId(defaultTargetTeamId ?? "");
     if (fileInputRef.current) fileInputRef.current.value = "";
   };
 
@@ -61,6 +75,7 @@ export function ImportClubCornerWizard() {
     const fd = new FormData();
     fd.set("locale", locale);
     fd.set("csv", csvText);
+    if (targetTeamId) fd.set("targetTeamId", targetTeamId);
     startTransition(async () => {
       try {
         const result = await importClubCornerCsvAction(fd);
@@ -186,6 +201,36 @@ export function ImportClubCornerWizard() {
                   </p>
                 )}
               </div>
+
+              {teams.length > 0 && (
+                <div className="flex flex-col gap-1">
+                  <label
+                    htmlFor="import-target-team"
+                    className="text-sm font-medium text-zinc-700 dark:text-zinc-300"
+                  >
+                    {t("targetTeamLabel")}
+                  </label>
+                  <Select
+                    id="import-target-team"
+                    value={targetTeamId}
+                    onChange={(e) => setTargetTeamId(e.target.value)}
+                    aria-label={t("targetTeamLabel")}
+                  >
+                    <option value="">{t("noTargetTeam")}</option>
+                    {teams.map((tm) => (
+                      <option key={tm.id} value={tm.id}>
+                        {tm.name}
+                        {tm.age_group ? ` · ${tm.age_group}` : ""}
+                      </option>
+                    ))}
+                  </Select>
+                  <p className="text-xs text-zinc-500 dark:text-zinc-400">
+                    {targetTeamId
+                      ? t("targetTeamHint")
+                      : t("noTargetTeamHint")}
+                  </p>
+                </div>
+              )}
 
               {error && <p className="text-sm text-red-600">{error}</p>}
 

@@ -349,7 +349,9 @@
       "infoDesc": "Nome, stagione, categoria, descrizione e foto di riferimento.",
       "categoryLabel": "Categoria",
       "seasonLabel": "Stagione",
-      "emptyDescHint": "Aggiungi una breve descrizione per inquadrare l'identità, gli obiettivi o le note importanti di questa squadra."
+      "emptyDescHint": "Aggiungi una breve descrizione per inquadrare l'identità, gli obiettivi o le note importanti di questa squadra.",
+      "openContingent": "Apri nella rosa",
+      "importClubCorner": "Importa ClubCorner"
     }
   },
   "exercises": {
@@ -1156,7 +1158,33 @@
       "guardianPhone": "Telefono rapp.",
       "guardian2Name": "Nome rapp. 2",
       "guardian2Email": "Email rapp. 2",
-      "guardian2Phone": "Telefono rapp. 2"
+      "guardian2Phone": "Telefono rapp. 2",
+      "teamsLabel": "Squadre"
+    },
+    "assignments": {
+      "title": "Squadre del giocatore",
+      "noTeamsYet": "Nessuna squadra disponibile — creane una dal tab Squadre.",
+      "helper": "Seleziona le squadre a cui appartiene questo giocatore per la stagione corrente.",
+      "save": "Salva assegnazioni",
+      "saving": "Salvataggio…",
+      "saved": "Assegnazioni aggiornate."
+    },
+    "bulk": {
+      "selected": "{n} giocatore/i selezionato/i",
+      "hint": "Assegna i giocatori selezionati a una squadra — le assegnazioni esistenti non vengono duplicate.",
+      "pickTeam": "Scegli una squadra…",
+      "assign": "Assegna",
+      "assigning": "Assegnazione…",
+      "clear": "Annulla selezione",
+      "selectAll": "Seleziona tutto",
+      "selectOne": "Seleziona {name}",
+      "done": "{assigned} assegnato/i, {skipped} già nella squadra.",
+      "delete": "Elimina",
+      "confirmDelete": "Elimina {n} giocatore/i",
+      "confirmHint": "Azione irreversibile: {n} giocatore/i verranno rimossi definitivamente dalla rosa.",
+      "deleting": "Eliminazione…",
+      "deleted": "{deleted} giocatore/i eliminato/i.",
+      "cancel": "Annulla"
     },
     "deleteSection": {
       "title": "Elimina giocatore",
@@ -1191,7 +1219,11 @@
       "doneErrors": "{n} errori",
       "detailsToggle": "Dettagli",
       "again": "Nuovo import",
-      "backToList": "Vedi la rosa"
+      "backToList": "Vedi la rosa",
+      "targetTeamLabel": "Squadra di destinazione",
+      "noTargetTeam": "Nessuna squadra — importa solo nella rosa",
+      "targetTeamHint": "Ogni giocatore importato sarà assegnato a questa squadra (stagione corrente).",
+      "noTargetTeamHint": "I giocatori saranno aggiunti alla rosa senza assegnazione. Potrai assegnarli in seguito."
     },
     "addMenu": {
       "trigger": "Aggiungi",

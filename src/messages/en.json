@@ -355,7 +355,9 @@
       "infoDesc": "Name, season, category, description and reference photo.",
       "categoryLabel": "Category",
       "seasonLabel": "Season",
-      "emptyDescHint": "Add a short description to frame the identity, objectives or important notes for this team."
+      "emptyDescHint": "Add a short description to frame the identity, objectives or important notes for this team.",
+      "openContingent": "Open in squad",
+      "importClubCorner": "Import ClubCorner"
     }
   },
   "exercises": {
@@ -1162,7 +1164,33 @@
       "guardianPhone": "Guardian phone",
       "guardian2Name": "Guardian 2 name",
       "guardian2Email": "Guardian 2 email",
-      "guardian2Phone": "Guardian 2 phone"
+      "guardian2Phone": "Guardian 2 phone",
+      "teamsLabel": "Teams"
+    },
+    "assignments": {
+      "title": "Player's teams",
+      "noTeamsYet": "No team available yet — create one from the Teams tab.",
+      "helper": "Pick the teams this player belongs to for the current season.",
+      "save": "Save assignments",
+      "saving": "Saving…",
+      "saved": "Assignments updated."
+    },
+    "bulk": {
+      "selected": "{n} player(s) selected",
+      "hint": "Assign selected players to a team — existing memberships are not duplicated.",
+      "pickTeam": "Choose a team…",
+      "assign": "Assign",
+      "assigning": "Assigning…",
+      "clear": "Clear selection",
+      "selectAll": "Select all",
+      "selectOne": "Select {name}",
+      "done": "{assigned} assigned, {skipped} already on the team.",
+      "delete": "Delete",
+      "confirmDelete": "Delete {n} player(s)",
+      "confirmHint": "Irreversible: {n} player(s) will be permanently removed from the squad.",
+      "deleting": "Deleting…",
+      "deleted": "{deleted} player(s) deleted.",
+      "cancel": "Cancel"
     },
     "deleteSection": {
       "title": "Delete player",
@@ -1197,7 +1225,11 @@
       "doneErrors": "{n} error(s)",
       "detailsToggle": "Show details",
       "again": "New import",
-      "backToList": "View squad"
+      "backToList": "View squad",
+      "targetTeamLabel": "Target team",
+      "noTargetTeam": "No team — import to squad only",
+      "targetTeamHint": "Each imported player will be assigned to this team (current season).",
+      "noTargetTeamHint": "Players will be added to the squad without assignment. You can attach them later."
     },
     "addMenu": {
       "trigger": "Add",

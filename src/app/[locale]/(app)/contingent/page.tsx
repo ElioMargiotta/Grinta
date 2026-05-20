@@ -5,6 +5,7 @@ import {
 } from "@/components/contingent/ContingentList";
 import { AddPlayerMenu } from "@/components/contingent/AddPlayerMenu";
 import { requireMembership } from "@/lib/auth/getUser";
+import { listClubTeams } from "@/lib/contingent/teams";
 
 type AssignmentRow = {
   team_id: string;
@@ -23,23 +24,29 @@ type PlayerRow = {
 
 export default async function ContingentPage({
   params,
+  searchParams,
 }: {
   params: Promise<{ locale: string }>;
+  searchParams: Promise<{ team?: string }>;
 }) {
   const { locale } = await params;
+  const { team: initialTeamFilter } = await searchParams;
   setRequestLocale(locale);
   const { supabase, membership } = await requireMembership(locale);
   const t = await getTranslations("contingent");
 
-  const { data } = await supabase
-    .from("players")
-    .select(
-      `id, first_name, last_name, position, jersey_number, birth_date,
+  const [{ data }, teams] = await Promise.all([
+    supabase
+      .from("players")
+      .select(
+        `id, first_name, last_name, position, jersey_number, birth_date,
        player_team_assignments ( team_id, teams ( name, age_group ) )`,
-    )
-    .eq("club_id", membership.club_id)
-    .order("last_name", { ascending: true })
-    .returns<PlayerRow[]>();
+      )
+      .eq("club_id", membership.club_id)
+      .order("last_name", { ascending: true })
+      .returns<PlayerRow[]>(),
+    listClubTeams(membership.club_id),
+  ]);
 
   const players: ContingentPlayer[] = (data ?? []).map((p) => ({
     id: p.id,
@@ -69,7 +76,15 @@ export default async function ContingentPage({
         <AddPlayerMenu />
       </div>
 
-      <ContingentList players={players} />
+      <ContingentList
+        players={players}
+        teams={teams}
+        initialTeamFilter={
+          initialTeamFilter && teams.some((tm) => tm.id === initialTeamFilter)
+            ? initialTeamFilter
+            : undefined
+        }
+      />
     </div>
   );
 }
