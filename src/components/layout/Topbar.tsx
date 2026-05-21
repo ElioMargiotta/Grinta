@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/Button";
 import { logoutAction } from "@/app/[locale]/(app)/actions";
 import { ClubSwitcher } from "./ClubSwitcher";
 import { PersonaSwitcher } from "./PersonaSwitcher";
+import { LocaleSwitcher } from "./LocaleSwitcher";
 import type { ClubMembership } from "@/lib/club/types";
 import type { PersonaState } from "@/lib/club/persona";
 
@@ -86,19 +87,22 @@ export function Topbar({
           </div>
         )}
       </div>
-      <Button
-        variant="ghost"
-        size="sm"
-        onClick={() =>
-          startTransition(async () => {
-            await logoutAction();
-          })
-        }
-        loading={isPending}
-      >
-        <LogOut className="h-4 w-4" />
-        {t("logout")}
-      </Button>
+      <div className="flex items-center gap-1">
+        <LocaleSwitcher variant="subtle" />
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={() =>
+            startTransition(async () => {
+              await logoutAction();
+            })
+          }
+          loading={isPending}
+        >
+          <LogOut className="h-4 w-4" />
+          {t("logout")}
+        </Button>
+      </div>
     </header>
   );
 }

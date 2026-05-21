@@ -9,5 +9,5 @@ export async function logoutAction() {
   await supabase.auth.signOut();
   const cookieStore = await cookies();
   const locale = cookieStore.get("NEXT_LOCALE")?.value ?? "fr";
-  redirect(`/${locale}/login`);
+  redirect(`/${locale}`);
 }

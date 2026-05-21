@@ -5,6 +5,7 @@ import { useTranslations } from "next-intl";
 import { ArrowRight } from "lucide-react";
 import { Link } from "@/i18n/navigation";
 import { GrintaLogoIcon, GrintaLogoType } from "./BrandSeal";
+import { LocaleSwitcher } from "@/components/layout/LocaleSwitcher";
 
 export function NavBar() {
   const t = useTranslations("landing.nav");
@@ -49,6 +50,7 @@ export function NavBar() {
           ))}
         </nav>
         <div className="flex items-center gap-2">
+          <LocaleSwitcher />
           <Link
             href="/login"
             className="hidden sm:inline-flex text-[13px] font-medium px-3 py-2 text-[var(--ink-2)] hover:text-[var(--ink)]"
