@@ -218,7 +218,10 @@
     "planner": "Planning",
     "settings": "Paramètres",
     "logout": "Quitter",
-    "contingent": "Contingent"
+    "contingent": "Contingent",
+    "playerMe": "Ma fiche",
+    "playerTeam": "Mes équipes",
+    "playerSchedule": "Mon planning"
   },
   "auth": {
     "tabLogin": "S'identifier",
@@ -1087,7 +1090,10 @@
     "trialDays": "Essai · {days}j restants",
     "planPerTeam": "{count} {teams} · {amount} CHF/mois",
     "planStatus": "{status} · {count} {teams}",
-    "fallbackName": "Coach"
+    "fallbackName": "Coach",
+    "personaCoach": "Entraîneur",
+    "personaPlayer": "Joueur",
+    "personaSwitchAria": "Changer de vue"
   },
   "sidebar": {
     "fallbackClubName": "Club",
@@ -1255,5 +1261,43 @@
       "import": "Importer depuis ClubCorner",
       "importHint": "Depuis un CSV exporté"
     }
+  },
+  "playerMe": {
+    "title": "Ma fiche",
+    "readOnlyHint": "Vue lecture seule — contacte le staff pour toute modification.",
+    "empty": "Aucune fiche joueur n'est rattachée à ton compte.",
+    "sectionIdentity": "Identité",
+    "sectionGame": "Profil de jeu",
+    "sectionContact": "Coordonnées",
+    "sectionDualLicence": "Double licence",
+    "firstName": "Prénom",
+    "lastName": "Nom",
+    "birthDate": "Date de naissance",
+    "nationality": "Nationalité",
+    "position": "Poste",
+    "jerseyNumber": "Numéro",
+    "strongFoot": "Pied fort",
+    "licenseNumber": "N° de licence",
+    "jsNumber": "N° J+S",
+    "email": "Email",
+    "phone": "Téléphone",
+    "address": "Adresse",
+    "postalCode": "NPA",
+    "city": "Ville",
+    "canton": "Canton",
+    "dualLicenceClub": "Club partenaire",
+    "dualLicenceLevel": "Niveau",
+    "dualLicenceTeam": "Équipe"
+  },
+  "playerTeam": {
+    "title": "Mes équipes",
+    "empty": "Tu n'es affecté à aucune équipe pour l'instant.",
+    "currentSeason": "Saison en cours"
+  },
+  "playerSchedule": {
+    "title": "Mon planning",
+    "empty": "Aucune équipe — aucun planning à afficher.",
+    "emptyUpcoming": "Aucune séance à venir.",
+    "untitled": "Séance"
   }
 }

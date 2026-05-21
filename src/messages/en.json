@@ -219,7 +219,10 @@
     "planner": "Planner",
     "settings": "Settings",
     "logout": "Log out",
-    "contingent": "Squad"
+    "contingent": "Squad",
+    "playerMe": "My profile",
+    "playerTeam": "My teams",
+    "playerSchedule": "My schedule"
   },
   "auth": {
     "tabLogin": "Log in",
@@ -1088,7 +1091,10 @@
     "trialDays": "Trial · {days}d remaining",
     "planPerTeam": "{count} {teams} · {amount} CHF/month",
     "planStatus": "{status} · {count} {teams}",
-    "fallbackName": "Coach"
+    "fallbackName": "Coach",
+    "personaCoach": "Coach",
+    "personaPlayer": "Player",
+    "personaSwitchAria": "Switch view"
   },
   "sidebar": {
     "fallbackClubName": "Club",
@@ -1256,5 +1262,43 @@
       "import": "Import from ClubCorner",
       "importHint": "From an exported CSV"
     }
+  },
+  "playerMe": {
+    "title": "My profile",
+    "readOnlyHint": "Read-only view — contact staff for changes.",
+    "empty": "No player record is linked to your account.",
+    "sectionIdentity": "Identity",
+    "sectionGame": "Playing profile",
+    "sectionContact": "Contact",
+    "sectionDualLicence": "Dual licence",
+    "firstName": "First name",
+    "lastName": "Last name",
+    "birthDate": "Date of birth",
+    "nationality": "Nationality",
+    "position": "Position",
+    "jerseyNumber": "Jersey number",
+    "strongFoot": "Strong foot",
+    "licenseNumber": "Licence #",
+    "jsNumber": "J+S #",
+    "email": "Email",
+    "phone": "Phone",
+    "address": "Address",
+    "postalCode": "Postcode",
+    "city": "City",
+    "canton": "Canton",
+    "dualLicenceClub": "Partner club",
+    "dualLicenceLevel": "Level",
+    "dualLicenceTeam": "Team"
+  },
+  "playerTeam": {
+    "title": "My teams",
+    "empty": "You are not assigned to any team yet.",
+    "currentSeason": "Current season"
+  },
+  "playerSchedule": {
+    "title": "My schedule",
+    "empty": "No team — nothing to display.",
+    "emptyUpcoming": "No upcoming session.",
+    "untitled": "Session"
   }
 }

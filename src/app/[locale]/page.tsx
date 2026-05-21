@@ -1,5 +1,6 @@
 import { Link, redirect } from "@/i18n/navigation";
 import { createClient } from "@/lib/supabase/server";
+import { resolvePersona } from "@/lib/club/persona";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { getMessages } from "next-intl/server";
 import { ArrowRight, Check } from "lucide-react";
@@ -42,7 +43,13 @@ export default async function LocaleHome({
   } = await supabase.auth.getUser();
 
   if (user) {
-    redirect({ href: "/dashboard", locale });
+    // Dispatch to the active persona's landing. Player-only accounts go
+    // straight to /me; staff (or dual with staff active) keep /dashboard.
+    const persona = await resolvePersona();
+    redirect({
+      href: persona?.active === "player" ? "/me" : "/dashboard",
+      locale,
+    });
   }
 
   const messages = (await getMessages()) as {

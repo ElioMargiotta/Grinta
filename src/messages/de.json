@@ -219,7 +219,10 @@
     "planner": "Planung",
     "settings": "Einstellungen",
     "logout": "Abmelden",
-    "contingent": "Kader"
+    "contingent": "Kader",
+    "playerMe": "Mein Profil",
+    "playerTeam": "Meine Mannschaften",
+    "playerSchedule": "Mein Plan"
   },
   "auth": {
     "tabLogin": "Anmelden",
@@ -1082,7 +1085,10 @@
     "trialDays": "Testphase · {days}T verbleibend",
     "planPerTeam": "{count} {teams} · {amount} CHF/Monat",
     "planStatus": "{status} · {count} {teams}",
-    "fallbackName": "Coach"
+    "fallbackName": "Coach",
+    "personaCoach": "Trainer",
+    "personaPlayer": "Spieler",
+    "personaSwitchAria": "Ansicht wechseln"
   },
   "sidebar": {
     "fallbackClubName": "Club",
@@ -1250,5 +1256,43 @@
       "import": "Aus ClubCorner importieren",
       "importHint": "Aus exportierter CSV"
     }
+  },
+  "playerMe": {
+    "title": "Mein Profil",
+    "readOnlyHint": "Nur-Lese-Ansicht — wende dich an das Staff für Änderungen.",
+    "empty": "Mit deinem Konto ist keine Spielerakte verknüpft.",
+    "sectionIdentity": "Identität",
+    "sectionGame": "Spielprofil",
+    "sectionContact": "Kontakt",
+    "sectionDualLicence": "Doppellizenz",
+    "firstName": "Vorname",
+    "lastName": "Nachname",
+    "birthDate": "Geburtsdatum",
+    "nationality": "Nationalität",
+    "position": "Position",
+    "jerseyNumber": "Trikotnummer",
+    "strongFoot": "Starker Fuss",
+    "licenseNumber": "Lizenznummer",
+    "jsNumber": "J+S-Nummer",
+    "email": "E-Mail",
+    "phone": "Telefon",
+    "address": "Adresse",
+    "postalCode": "PLZ",
+    "city": "Ort",
+    "canton": "Kanton",
+    "dualLicenceClub": "Partnerverein",
+    "dualLicenceLevel": "Niveau",
+    "dualLicenceTeam": "Mannschaft"
+  },
+  "playerTeam": {
+    "title": "Meine Mannschaften",
+    "empty": "Du bist noch keiner Mannschaft zugewiesen.",
+    "currentSeason": "Aktuelle Saison"
+  },
+  "playerSchedule": {
+    "title": "Mein Plan",
+    "empty": "Keine Mannschaft — nichts anzuzeigen.",
+    "emptyUpcoming": "Kein anstehendes Training.",
+    "untitled": "Training"
   }
 }
