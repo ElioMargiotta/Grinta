@@ -6,7 +6,9 @@ import { useTransition } from "react";
 import { Button } from "@/components/ui/Button";
 import { logoutAction } from "@/app/[locale]/(app)/actions";
 import { ClubSwitcher } from "./ClubSwitcher";
+import { PersonaSwitcher } from "./PersonaSwitcher";
 import type { ClubMembership } from "@/lib/club/types";
+import type { PersonaState } from "@/lib/club/persona";
 
 const PRICE_PER_TEAM_CHF = 12;
 
@@ -29,11 +31,13 @@ export function Topbar({
   currentMembership,
   memberships,
   teamCount,
+  persona,
 }: {
   userName: string;
   currentMembership: ClubMembership | null;
   memberships: ClubMembership[];
   teamCount: number;
+  persona?: PersonaState | null;
 }) {
   const t = useTranslations("nav");
   const tp = useTranslations("topbar");
@@ -74,6 +78,11 @@ export function Topbar({
         {currentMembership && (
           <div className="ml-2">
             <ClubSwitcher current={currentMembership} memberships={memberships} />
+          </div>
+        )}
+        {persona?.available === "dual" && (
+          <div className="ml-2">
+            <PersonaSwitcher active={persona.active} />
           </div>
         )}
       </div>

@@ -1,14 +1,12 @@
 import { setRequestLocale } from "next-intl/server";
-import { Sidebar } from "@/components/layout/Sidebar";
+import { PlayerSidebar } from "@/components/layout/PlayerSidebar";
 import { Topbar } from "@/components/layout/Topbar";
-import { requireUser } from "@/lib/auth/getUser";
+import { requirePersona } from "@/lib/auth/getUser";
 import { resolveCurrentMembership } from "@/lib/club/context";
 import { getMyMemberships } from "@/lib/club/queries";
-import { resolvePersona } from "@/lib/club/persona";
-import { redirect } from "next/navigation";
 import { clubThemeStyle } from "@/lib/club/theme";
 
-export default async function AppLayout({
+export default async function PlayerLayout({
   children,
   params,
 }: {
@@ -17,14 +15,7 @@ export default async function AppLayout({
 }) {
   const { locale } = await params;
   setRequestLocale(locale);
-  const { supabase, user } = await requireUser(locale);
-
-  // Route group (app) is staff territory. If the user is in player mode (or
-  // is purely a player), bounce to /me so the two views stay disjoint.
-  const persona = await resolvePersona();
-  if (persona && persona.active === "player") {
-    redirect(`/${locale}/me`);
-  }
+  const { supabase, user, persona } = await requirePersona(locale, "player");
 
   const [{ data: profile }, membership, memberships] = await Promise.all([
     supabase.from("profiles").select("full_name").eq("id", user.id).single(),
@@ -33,19 +24,6 @@ export default async function AppLayout({
   ]);
 
   const displayName = profile?.full_name?.trim() || user.email || "";
-  const hasMembership = memberships.length > 0;
-
-  // Per-team billing summary: count non-archived teams of the current club
-  // and surface the trial state. Free-tier (no membership) shows nothing.
-  let teamCount = 0;
-  if (membership) {
-    const { count } = await supabase
-      .from("teams")
-      .select("id", { head: true, count: "exact" })
-      .eq("club_id", membership.club_id)
-      .is("archived_at", null);
-    teamCount = count ?? 0;
-  }
 
   return (
     <div
@@ -53,7 +31,7 @@ export default async function AppLayout({
       style={clubThemeStyle(membership)}
     >
       <div className="print:hidden">
-        <Sidebar hasMembership={hasMembership} currentMembership={membership} />
+        <PlayerSidebar currentMembership={membership} />
       </div>
       <div className="flex flex-1 flex-col">
         <div className="print:hidden">
@@ -61,7 +39,7 @@ export default async function AppLayout({
             userName={displayName}
             currentMembership={membership}
             memberships={memberships}
-            teamCount={teamCount}
+            teamCount={0}
             persona={persona}
           />
         </div>
