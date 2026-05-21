@@ -141,9 +141,9 @@
         },
         {
           "name": "Club",
-          "originalPrice": "25 CHF",
+          "originalPrice": "50 CHF",
           "discountLabel": "Offre de lancement",
-          "price": "12 CHF",
+          "price": "25 CHF",
           "priceSuffix": "/ équipe / mois",
           "sub": "Toutes les catégories, une seule méthode.",
           "features": [
