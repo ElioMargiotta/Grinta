@@ -219,7 +219,10 @@
     "planner": "Pianificazione",
     "settings": "Impostazioni",
     "logout": "Esci",
-    "contingent": "Rosa"
+    "contingent": "Rosa",
+    "playerMe": "La mia scheda",
+    "playerTeam": "Le mie squadre",
+    "playerSchedule": "Il mio calendario"
   },
   "auth": {
     "tabLogin": "Accedi",
@@ -1082,7 +1085,10 @@
     "trialDays": "Prova · {days}g rimanenti",
     "planPerTeam": "{count} {teams} · {amount} CHF/mese",
     "planStatus": "{status} · {count} {teams}",
-    "fallbackName": "Coach"
+    "fallbackName": "Coach",
+    "personaCoach": "Allenatore",
+    "personaPlayer": "Giocatore",
+    "personaSwitchAria": "Cambia vista"
   },
   "sidebar": {
     "fallbackClubName": "Club",
@@ -1250,5 +1256,43 @@
       "import": "Importa da ClubCorner",
       "importHint": "Da un CSV esportato"
     }
+  },
+  "playerMe": {
+    "title": "La mia scheda",
+    "readOnlyHint": "Vista in sola lettura — contatta lo staff per qualsiasi modifica.",
+    "empty": "Nessuna scheda giocatore è collegata al tuo account.",
+    "sectionIdentity": "Identità",
+    "sectionGame": "Profilo di gioco",
+    "sectionContact": "Contatti",
+    "sectionDualLicence": "Doppio tesseramento",
+    "firstName": "Nome",
+    "lastName": "Cognome",
+    "birthDate": "Data di nascita",
+    "nationality": "Nazionalità",
+    "position": "Ruolo",
+    "jerseyNumber": "Numero",
+    "strongFoot": "Piede forte",
+    "licenseNumber": "N° licenza",
+    "jsNumber": "N° J+S",
+    "email": "Email",
+    "phone": "Telefono",
+    "address": "Indirizzo",
+    "postalCode": "CAP",
+    "city": "Città",
+    "canton": "Cantone",
+    "dualLicenceClub": "Club partner",
+    "dualLicenceLevel": "Livello",
+    "dualLicenceTeam": "Squadra"
+  },
+  "playerTeam": {
+    "title": "Le mie squadre",
+    "empty": "Non sei ancora assegnato a nessuna squadra.",
+    "currentSeason": "Stagione in corso"
+  },
+  "playerSchedule": {
+    "title": "Il mio calendario",
+    "empty": "Nessuna squadra — niente da mostrare.",
+    "emptyUpcoming": "Nessuna sessione in arrivo.",
+    "untitled": "Sessione"
   }
 }
