@@ -142,10 +142,10 @@
         },
         {
           "name": "Club",
-          "originalPrice": "25 CHF",
+          "originalPrice": "50 CHF",
           "discountLabel": "Sconto early bakers",
-          "price": "12 CHF",
-          "priceSuffix": "/ mese",
+          "price": "25 CHF",
+          "priceSuffix": "/ team / month",
           "sub": "Tutte le categorie, un unico metodo.",
           "features": [
             "Squadre illimitate",

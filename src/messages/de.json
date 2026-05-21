@@ -142,10 +142,10 @@
         },
         {
           "name": "Verein",
-          "originalPrice": "25 CHF",
+          "originalPrice": "50 CHF",
           "discountLabel": "Early-Bakers-Rabatt",
-          "price": "12 CHF",
-          "priceSuffix": "/ Monat",
+          "price": "25 CHF",
+          "priceSuffix": "/ team / month",
           "sub": "Alle Kategorien, eine Methode.",
           "features": [
             "Unbegrenzte Mannschaften",
