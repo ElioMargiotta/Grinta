@@ -52,9 +52,14 @@ type SessionPayload = {
   duration: number | null;
   theme: string | null;
   notes: string | null;
+  rsvpDeadlineHours: number;
 };
 
 function readSessionFields(formData: FormData): SessionPayload {
+  const rawDeadline = formData.get("rsvpDeadlineHours");
+  const deadline = rawDeadline === null || rawDeadline === ""
+    ? 24
+    : Math.max(0, Math.min(168, Math.round(Number(rawDeadline))));
   return {
     teamId: String(formData.get("teamId") ?? ""),
     date: String(formData.get("date") ?? ""),
@@ -62,6 +67,7 @@ function readSessionFields(formData: FormData): SessionPayload {
     duration: formData.get("duration") ? Number(formData.get("duration")) : null,
     theme: String(formData.get("theme") ?? "").trim() || null,
     notes: String(formData.get("notes") ?? "").trim() || null,
+    rsvpDeadlineHours: Number.isFinite(deadline) ? deadline : 24,
   };
 }
 
@@ -388,6 +394,7 @@ export async function createSessionAction(formData: FormData) {
       duration_minutes: fields.duration,
       theme: fields.theme,
       notes: fields.notes,
+      rsvp_deadline_hours: fields.rsvpDeadlineHours,
     })
     .select("id")
     .single();
@@ -435,6 +442,7 @@ export async function updateSessionAction(formData: FormData) {
       duration_minutes: fields.duration,
       theme: fields.theme,
       notes: fields.notes,
+      rsvp_deadline_hours: fields.rsvpDeadlineHours,
     })
     .eq("id", id);
 

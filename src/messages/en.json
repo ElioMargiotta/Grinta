@@ -560,6 +560,8 @@
       "duration": "Duration (minutes)",
       "theme": "Theme",
       "notes": "Notes",
+      "rsvpDeadlineHours": "RSVP deadline (h)",
+      "rsvpDeadlineHoursHint": "Hours before the start when players can still respond",
       "exercises": "Exercises",
       "addExercise": "Add exercise",
       "noExercises": "No exercises attached. Add some from your library.",
@@ -1300,5 +1302,48 @@
     "empty": "No team — nothing to display.",
     "emptyUpcoming": "No upcoming session.",
     "untitled": "Session"
+  },
+  "attendance": {
+    "present": "Going",
+    "absent": "Not going",
+    "confirmAbsent": "Confirm absence",
+    "cancel": "Cancel",
+    "reasonLabel": "Reason",
+    "answeredPresent": "You marked yourself present",
+    "answeredAbsent": "You marked yourself absent",
+    "deadlinePassed": "Deadline passed — contact your coach to change",
+    "errors": {
+      "unauthenticated": "You must be signed in",
+      "reason_required_when_absent": "A reason is required when marking absent",
+      "session_not_found": "Session not found",
+      "club_inactive": "The club is no longer active",
+      "not_assigned_to_team": "You are not assigned to this team",
+      "deadline_passed": "Response deadline passed",
+      "missing_session": "Missing session",
+      "invalid_status": "Invalid status",
+      "unknown": "Something went wrong — try again"
+    },
+    "coach": {
+      "title": "Attendance",
+      "openLink": "Attendance",
+      "backToPreparation": "Back to preparation",
+      "statAnnouncedPresent": "Announced going",
+      "statAnnouncedAbsent": "Announced absent",
+      "statNoResponse": "No response",
+      "statActualPresent": "Actually present",
+      "deadlineLabel": "Deadline (h)",
+      "deadlineSave": "Save",
+      "deadlineHint": "Hours before the session when players can respond. 0 = up to start. Max 168 (7 days).",
+      "colPlayer": "Player",
+      "colAnnounced": "Announced",
+      "colActual": "Actual",
+      "noResponse": "No response",
+      "present": "Present",
+      "absent": "Absent",
+      "markPresent": "Mark present",
+      "markAbsent": "Mark absent",
+      "markUnknown": "Clear",
+      "emptyRoster": "No players assigned to this team."
+    }
   }
 }

@@ -17,6 +17,7 @@ type Initial = {
   duration_minutes: number | null;
   theme: string | null;
   notes: string | null;
+  rsvp_deadline_hours: number | null;
 };
 
 export function SessionForm({
@@ -82,6 +83,16 @@ export function SessionForm({
           name="theme"
           label={t("theme")}
           defaultValue={initial?.theme ?? ""}
+        />
+        <Input
+          id="rsvpDeadlineHours"
+          name="rsvpDeadlineHours"
+          type="number"
+          min={0}
+          max={168}
+          label={t("rsvpDeadlineHours")}
+          hint={t("rsvpDeadlineHoursHint")}
+          defaultValue={initial?.rsvp_deadline_hours ?? 24}
         />
       </div>
       <Textarea

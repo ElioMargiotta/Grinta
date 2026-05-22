@@ -554,6 +554,8 @@
       "duration": "Dauer (Minuten)",
       "theme": "Thema",
       "notes": "Notizen",
+      "rsvpDeadlineHours": "Rückmeldefrist (Std)",
+      "rsvpDeadlineHoursHint": "Stunden vor Beginn, in denen Spieler noch antworten können",
       "exercises": "Übungen",
       "addExercise": "Übung hinzufügen",
       "noExercises": "Keine Übungen verknüpft. Füge welche aus deiner Bibliothek hinzu.",
@@ -1294,5 +1296,48 @@
     "empty": "Keine Mannschaft — nichts anzuzeigen.",
     "emptyUpcoming": "Kein anstehendes Training.",
     "untitled": "Training"
+  },
+  "attendance": {
+    "present": "Dabei",
+    "absent": "Nicht dabei",
+    "confirmAbsent": "Absage bestätigen",
+    "cancel": "Abbrechen",
+    "reasonLabel": "Grund",
+    "answeredPresent": "Du hast deine Teilnahme gemeldet",
+    "answeredAbsent": "Du hast deine Abwesenheit gemeldet",
+    "deadlinePassed": "Frist abgelaufen — kontaktiere deinen Trainer",
+    "errors": {
+      "unauthenticated": "Du musst angemeldet sein",
+      "reason_required_when_absent": "Bei einer Absage ist ein Grund erforderlich",
+      "session_not_found": "Training nicht gefunden",
+      "club_inactive": "Der Verein ist nicht mehr aktiv",
+      "not_assigned_to_team": "Du bist dieser Mannschaft nicht zugewiesen",
+      "deadline_passed": "Antwortfrist abgelaufen",
+      "missing_session": "Training fehlt",
+      "invalid_status": "Ungültiger Status",
+      "unknown": "Etwas ist schiefgelaufen — bitte erneut versuchen"
+    },
+    "coach": {
+      "title": "Anwesenheit",
+      "openLink": "Anwesenheit",
+      "backToPreparation": "Zurück zur Vorbereitung",
+      "statAnnouncedPresent": "Angemeldet dabei",
+      "statAnnouncedAbsent": "Angemeldet abwesend",
+      "statNoResponse": "Keine Antwort",
+      "statActualPresent": "Tatsächlich anwesend",
+      "deadlineLabel": "Frist (Std)",
+      "deadlineSave": "Speichern",
+      "deadlineHint": "Stunden vor dem Training, in denen Spieler antworten können. 0 = bis zum Start. Max. 168 (7 Tage).",
+      "colPlayer": "Spieler",
+      "colAnnounced": "Angemeldet",
+      "colActual": "Tatsächlich",
+      "noResponse": "Keine Antwort",
+      "present": "Anwesend",
+      "absent": "Abwesend",
+      "markPresent": "Als anwesend markieren",
+      "markAbsent": "Als abwesend markieren",
+      "markUnknown": "Zurücksetzen",
+      "emptyRoster": "Keine Spieler dieser Mannschaft zugewiesen."
+    }
   }
 }

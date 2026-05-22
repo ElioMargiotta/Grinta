@@ -554,6 +554,8 @@
       "duration": "Durata (minuti)",
       "theme": "Tema",
       "notes": "Note",
+      "rsvpDeadlineHours": "Scadenza risposta (h)",
+      "rsvpDeadlineHoursHint": "Ore prima dell'inizio in cui i giocatori possono ancora rispondere",
       "exercises": "Esercizi",
       "addExercise": "Aggiungi un esercizio",
       "noExercises": "Nessun esercizio collegato. Aggiungine dalla tua libreria.",
@@ -1294,5 +1296,48 @@
     "empty": "Nessuna squadra — niente da mostrare.",
     "emptyUpcoming": "Nessuna sessione in arrivo.",
     "untitled": "Sessione"
+  },
+  "attendance": {
+    "present": "Presente",
+    "absent": "Assente",
+    "confirmAbsent": "Conferma assenza",
+    "cancel": "Annulla",
+    "reasonLabel": "Motivo",
+    "answeredPresent": "Hai dichiarato la presenza",
+    "answeredAbsent": "Hai dichiarato l'assenza",
+    "deadlinePassed": "Scadenza superata — contatta il tuo allenatore",
+    "errors": {
+      "unauthenticated": "Devi essere connesso",
+      "reason_required_when_absent": "È richiesto un motivo per segnalare un'assenza",
+      "session_not_found": "Sessione non trovata",
+      "club_inactive": "Il club non è più attivo",
+      "not_assigned_to_team": "Non sei assegnato a questa squadra",
+      "deadline_passed": "Scadenza per la risposta superata",
+      "missing_session": "Sessione mancante",
+      "invalid_status": "Stato non valido",
+      "unknown": "Qualcosa è andato storto — riprova"
+    },
+    "coach": {
+      "title": "Presenze",
+      "openLink": "Presenze",
+      "backToPreparation": "Torna alla preparazione",
+      "statAnnouncedPresent": "Annunciati presenti",
+      "statAnnouncedAbsent": "Annunciati assenti",
+      "statNoResponse": "Senza risposta",
+      "statActualPresent": "Effettivi presenti",
+      "deadlineLabel": "Scadenza (h)",
+      "deadlineSave": "Salva",
+      "deadlineHint": "Ore prima della sessione in cui i giocatori possono rispondere. 0 = fino all'inizio. Max 168 (7 g).",
+      "colPlayer": "Giocatore",
+      "colAnnounced": "Annunciato",
+      "colActual": "Effettivo",
+      "noResponse": "Nessuna risposta",
+      "present": "Presente",
+      "absent": "Assente",
+      "markPresent": "Segna presente",
+      "markAbsent": "Segna assente",
+      "markUnknown": "Azzera",
+      "emptyRoster": "Nessun giocatore assegnato a questa squadra."
+    }
   }
 }

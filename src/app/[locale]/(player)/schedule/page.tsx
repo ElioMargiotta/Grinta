@@ -1,5 +1,6 @@
 import { getLocale, getTranslations, setRequestLocale } from "next-intl/server";
 import { Card } from "@/components/ui/Card";
+import { AttendanceRSVP } from "@/components/player/AttendanceRSVP";
 import { requirePersona } from "@/lib/auth/getUser";
 
 type SessionRow = {
@@ -9,7 +10,14 @@ type SessionRow = {
   start_time: string | null;
   duration_minutes: number | null;
   theme: string | null;
+  rsvp_deadline_hours: number | null;
   teams: { name: string } | null;
+};
+
+type AttendanceRow = {
+  session_id: string;
+  announced_status: "present" | "absent" | null;
+  announced_reason: string | null;
 };
 
 function formatDate(iso: string, locale: string) {
@@ -23,6 +31,13 @@ function formatDate(iso: string, locale: string) {
   } catch {
     return iso;
   }
+}
+
+function deadlinePassed(session: SessionRow): boolean {
+  const startIso = `${session.date}T${session.start_time ?? "00:00"}:00`;
+  const start = new Date(startIso).getTime();
+  const hours = session.rsvp_deadline_hours ?? 24;
+  return Date.now() > start - hours * 3600_000;
 }
 
 export default async function PlayerSchedulePage({
@@ -49,8 +64,6 @@ export default async function PlayerSchedulePage({
     );
   }
 
-  // Player team ids (any season). RLS sessions_player_read filters on the join,
-  // so this list scope is just to avoid a redundant subselect in the SQL.
   const { data: assignments } = await supabase
     .from("player_team_assignments")
     .select("team_id")
@@ -71,9 +84,12 @@ export default async function PlayerSchedulePage({
   }
 
   const today = new Date().toISOString().slice(0, 10);
-  const { data } = await supabase
+  const { data: sessionData } = await supabase
     .from("sessions")
-    .select(`id, team_id, date, start_time, duration_minutes, theme, teams!inner(name)`)
+    .select(
+      `id, team_id, date, start_time, duration_minutes, theme,
+       rsvp_deadline_hours, teams!inner(name)`,
+    )
     .in("team_id", teamIds)
     .gte("date", today)
     .order("date", { ascending: true })
@@ -81,7 +97,21 @@ export default async function PlayerSchedulePage({
     .limit(50)
     .returns<SessionRow[]>();
 
-  const sessions = data ?? [];
+  const sessions = sessionData ?? [];
+
+  const sessionIds = sessions.map((s) => s.id);
+  const { data: attendanceData } = sessionIds.length
+    ? await supabase
+        .from("session_attendances")
+        .select("session_id, announced_status, announced_reason")
+        .eq("player_id", persona.playerId)
+        .in("session_id", sessionIds)
+        .returns<AttendanceRow[]>()
+    : { data: [] as AttendanceRow[] };
+
+  const attendanceBySession = new Map(
+    (attendanceData ?? []).map((a) => [a.session_id, a]),
+  );
 
   return (
     <div className="mx-auto flex w-full max-w-3xl flex-col gap-6">
@@ -95,29 +125,42 @@ export default async function PlayerSchedulePage({
         </Card>
       ) : (
         <div className="flex flex-col gap-3">
-          {sessions.map((s) => (
-            <Card key={s.id}>
-              <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-                <div>
-                  <div className="text-base font-semibold text-zinc-900 dark:text-zinc-100">
-                    {s.theme ?? t("untitled")}
-                  </div>
-                  <div className="text-sm text-zinc-500 dark:text-zinc-400">
-                    {s.teams?.name ?? "—"}
-                  </div>
-                </div>
-                <div className="text-sm text-zinc-600 dark:text-zinc-300">
-                  <div>{formatDate(s.date, currentLocale)}</div>
-                  {s.start_time && (
-                    <div className="text-[11px] font-mono uppercase tracking-widest text-zinc-500">
-                      {s.start_time.slice(0, 5)}
-                      {s.duration_minutes ? ` · ${s.duration_minutes}'` : ""}
+          {sessions.map((s) => {
+            const attendance = attendanceBySession.get(s.id) ?? null;
+            return (
+              <Card key={s.id}>
+                <div className="flex flex-col gap-3">
+                  <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+                    <div>
+                      <div className="text-base font-semibold text-zinc-900 dark:text-zinc-100">
+                        {s.theme ?? t("untitled")}
+                      </div>
+                      <div className="text-sm text-zinc-500 dark:text-zinc-400">
+                        {s.teams?.name ?? "—"}
+                      </div>
                     </div>
-                  )}
+                    <div className="text-sm text-zinc-600 dark:text-zinc-300">
+                      <div>{formatDate(s.date, currentLocale)}</div>
+                      {s.start_time && (
+                        <div className="text-[11px] font-mono uppercase tracking-widest text-zinc-500">
+                          {s.start_time.slice(0, 5)}
+                          {s.duration_minutes ? ` · ${s.duration_minutes}'` : ""}
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                  <div className="border-t border-zinc-200 pt-3 dark:border-zinc-800">
+                    <AttendanceRSVP
+                      sessionId={s.id}
+                      deadlinePassed={deadlinePassed(s)}
+                      initialStatus={attendance?.announced_status ?? null}
+                      initialReason={attendance?.announced_reason ?? null}
+                    />
+                  </div>
                 </div>
-              </div>
-            </Card>
-          ))}
+              </Card>
+            );
+          })}
         </div>
       )}
     </div>
