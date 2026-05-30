@@ -4,7 +4,7 @@ import { useMemo, useState, useTransition } from "react";
 import type { DragEvent } from "react";
 import { useTranslations, useLocale } from "next-intl";
 import { useRouter } from "@/i18n/navigation";
-import { Copy, Trash2 } from "lucide-react";
+import { Copy, Trash2, Users } from "lucide-react";
 import type { Macrocycle, Mesocycle } from "./PlannerTourView";
 import {
   MicrocycleThemePicker,
@@ -264,6 +264,7 @@ export function PlannerWeeksGrid({
   const t = useTranslations("planner.weeks");
   const tTour = useTranslations("planner.tour");
   const tTheme = useTranslations("planner.theme");
+  const tAtt = useTranslations("attendance.coach");
   const today = ymd(new Date());
   const [isCreatingSlot, startSlotCreate] = useTransition();
   const [isSessionActionPending, startSessionAction] = useTransition();
@@ -689,6 +690,20 @@ export function PlannerWeeksGrid({
 	                    </span>
 	                  </button>
                   <div className="absolute right-1 top-1 flex items-center gap-1 rounded-lg bg-white/90 p-0.5 opacity-0 shadow-sm ring-1 ring-zinc-200 transition-opacity group-hover/session:opacity-100 dark:bg-zinc-900/90 dark:ring-zinc-700">
+                    <button
+                      type="button"
+                      title={tAtt("openLink")}
+                      aria-label={tAtt("openLink")}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        router.push(
+                          `/planner/${teamId}/sessions/${session.id}/attendance`,
+                        );
+                      }}
+                      className="inline-flex h-6 w-6 items-center justify-center rounded-lg text-zinc-500 transition-all duration-150 hover:bg-zinc-100 hover:text-zinc-900 active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-zinc-300 dark:text-zinc-400 dark:hover:bg-zinc-800 dark:hover:text-zinc-100"
+                    >
+                      <Users size={12} strokeWidth={2.2} />
+                    </button>
                     <button
 	                      type="button"
 	                      title={t("duplicate")}
