@@ -1,8 +1,9 @@
 "use client";
 
-import { LogOut } from "lucide-react";
+import { LogOut, UserCog } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useTransition } from "react";
+import { Link } from "@/i18n/navigation";
 import { Button } from "@/components/ui/Button";
 import { logoutAction } from "@/app/[locale]/(app)/actions";
 import { ClubSwitcher } from "./ClubSwitcher";
@@ -76,7 +77,7 @@ export function Topbar({
             {subtitle}
           </div>
         </div>
-        {currentMembership && (
+        {currentMembership && persona?.active !== "player" && (
           <div className="ml-2">
             <ClubSwitcher current={currentMembership} memberships={memberships} />
           </div>
@@ -89,6 +90,13 @@ export function Topbar({
       </div>
       <div className="flex items-center gap-1">
         <LocaleSwitcher variant="subtle" />
+        <Link
+          href="/account"
+          className="inline-flex h-8 items-center gap-1.5 rounded-md px-2 text-xs font-medium text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 dark:text-zinc-400 dark:hover:bg-zinc-800 dark:hover:text-zinc-100"
+        >
+          <UserCog className="h-4 w-4" />
+          <span className="hidden sm:inline">{t("account")}</span>
+        </Link>
         <Button
           variant="ghost"
           size="sm"

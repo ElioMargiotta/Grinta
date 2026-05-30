@@ -6,6 +6,7 @@ import { resolveCurrentMembership } from "./context";
 
 export type Persona = "staff" | "player";
 export type PersonaAvailability = "staff" | "player" | "dual";
+export type PersonaPreference = "staff" | "player" | "dual";
 
 const CURRENT_PERSONA_COOKIE = "grinta_current_persona";
 const COOKIE_MAX_AGE_DAYS = 365;
@@ -15,6 +16,10 @@ export type PersonaState = {
   active: Persona;
   playerId: string | null;
   playerClubId: string | null;
+  // Stated intent from signup (or account settings). Drives switcher
+  // availability for unaffiliated accounts — when "dual" the user can flip
+  // views before joining a club or being registered as a player.
+  preference: PersonaPreference;
 };
 
 export async function getCurrentPersona(): Promise<Persona | null> {
@@ -48,18 +53,21 @@ export async function clearCurrentPersona(): Promise<void> {
   }
 }
 
+function normalizePreference(value: unknown): PersonaPreference {
+  return value === "player" || value === "dual" ? value : "staff";
+}
+
 /**
- * Looks up the persona state for the current user.
- *   - playerId / playerClubId are non-null iff a `players` row exists with
- *     this user_id (#35 bridge). We pick the first match — the unique index
- *     `(club_id, user_id)` guarantees at most one per club, but a single
- *     account COULD be linked to player rows in multiple clubs. The current
- *     club cookie still drives which data is shown; the player identity is
- *     just "exists or not" at the account level.
- *   - available: "staff" if only memberships, "player" if only player row,
- *     "dual" if both.
- *   - active: cookie value if valid AND available, else the only side, else
- *     "staff" when dual without preference.
+ * Resolves the active persona for the current user.
+ *
+ * The stated preference is authoritative — it alone decides which sides are
+ * available. Data presence (membership, players row) only feeds the
+ * playerId / playerClubId fields used by the player view.
+ *
+ *   - preference "staff"  → available "staff", locked to /dashboard.
+ *   - preference "player" → available "player", locked to /me.
+ *   - preference "dual"   → available "dual", switcher visible. Cookie picks
+ *                           the active side, defaulting to "staff".
  */
 export const resolvePersona = cache(async (): Promise<PersonaState | null> => {
   const supabase = await createClient();
@@ -68,7 +76,9 @@ export const resolvePersona = cache(async (): Promise<PersonaState | null> => {
   } = await supabase.auth.getUser();
   if (!user) return null;
 
-  const [membership, { data: playerRow }] = await Promise.all([
+  // resolveCurrentMembership is awaited for its side-effect of pinning the
+  // current club cookie when one isn't set yet.
+  const [, { data: playerRow }, { data: profileRow }] = await Promise.all([
     resolveCurrentMembership(),
     supabase
       .from("players")
@@ -76,25 +86,27 @@ export const resolvePersona = cache(async (): Promise<PersonaState | null> => {
       .eq("user_id", user.id)
       .limit(1)
       .maybeSingle(),
+    supabase
+      .from("profiles")
+      .select("persona_preference")
+      .eq("id", user.id)
+      .maybeSingle(),
   ]);
 
-  const isStaff = membership !== null;
-  const isPlayer = playerRow !== null;
-
-  if (!isStaff && !isPlayer) return null;
-
-  const available: PersonaAvailability = isStaff && isPlayer
-    ? "dual"
-    : isStaff
-      ? "staff"
-      : "player";
-
+  const preference = normalizePreference(profileRow?.persona_preference);
   const cookiePersona = await getCurrentPersona();
+
+  let available: PersonaAvailability;
   let active: Persona;
-  if (available === "dual") {
+  if (preference === "dual") {
+    available = "dual";
     active = cookiePersona ?? "staff";
+  } else if (preference === "player") {
+    available = "player";
+    active = "player";
   } else {
-    active = available;
+    available = "staff";
+    active = "staff";
   }
 
   return {
@@ -102,5 +114,6 @@ export const resolvePersona = cache(async (): Promise<PersonaState | null> => {
     active,
     playerId: playerRow?.id ?? null,
     playerClubId: playerRow?.club_id ?? null,
+    preference,
   };
 });

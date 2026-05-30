@@ -31,9 +31,9 @@ export async function requireMembership(locale: string) {
 export async function requirePersona(locale: string, expected: Persona) {
   const { supabase, user } = await requireUser(locale);
   const persona = await resolvePersona();
-  if (!persona) {
-    redirect(`/${locale}/onboarding/club`);
-  }
+  // persona is non-null now: unaffiliated users resolve to active="player"
+  // (see resolvePersona). They can still land on /me even with no club.
+  if (!persona) redirect(`/${locale}/login`);
   if (persona.active !== expected) {
     redirect(`/${locale}/${persona.active === "staff" ? "dashboard" : "me"}`);
   }
