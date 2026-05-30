@@ -3,19 +3,23 @@
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { getSiteUrl } from "@/lib/site-url";
+import { resolvePersona } from "@/lib/club/persona";
 
 export async function signupAction(formData: FormData) {
   const email = String(formData.get("email") ?? "");
   const password = String(formData.get("password") ?? "");
   const fullName = String(formData.get("fullName") ?? "");
   const locale = String(formData.get("locale") ?? "fr");
+  const rawPersona = String(formData.get("personaPreference") ?? "staff");
+  const personaPreference =
+    rawPersona === "player" || rawPersona === "dual" ? rawPersona : "staff";
 
   const supabase = await createClient();
   const { data, error } = await supabase.auth.signUp({
     email,
     password,
     options: {
-      data: { full_name: fullName },
+      data: { full_name: fullName, persona_preference: personaPreference },
       emailRedirectTo: `${getSiteUrl()}/${locale}/confirm`,
     },
   });
@@ -38,7 +42,9 @@ export async function signupAction(formData: FormData) {
   }
 
   if (data.session) {
-    redirect(`/${locale}/dashboard`);
+    const persona = await resolvePersona();
+    const target = persona?.active === "player" ? "me" : "dashboard";
+    redirect(`/${locale}/${target}`);
   }
 
   return { needsConfirmation: true };

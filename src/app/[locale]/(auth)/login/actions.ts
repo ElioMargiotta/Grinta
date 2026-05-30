@@ -2,6 +2,7 @@
 
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
+import { resolvePersona } from "@/lib/club/persona";
 
 export async function loginAction(formData: FormData) {
   const email = String(formData.get("email") ?? "");
@@ -27,5 +28,10 @@ export async function loginAction(formData: FormData) {
     return { error: error.message };
   }
 
-  redirect(`/${locale}/dashboard`);
+  // Land the user on the right side based on their persona preference, so a
+  // "player" account isn't bounced through /dashboard before being redirected
+  // to /me.
+  const persona = await resolvePersona();
+  const target = persona?.active === "player" ? "me" : "dashboard";
+  redirect(`/${locale}/${target}`);
 }
