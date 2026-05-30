@@ -1,6 +1,10 @@
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { Card } from "@/components/ui/Card";
 import { requirePersona } from "@/lib/auth/getUser";
+import {
+  PendingInvitationsCard,
+  type PendingInvitation,
+} from "@/components/player/PendingInvitationsCard";
 
 type PlayerRow = {
   id: string;
@@ -26,6 +30,15 @@ type PlayerRow = {
   dual_licence_team: string | null;
 };
 
+type InvitationRow = {
+  id: string;
+  kind: "staff" | "player";
+  expires_at: string;
+  clubs: { name: string } | null;
+  club_roles: { name: string } | null;
+  teams: { name: string } | null;
+};
+
 function Field({ label, value }: { label: string; value: string | number | null }) {
   const display = value === null || value === "" ? "—" : String(value);
   return (
@@ -47,18 +60,42 @@ export default async function PlayerMePage({
   setRequestLocale(locale);
   const { supabase, user } = await requirePersona(locale, "player");
   const t = await getTranslations("playerMe");
+  const tInv = await getTranslations("invitations");
 
-  const { data: player } = await supabase
-    .from("players")
-    .select(
-      `id, club_id, first_name, last_name, birth_date, position, jersey_number,
-       strong_foot, license_number, js_number, email, phone, nationality,
-       address, postal_code, city, canton, photo_url,
-       dual_licence_club, dual_licence_level, dual_licence_team`,
-    )
-    .eq("user_id", user.id)
-    .limit(1)
-    .maybeSingle<PlayerRow>();
+  const [{ data: player }, { data: invitationRows }] = await Promise.all([
+    supabase
+      .from("players")
+      .select(
+        `id, club_id, first_name, last_name, birth_date, position, jersey_number,
+         strong_foot, license_number, js_number, email, phone, nationality,
+         address, postal_code, city, canton, photo_url,
+         dual_licence_club, dual_licence_level, dual_licence_team`,
+      )
+      .eq("user_id", user.id)
+      .limit(1)
+      .maybeSingle<PlayerRow>(),
+    supabase
+      .from("club_invitations")
+      .select(
+        `id, kind, expires_at,
+         clubs!inner(name),
+         club_roles(name),
+         teams(name)`,
+      )
+      .eq("status", "pending")
+      .gt("expires_at", new Date().toISOString())
+      .order("created_at", { ascending: false })
+      .returns<InvitationRow[]>(),
+  ]);
+
+  const invitations: PendingInvitation[] = (invitationRows ?? []).map((r) => ({
+    id: r.id,
+    kind: r.kind,
+    clubName: r.clubs?.name ?? "—",
+    roleName: r.club_roles?.name ?? null,
+    teamName: r.teams?.name ?? null,
+    expiresAt: r.expires_at,
+  }));
 
   if (!player) {
     return (
@@ -66,9 +103,21 @@ export default async function PlayerMePage({
         <h1 className="text-2xl font-semibold text-zinc-900 dark:text-zinc-100">
           {t("title")}
         </h1>
+
         <Card>
-          <p className="text-sm text-zinc-600 dark:text-zinc-400">{t("empty")}</p>
+          <div className="flex flex-col items-start gap-2">
+            <h2 className="text-base font-semibold text-zinc-900 dark:text-zinc-100">
+              {tInv("welcomeTitle")}
+            </h2>
+            <p className="text-sm text-zinc-600 dark:text-zinc-400">
+              {invitations.length > 0
+                ? tInv("welcomeWithInvites")
+                : tInv("welcomeNoInvites")}
+            </p>
+          </div>
         </Card>
+
+        <PendingInvitationsCard locale={locale} invitations={invitations} />
       </div>
     );
   }
@@ -98,6 +147,8 @@ export default async function PlayerMePage({
           <p className="text-sm text-zinc-500 dark:text-zinc-400">{t("readOnlyHint")}</p>
         </div>
       </div>
+
+      <PendingInvitationsCard locale={locale} invitations={invitations} />
 
       <Card>
         <h2 className="mb-4 text-base font-semibold text-zinc-900 dark:text-zinc-100">

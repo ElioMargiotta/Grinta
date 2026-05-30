@@ -1,14 +1,16 @@
 "use server";
 
+import { createHash } from "node:crypto";
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 import { resolveCurrentMembership } from "@/lib/club/context";
 import { getSiteUrl } from "@/lib/site-url";
 import { canManageClub } from "@/lib/club/types";
+import { sendClubInvitationEmail } from "@/lib/email/invitations";
 import type { AccessLevel, ClubThemeMode } from "@/lib/club/types";
 
 type InviteResult =
-  | { ok: true; token: string; url: string }
+  | { ok: true; token: string; url: string; emailSent: boolean; emailError?: string }
   | { error: string };
 
 const HEX_COLOR_RE = /^#[0-9a-fA-F]{6}$/;
@@ -88,6 +90,7 @@ export async function updateClubIdentityAction(formData: FormData) {
 }
 
 export async function inviteMemberAction(formData: FormData): Promise<InviteResult> {
+  const locale = String(formData.get("locale") ?? "fr");
   const email = String(formData.get("email") ?? "").trim().toLowerCase();
   const roleId = String(formData.get("roleId") ?? "");
   const teamIdsRaw = formData.getAll("teamIds").map(String).filter(Boolean);
@@ -111,13 +114,74 @@ export async function inviteMemberAction(formData: FormData): Promise<InviteResu
   });
 
   if (error || !token) {
+    if (error?.message?.includes("rate_limited")) {
+      return { error: "Trop d'invitations récentes pour cet email. Réessaie plus tard." };
+    }
     return { error: error?.message ?? "Échec de la création de l'invitation." };
   }
 
-  const url = `${getSiteUrl()}/invite/${token as string}`;
+  const plainToken = token as string;
+  const url = `${getSiteUrl()}/${locale}/invite/${plainToken}`;
+  const tokenHash = createHash("sha256").update(plainToken, "utf8").digest("hex");
+
+  const { data: invitation } = await supabase
+    .from("club_invitations")
+    .select("id, expires_at, role_id, team_id")
+    .eq("token_hash", tokenHash)
+    .maybeSingle();
+
+  if (!invitation) {
+    return {
+      ok: true,
+      token: plainToken,
+      url,
+      emailSent: false,
+      emailError: "invitation_not_found_after_insert",
+    };
+  }
+
+  const [{ data: role }, { data: profile }] = await Promise.all([
+    supabase
+      .from("club_roles")
+      .select("name")
+      .eq("id", roleId)
+      .maybeSingle(),
+    (async () => {
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+      if (!user) return { data: null };
+      return supabase
+        .from("profiles")
+        .select("full_name")
+        .eq("id", user.id)
+        .maybeSingle();
+    })(),
+  ]);
+
+  const emailResult = await sendClubInvitationEmail(supabase, {
+    invitationId: invitation.id,
+    kind: "staff",
+    locale,
+    to: email,
+    clubName: membership.club_name,
+    inviterName: profile?.full_name ?? null,
+    roleName: role?.name ?? null,
+    playerName: null,
+    teamName: null,
+    acceptUrl: url,
+    expiresAt: invitation.expires_at,
+    brandColor: membership.theme_primary_color,
+  });
 
   revalidatePath("/settings/club");
-  return { ok: true, token: token as string, url };
+  return {
+    ok: true,
+    token: plainToken,
+    url,
+    emailSent: emailResult.ok,
+    ...(emailResult.ok ? {} : { emailError: emailResult.reason }),
+  };
 }
 
 export async function revokeInvitationAction(formData: FormData) {

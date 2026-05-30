@@ -11,6 +11,10 @@ import {
 import { DeletePlayerSection } from "@/components/contingent/DeletePlayerSection";
 import { DualLicenceBlock } from "@/components/contingent/DualLicenceBlock";
 import { TeamAssignmentsBlock } from "@/components/contingent/TeamAssignmentsBlock";
+import {
+  InvitePlayerSection,
+  type PlayerInvitation,
+} from "@/components/contingent/InvitePlayerSection";
 import { listClubTeams } from "@/lib/contingent/teams";
 
 export default async function ContingentPlayerPage({
@@ -28,27 +32,42 @@ export default async function ContingentPlayerPage({
     .select(
       `id, first_name, last_name, birth_date, position, jersey_number, notes,
        strong_foot, license_number, js_number, email, phone, nationality,
-       address, postal_code, city, canton,
+       address, postal_code, city, canton, user_id,
        guardian_name, guardian_email, guardian_phone,
        guardian2_name, guardian2_email, guardian2_phone,
        dual_licence_club, dual_licence_level, dual_licence_team`,
     )
     .eq("id", playerId)
-    .single<EditablePlayer>();
+    .single<EditablePlayer & { user_id: string | null }>();
 
   if (!player) notFound();
 
   // Affectations actuelles (saison NULL = "courante"), pour pré-cocher le
   // picker du bloc dédié (#39).
-  const [{ data: assignments }, teams] = await Promise.all([
+  const [{ data: assignments }, teams, { data: inviteRows }] = await Promise.all([
     supabase
       .from("player_team_assignments")
       .select("team_id")
       .eq("player_id", playerId)
       .is("season", null),
     listClubTeams(membership.club_id),
+    supabase
+      .from("club_invitations")
+      .select("id, email, status, team_id, expires_at, email_status, email_sent_at")
+      .eq("player_id", playerId)
+      .eq("status", "pending")
+      .order("created_at", { ascending: false }),
   ]);
   const currentTeamIds = (assignments ?? []).map((a) => a.team_id as string);
+  const pendingInvitations: PlayerInvitation[] = (inviteRows ?? []).map((r) => ({
+    id: r.id as string,
+    email: r.email as string,
+    status: r.status as PlayerInvitation["status"],
+    team_id: (r.team_id as string | null) ?? null,
+    expires_at: r.expires_at as string,
+    email_status: (r.email_status as PlayerInvitation["email_status"]) ?? "pending",
+    email_sent_at: (r.email_sent_at as string | null) ?? null,
+  }));
 
   const fullName = `${player.first_name} ${player.last_name}`;
 
@@ -78,6 +97,15 @@ export default async function ContingentPlayerPage({
         playerId={player.id}
         teams={teams}
         currentTeamIds={currentTeamIds}
+      />
+
+      <InvitePlayerSection
+        locale={locale}
+        playerId={player.id}
+        defaultEmail={player.email ?? ""}
+        teams={teams.map((t) => ({ id: t.id, name: t.name }))}
+        pendingInvitations={pendingInvitations}
+        isLinkedToUser={Boolean(player.user_id)}
       />
 
       <DualLicenceBlock
