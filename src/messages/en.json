@@ -358,6 +358,40 @@
       "emptyDescHint": "Add a short description to frame the identity, objectives or important notes for this team.",
       "openContingent": "Open in squad",
       "importClubCorner": "Import ClubCorner"
+    },
+    "calendar": {
+      "title": "Official match calendar",
+      "subtitle": "Import your team's ICS feed (football.ch or any other). With a subscription URL, matches refresh automatically every day.",
+      "urlLabel": "ICS subscription URL",
+      "urlHint": "Paste the calendar link from your federation. webcal:// is also accepted.",
+      "saveAndSync": "Save and sync",
+      "updateAndSync": "Update and resync",
+      "syncNow": "Sync now",
+      "syncing": "Syncing…",
+      "uploadFile": "Upload .ics file",
+      "disconnect": "Disconnect",
+      "disconnectConfirm": "Remove the subscription? Already imported matches will be kept.",
+      "matchesTitle": "{n, plural, =0 {No matches imported} one {1 match imported} other {# matches imported}}",
+      "matchesEmpty": "No matches yet. Enter a URL or upload an .ics file.",
+      "syncedCount": "{n, plural, one {1 match synced.} other {# matches synced.}}",
+      "ok": "Sync complete.",
+      "statusOk": "{n, plural, =0 {No matches} one {1 match} other {# matches}}",
+      "statusError": "Last sync failed",
+      "statusPending": "Sync pending…",
+      "lastSyncedAt": "Last sync: {when}",
+      "neverSynced": "Not synced yet",
+      "err": {
+        "unauthenticated": "You must be signed in.",
+        "team_not_found": "Team not found.",
+        "forbidden": "You don't have access to this team.",
+        "url_invalid": "Invalid calendar URL.",
+        "ics_invalid": "Could not read the ICS file.",
+        "ics_empty": "No matches found in this calendar.",
+        "fetch_failed": "Could not fetch the calendar at that URL.",
+        "fetch_timeout": "The calendar server did not respond in time.",
+        "fetch_too_large": "Calendar file is too large.",
+        "db_error": "Save error. Please try again."
+      }
     }
   },
   "exercises": {

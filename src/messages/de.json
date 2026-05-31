@@ -352,6 +352,40 @@
       "emptyDescHint": "Füge eine kurze Beschreibung hinzu, um die Identität, Ziele oder wichtige Notizen dieses Teams zu definieren.",
       "openContingent": "Im Kader öffnen",
       "importClubCorner": "ClubCorner importieren"
+    },
+    "calendar": {
+      "title": "Offizieller Spielkalender",
+      "subtitle": "Importiere den ICS-Feed deiner Mannschaft (football.ch oder andere). Mit einer Abo-URL werden die Spiele täglich automatisch aktualisiert.",
+      "urlLabel": "ICS-Abo-URL",
+      "urlHint": "Füge den Kalenderlink deines Verbands ein. webcal:// ist ebenfalls möglich.",
+      "saveAndSync": "Speichern und synchronisieren",
+      "updateAndSync": "Aktualisieren und neu synchronisieren",
+      "syncNow": "Jetzt synchronisieren",
+      "syncing": "Synchronisiere…",
+      "uploadFile": ".ics-Datei hochladen",
+      "disconnect": "Abo entfernen",
+      "disconnectConfirm": "Abo entfernen? Bereits importierte Spiele bleiben erhalten.",
+      "matchesTitle": "{n, plural, =0 {Keine Spiele importiert} one {1 Spiel importiert} other {# Spiele importiert}}",
+      "matchesEmpty": "Noch keine Spiele. Gib eine URL ein oder lade eine .ics-Datei hoch.",
+      "syncedCount": "{n, plural, one {1 Spiel synchronisiert.} other {# Spiele synchronisiert.}}",
+      "ok": "Synchronisation abgeschlossen.",
+      "statusOk": "{n, plural, =0 {Keine Spiele} one {1 Spiel} other {# Spiele}}",
+      "statusError": "Letzte Synchronisation fehlgeschlagen",
+      "statusPending": "Synchronisation läuft…",
+      "lastSyncedAt": "Letzte Synchronisation: {when}",
+      "neverSynced": "Noch nicht synchronisiert",
+      "err": {
+        "unauthenticated": "Bitte anmelden.",
+        "team_not_found": "Mannschaft nicht gefunden.",
+        "forbidden": "Du hast keinen Zugriff auf diese Mannschaft.",
+        "url_invalid": "Ungültige Kalender-URL.",
+        "ics_invalid": "ICS-Datei konnte nicht gelesen werden.",
+        "ics_empty": "Keine Spiele im Kalender gefunden.",
+        "fetch_failed": "Kalender konnte nicht abgerufen werden.",
+        "fetch_timeout": "Kalender-Server antwortet nicht.",
+        "fetch_too_large": "Kalenderdatei ist zu groß.",
+        "db_error": "Speicherfehler. Bitte erneut versuchen."
+      }
     }
   },
   "exercises": {
