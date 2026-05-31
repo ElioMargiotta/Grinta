@@ -60,6 +60,8 @@ export function ClubSettings({ data }: { data: Data }) {
   const accessHelp = (level: AccessLevel) => t(`access.${level}Help`);
 
   const [invitedEmail, setInvitedEmail] = useState<string | null>(null);
+  const [inviteEmailSent, setInviteEmailSent] = useState<boolean>(true);
+  const [inviteLinkFallback, setInviteLinkFallback] = useState<string | null>(null);
   const [inviteError, setInviteError] = useState<string | null>(null);
   const [selectedRoleId, setSelectedRoleId] = useState<string>(
     data.roles[0]?.id ?? "",
@@ -219,11 +221,18 @@ export function ClubSettings({ data }: { data: Data }) {
           action={(formData) => {
             setInviteError(null);
             setInvitedEmail(null);
+            setInviteLinkFallback(null);
+            formData.set("locale", locale);
             const email = String(formData.get("email") ?? "");
             startTransition(async () => {
               const result = await inviteMemberAction(formData);
-              if ("error" in result) setInviteError(result.error);
-              else setInvitedEmail(email);
+              if ("error" in result) {
+                setInviteError(result.error);
+              } else {
+                setInvitedEmail(email);
+                setInviteEmailSent(result.emailSent);
+                setInviteLinkFallback(result.emailSent ? null : result.url);
+              }
             });
           }}
         >
@@ -287,11 +296,22 @@ export function ClubSettings({ data }: { data: Data }) {
           )}
 
           {invitedEmail && (
-            <div className="rounded-md border border-emerald-200 bg-emerald-50 px-3 py-2 text-sm text-emerald-800">
-              {t.rich("invite.savedFor", {
+            <div
+              className={
+                inviteEmailSent
+                  ? "rounded-md border border-emerald-200 bg-emerald-50 px-3 py-2 text-sm text-emerald-800"
+                  : "rounded-md border border-amber-200 bg-amber-50 px-3 py-2 text-sm text-amber-800"
+              }
+            >
+              {t.rich(inviteEmailSent ? "invite.emailSent" : "invite.emailFailed", {
                 email: invitedEmail,
                 strong: (chunks) => <strong>{chunks}</strong>,
               })}
+              {!inviteEmailSent && inviteLinkFallback && (
+                <div className="mt-2 break-all font-mono text-[11px] text-amber-900">
+                  {inviteLinkFallback}
+                </div>
+              )}
             </div>
           )}
 

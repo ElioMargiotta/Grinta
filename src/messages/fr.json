@@ -218,6 +218,7 @@
     "planner": "Planning",
     "settings": "Paramètres",
     "logout": "Quitter",
+    "account": "Compte",
     "contingent": "Contingent",
     "playerMe": "Ma fiche",
     "playerTeam": "Mes équipes",
@@ -259,7 +260,12 @@
     "confirmedTitle": "Email vérifié",
     "confirmedBody": "Votre adresse email a été confirmée et votre compte est maintenant actif.",
     "confirmedRedirect": "Redirection vers la page de connexion…",
-    "confirmedCta": "Aller à la connexion"
+    "confirmedCta": "Aller à la connexion",
+    "personaChoiceLabel": "Tu es…",
+    "personaChoiceHelp": "Tu pourras changer ce choix à tout moment dans les paramètres du compte.",
+    "personaChoiceStaff": "Entraîneur",
+    "personaChoicePlayer": "Joueur",
+    "personaChoiceDual": "Les deux"
   },
   "dashboard": {
     "title": "Tableau de bord",
@@ -559,6 +565,8 @@
       "duration": "Durée (minutes)",
       "theme": "Thème",
       "notes": "Notes",
+      "rsvpDeadlineHours": "Délai de réponse (h)",
+      "rsvpDeadlineHoursHint": "Heures avant le début pendant lesquelles le joueur peut encore répondre",
       "exercises": "Exercices",
       "addExercise": "Ajouter un exercice",
       "noExercises": "Aucun exercice rattaché. Ajoutez-en depuis votre bibliothèque.",
@@ -968,7 +976,9 @@
         "noTeamsInClub": "Aucune équipe dans ce club. Crée une équipe d'abord.",
         "savedFor": "Invitation enregistrée pour <strong>{email}</strong>. Elle sera visible sur son dashboard à sa prochaine connexion.",
         "sending": "Création…",
-        "send": "Envoyer l'invitation"
+        "send": "Envoyer l'invitation",
+        "emailSent": "Email d'invitation envoyé à <strong>{email}</strong>.",
+        "emailFailed": "Invitation créée pour <strong>{email}</strong>, mais l'email n'a pas pu être envoyé. Partage le lien manuellement."
       },
       "pendingInvitations": {
         "title": "Invitations en attente ({n})",
@@ -1031,6 +1041,11 @@
       "wrongAccountDesc1": "Cette invitation a été envoyée à {invitedEmail}, mais tu es connecté en tant que {currentEmail}.",
       "wrongAccountDesc2": "Déconnecte-toi et reconnecte-toi avec le bon compte.",
       "joinClub": "Rejoindre {club}",
+      "noTeam": "aucune équipe",
+      "invitedAsPlayer": "Récupère le profil joueur de <strong>{name}</strong> — équipe : <strong>{team}</strong>.",
+      "invitedAsStaff": "Rôle : <strong>{role}</strong>",
+      "revoked": "Invitation révoquée",
+      "revokedDesc": "L'administrateur du club a annulé cette invitation.",
       "accessLabels": {
         "full": "Accès total",
         "extended": "Accès étendu (toutes les équipes)",
@@ -1038,6 +1053,66 @@
         "team_readonly": "Lecture seule sur l'équipe assignée"
       }
     }
+  },
+  "invitations": {
+    "pendingTitle": "Invitations en attente",
+    "welcomeTitle": "Bienvenue sur Grinta",
+    "welcomeWithInvites": "Tu n'as pas encore rejoint de club. Accepte une invitation ci-dessous pour démarrer.",
+    "welcomeNoInvites": "Tu n'as pas encore rejoint de club. Quand un coach t'invitera par email, l'invitation apparaîtra ici.",
+    "playerWithTeam": "Joueur — équipe : {team}",
+    "playerNoTeam": "Joueur",
+    "staffAs": "Staff — {role}",
+    "accept": "Accepter",
+    "decline": "Refuser",
+    "errors": {
+      "missing_token": "Jeton d'invitation manquant.",
+      "unauthenticated": "Connecte-toi pour répondre à l'invitation.",
+      "invitation_not_found": "Invitation introuvable.",
+      "invitation_not_pending": "Cette invitation a déjà été traitée.",
+      "invitation_expired": "Cette invitation a expiré.",
+      "email_mismatch": "Cette invitation est destinée à une autre adresse.",
+      "club_inactive": "Ce club est actuellement inactif.",
+      "rpc_error": "Impossible de traiter l'invitation. Réessaie.",
+      "missing_id": "Identifiant d'invitation manquant.",
+      "already_linked_to_other_player": "Ton compte est déjà rattaché à un autre profil joueur dans ce club. Demande au coach de fusionner les fiches."
+    }
+  },
+  "invitePlayer": {
+    "title": "Inviter ce joueur",
+    "description": "Envoie un lien que le joueur pourra utiliser pour récupérer ce profil et accéder à son calendrier.",
+    "emailLabel": "Email du joueur",
+    "emailPlaceholder": "joueur@example.com",
+    "teamLabel": "Équipe (optionnel)",
+    "teamNone": "Aucune équipe",
+    "generate": "Générer le lien d'invitation",
+    "linkReady": "Lien prêt — partage-le avec le joueur.",
+    "copy": "Copier",
+    "copied": "Copié",
+    "copyFallback": "Copie ce lien manuellement :",
+    "pendingTitle": "Invitations en attente",
+    "expiresAt": "Expire le {date}",
+    "revoke": "Révoquer",
+    "alreadyLinked": "Ce joueur est déjà lié à un compte utilisateur.",
+    "errors": {
+      "missing_fields": "L'email est requis.",
+      "invalid_email": "Saisis une adresse email valide.",
+      "player_not_in_club": "Ce joueur n'appartient pas au club courant.",
+      "db_error": "Impossible de créer l'invitation. Réessaie.",
+      "rate_limited": "Trop d'invitations récentes pour cet email. Réessaie dans une heure.",
+      "email_already_linked_to_other_player": "Cet email est déjà rattaché à un autre joueur du club."
+    },
+    "emailSent": "Email envoyé à {email}.",
+    "emailFailed": "L'envoi de l'email a échoué — copie le lien ci-dessous :",
+    "linkFallback": "Tu peux aussi partager le lien manuellement :",
+    "resend": "Renvoyer",
+    "resendSent": "Email renvoyé à {email}.",
+    "resendFailed": "Échec du renvoi de l'email.",
+    "pendingEmailSent": "Email envoyé",
+    "pendingEmailDelivered": "Email reçu",
+    "pendingEmailOpened": "Email ouvert",
+    "pendingEmailBounced": "Email rejeté",
+    "pendingEmailFailed": "Échec d'envoi",
+    "pendingEmailPending": "En cours d'envoi"
   },
   "libraries": {
     "noDiagram": "Pas de schéma",
@@ -1299,5 +1374,93 @@
     "empty": "Aucune équipe — aucun planning à afficher.",
     "emptyUpcoming": "Aucune séance à venir.",
     "untitled": "Séance"
+  },
+  "attendance": {
+    "present": "Présent",
+    "absent": "Absent",
+    "confirmAbsent": "Confirmer l'absence",
+    "cancel": "Annuler",
+    "reasonLabel": "Raison de l'absence",
+    "answeredPresent": "Tu as annoncé ta présence",
+    "answeredAbsent": "Tu as annoncé ton absence",
+    "deadlinePassed": "Délai dépassé — contacte ton coach pour modifier",
+    "errors": {
+      "unauthenticated": "Tu dois être connecté",
+      "reason_required_when_absent": "Une raison est requise pour signaler une absence",
+      "session_not_found": "Séance introuvable",
+      "club_inactive": "Le club n'est plus actif",
+      "not_assigned_to_team": "Tu n'es pas affecté à cette équipe",
+      "deadline_passed": "Délai de réponse dépassé",
+      "missing_session": "Séance manquante",
+      "invalid_status": "Statut invalide",
+      "unknown": "Erreur — réessaie"
+    },
+    "coach": {
+      "title": "Présences",
+      "openLink": "Présences",
+      "backToPreparation": "Retour à la préparation",
+      "statAnnouncedPresent": "Annoncés présents",
+      "statAnnouncedAbsent": "Annoncés absents",
+      "statNoResponse": "Sans réponse",
+      "statActualPresent": "Présents réels",
+      "deadlineLabel": "Délai (h)",
+      "deadlineSave": "Enregistrer",
+      "deadlineHint": "Heures avant la séance pendant lesquelles le joueur peut répondre. 0 = jusqu'au début. Max 168 (7j).",
+      "colPlayer": "Joueur",
+      "colAnnounced": "Annoncé",
+      "colActual": "Présence réelle",
+      "noResponse": "Pas de réponse",
+      "present": "Présent",
+      "absent": "Absent",
+      "markPresent": "Marquer présent",
+      "markAbsent": "Marquer absent",
+      "markUnknown": "Effacer",
+      "emptyRoster": "Aucun joueur affecté à cette équipe."
+    }
+  },
+  "email": {
+    "invitation": {
+      "subject": {
+        "player": "Tu es invité à rejoindre {club} sur Grinta",
+        "staff": "Tu es invité à rejoindre {club} sur Grinta"
+      },
+      "heading": {
+        "player": "Bienvenue chez {club}",
+        "staff": "Rejoins {club} sur Grinta"
+      },
+      "preview": "Ton invitation à rejoindre le club sur Grinta",
+      "intro": "{inviter} t'invite à rejoindre {club} sur Grinta.",
+      "detail": {
+        "player": "Tu rejoins l'effectif en tant que {name} ({team}).",
+        "staff": "Tu rejoins le staff avec le rôle {role}."
+      },
+      "cta": "Accepter l'invitation",
+      "expiry": "Ce lien est valable jusqu'au {date}.",
+      "fallbackLabel": "Si le bouton ne fonctionne pas, copie ce lien dans ton navigateur :",
+      "securityNote": "Si tu n'attendais pas cette invitation, ignore simplement cet email.",
+      "footer": "Email envoyé par Grinta pour le compte de {club}.",
+      "defaultInviter": "Un membre du club",
+      "defaultPlayer": "joueur",
+      "defaultRole": "membre",
+      "noTeam": "sans équipe"
+    }
+  },
+  "account": {
+    "title": "Mon compte",
+    "subtitle": "Choisis comment tu utilises Grinta.",
+    "back": "Retour",
+    "identityLabel": "Connecté en tant que",
+    "personaLabel": "Type de compte",
+    "personaHelp": "Détermine les vues disponibles dans Grinta. Tu peux changer à tout moment.",
+    "optionStaffLabel": "Entraîneur",
+    "optionStaffDesc": "Planifie les saisons et les séances pour une ou plusieurs équipes.",
+    "optionPlayerLabel": "Joueur",
+    "optionPlayerDesc": "Consulte ta fiche, tes équipes et ton planning.",
+    "optionDualLabel": "Les deux",
+    "optionDualDesc": "Bascule entre la vue entraîneur et la vue joueur depuis la barre du haut.",
+    "save": "Enregistrer",
+    "saving": "Enregistrement…",
+    "saved": "Préférence enregistrée.",
+    "saveError": "Impossible d'enregistrer ta préférence."
   }
 }

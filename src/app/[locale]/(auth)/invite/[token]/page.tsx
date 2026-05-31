@@ -3,15 +3,18 @@ import { Link } from "@/i18n/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { AcceptInvitationForm } from "@/components/onboarding/AcceptInvitationForm";
 
-type Preview = {
+type InvitationPreview = {
+  id: string;
   club_id: string;
   club_name: string;
-  role_name: string;
-  access_level: "full" | "extended" | "team" | "team_readonly";
+  kind: "staff" | "player";
   email: string;
+  role_name: string | null;
+  player_first_name: string | null;
+  player_last_name: string | null;
+  team_name: string | null;
+  status: "pending" | "accepted" | "revoked" | "expired";
   expires_at: string;
-  already_accepted: boolean;
-  expired: boolean;
 };
 
 export default async function AcceptInvitePage({
@@ -23,47 +26,41 @@ export default async function AcceptInvitePage({
   setRequestLocale(locale);
   const t = await getTranslations("invite.page");
 
-  const ACCESS_LABEL: Record<Preview["access_level"], string> = {
-    full: t("accessLabels.full"),
-    extended: t("accessLabels.extended"),
-    team: t("accessLabels.team"),
-    team_readonly: t("accessLabels.team_readonly"),
-  };
-
   const supabase = await createClient();
-  const { data: rows, error } = await supabase.rpc("preview_invitation", {
+  const { data: rows, error } = await supabase.rpc("get_invitation", {
     p_token: token,
   });
 
-  const preview = (rows as Preview[] | null)?.[0];
+  const preview = (rows as InvitationPreview[] | null)?.[0];
 
   if (error || !preview) {
     return (
       <div className="flex flex-col gap-3 rounded-md border border-amber-200 bg-amber-50 p-5">
-        <h1 className="text-base font-semibold text-amber-900">
-          {t("notFound")}
-        </h1>
-        <p className="text-sm text-amber-800">
-          {t("notFoundDesc")}
-        </p>
+        <h1 className="text-base font-semibold text-amber-900">{t("notFound")}</h1>
+        <p className="text-sm text-amber-800">{t("notFoundDesc")}</p>
       </div>
     );
   }
 
-  if (preview.expired) {
+  if (preview.status === "expired") {
     return (
       <div className="flex flex-col gap-3 rounded-md border border-amber-200 bg-amber-50 p-5">
-        <h1 className="text-base font-semibold text-amber-900">
-          {t("expired")}
-        </h1>
-        <p className="text-sm text-amber-800">
-          {t("expiredDesc")}
-        </p>
+        <h1 className="text-base font-semibold text-amber-900">{t("expired")}</h1>
+        <p className="text-sm text-amber-800">{t("expiredDesc")}</p>
       </div>
     );
   }
 
-  if (preview.already_accepted) {
+  if (preview.status === "revoked") {
+    return (
+      <div className="flex flex-col gap-3 rounded-md border border-amber-200 bg-amber-50 p-5">
+        <h1 className="text-base font-semibold text-amber-900">{t("revoked")}</h1>
+        <p className="text-sm text-amber-800">{t("revokedDesc")}</p>
+      </div>
+    );
+  }
+
+  if (preview.status === "accepted") {
     return (
       <div className="flex flex-col gap-3 rounded-md border border-emerald-200 bg-emerald-50 p-5">
         <h1 className="text-base font-semibold text-emerald-900">
@@ -75,15 +72,24 @@ export default async function AcceptInvitePage({
             strong: (chunks) => <strong>{chunks}</strong>,
           })}
         </p>
-        <Link
-          href="/login"
-          className="text-sm font-medium text-emerald-900 underline"
-        >
+        <Link href="/login" className="text-sm font-medium text-emerald-900 underline">
           {t("goToLogin")}
         </Link>
       </div>
     );
   }
+
+  const detail =
+    preview.kind === "player"
+      ? t.rich("invitedAsPlayer", {
+          name: `${preview.player_first_name ?? ""} ${preview.player_last_name ?? ""}`.trim(),
+          team: preview.team_name ?? t("noTeam"),
+          strong: (chunks) => <strong>{chunks}</strong>,
+        })
+      : t.rich("invitedAsStaff", {
+          role: preview.role_name ?? "",
+          strong: (chunks) => <strong>{chunks}</strong>,
+        });
 
   const {
     data: { user },
@@ -96,13 +102,7 @@ export default async function AcceptInvitePage({
           <h1 className="text-xl font-semibold text-zinc-900">
             {t("joinClub", { club: preview.club_name })}
           </h1>
-          <p className="mt-1 text-sm text-zinc-600">
-            {t.rich("invitedToJoinWithRole", {
-              role: preview.role_name,
-              access: ACCESS_LABEL[preview.access_level as Preview["access_level"]],
-              strong: (chunks) => <strong>{chunks}</strong>,
-            })}
-          </p>
+          <p className="mt-1 text-sm text-zinc-600">{detail}</p>
           <p className="mt-1 text-sm text-zinc-600">
             {t.rich("invitationSentTo", {
               email: preview.email,
@@ -111,9 +111,7 @@ export default async function AcceptInvitePage({
           </p>
         </div>
         <div className="rounded-md border border-zinc-200 bg-white p-4">
-          <p className="text-sm text-zinc-700">
-            {t("connectOrCreate")}
-          </p>
+          <p className="text-sm text-zinc-700">{t("connectOrCreate")}</p>
           <div className="mt-3 flex gap-2">
             <Link
               href={`/login?next=${encodeURIComponent(`/invite/${token}`)}`}
@@ -136,9 +134,7 @@ export default async function AcceptInvitePage({
   if (user.email?.toLowerCase() !== preview.email.toLowerCase()) {
     return (
       <div className="flex flex-col gap-3 rounded-md border border-red-200 bg-red-50 p-5">
-        <h1 className="text-base font-semibold text-red-900">
-          {t("wrongAccount")}
-        </h1>
+        <h1 className="text-base font-semibold text-red-900">{t("wrongAccount")}</h1>
         <p className="text-sm text-red-800">
           {t.rich("wrongAccountDesc1", {
             invitedEmail: preview.email,
@@ -146,9 +142,7 @@ export default async function AcceptInvitePage({
             strong: (chunks) => <strong>{chunks}</strong>,
           })}
         </p>
-        <p className="text-sm text-red-800">
-          {t("wrongAccountDesc2")}
-        </p>
+        <p className="text-sm text-red-800">{t("wrongAccountDesc2")}</p>
       </div>
     );
   }
@@ -159,13 +153,7 @@ export default async function AcceptInvitePage({
         <h1 className="text-xl font-semibold text-zinc-900">
           {t("joinClub", { club: preview.club_name })}
         </h1>
-        <p className="mt-1 text-sm text-zinc-600">
-          {t.rich("invitedToJoinWithRole", {
-            role: preview.role_name,
-            access: ACCESS_LABEL[preview.access_level as Preview["access_level"]],
-            strong: (chunks) => <strong>{chunks}</strong>,
-          })}
-        </p>
+        <p className="mt-1 text-sm text-zinc-600">{detail}</p>
       </div>
       <AcceptInvitationForm token={token} />
     </div>

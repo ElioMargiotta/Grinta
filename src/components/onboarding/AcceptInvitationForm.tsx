@@ -8,6 +8,7 @@ import { acceptInvitationAction } from "@/app/[locale]/(auth)/invite/[token]/act
 export function AcceptInvitationForm({ token }: { token: string }) {
   const locale = useLocale();
   const t = useTranslations("onboarding.acceptForm");
+  const tErrors = useTranslations("invitations.errors");
   const [error, setError] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
 
@@ -20,7 +21,13 @@ export function AcceptInvitationForm({ token }: { token: string }) {
         formData.set("token", token);
         startTransition(async () => {
           const result = await acceptInvitationAction(formData);
-          if (result?.error) setError(result.error);
+          if (result?.error) {
+            try {
+              setError(tErrors(result.error));
+            } catch {
+              setError(result.error);
+            }
+          }
         });
       }}
     >

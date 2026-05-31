@@ -1,5 +1,7 @@
 import { notFound } from "next/navigation";
-import { setRequestLocale } from "next-intl/server";
+import Link from "next/link";
+import { Users } from "lucide-react";
+import { getTranslations, setRequestLocale } from "next-intl/server";
 import { PreparationSheet } from "@/components/sheet/PreparationSheet";
 import type { LibraryExercise } from "@/components/sheet/ExerciseLibraryPicker";
 import { mergePreparation, type PreparationData } from "@/components/sheet/types";
@@ -83,18 +85,29 @@ export default async function PreparationPage({
     }
   }
 
+  const tNav = await getTranslations("attendance.coach");
+
   return (
-    <PreparationSheet
-      teamId={teamId}
-      sessionId={sessionId}
-      initial={initial}
-      libraryExercises={(library ?? []) as LibraryExercise[]}
-      sessionMeta={{
-        title: session.theme ?? "",
-        startTime: (session.start_time as string | null)?.slice(0, 5) ?? "",
-        durationMinutes: session.duration_minutes ?? null,
-      }}
-      weekTheme={weekTheme}
-    />
+    <div className="flex flex-col gap-3">
+      <Link
+        href={`/${locale}/planner/${teamId}/sessions/${sessionId}/attendance`}
+        className="inline-flex w-fit items-center gap-1.5 rounded-md border border-zinc-200 bg-white px-3 py-1.5 text-[12px] font-medium text-zinc-700 shadow-sm transition-colors hover:bg-zinc-50 print:hidden dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-300 dark:hover:bg-zinc-800"
+      >
+        <Users className="h-3.5 w-3.5" />
+        {tNav("openLink")}
+      </Link>
+      <PreparationSheet
+        teamId={teamId}
+        sessionId={sessionId}
+        initial={initial}
+        libraryExercises={(library ?? []) as LibraryExercise[]}
+        sessionMeta={{
+          title: session.theme ?? "",
+          startTime: (session.start_time as string | null)?.slice(0, 5) ?? "",
+          durationMinutes: session.duration_minutes ?? null,
+        }}
+        weekTheme={weekTheme}
+      />
+    </div>
   );
 }
