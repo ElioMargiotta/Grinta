@@ -15,6 +15,15 @@ import {
   InvitePlayerSection,
   type PlayerInvitation,
 } from "@/components/contingent/InvitePlayerSection";
+import {
+  EvaluationsSection,
+  type EvaluationRow,
+} from "@/components/evaluation/EvaluationsSection";
+import {
+  overallAverage,
+  mergeEvaluation,
+  type EvaluationData,
+} from "@/components/evaluation/types";
 import { listClubTeams } from "@/lib/contingent/teams";
 
 export default async function ContingentPlayerPage({
@@ -44,7 +53,12 @@ export default async function ContingentPlayerPage({
 
   // Affectations actuelles (saison NULL = "courante"), pour pré-cocher le
   // picker du bloc dédié (#39).
-  const [{ data: assignments }, teams, { data: inviteRows }] = await Promise.all([
+  const [
+    { data: assignments },
+    teams,
+    { data: inviteRows },
+    { data: evalRows },
+  ] = await Promise.all([
     supabase
       .from("player_team_assignments")
       .select("team_id")
@@ -57,8 +71,26 @@ export default async function ContingentPlayerPage({
       .eq("player_id", playerId)
       .eq("status", "pending")
       .order("created_at", { ascending: false }),
+    supabase
+      .from("player_evaluations")
+      .select("id, season, evaluation_date, data, created_at")
+      .eq("player_id", playerId)
+      .order("evaluation_date", { ascending: false, nullsFirst: false })
+      .order("created_at", { ascending: false }),
   ]);
   const currentTeamIds = (assignments ?? []).map((a) => a.team_id as string);
+
+  const evaluations: EvaluationRow[] = (evalRows ?? []).map((row) => {
+    const merged = mergeEvaluation(row.data as Partial<EvaluationData> | null);
+    return {
+      id: row.id as string,
+      evaluation_date: (row.evaluation_date as string | null) ?? null,
+      season: (row.season as string | null) ?? null,
+      appreciation: merged.appreciation,
+      average: overallAverage(merged.tips),
+    };
+  });
+
   const pendingInvitations: PlayerInvitation[] = (inviteRows ?? []).map((r) => ({
     id: r.id as string,
     email: r.email as string,
@@ -115,6 +147,12 @@ export default async function ContingentPlayerPage({
           level: player.dual_licence_level,
           team: player.dual_licence_team,
         }}
+      />
+
+      <EvaluationsSection
+        playerId={player.id}
+        locale={locale}
+        evaluations={evaluations}
       />
 
       <DeletePlayerSection playerId={player.id} playerName={fullName} />

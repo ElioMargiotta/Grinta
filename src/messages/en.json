@@ -1463,5 +1463,197 @@
     "saving": "Saving…",
     "saved": "Preference saved.",
     "saveError": "Could not save your preference."
+  },
+  "evaluation": {
+    "header": "Player evaluation",
+    "back": "Back",
+    "save": "Save",
+    "saving": "Saving…",
+    "saved": "Saved",
+    "upToDate": "Up to date",
+    "delete": "Delete",
+    "deleting": "Deleting…",
+    "deleteConfirm": "Delete this evaluation? This cannot be undone.",
+    "exportPdf": "Export PDF",
+    "noPlayer": "Player",
+    "noDate": "No date",
+    "scale": {
+      "1": "Severe difficulty",
+      "2": "Struggling",
+      "3": "Good",
+      "4": "Very good",
+      "5": "Excellent"
+    },
+    "group": {
+      "T": "Technique",
+      "I": "Intelligence – tactics",
+      "P": "Personality – mental",
+      "S": "Speed – physical"
+    },
+    "criterion": {
+      "T_firstTouch": {
+        "label": "Control – first touch",
+        "hint": "Receiving the ball, orientation"
+      },
+      "T_ballDriving": {
+        "label": "Ball carrying",
+        "hint": "Head up, quality of run"
+      },
+      "T_pass": {
+        "label": "Passing",
+        "hint": "Quality, timing, choice"
+      },
+      "T_dribble": {
+        "label": "Dribble – technical gestures",
+        "hint": "1v1, feints, technical moves"
+      },
+      "T_shot": {
+        "label": "Striking",
+        "hint": "Finishing, power, accuracy"
+      },
+      "I_headMovement": {
+        "label": "Head movement",
+        "hint": "Frequency of scanning"
+      },
+      "I_scanning": {
+        "label": "Information gathering",
+        "hint": "Quality of perception, anticipation"
+      },
+      "I_offensive": {
+        "label": "Offensive principles",
+        "hint": "Spacing, give-and-go"
+      },
+      "I_defensive": {
+        "label": "Defensive principles",
+        "hint": "Pressing, holding back, recovery, collaboration"
+      },
+      "P_selfAwareness": {
+        "label": "Self-confidence – initiative",
+        "hint": "Self-esteem, calculated risk taking"
+      },
+      "P_emotionRegulation": {
+        "label": "Emotion management – stress",
+        "hint": "Control under pressure"
+      },
+      "P_solidarity": {
+        "label": "Solidarity – respect",
+        "hint": "Team spirit, fair play"
+      },
+      "S_speedCoordination": {
+        "label": "Speed – coordination",
+        "hint": "Acceleration, agility, fluidity"
+      },
+      "S_endurance": {
+        "label": "Endurance – fatigue resistance",
+        "hint": "Ability to repeat efforts"
+      }
+    },
+    "appreciation": {
+      "good": "Good, keep up the progression.",
+      "envisageable": "Possible, but progress needed.",
+      "problematic": "Problematic without rapid progress.",
+      "veryDifficult": "Very difficult unless progress is made."
+    },
+    "section": {
+      "identity": {
+        "eyebrow": "Identity",
+        "title": "Player and season"
+      },
+      "stats": {
+        "eyebrow": "Statistics",
+        "title": "Season statistics",
+        "description": "Fill the statistics per tour when available.",
+        "tour1": "Tour 1 (July–December)",
+        "tour2": "Tour 2 (January–June)"
+      },
+      "asf": {
+        "eyebrow": "ASF tests",
+        "title": "ASF physical tests",
+        "description": "FE13 / FE14 measurements per tour.",
+        "tour1": "Tour 1",
+        "tour2": "Tour 2"
+      },
+      "tips": {
+        "eyebrow": "TIPS",
+        "title": "Performance domains",
+        "description": "Criteria for moving up to the next category.",
+        "average": "Average score"
+      },
+      "bullets": {
+        "eyebrow": "Summary",
+        "title": "Strengths and growth areas",
+        "description": "Up to three — all printed on the PDF.",
+        "strengths": "Strengths",
+        "improvements": "Areas to improve"
+      },
+      "appreciation": {
+        "eyebrow": "Appraisal",
+        "title": "Promotion to next category"
+      },
+      "signatures": {
+        "eyebrow": "Signatures",
+        "title": "Responsible staff and parents"
+      }
+    },
+    "field": {
+      "season": "Season",
+      "team": "Team",
+      "playerName": "Full name",
+      "birthDate": "Birth date",
+      "position": "Position",
+      "evaluationDate": "Evaluation date",
+      "matches": "Matches",
+      "playTime": "Play time (min)",
+      "height": "Height",
+      "weight": "Weight",
+      "speed10": "Speed 10 m",
+      "speed30": "Speed 30 m",
+      "proAgility": "Pro Agility 5-10-5",
+      "yoyo": "Yo-Yo",
+      "agility": "Agility",
+      "ballControl": "Ball control",
+      "juggling": "Juggling",
+      "commentPlaceholder": "Comment…",
+      "technicalLead": "Technical lead",
+      "coaches": "Coaches",
+      "parents": "Parent signature(s)",
+      "signatureDate": "Date"
+    },
+    "list": {
+      "title": "Evaluations",
+      "subtitle": "TIPS / ASF tracking for this player — one per moment.",
+      "create": "New evaluation",
+      "creating": "Creating…",
+      "empty": "No evaluation recorded yet.",
+      "noDate": "No date",
+      "average": "Avg",
+      "appreciation": {
+        "good": "Good progression",
+        "envisageable": "Possible",
+        "problematic": "Problematic",
+        "veryDifficult": "Very difficult"
+      }
+    },
+    "progress": "Progress",
+    "stepsLabel": "Steps",
+    "next": "Next",
+    "scaleLegend": "Scale",
+    "steps": [
+      {
+        "label": "Identity & statistics",
+        "eyebrow": "Step 1",
+        "desc": "Player identity, season statistics, and ASF tests per tour."
+      },
+      {
+        "label": "TIPS scores",
+        "eyebrow": "Step 2",
+        "desc": "Score each criterion from 1 to 5; add a comment if needed."
+      },
+      {
+        "label": "Summary & appraisal",
+        "eyebrow": "Step 3",
+        "desc": "Strengths, growth areas, appraisal, and signatures."
+      }
+    ]
   }
 }

@@ -1457,5 +1457,197 @@
     "saving": "Salvataggio…",
     "saved": "Preferenza salvata.",
     "saveError": "Impossibile salvare la preferenza."
+  },
+  "evaluation": {
+    "header": "Valutazione giocatore",
+    "back": "Indietro",
+    "save": "Salva",
+    "saving": "Salvataggio…",
+    "saved": "Salvato",
+    "upToDate": "Aggiornato",
+    "delete": "Elimina",
+    "deleting": "Eliminazione…",
+    "deleteConfirm": "Eliminare questa valutazione? L'azione è irreversibile.",
+    "exportPdf": "Esporta PDF",
+    "noPlayer": "Giocatore",
+    "noDate": "Senza data",
+    "scale": {
+      "1": "Grande difficoltà",
+      "2": "In difficoltà",
+      "3": "Bene",
+      "4": "Molto bene",
+      "5": "Eccellente"
+    },
+    "group": {
+      "T": "Tecnica",
+      "I": "Intelligenza – tattica",
+      "P": "Personalità – mentale",
+      "S": "Velocità – condizione fisica"
+    },
+    "criterion": {
+      "T_firstTouch": {
+        "label": "Controllo – presa di palla",
+        "hint": "Primo contatto, orientamento"
+      },
+      "T_ballDriving": {
+        "label": "Conduzione della palla",
+        "hint": "Testa alta, qualità della corsa"
+      },
+      "T_pass": {
+        "label": "Passaggio",
+        "hint": "Qualità, tempo, scelta"
+      },
+      "T_dribble": {
+        "label": "Dribbling – gestualità tecnica",
+        "hint": "1×1, finte, gesti tecnici"
+      },
+      "T_shot": {
+        "label": "Tiro",
+        "hint": "Conclusione, potenza, precisione"
+      },
+      "I_headMovement": {
+        "label": "Muovere la testa",
+        "hint": "Frequenza delle letture"
+      },
+      "I_scanning": {
+        "label": "Presa di informazioni",
+        "hint": "Qualità della percezione, anticipazione"
+      },
+      "I_offensive": {
+        "label": "Principi offensivi",
+        "hint": "Occupazione spazi, dai e vai"
+      },
+      "I_defensive": {
+        "label": "Principi difensivi",
+        "hint": "Pressione, contenimento, riposizionamento, collaborazione"
+      },
+      "P_selfAwareness": {
+        "label": "Fiducia in sé – iniziativa",
+        "hint": "Autostima, rischio calcolato"
+      },
+      "P_emotionRegulation": {
+        "label": "Gestione delle emozioni – stress",
+        "hint": "Controllo sotto pressione"
+      },
+      "P_solidarity": {
+        "label": "Solidarietà – rispetto",
+        "hint": "Spirito di squadra, fair play"
+      },
+      "S_speedCoordination": {
+        "label": "Velocità – coordinazione",
+        "hint": "Accelerazione, agilità, fluidità"
+      },
+      "S_endurance": {
+        "label": "Resistenza – tolleranza alla fatica",
+        "hint": "Capacità di ripetere gli sforzi"
+      }
+    },
+    "appreciation": {
+      "good": "Buona, proseguire la progressione.",
+      "envisageable": "Possibile, ma servono progressi.",
+      "problematic": "Problematica senza progressi rapidi.",
+      "veryDifficult": "Molto difficile senza progressi sostanziali."
+    },
+    "section": {
+      "identity": {
+        "eyebrow": "Identità",
+        "title": "Giocatore e stagione"
+      },
+      "stats": {
+        "eyebrow": "Statistiche",
+        "title": "Statistiche stagionali",
+        "description": "Compila le statistiche per tour se disponibili.",
+        "tour1": "Tour 1 (luglio–dicembre)",
+        "tour2": "Tour 2 (gennaio–giugno)"
+      },
+      "asf": {
+        "eyebrow": "Test ASF",
+        "title": "Test fisici ASF",
+        "description": "Misure FE13 / FE14 per tour.",
+        "tour1": "Tour 1",
+        "tour2": "Tour 2"
+      },
+      "tips": {
+        "eyebrow": "TIPS",
+        "title": "Aree di performance",
+        "description": "Criteri in vista del passaggio alla categoria superiore.",
+        "average": "Media"
+      },
+      "bullets": {
+        "eyebrow": "Sintesi",
+        "title": "Punti di forza e aree di miglioramento",
+        "description": "Fino a tre — tutti riportati sul PDF.",
+        "strengths": "Punti di forza",
+        "improvements": "Aree da migliorare"
+      },
+      "appreciation": {
+        "eyebrow": "Valutazione",
+        "title": "Passaggio alla categoria superiore"
+      },
+      "signatures": {
+        "eyebrow": "Firme",
+        "title": "Responsabili e genitori"
+      }
+    },
+    "field": {
+      "season": "Stagione",
+      "team": "Squadra",
+      "playerName": "Nome – cognome",
+      "birthDate": "Data di nascita",
+      "position": "Ruolo",
+      "evaluationDate": "Data della valutazione",
+      "matches": "Partite",
+      "playTime": "Minuti giocati",
+      "height": "Altezza",
+      "weight": "Peso",
+      "speed10": "Velocità 10 m",
+      "speed30": "Velocità 30 m",
+      "proAgility": "Pro Agility 5-10-5",
+      "yoyo": "Yo-Yo",
+      "agility": "Agilità",
+      "ballControl": "Conduzione di palla",
+      "juggling": "Palleggio",
+      "commentPlaceholder": "Commento…",
+      "technicalLead": "Responsabile tecnico",
+      "coaches": "Allenatori",
+      "parents": "Firma genitori",
+      "signatureDate": "Data"
+    },
+    "list": {
+      "title": "Valutazioni",
+      "subtitle": "Storico TIPS / ASF di questo giocatore — una valutazione per momento.",
+      "create": "Nuova valutazione",
+      "creating": "Creazione…",
+      "empty": "Nessuna valutazione registrata.",
+      "noDate": "Senza data",
+      "average": "Media",
+      "appreciation": {
+        "good": "Buona progressione",
+        "envisageable": "Possibile",
+        "problematic": "Problematica",
+        "veryDifficult": "Molto difficile"
+      }
+    },
+    "progress": "Avanzamento",
+    "stepsLabel": "Passi",
+    "next": "Avanti",
+    "scaleLegend": "Scala",
+    "steps": [
+      {
+        "label": "Identità & statistiche",
+        "eyebrow": "Passo 1",
+        "desc": "Identità del giocatore, statistiche stagionali e test ASF per tour."
+      },
+      {
+        "label": "Punteggi TIPS",
+        "eyebrow": "Passo 2",
+        "desc": "Valuta ogni criterio da 1 a 5 e aggiungi un commento se necessario."
+      },
+      {
+        "label": "Sintesi e valutazione",
+        "eyebrow": "Passo 3",
+        "desc": "Punti di forza, aree di miglioramento, valutazione e firme."
+      }
+    ]
   }
 }
