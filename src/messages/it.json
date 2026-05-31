@@ -352,6 +352,40 @@
       "emptyDescHint": "Aggiungi una breve descrizione per inquadrare l'identità, gli obiettivi o le note importanti di questa squadra.",
       "openContingent": "Apri nella rosa",
       "importClubCorner": "Importa ClubCorner"
+    },
+    "calendar": {
+      "title": "Calendario partite ufficiali",
+      "subtitle": "Importa il feed ICS della tua squadra (football.ch o altri). Con un URL di sottoscrizione, le partite si aggiornano automaticamente ogni giorno.",
+      "urlLabel": "URL di sottoscrizione ICS",
+      "urlHint": "Incolla il link del calendario della tua federazione. webcal:// è accettato.",
+      "saveAndSync": "Salva e sincronizza",
+      "updateAndSync": "Aggiorna e risincronizza",
+      "syncNow": "Sincronizza ora",
+      "syncing": "Sincronizzazione…",
+      "uploadFile": "Carica file .ics",
+      "disconnect": "Annulla sottoscrizione",
+      "disconnectConfirm": "Rimuovere la sottoscrizione? Le partite già importate vengono conservate.",
+      "matchesTitle": "{n, plural, =0 {Nessuna partita importata} one {1 partita importata} other {# partite importate}}",
+      "matchesEmpty": "Ancora nessuna partita. Inserisci un URL o carica un file .ics.",
+      "syncedCount": "{n, plural, one {1 partita sincronizzata.} other {# partite sincronizzate.}}",
+      "ok": "Sincronizzazione completata.",
+      "statusOk": "{n, plural, =0 {Nessuna partita} one {1 partita} other {# partite}}",
+      "statusError": "Ultima sincronizzazione fallita",
+      "statusPending": "Sincronizzazione in corso…",
+      "lastSyncedAt": "Ultima sincronizzazione: {when}",
+      "neverSynced": "Non ancora sincronizzato",
+      "err": {
+        "unauthenticated": "Devi essere collegato.",
+        "team_not_found": "Squadra non trovata.",
+        "forbidden": "Non hai accesso a questa squadra.",
+        "url_invalid": "URL del calendario non valido.",
+        "ics_invalid": "Impossibile leggere il file ICS.",
+        "ics_empty": "Nessuna partita trovata in questo calendario.",
+        "fetch_failed": "Impossibile recuperare il calendario da quell'URL.",
+        "fetch_timeout": "Il server del calendario non ha risposto in tempo.",
+        "fetch_too_large": "File del calendario troppo grande.",
+        "db_error": "Errore di salvataggio. Riprova."
+      }
     }
   },
   "exercises": {
