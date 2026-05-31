@@ -1462,5 +1462,197 @@
     "saving": "Enregistrement…",
     "saved": "Préférence enregistrée.",
     "saveError": "Impossible d'enregistrer ta préférence."
+  },
+  "evaluation": {
+    "header": "Évaluation joueur",
+    "back": "Retour",
+    "save": "Enregistrer",
+    "saving": "Enregistrement…",
+    "saved": "Enregistré",
+    "upToDate": "À jour",
+    "delete": "Supprimer",
+    "deleting": "Suppression…",
+    "deleteConfirm": "Supprimer cette évaluation ? Cette action est irréversible.",
+    "exportPdf": "Exporter PDF",
+    "noPlayer": "Joueur",
+    "noDate": "Sans date",
+    "scale": {
+      "1": "En grande difficulté",
+      "2": "En difficulté",
+      "3": "Bien",
+      "4": "Très bien",
+      "5": "Excellent"
+    },
+    "group": {
+      "T": "Technique",
+      "I": "Intelligence – tactique",
+      "P": "Personnalité – mental",
+      "S": "Vitesse – condition physique"
+    },
+    "criterion": {
+      "T_firstTouch": {
+        "label": "Contrôle – prise de balle",
+        "hint": "Premier contact, orientation"
+      },
+      "T_ballDriving": {
+        "label": "Conduite du ballon",
+        "hint": "Tête haute, qualité de course"
+      },
+      "T_pass": {
+        "label": "Passe",
+        "hint": "Qualité, timing, choix"
+      },
+      "T_dribble": {
+        "label": "Dribble – gestuelle TE",
+        "hint": "1×1, feinte, gestuelle technique"
+      },
+      "T_shot": {
+        "label": "Frappe",
+        "hint": "Finition, puissance, précision"
+      },
+      "I_headMovement": {
+        "label": "Bouger la tête",
+        "hint": "Fréquence des prises d'information"
+      },
+      "I_scanning": {
+        "label": "Prise d'informations",
+        "hint": "Qualité de la perception, anticipation"
+      },
+      "I_offensive": {
+        "label": "Principes offensifs",
+        "hint": "Occupation de l'espace, donner et redemander"
+      },
+      "I_defensive": {
+        "label": "Principes défensifs",
+        "hint": "Pression, ne pas se lancer, replacement, collaboration"
+      },
+      "P_selfAwareness": {
+        "label": "Confiance en soi – initiatives",
+        "hint": "Estime, prise de risque assumée"
+      },
+      "P_emotionRegulation": {
+        "label": "Gestion des émotions – stress",
+        "hint": "Maîtrise sous pression"
+      },
+      "P_solidarity": {
+        "label": "Solidarité – respect",
+        "hint": "Esprit d'équipe, fair-play"
+      },
+      "S_speedCoordination": {
+        "label": "Vitesse – coordination",
+        "hint": "Accélération, agilité, fluidité"
+      },
+      "S_endurance": {
+        "label": "Endurance – résistance à la fatigue",
+        "hint": "Capacité à répéter les efforts"
+      }
+    },
+    "appreciation": {
+      "good": "Bon, poursuivre la progression.",
+      "envisageable": "Envisageable, mais progrès à faire.",
+      "problematic": "Problématique si des progrès rapides ne sont pas constatés.",
+      "veryDifficult": "Très difficile en fonction des progrès qui doivent être réalisés."
+    },
+    "section": {
+      "identity": {
+        "eyebrow": "Identité",
+        "title": "Joueur et saison"
+      },
+      "stats": {
+        "eyebrow": "Statistiques",
+        "title": "Statistiques saison",
+        "description": "Renseignez les statistiques par tour si disponibles.",
+        "tour1": "Tour 1 (juillet–décembre)",
+        "tour2": "Tour 2 (janvier–juin)"
+      },
+      "asf": {
+        "eyebrow": "Tests ASF",
+        "title": "Tests physiques ASF",
+        "description": "Mesures FE13 / FE14 par tour.",
+        "tour1": "Tour 1",
+        "tour2": "Tour 2"
+      },
+      "tips": {
+        "eyebrow": "TIPS",
+        "title": "Domaines de performance",
+        "description": "Critères dans l'optique d'un passage en catégorie supérieure.",
+        "average": "Note moyenne"
+      },
+      "bullets": {
+        "eyebrow": "Synthèse",
+        "title": "Points forts et axes de progrès",
+        "description": "Trois maxima — tous reportés sur le PDF.",
+        "strengths": "Points forts",
+        "improvements": "Points à améliorer"
+      },
+      "appreciation": {
+        "eyebrow": "Appréciation",
+        "title": "Passage en catégorie supérieure"
+      },
+      "signatures": {
+        "eyebrow": "Signatures",
+        "title": "Personnes responsables et parents"
+      }
+    },
+    "field": {
+      "season": "Saison",
+      "team": "Équipe",
+      "playerName": "Nom – prénom",
+      "birthDate": "Date de naissance",
+      "position": "Position",
+      "evaluationDate": "Date de l'évaluation",
+      "matches": "Matches",
+      "playTime": "Temps de jeu (min)",
+      "height": "Taille",
+      "weight": "Poids",
+      "speed10": "Vitesse 10 m",
+      "speed30": "Vitesse 30 m",
+      "proAgility": "Pro Agility 5-10-5",
+      "yoyo": "Yo-Yo",
+      "agility": "Agilité",
+      "ballControl": "Conduite de balle",
+      "juggling": "Jonglage",
+      "commentPlaceholder": "Commentaire…",
+      "technicalLead": "Responsable technique",
+      "coaches": "Entraîneurs",
+      "parents": "Signature(s) parents",
+      "signatureDate": "Date"
+    },
+    "list": {
+      "title": "Évaluations",
+      "subtitle": "Suivi TIPS / ASF de ce joueur — une évaluation par moment.",
+      "create": "Nouvelle évaluation",
+      "creating": "Création…",
+      "empty": "Aucune évaluation enregistrée pour ce joueur.",
+      "noDate": "Sans date",
+      "average": "Moyenne",
+      "appreciation": {
+        "good": "Progression bonne",
+        "envisageable": "Envisageable",
+        "problematic": "Problématique",
+        "veryDifficult": "Très difficile"
+      }
+    },
+    "progress": "Avancement",
+    "stepsLabel": "Étapes",
+    "next": "Suivant",
+    "scaleLegend": "Échelle",
+    "steps": [
+      {
+        "label": "Identité & statistiques",
+        "eyebrow": "Étape 1",
+        "desc": "Saisissez l'identité du joueur, les statistiques de saison et les tests ASF par tour."
+      },
+      {
+        "label": "Notes TIPS",
+        "eyebrow": "Étape 2",
+        "desc": "Notez chaque critère de 1 à 5, ajoutez un commentaire si nécessaire."
+      },
+      {
+        "label": "Synthèse & appréciation",
+        "eyebrow": "Étape 3",
+        "desc": "Points forts, points à améliorer, appréciation et signatures."
+      }
+    ]
   }
 }

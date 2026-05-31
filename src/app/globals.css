@@ -289,10 +289,14 @@ body {
 }
 
 @media print {
+  html,
   body {
     background: #fff;
     margin: 0;
     padding: 0;
+    width: 210mm;
+    min-height: 297mm;
+    overflow: visible;
   }
 
   body * {
@@ -320,6 +324,12 @@ body {
   }
 
   .prep-page {
+    display: block !important;
+    width: 210mm !important;
+    height: 297mm !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    overflow: hidden !important;
     box-shadow: none !important;
     border: 0 !important;
   }
