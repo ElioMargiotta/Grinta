@@ -174,41 +174,181 @@
         {
           "title": "Produkt",
           "links": [
-            "Planer",
-            "Bibliothek",
-            "Vorbereitung",
-            "Vereinssicht",
-            "Preise"
+            { "label": "Methode", "href": "#methode" },
+            { "label": "So funktioniert's", "href": "#flow" },
+            { "label": "Preise", "href": "#tarifs" }
           ]
         },
         {
-          "title": "Methode",
+          "title": "Konto",
           "links": [
-            "Spielprinzipien",
-            "Mikrozyklen",
-            "Mesozyklen",
-            "Pädagogik"
+            { "label": "Anmelden", "href": "/login" },
+            { "label": "Konto erstellen", "href": "/signup" }
           ]
         },
         {
-          "title": "Ressourcen",
+          "title": "Rechtliches",
           "links": [
-            "Blog",
-            "Vorlagen",
-            "Hilfecenter",
-            "API"
-          ]
-        },
-        {
-          "title": "Unternehmen",
-          "links": [
-            "Über uns",
-            "Karriere",
-            "Kontakt",
-            "Impressum"
+            { "label": "Impressum", "href": "/legal/mentions-legales" },
+            { "label": "AGB", "href": "/legal/cgv" },
+            { "label": "Datenschutz", "href": "/legal/confidentialite" }
           ]
         }
       ]
+    }
+  },
+  "legal": {
+    "backToHome": "Zurück zur Startseite",
+    "lastUpdated": "Zuletzt aktualisiert: Juni 2026",
+    "docs": {
+      "mentions-legales": {
+        "title": "Impressum",
+        "intro": "Dieses Impressum gilt für die Website und die Anwendung von Grinta. Grinta wird aus der Schweiz betrieben und unterliegt dem schweizerischen Recht.",
+        "sections": [
+          {
+            "heading": "Herausgeber",
+            "body": [
+              "Grinta — [Genaue Firmenbezeichnung], [Rechtsform].",
+              "Adresse: [Strasse und Nummer], [PLZ] [Ort], Schweiz.",
+              "Unternehmens-Identifikationsnummer (UID): [CHE-xxx.xxx.xxx].",
+              "Kontakt: contact@grinta.app."
+            ]
+          },
+          {
+            "heading": "Hosting",
+            "body": [
+              "Die Anwendung wird von Vercel Inc., 440 N Barranca Ave #4133, Covina, CA 91723, USA, auf einer Cloud-Infrastruktur gehostet, die Rechenzentren in der Europäischen Union umfassen kann.",
+              "Da eine Übermittlung von Daten in die USA erfolgen kann, werden gemäss revDSG angemessene Garantien (insbesondere Standardvertragsklauseln) getroffen. Bei Fragen zum Hosting schreiben Sie an contact@grinta.app."
+            ]
+          },
+          {
+            "heading": "Geistiges Eigentum",
+            "body": [
+              "Sämtliche Inhalte der Website und der Anwendung (Marke Grinta, Logos, Texte, Benutzeroberflächen, Code, Methodik) sind durch das schweizerische Immaterialgüterrecht geschützt und bleiben ausschliessliches Eigentum des Herausgebers oder seiner Partner.",
+              "Jede vollständige oder teilweise Vervielfältigung, Wiedergabe oder Verwertung ohne vorherige schriftliche Genehmigung ist untersagt."
+            ]
+          },
+          {
+            "heading": "Haftung",
+            "body": [
+              "Der Herausgeber bemüht sich um die Richtigkeit und Verfügbarkeit der bereitgestellten Informationen, kann diese jedoch nicht garantieren. Eine Haftung für Schäden aus der Nutzung der Website oder der Anwendung ist im Rahmen des schweizerischen Rechts ausgeschlossen.",
+              "Links zu Websites Dritter werden nur zu Informationszwecken bereitgestellt; der Herausgeber hat keinen Einfluss auf deren Inhalte."
+            ]
+          },
+          {
+            "heading": "Anwendbares Recht und Gerichtsstand",
+            "body": [
+              "Dieses Impressum unterliegt dem schweizerischen Recht. Ausschliesslicher Gerichtsstand ist der Sitz des Herausgebers, vorbehaltlich zwingender gesetzlicher Gerichtsstände."
+            ]
+          }
+        ]
+      },
+      "cgv": {
+        "title": "Allgemeine Geschäftsbedingungen",
+        "intro": "Diese Allgemeinen Geschäftsbedingungen (AGB) regeln den Abschluss und die Nutzung der kostenpflichtigen Abonnements von Grinta. Sie unterliegen dem schweizerischen Recht, insbesondere dem Obligationenrecht (OR).",
+        "sections": [
+          {
+            "heading": "Gegenstand und Geltungsbereich",
+            "body": [
+              "Diese AGB regeln das Vertragsverhältnis zwischen dem Herausgeber von Grinta und jedem Kunden, der ein Abonnement abschliesst. Der Abschluss eines Abonnements gilt als vorbehaltlose Annahme dieser AGB."
+            ]
+          },
+          {
+            "heading": "Abonnements und Preise",
+            "body": [
+              "Die Funktionen und Preise der Abonnements sind auf der Preisseite der Website beschrieben. Die Preise sind in Schweizer Franken (CHF) angegeben, gegebenenfalls inklusive Steuern.",
+              "Der Herausgeber behält sich vor, seine Preise zu ändern; jede Änderung wird dem Kunden vor der Verlängerung mitgeteilt und gilt nicht für die bereits bezahlte laufende Periode."
+            ]
+          },
+          {
+            "heading": "Zahlung",
+            "body": [
+              "Die Zahlung erfolgt über die beim Abschluss angebotenen Mittel, über einen Drittanbieter für Zahlungen. Das Abonnement wird nach Zahlungsbestätigung aktiviert.",
+              "Bei Zahlungsverzug kann der Herausgeber den Zugang zum Dienst nach erfolgloser Mahnung sperren oder kündigen."
+            ]
+          },
+          {
+            "heading": "Laufzeit und Kündigung",
+            "body": [
+              "Das Abonnement wird für die gewählte Periode (monatlich oder jährlich) abgeschlossen und verlängert sich automatisch um eine identische Periode, sofern es nicht vor dem Ablauf gekündigt wird.",
+              "Der Kunde kann jederzeit über sein Konto oder per E-Mail an contact@grinta.app kündigen; die Kündigung wird zum Ende der laufenden Periode wirksam, ohne Rückerstattung der bereits begonnenen Periode."
+            ]
+          },
+          {
+            "heading": "Widerrufsrecht",
+            "body": [
+              "Das schweizerische Recht sieht für online geschlossene Verträge kein allgemeines Widerrufsrecht vor. Der Kunde anerkennt, dass der Zugang zum digitalen Dienst mit der Aktivierung des Abonnements beginnt."
+            ]
+          },
+          {
+            "heading": "Verfügbarkeit und Haftung",
+            "body": [
+              "Der Herausgeber erbringt den Dienst mit der gebotenen Sorgfalt, garantiert jedoch keine ununterbrochene Verfügbarkeit. Seine Haftung ist auf direkte Schäden beschränkt und für indirekte Schäden im Rahmen des schweizerischen Rechts ausgeschlossen.",
+              "Der Kunde bleibt für die Richtigkeit der von ihm eingegebenen Daten und für die Sicherung seiner Inhalte verantwortlich."
+            ]
+          },
+          {
+            "heading": "Anwendbares Recht und Gerichtsstand",
+            "body": [
+              "Diese AGB unterliegen dem schweizerischen Recht. Für Streitigkeiten sind ausschliesslich die Gerichte am Sitz des Herausgebers zuständig, vorbehaltlich zwingender Gerichtsstände."
+            ]
+          }
+        ]
+      },
+      "confidentialite": {
+        "title": "Datenschutzerklärung",
+        "intro": "Diese Erklärung beschreibt, wie Grinta Personendaten bearbeitet, in Übereinstimmung mit dem schweizerischen Datenschutzgesetz (revDSG). Soweit Nutzer aus der Europäischen Union betroffen sind, kann zusätzlich die DSGVO gelten.",
+        "sections": [
+          {
+            "heading": "Verantwortlicher",
+            "body": [
+              "Verantwortlich für die Bearbeitung ist der Herausgeber von Grinta — [Genaue Firmenbezeichnung], [PLZ] [Ort], Schweiz.",
+              "Bei Fragen zum Datenschutz: contact@grinta.app."
+            ]
+          },
+          {
+            "heading": "Erhobene Daten",
+            "body": [
+              "Kontodaten: Name, E-Mail-Adresse, Verein und Rolle.",
+              "Nutzungsdaten: in der Anwendung erstellte Inhalte (Teams, Spieler, Einheiten, Bewertungen) und technische Protokolle, die für den Betrieb erforderlich sind.",
+              "Zahlungsdaten: werden von unserem Zahlungsdienstleister verarbeitet; wir speichern keine vollständigen Kartendaten."
+            ]
+          },
+          {
+            "heading": "Zwecke und Rechtsgrundlage",
+            "body": [
+              "Die Daten werden bearbeitet, um den Dienst bereitzustellen und zu sichern, Abonnements zu verwalten, Support zu leisten und die Anwendung zu verbessern.",
+              "Die Bearbeitung stützt sich auf die Vertragserfüllung, die Einwilligung sofern erforderlich, und die berechtigten Interessen des Herausgebers gemäss revDSG."
+            ]
+          },
+          {
+            "heading": "Bekanntgabe der Daten",
+            "body": [
+              "Daten können an Auftragsbearbeiter (Hosting, Zahlung, E-Mail) weitergegeben werden, die auf Weisung des Herausgebers handeln und zur Vertraulichkeit verpflichtet sind.",
+              "Bei einer Übermittlung ausserhalb der Schweiz oder der EU/des EWR werden gemäss revDSG angemessene Garantien getroffen."
+            ]
+          },
+          {
+            "heading": "Aufbewahrungsdauer",
+            "body": [
+              "Die Daten werden so lange aufbewahrt, wie es für die beschriebenen Zwecke und für die Dauer des Vertragsverhältnisses erforderlich ist, und anschliessend gelöscht oder anonymisiert, vorbehaltlich gesetzlicher Aufbewahrungspflichten."
+            ]
+          },
+          {
+            "heading": "Ihre Rechte",
+            "body": [
+              "Gemäss revDSG haben Sie ein Recht auf Auskunft, Berichtigung, Löschung und Widerspruch sowie das Recht auf Datenübertragbarkeit.",
+              "Zur Ausübung dieser Rechte schreiben Sie an contact@grinta.app. Sie können sich auch an den Eidgenössischen Datenschutz- und Öffentlichkeitsbeauftragten (EDÖB) wenden."
+            ]
+          },
+          {
+            "heading": "Sicherheit",
+            "body": [
+              "Der Herausgeber trifft angemessene technische und organisatorische Massnahmen, um die Daten vor unbefugtem Zugriff, Verlust oder Veränderung zu schützen."
+            ]
+          }
+        ]
+      }
     }
   },
   "nav": {
