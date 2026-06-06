@@ -26,6 +26,7 @@ type Tier = {
   priceSuffix: string;
   sub: string;
   features: string[];
+  notes?: string[];
   cta: string;
 };
 type FooterLink = { label: string; href: string };
@@ -389,6 +390,19 @@ async function PricingSection({ tiers }: { tiers: Tier[] }) {
                       </li>
                     ))}
                   </ul>
+                  {tier.notes && tier.notes.length > 0 && (
+                    <ul
+                      className="flex flex-col gap-1 text-[11px] leading-relaxed pt-1"
+                      style={{
+                        color: "var(--ink-3)",
+                        borderTop: "1px solid var(--line)",
+                      }}
+                    >
+                      {tier.notes.map((n) => (
+                        <li key={n}>{n}</li>
+                      ))}
+                    </ul>
+                  )}
                   <Link
                     href="/signup"
                     className={

@@ -154,6 +154,11 @@
             "Staff & DTN roles",
             "Priority support"
           ],
+          "notes": [
+            "Prices in CHF, VAT included",
+            "14-day free trial, no card required",
+            "Billed monthly, per team — cancel anytime"
+          ],
           "cta": "Start the season"
         }
       ]
@@ -174,24 +179,52 @@
         {
           "title": "Product",
           "links": [
-            { "label": "Method", "href": "#methode" },
-            { "label": "How it works", "href": "#flow" },
-            { "label": "Pricing", "href": "#tarifs" }
+            {
+              "label": "Method",
+              "href": "#methode"
+            },
+            {
+              "label": "How it works",
+              "href": "#flow"
+            },
+            {
+              "label": "Pricing",
+              "href": "#tarifs"
+            },
+            {
+              "label": "Contact",
+              "href": "/contact"
+            }
           ]
         },
         {
           "title": "Account",
           "links": [
-            { "label": "Log in", "href": "/login" },
-            { "label": "Create account", "href": "/signup" }
+            {
+              "label": "Log in",
+              "href": "/login"
+            },
+            {
+              "label": "Create account",
+              "href": "/signup"
+            }
           ]
         },
         {
           "title": "Legal",
           "links": [
-            { "label": "Legal notice", "href": "/legal/mentions-legales" },
-            { "label": "Terms of sale", "href": "/legal/cgv" },
-            { "label": "Privacy", "href": "/legal/confidentialite" }
+            {
+              "label": "Legal notice",
+              "href": "/legal/mentions-legales"
+            },
+            {
+              "label": "Terms of sale",
+              "href": "/legal/cgv"
+            },
+            {
+              "label": "Privacy",
+              "href": "/legal/confidentialite"
+            }
           ]
         }
       ]
@@ -349,6 +382,24 @@
           }
         ]
       }
+    }
+  },
+  "contact": {
+    "backToHome": "Back to home",
+    "title": "Contact",
+    "intro": "A question about Grinta, a demo request or need a hand? Drop us a line — we reply within 2 business days.",
+    "form": {
+      "name": "Name",
+      "namePlaceholder": "Your name",
+      "email": "Email",
+      "emailPlaceholder": "you@club.ch",
+      "message": "Message",
+      "messagePlaceholder": "How can we help?",
+      "submit": "Send",
+      "submitting": "Sending…",
+      "error": "Sending failed. Try again or email us directly.",
+      "successTitle": "Message sent",
+      "successBody": "Thanks! We'll get back to you shortly."
     }
   },
   "nav": {
