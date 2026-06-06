@@ -18,20 +18,12 @@ export default async function LoginPage({
         <p className="mt-1 text-sm text-zinc-600">{t("loginSubtitle")}</p>
       </div>
       <LoginForm />
-      <div className="flex flex-col gap-2 text-center text-sm text-zinc-600">
-        <Link
-          href="/forgot-password"
-          className="font-medium text-zinc-900 underline"
-        >
-          {t("forgotPasswordLink")}
+      <p className="text-center text-sm text-zinc-600">
+        {t("noAccount")}{" "}
+        <Link href="/signup" className="font-medium text-zinc-900 underline">
+          {t("switchToSignup")}
         </Link>
-        <p>
-          {t("noAccount")}{" "}
-          <Link href="/signup" className="font-medium text-zinc-900 underline">
-            {t("switchToSignup")}
-          </Link>
-        </p>
-      </div>
+      </p>
     </div>
   );
 }
