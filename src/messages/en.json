@@ -154,6 +154,11 @@
             "Staff & DTN roles",
             "Priority support"
           ],
+          "notes": [
+            "Prices in CHF, VAT included",
+            "14-day free trial, no card required",
+            "Billed monthly, per team — cancel anytime"
+          ],
           "cta": "Start the season"
         }
       ]
@@ -174,41 +179,227 @@
         {
           "title": "Product",
           "links": [
-            "Planner",
-            "Library",
-            "Preparation",
-            "Club view",
-            "Pricing"
+            {
+              "label": "Method",
+              "href": "#methode"
+            },
+            {
+              "label": "How it works",
+              "href": "#flow"
+            },
+            {
+              "label": "Pricing",
+              "href": "#tarifs"
+            },
+            {
+              "label": "Contact",
+              "href": "/contact"
+            }
           ]
         },
         {
-          "title": "Method",
+          "title": "Account",
           "links": [
-            "Playing principles",
-            "Microcycles",
-            "Mesocycles",
-            "Pedagogy"
+            {
+              "label": "Log in",
+              "href": "/login"
+            },
+            {
+              "label": "Create account",
+              "href": "/signup"
+            }
           ]
         },
         {
-          "title": "Resources",
+          "title": "Legal",
           "links": [
-            "Blog",
-            "Templates",
-            "Help center",
-            "API"
-          ]
-        },
-        {
-          "title": "Company",
-          "links": [
-            "About",
-            "Careers",
-            "Contact",
-            "Legal"
+            {
+              "label": "Legal notice",
+              "href": "/legal/mentions-legales"
+            },
+            {
+              "label": "Terms of sale",
+              "href": "/legal/cgv"
+            },
+            {
+              "label": "Privacy",
+              "href": "/legal/confidentialite"
+            }
           ]
         }
       ]
+    }
+  },
+  "legal": {
+    "backToHome": "Back to home",
+    "lastUpdated": "Last updated: June 2026",
+    "docs": {
+      "mentions-legales": {
+        "title": "Legal notice",
+        "intro": "This legal notice applies to the Grinta website and application. Grinta is operated from Switzerland and governed by Swiss law.",
+        "sections": [
+          {
+            "heading": "Publisher",
+            "body": [
+              "Grinta — [Exact company name], [Legal form].",
+              "Address: [Street and number], [Postal code] [City], Switzerland.",
+              "Business identification number (UID): [CHE-xxx.xxx.xxx].",
+              "Contact: contact@grinta.app."
+            ]
+          },
+          {
+            "heading": "Hosting",
+            "body": [
+              "The application is hosted by Vercel Inc., 440 N Barranca Ave #4133, Covina, CA 91723, United States, on a cloud infrastructure that may include data centres located in the European Union.",
+              "As a transfer of data to the United States may occur, appropriate safeguards (in particular standard contractual clauses) are put in place in accordance with the revFADP. For any hosting-related question, write to contact@grinta.app."
+            ]
+          },
+          {
+            "heading": "Intellectual property",
+            "body": [
+              "All content of the website and application (the Grinta brand, logos, texts, interfaces, code, methodology) is protected under Swiss intellectual property law and remains the exclusive property of the publisher or its partners.",
+              "Any reproduction, representation or use, in whole or in part, without prior written authorisation is prohibited."
+            ]
+          },
+          {
+            "heading": "Liability",
+            "body": [
+              "The publisher strives to ensure the accuracy and availability of the information provided, without being able to guarantee it. Its liability cannot be engaged for any damage resulting from the use of the website or application, within the limits permitted by Swiss law.",
+              "Links to third-party sites are provided for information only; the publisher exercises no control over their content."
+            ]
+          },
+          {
+            "heading": "Governing law and jurisdiction",
+            "body": [
+              "This notice is governed by Swiss law. The exclusive place of jurisdiction is the registered office of the publisher, subject to any mandatory jurisdiction provided by law."
+            ]
+          }
+        ]
+      },
+      "cgv": {
+        "title": "Terms of sale",
+        "intro": "These general terms and conditions (GTC) govern the subscription to and use of Grinta's paid plans. They are governed by Swiss law, in particular the Swiss Code of Obligations (CO).",
+        "sections": [
+          {
+            "heading": "Purpose and scope",
+            "body": [
+              "These GTC govern the contractual relationship between the publisher of Grinta and any customer subscribing to a plan. Subscribing to a plan constitutes unconditional acceptance of these GTC."
+            ]
+          },
+          {
+            "heading": "Plans and prices",
+            "body": [
+              "The features and prices of the plans are described on the Pricing page of the website. Prices are stated in Swiss francs (CHF), including taxes where applicable.",
+              "The publisher reserves the right to change its prices; any change is communicated to the customer before renewal and does not apply to the current period already paid."
+            ]
+          },
+          {
+            "heading": "Payment",
+            "body": [
+              "Payment is made using the means offered at subscription, through a third-party payment provider. The plan is activated after payment confirmation.",
+              "In the event of non-payment, the publisher may suspend or terminate access to the service after an unsuccessful reminder."
+            ]
+          },
+          {
+            "heading": "Term and termination",
+            "body": [
+              "The plan is concluded for the chosen period (monthly or yearly) and renews automatically for an identical period, unless cancelled before the renewal date.",
+              "The customer may cancel at any time from their account or by writing to contact@grinta.app; cancellation takes effect at the end of the current period, with no refund for the period already started."
+            ]
+          },
+          {
+            "heading": "Right of withdrawal",
+            "body": [
+              "Swiss law does not provide a general right of withdrawal for contracts concluded online. The customer acknowledges that access to the digital service begins as soon as the plan is activated."
+            ]
+          },
+          {
+            "heading": "Availability and liability",
+            "body": [
+              "The publisher provides the service with due care but does not guarantee uninterrupted availability. Its liability is limited to direct damage and, to the fullest extent permitted by Swiss law, excluded for indirect damage.",
+              "The customer remains responsible for the accuracy of the data they enter and for backing up their content."
+            ]
+          },
+          {
+            "heading": "Governing law and jurisdiction",
+            "body": [
+              "These GTC are governed by Swiss law. Any dispute falls under the exclusive jurisdiction of the courts at the publisher's registered office, subject to any mandatory jurisdiction."
+            ]
+          }
+        ]
+      },
+      "confidentialite": {
+        "title": "Privacy policy",
+        "intro": "This policy describes how Grinta processes personal data, in accordance with the Swiss Federal Act on Data Protection (revFADP). Where users in the European Union are concerned, the GDPR may also apply.",
+        "sections": [
+          {
+            "heading": "Data controller",
+            "body": [
+              "The data controller is the publisher of Grinta — [Exact company name], [Postal code] [City], Switzerland.",
+              "For any data protection question: contact@grinta.app."
+            ]
+          },
+          {
+            "heading": "Data collected",
+            "body": [
+              "Account data: name, email address, club and role.",
+              "Usage data: content created in the application (teams, players, sessions, evaluations) and technical logs required for operation.",
+              "Payment data: handled by our payment provider; we do not store full card details."
+            ]
+          },
+          {
+            "heading": "Purposes and legal basis",
+            "body": [
+              "Data is processed to provide and secure the service, manage subscriptions, provide support and improve the application.",
+              "Processing is based on the performance of the contract, consent where required, and the publisher's legitimate interests, in accordance with the revFADP."
+            ]
+          },
+          {
+            "heading": "Disclosure of data",
+            "body": [
+              "Data may be disclosed to processors (hosting, payment, email) acting on the publisher's instructions and bound by confidentiality.",
+              "In the event of a transfer outside Switzerland or the EU/EEA, appropriate safeguards are put in place in accordance with the revFADP."
+            ]
+          },
+          {
+            "heading": "Retention period",
+            "body": [
+              "Data is kept for as long as necessary for the purposes described and for the duration of the contractual relationship, then deleted or anonymised subject to legal retention obligations."
+            ]
+          },
+          {
+            "heading": "Your rights",
+            "body": [
+              "In accordance with the revFADP, you have the right of access, rectification, erasure and objection, as well as the right to data portability.",
+              "To exercise these rights, write to contact@grinta.app. You may also contact the Federal Data Protection and Information Commissioner (FDPIC)."
+            ]
+          },
+          {
+            "heading": "Security",
+            "body": [
+              "The publisher implements appropriate technical and organisational measures to protect data against unauthorised access, loss or alteration."
+            ]
+          }
+        ]
+      }
+    }
+  },
+  "contact": {
+    "backToHome": "Back to home",
+    "title": "Contact",
+    "intro": "A question about Grinta, a demo request or need a hand? Drop us a line — we reply within 2 business days.",
+    "form": {
+      "name": "Name",
+      "namePlaceholder": "Your name",
+      "email": "Email",
+      "emailPlaceholder": "you@club.ch",
+      "message": "Message",
+      "messagePlaceholder": "How can we help?",
+      "submit": "Send",
+      "submitting": "Sending…",
+      "error": "Sending failed. Try again or email us directly.",
+      "successTitle": "Message sent",
+      "successBody": "Thanks! We'll get back to you shortly."
     }
   },
   "nav": {

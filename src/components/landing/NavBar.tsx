@@ -3,12 +3,14 @@
 import { useEffect, useState } from "react";
 import { useTranslations } from "next-intl";
 import { ArrowRight } from "lucide-react";
-import { Link } from "@/i18n/navigation";
+import { Link, usePathname } from "@/i18n/navigation";
 import { GrintaLogoIcon, GrintaLogoType } from "./BrandSeal";
 import { LocaleSwitcher } from "@/components/layout/LocaleSwitcher";
 
 export function NavBar() {
   const t = useTranslations("landing.nav");
+  const pathname = usePathname();
+  const onHome = pathname === "/";
   const [scrolled, setScrolled] = useState(false);
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 8);
@@ -18,9 +20,9 @@ export function NavBar() {
   }, []);
 
   const links = [
-    { label: t("method"), href: "#methode" },
-    { label: t("how"), href: "#flow" },
-    { label: t("pricing"), href: "#tarifs" },
+    { label: t("method"), hash: "methode" },
+    { label: t("how"), hash: "flow" },
+    { label: t("pricing"), hash: "tarifs" },
   ];
 
   return (
@@ -39,15 +41,25 @@ export function NavBar() {
           <GrintaLogoType height={18} title="GRINTA" />
         </Link>
         <nav className="hidden md:flex items-center gap-7">
-          {links.map((l) => (
-            <a
-              key={l.href}
-              href={l.href}
-              className="text-[13px] font-medium text-[var(--ink-2)] hover:text-[var(--ink)] transition-colors"
-            >
-              {l.label}
-            </a>
-          ))}
+          {links.map((l) =>
+            onHome ? (
+              <a
+                key={l.hash}
+                href={`#${l.hash}`}
+                className="text-[13px] font-medium text-[var(--ink-2)] hover:text-[var(--ink)] transition-colors"
+              >
+                {l.label}
+              </a>
+            ) : (
+              <Link
+                key={l.hash}
+                href={{ pathname: "/", hash: l.hash }}
+                className="text-[13px] font-medium text-[var(--ink-2)] hover:text-[var(--ink)] transition-colors"
+              >
+                {l.label}
+              </Link>
+            ),
+          )}
         </nav>
         <div className="flex items-center gap-2">
           <LocaleSwitcher />

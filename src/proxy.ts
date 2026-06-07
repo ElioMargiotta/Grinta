@@ -15,6 +15,7 @@ const PUBLIC_PATHS = new Set([
   "reset-password",
   "auth",
 ]);
+const PUBLIC_PATHS = new Set(["", "login", "signup", "invite", "confirm", "legal", "contact"]);
 
 export async function proxy(request: NextRequest) {
   const { response: supabaseResponse, user } = await updateSession(request);
