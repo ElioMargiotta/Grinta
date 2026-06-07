@@ -154,6 +154,11 @@
             "Staff- & DTN-Rollen",
             "Priorisierter Support"
           ],
+          "notes": [
+            "Preise in CHF, inkl. MwSt.",
+            "14 Tage kostenlos testen, ohne Karte",
+            "Monatliche Abrechnung pro Team — jederzeit kündbar"
+          ],
           "cta": "Saison starten"
         }
       ]
@@ -174,24 +179,52 @@
         {
           "title": "Produkt",
           "links": [
-            { "label": "Methode", "href": "#methode" },
-            { "label": "So funktioniert's", "href": "#flow" },
-            { "label": "Preise", "href": "#tarifs" }
+            {
+              "label": "Methode",
+              "href": "#methode"
+            },
+            {
+              "label": "So funktioniert's",
+              "href": "#flow"
+            },
+            {
+              "label": "Preise",
+              "href": "#tarifs"
+            },
+            {
+              "label": "Kontakt",
+              "href": "/contact"
+            }
           ]
         },
         {
           "title": "Konto",
           "links": [
-            { "label": "Anmelden", "href": "/login" },
-            { "label": "Konto erstellen", "href": "/signup" }
+            {
+              "label": "Anmelden",
+              "href": "/login"
+            },
+            {
+              "label": "Konto erstellen",
+              "href": "/signup"
+            }
           ]
         },
         {
           "title": "Rechtliches",
           "links": [
-            { "label": "Impressum", "href": "/legal/mentions-legales" },
-            { "label": "AGB", "href": "/legal/cgv" },
-            { "label": "Datenschutz", "href": "/legal/confidentialite" }
+            {
+              "label": "Impressum",
+              "href": "/legal/mentions-legales"
+            },
+            {
+              "label": "AGB",
+              "href": "/legal/cgv"
+            },
+            {
+              "label": "Datenschutz",
+              "href": "/legal/confidentialite"
+            }
           ]
         }
       ]
@@ -349,6 +382,24 @@
           }
         ]
       }
+    }
+  },
+  "contact": {
+    "backToHome": "Zurück zur Startseite",
+    "title": "Kontakt",
+    "intro": "Eine Frage zu Grinta, eine Demo-Anfrage oder brauchen Sie Hilfe? Schreiben Sie uns — wir antworten innerhalb von 2 Werktagen.",
+    "form": {
+      "name": "Name",
+      "namePlaceholder": "Ihr Name",
+      "email": "E-Mail",
+      "emailPlaceholder": "sie@verein.ch",
+      "message": "Nachricht",
+      "messagePlaceholder": "Wie können wir helfen?",
+      "submit": "Senden",
+      "submitting": "Wird gesendet…",
+      "error": "Senden fehlgeschlagen. Versuchen Sie es erneut oder schreiben Sie uns direkt per E-Mail.",
+      "successTitle": "Nachricht gesendet",
+      "successBody": "Danke! Wir melden uns in Kürze."
     }
   },
   "nav": {

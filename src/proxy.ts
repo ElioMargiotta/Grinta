@@ -5,7 +5,7 @@ import { updateSession } from "@/lib/supabase/middleware";
 
 const intlMiddleware = createIntlMiddleware(routing);
 
-const PUBLIC_PATHS = new Set(["", "login", "signup", "invite", "confirm", "legal"]);
+const PUBLIC_PATHS = new Set(["", "login", "signup", "invite", "confirm", "legal", "contact"]);
 
 export async function proxy(request: NextRequest) {
   const { response: supabaseResponse, user } = await updateSession(request);
