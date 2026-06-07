@@ -26,9 +26,11 @@ type Tier = {
   priceSuffix: string;
   sub: string;
   features: string[];
+  notes?: string[];
   cta: string;
 };
-type FooterCol = { title: string; links: string[] };
+type FooterLink = { label: string; href: string };
+type FooterCol = { title: string; links: FooterLink[] };
 
 export default async function LocaleHome({
   params,
@@ -388,6 +390,19 @@ async function PricingSection({ tiers }: { tiers: Tier[] }) {
                       </li>
                     ))}
                   </ul>
+                  {tier.notes && tier.notes.length > 0 && (
+                    <ul
+                      className="flex flex-col gap-1 text-[11px] leading-relaxed pt-1"
+                      style={{
+                        color: "var(--ink-3)",
+                        borderTop: "1px solid var(--line)",
+                      }}
+                    >
+                      {tier.notes.map((n) => (
+                        <li key={n}>{n}</li>
+                      ))}
+                    </ul>
+                  )}
                   <Link
                     href="/signup"
                     className={
@@ -510,7 +525,7 @@ async function FooterBar({ cols }: { cols: FooterCol[] }) {
               {t("copyright")}
             </div>
           </div>
-          <div className="lg:col-span-8 grid grid-cols-2 sm:grid-cols-4 gap-8">
+          <div className="lg:col-span-8 grid grid-cols-2 sm:grid-cols-3 gap-8">
             {cols.map((c) => (
               <div key={c.title}>
                 <div
@@ -521,14 +536,24 @@ async function FooterBar({ cols }: { cols: FooterCol[] }) {
                 </div>
                 <ul className="mt-3 flex flex-col gap-2">
                   {c.links.map((l) => (
-                    <li key={l}>
-                      <a
-                        href="#"
-                        className="text-[13px] hover:text-[var(--ink)] transition-colors"
-                        style={{ color: "var(--ink-2)" }}
-                      >
-                        {l}
-                      </a>
+                    <li key={l.href}>
+                      {l.href.startsWith("#") ? (
+                        <a
+                          href={l.href}
+                          className="text-[13px] hover:text-[var(--ink)] transition-colors"
+                          style={{ color: "var(--ink-2)" }}
+                        >
+                          {l.label}
+                        </a>
+                      ) : (
+                        <Link
+                          href={l.href}
+                          className="text-[13px] hover:text-[var(--ink)] transition-colors"
+                          style={{ color: "var(--ink-2)" }}
+                        >
+                          {l.label}
+                        </Link>
+                      )}
                     </li>
                   ))}
                 </ul>

@@ -153,6 +153,11 @@
             "Suivi des joueurs",
             "Automatisation export CDP J+S"
           ],
+          "notes": [
+            "Prix en CHF, TVA incluse",
+            "14 jours d'essai gratuit, sans carte",
+            "Facturation mensuelle, par équipe — résiliable à tout moment"
+          ],
           "cta": "Démarrer la saison"
         }
       ]
@@ -173,41 +178,227 @@
         {
           "title": "Produit",
           "links": [
-            "Planificateur",
-            "Bibliothèque",
-            "Préparation",
-            "Vision club",
-            "Tarifs"
+            {
+              "label": "Méthode",
+              "href": "#methode"
+            },
+            {
+              "label": "Comment ça marche",
+              "href": "#flow"
+            },
+            {
+              "label": "Tarifs",
+              "href": "#tarifs"
+            },
+            {
+              "label": "Contact",
+              "href": "/contact"
+            }
           ]
         },
         {
-          "title": "Méthode",
+          "title": "Compte",
           "links": [
-            "Principes de jeu",
-            "Microcycles",
-            "Mésocycles",
-            "Pédagogie"
+            {
+              "label": "Connexion",
+              "href": "/login"
+            },
+            {
+              "label": "Créer un compte",
+              "href": "/signup"
+            }
           ]
         },
         {
-          "title": "Ressources",
+          "title": "Légal",
           "links": [
-            "Blog",
-            "Templates",
-            "Centre d'aide",
-            "API"
-          ]
-        },
-        {
-          "title": "Société",
-          "links": [
-            "À propos",
-            "Carrières",
-            "Contact",
-            "Mentions légales"
+            {
+              "label": "Mentions légales",
+              "href": "/legal/mentions-legales"
+            },
+            {
+              "label": "CGV",
+              "href": "/legal/cgv"
+            },
+            {
+              "label": "Confidentialité",
+              "href": "/legal/confidentialite"
+            }
           ]
         }
       ]
+    }
+  },
+  "legal": {
+    "backToHome": "Retour à l'accueil",
+    "lastUpdated": "Dernière mise à jour : juin 2026",
+    "docs": {
+      "mentions-legales": {
+        "title": "Mentions légales",
+        "intro": "Les présentes mentions légales s'appliquent au site et à l'application Grinta. Grinta est édité depuis la Suisse et soumis au droit suisse.",
+        "sections": [
+          {
+            "heading": "Éditeur",
+            "body": [
+              "Grinta — [Raison sociale exacte], [Forme juridique].",
+              "Adresse : [Rue et numéro], [NPA] [Ville], Suisse.",
+              "Numéro d'identification des entreprises (IDE) : [CHE-xxx.xxx.xxx].",
+              "Contact : contact@grinta.app."
+            ]
+          },
+          {
+            "heading": "Hébergement",
+            "body": [
+              "L'application est hébergée par Vercel Inc., 440 N Barranca Ave #4133, Covina, CA 91723, États-Unis, sur une infrastructure cloud pouvant inclure des centres de données situés dans l'Union européenne.",
+              "Un transfert de données vers les États-Unis pouvant intervenir, des garanties appropriées (notamment des clauses contractuelles types) sont mises en place conformément à la nLPD. Pour toute question relative à l'hébergement, écrivez à contact@grinta.app."
+            ]
+          },
+          {
+            "heading": "Propriété intellectuelle",
+            "body": [
+              "L'ensemble des contenus du site et de l'application (marque Grinta, logos, textes, interfaces, code, méthodologie) est protégé par le droit suisse de la propriété intellectuelle et reste la propriété exclusive de l'éditeur ou de ses partenaires.",
+              "Toute reproduction, représentation ou exploitation, totale ou partielle, sans autorisation écrite préalable est interdite."
+            ]
+          },
+          {
+            "heading": "Responsabilité",
+            "body": [
+              "L'éditeur s'efforce d'assurer l'exactitude et la disponibilité des informations diffusées, sans pouvoir le garantir. Sa responsabilité ne saurait être engagée pour un dommage résultant de l'utilisation du site ou de l'application, dans les limites permises par le droit suisse.",
+              "Les liens vers des sites tiers sont fournis à titre indicatif ; l'éditeur n'exerce aucun contrôle sur leur contenu."
+            ]
+          },
+          {
+            "heading": "Droit applicable et for",
+            "body": [
+              "Les présentes mentions sont régies par le droit suisse. Le for juridique exclusif est au siège de l'éditeur, sous réserve d'un for impératif prévu par la loi."
+            ]
+          }
+        ]
+      },
+      "cgv": {
+        "title": "Conditions générales de vente",
+        "intro": "Les présentes conditions générales (CGV) régissent la souscription et l'utilisation des abonnements payants à Grinta. Elles sont soumises au droit suisse, en particulier au Code des obligations (CO).",
+        "sections": [
+          {
+            "heading": "Objet et champ d'application",
+            "body": [
+              "Les présentes CGV régissent la relation contractuelle entre l'éditeur de Grinta et tout client souscrivant un abonnement. La souscription d'un abonnement vaut acceptation sans réserve des présentes CGV."
+            ]
+          },
+          {
+            "heading": "Abonnements et prix",
+            "body": [
+              "Les fonctionnalités et tarifs des abonnements sont décrits sur la page Tarifs du site. Les prix sont indiqués en francs suisses (CHF), taxes comprises le cas échéant.",
+              "L'éditeur se réserve le droit de modifier ses tarifs ; toute modification est communiquée au client avant le renouvellement et ne s'applique pas à la période en cours déjà réglée."
+            ]
+          },
+          {
+            "heading": "Paiement",
+            "body": [
+              "Le paiement s'effectue par les moyens proposés lors de la souscription, via un prestataire de paiement tiers. L'abonnement est activé après confirmation du paiement.",
+              "En cas de défaut de paiement, l'éditeur peut suspendre ou résilier l'accès au service après relance restée sans effet."
+            ]
+          },
+          {
+            "heading": "Durée et résiliation",
+            "body": [
+              "L'abonnement est conclu pour la période choisie (mensuelle ou annuelle) et se renouvelle automatiquement pour une période identique, sauf résiliation avant l'échéance.",
+              "Le client peut résilier à tout moment depuis son espace ou en écrivant à contact@grinta.app ; la résiliation prend effet à la fin de la période en cours, sans remboursement de la période entamée."
+            ]
+          },
+          {
+            "heading": "Droit de révocation",
+            "body": [
+              "Le droit suisse ne prévoit pas de droit de rétractation général pour les contrats conclus en ligne. Le client reconnaît que l'accès au service numérique débute dès l'activation de l'abonnement."
+            ]
+          },
+          {
+            "heading": "Disponibilité et responsabilité",
+            "body": [
+              "L'éditeur fournit le service avec le soin requis mais ne garantit pas une disponibilité ininterrompue. Sa responsabilité est limitée aux dommages directs et, dans toute la mesure permise par le droit suisse, exclue pour les dommages indirects.",
+              "Le client demeure responsable de l'exactitude des données qu'il saisit et de la sauvegarde de ses contenus."
+            ]
+          },
+          {
+            "heading": "Droit applicable et for",
+            "body": [
+              "Les présentes CGV sont soumises au droit suisse. Tout litige relève de la compétence exclusive des tribunaux du siège de l'éditeur, sous réserve d'un for impératif."
+            ]
+          }
+        ]
+      },
+      "confidentialite": {
+        "title": "Politique de confidentialité",
+        "intro": "Cette politique décrit comment Grinta traite les données personnelles, conformément à la loi fédérale suisse sur la protection des données (nLPD). Lorsque des utilisateurs de l'Union européenne sont concernés, le RGPD peut également s'appliquer.",
+        "sections": [
+          {
+            "heading": "Responsable du traitement",
+            "body": [
+              "Le responsable du traitement est l'éditeur de Grinta — [Raison sociale exacte], [NPA] [Ville], Suisse.",
+              "Pour toute question relative à la protection des données : contact@grinta.app."
+            ]
+          },
+          {
+            "heading": "Données collectées",
+            "body": [
+              "Données de compte : nom, adresse e-mail, club et rôle.",
+              "Données d'utilisation : contenus créés dans l'application (équipes, joueurs, séances, évaluations) et journaux techniques nécessaires au fonctionnement.",
+              "Données de paiement : traitées par notre prestataire de paiement ; nous ne stockons pas les données complètes de carte."
+            ]
+          },
+          {
+            "heading": "Finalités et base légale",
+            "body": [
+              "Les données sont traitées pour fournir et sécuriser le service, gérer les abonnements, assurer le support et améliorer l'application.",
+              "Le traitement repose sur l'exécution du contrat, le consentement lorsqu'il est requis, et les intérêts légitimes de l'éditeur, conformément à la nLPD."
+            ]
+          },
+          {
+            "heading": "Communication des données",
+            "body": [
+              "Les données peuvent être communiquées à des sous-traitants (hébergement, paiement, e-mail) agissant sur instruction de l'éditeur et tenus à la confidentialité.",
+              "En cas de transfert hors de Suisse ou de l'UE/EEE, des garanties appropriées sont mises en place conformément à la nLPD."
+            ]
+          },
+          {
+            "heading": "Durée de conservation",
+            "body": [
+              "Les données sont conservées le temps nécessaire aux finalités décrites et pendant la durée de la relation contractuelle, puis supprimées ou anonymisées sous réserve des obligations légales de conservation."
+            ]
+          },
+          {
+            "heading": "Vos droits",
+            "body": [
+              "Conformément à la nLPD, vous disposez d'un droit d'accès, de rectification, d'effacement et d'opposition, ainsi que du droit à la portabilité de vos données.",
+              "Pour exercer ces droits, écrivez à contact@grinta.app. Vous pouvez également vous adresser au Préposé fédéral à la protection des données et à la transparence (PFPDT)."
+            ]
+          },
+          {
+            "heading": "Sécurité",
+            "body": [
+              "L'éditeur met en œuvre des mesures techniques et organisationnelles appropriées pour protéger les données contre tout accès, perte ou altération non autorisés."
+            ]
+          }
+        ]
+      }
+    }
+  },
+  "contact": {
+    "backToHome": "Retour à l'accueil",
+    "title": "Contact",
+    "intro": "Une question sur Grinta, une demande de démo ou besoin d'un coup de main ? Écrivez-nous, nous répondons sous 2 jours ouvrés.",
+    "form": {
+      "name": "Nom",
+      "namePlaceholder": "Votre nom",
+      "email": "E-mail",
+      "emailPlaceholder": "vous@club.ch",
+      "message": "Message",
+      "messagePlaceholder": "Comment pouvons-nous vous aider ?",
+      "submit": "Envoyer",
+      "submitting": "Envoi…",
+      "error": "L'envoi a échoué. Réessayez ou écrivez-nous directement par e-mail.",
+      "successTitle": "Message envoyé",
+      "successBody": "Merci ! Nous vous répondrons dans les meilleurs délais."
     }
   },
   "nav": {
