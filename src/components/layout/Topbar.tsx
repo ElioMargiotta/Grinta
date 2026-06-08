@@ -7,6 +7,7 @@ import { Link } from "@/i18n/navigation";
 import { Button } from "@/components/ui/Button";
 import { logoutAction } from "@/app/[locale]/(app)/actions";
 import { ClubSwitcher } from "./ClubSwitcher";
+import { SeasonSwitcher } from "./SeasonSwitcher";
 import { PersonaSwitcher } from "./PersonaSwitcher";
 import { LocaleSwitcher } from "./LocaleSwitcher";
 import type { ClubMembership } from "@/lib/club/types";
@@ -34,12 +35,16 @@ export function Topbar({
   memberships,
   teamCount,
   persona,
+  currentSeason,
+  seasons,
 }: {
   userName: string;
   currentMembership: ClubMembership | null;
   memberships: ClubMembership[];
   teamCount: number;
   persona?: PersonaState | null;
+  currentSeason?: string | null;
+  seasons?: string[];
 }) {
   const t = useTranslations("nav");
   const tp = useTranslations("topbar");
@@ -80,6 +85,11 @@ export function Topbar({
         {currentMembership && persona?.active !== "player" && (
           <div className="ml-2">
             <ClubSwitcher current={currentMembership} memberships={memberships} />
+          </div>
+        )}
+        {currentMembership && persona?.active !== "player" && currentSeason && (
+          <div className="ml-2">
+            <SeasonSwitcher current={currentSeason} seasons={seasons ?? []} />
           </div>
         )}
         {persona?.available === "dual" && (

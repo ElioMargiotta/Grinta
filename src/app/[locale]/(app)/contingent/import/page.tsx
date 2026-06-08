@@ -4,6 +4,7 @@ import { Card } from "@/components/ui/Card";
 import { Link } from "@/i18n/navigation";
 import { ImportClubCornerWizard } from "@/components/contingent/ImportClubCornerWizard";
 import { requireMembership } from "@/lib/auth/getUser";
+import { resolveCurrentSeasonLabel } from "@/lib/club/season";
 import { listClubTeams } from "@/lib/contingent/teams";
 
 export default async function ImportContingentPage({
@@ -18,7 +19,10 @@ export default async function ImportContingentPage({
   setRequestLocale(locale);
   const { membership } = await requireMembership(locale);
   const t = await getTranslations("contingent");
-  const teams = await listClubTeams(membership.club_id);
+  const teams = await listClubTeams(
+    membership.club_id,
+    await resolveCurrentSeasonLabel(),
+  );
   // ?teamId=... vient typiquement du bouton "Importer ClubCorner" depuis une
   // équipe (#39) — on pré-sélectionne l'équipe cible dans le wizard.
   const defaultTargetTeamId =

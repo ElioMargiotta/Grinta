@@ -5,10 +5,12 @@ import {
 } from "@/components/contingent/ContingentList";
 import { AddPlayerMenu } from "@/components/contingent/AddPlayerMenu";
 import { requireMembership } from "@/lib/auth/getUser";
+import { resolveCurrentSeasonLabel } from "@/lib/club/season";
 import { listClubTeams } from "@/lib/contingent/teams";
 
 type AssignmentRow = {
   team_id: string;
+  season: string | null;
   teams: { name: string | null; age_group: string | null } | null;
 };
 
@@ -35,19 +37,25 @@ export default async function ContingentPage({
   setRequestLocale(locale);
   const { supabase, membership } = await requireMembership(locale);
   const t = await getTranslations("contingent");
+  const season = await resolveCurrentSeasonLabel();
 
+  // Vue par saison : on garde tous les joueurs du club, mais on ne remonte que
+  // leurs affectations de la saison active (filtre left-join sur la ressource
+  // imbriquée — les joueurs non affectés cette saison restent listés, sans
+  // équipe).
   const [{ data }, teams] = await Promise.all([
     supabase
       .from("players")
       .select(
         `id, first_name, last_name, position, jersey_number, birth_date,
        dual_licence_club,
-       player_team_assignments ( team_id, teams ( name, age_group ) )`,
+       player_team_assignments ( team_id, season, teams ( name, age_group ) )`,
       )
       .eq("club_id", membership.club_id)
+      .eq("player_team_assignments.season", season)
       .order("last_name", { ascending: true })
       .returns<PlayerRow[]>(),
-    listClubTeams(membership.club_id),
+    listClubTeams(membership.club_id, season),
   ]);
 
   const players: ContingentPlayer[] = (data ?? []).map((p) => ({
@@ -73,7 +81,7 @@ export default async function ContingentPage({
             {t("title")}
           </h1>
           <p className="mt-1 text-sm text-zinc-500 dark:text-zinc-400">
-            {t("subtitle", { club: membership.club_name })}
+            {t("subtitle", { club: membership.club_name })} · {t("seasonScope", { season })}
           </p>
         </div>
         <AddPlayerMenu />

@@ -4,6 +4,7 @@ import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 import { resolveCurrentMembership } from "@/lib/club/context";
+import { resolveCurrentSeasonLabel } from "@/lib/club/season";
 import {
   parseClubCornerCsv,
   type ClubCornerPlayer,
@@ -137,9 +138,10 @@ export async function createClubPlayerAction(formData: FormData) {
 
   const teamIds = readTeamIds(formData);
   if (created && teamIds.length > 0) {
+    const season = await resolveCurrentSeasonLabel();
     const { error: aErr } = await supabase
       .from("player_team_assignments")
-      .insert(teamIds.map((team_id) => ({ player_id: created.id, team_id })));
+      .insert(teamIds.map((team_id) => ({ player_id: created.id, team_id, season })));
     // L'insert principal a réussi : si l'affectation échoue on remonte le
     // message mais on n'annule pas la création (RLS, conflit unique, etc.).
     if (aErr) return { error: aErr.message };
@@ -166,11 +168,12 @@ export async function setPlayerAssignmentsAction(formData: FormData) {
   } = await supabase.auth.getUser();
   if (!user) redirect(`/${locale}/login`);
 
+  const season = await resolveCurrentSeasonLabel();
   const { data: existing, error: readErr } = await supabase
     .from("player_team_assignments")
     .select("id, team_id")
     .eq("player_id", playerId)
-    .is("season", null);
+    .eq("season", season);
   if (readErr) return { error: readErr.message };
 
   const currentByTeam = new Map(
@@ -194,7 +197,7 @@ export async function setPlayerAssignmentsAction(formData: FormData) {
   if (toAdd.length > 0) {
     const { error } = await supabase
       .from("player_team_assignments")
-      .insert(toAdd.map((team_id) => ({ player_id: playerId, team_id })));
+      .insert(toAdd.map((team_id) => ({ player_id: playerId, team_id, season })));
     if (error) return { error: error.message };
   }
 
@@ -267,12 +270,13 @@ export async function removePlayerFromTeamAction(formData: FormData) {
   } = await supabase.auth.getUser();
   if (!user) redirect(`/${locale}/login`);
 
+  const season = await resolveCurrentSeasonLabel();
   const { error } = await supabase
     .from("player_team_assignments")
     .delete()
     .eq("player_id", playerId)
     .eq("team_id", teamId)
-    .is("season", null);
+    .eq("season", season);
   if (error) return { error: error.message };
 
   revalidatePath(`/${locale}/contingent`);
@@ -302,11 +306,12 @@ export async function bulkAssignPlayersToTeamAction(formData: FormData) {
 
   // L'unique index porte sur (player_id, team_id, COALESCE(season, '')).
   // On déduplique côté app pour éviter les conflits côté DB.
+  const season = await resolveCurrentSeasonLabel();
   const { data: already, error: readErr } = await supabase
     .from("player_team_assignments")
     .select("player_id")
     .eq("team_id", teamId)
-    .is("season", null)
+    .eq("season", season)
     .in("player_id", playerIds);
   if (readErr) return { error: readErr.message };
 
@@ -316,7 +321,7 @@ export async function bulkAssignPlayersToTeamAction(formData: FormData) {
   if (toInsert.length > 0) {
     const { error } = await supabase
       .from("player_team_assignments")
-      .insert(toInsert.map((player_id) => ({ player_id, team_id: teamId })));
+      .insert(toInsert.map((player_id) => ({ player_id, team_id: teamId, season })));
     if (error) return { error: error.message };
   }
 
@@ -519,11 +524,12 @@ export async function importClubCornerCsvAction(
   // Affectation à l'équipe cible (optionnelle) — #39. On déduplique vs les
   // assignments existants pour rester idempotent même si l'import est rejoué.
   if (targetTeamId && importedPlayerIds.length > 0) {
+    const season = await resolveCurrentSeasonLabel();
     const { data: already } = await supabase
       .from("player_team_assignments")
       .select("player_id")
       .eq("team_id", targetTeamId)
-      .is("season", null)
+      .eq("season", season)
       .in("player_id", importedPlayerIds);
     const skipSet = new Set((already ?? []).map((r) => r.player_id as string));
     const toInsert = importedPlayerIds.filter((pid) => !skipSet.has(pid));
@@ -531,7 +537,7 @@ export async function importClubCornerCsvAction(
       await supabase
         .from("player_team_assignments")
         .insert(
-          toInsert.map((player_id) => ({ player_id, team_id: targetTeamId })),
+          toInsert.map((player_id) => ({ player_id, team_id: targetTeamId, season })),
         );
     }
   }

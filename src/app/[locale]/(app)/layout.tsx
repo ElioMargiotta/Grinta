@@ -3,6 +3,7 @@ import { Sidebar } from "@/components/layout/Sidebar";
 import { Topbar } from "@/components/layout/Topbar";
 import { requireUser } from "@/lib/auth/getUser";
 import { resolveCurrentMembership } from "@/lib/club/context";
+import { listClubSeasons, resolveCurrentSeasonLabel } from "@/lib/club/season";
 import { getMyMemberships } from "@/lib/club/queries";
 import { resolvePersona } from "@/lib/club/persona";
 import { redirect } from "next/navigation";
@@ -38,13 +39,21 @@ export default async function AppLayout({
   // Per-team billing summary: count non-archived teams of the current club
   // and surface the trial state. Free-tier (no membership) shows nothing.
   let teamCount = 0;
+  let currentSeason: string | null = null;
+  let seasons: string[] = [];
   if (membership) {
-    const { count } = await supabase
-      .from("teams")
-      .select("id", { head: true, count: "exact" })
-      .eq("club_id", membership.club_id)
-      .is("archived_at", null);
+    const [{ count }, season, seasonList] = await Promise.all([
+      supabase
+        .from("teams")
+        .select("id", { head: true, count: "exact" })
+        .eq("club_id", membership.club_id)
+        .is("archived_at", null),
+      resolveCurrentSeasonLabel(),
+      listClubSeasons(supabase, membership.club_id),
+    ]);
     teamCount = count ?? 0;
+    currentSeason = season;
+    seasons = seasonList;
   }
 
   return (
@@ -63,6 +72,8 @@ export default async function AppLayout({
             memberships={memberships}
             teamCount={teamCount}
             persona={persona}
+            currentSeason={currentSeason}
+            seasons={seasons}
           />
         </div>
         <main className="flex-1 p-4 md:p-6 print:p-0">{children}</main>

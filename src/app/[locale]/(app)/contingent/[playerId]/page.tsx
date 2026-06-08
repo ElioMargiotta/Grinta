@@ -25,6 +25,7 @@ import {
   type EvaluationData,
 } from "@/components/evaluation/types";
 import { listClubTeams } from "@/lib/contingent/teams";
+import { resolveCurrentSeasonLabel } from "@/lib/club/season";
 
 export default async function ContingentPlayerPage({
   params,
@@ -35,6 +36,7 @@ export default async function ContingentPlayerPage({
   setRequestLocale(locale);
   const { supabase, membership } = await requireMembership(locale);
   const t = await getTranslations("contingent");
+  const season = await resolveCurrentSeasonLabel();
 
   const { data: player } = await supabase
     .from("players")
@@ -63,8 +65,8 @@ export default async function ContingentPlayerPage({
       .from("player_team_assignments")
       .select("team_id")
       .eq("player_id", playerId)
-      .is("season", null),
-    listClubTeams(membership.club_id),
+      .eq("season", season),
+    listClubTeams(membership.club_id, season),
     supabase
       .from("club_invitations")
       .select("id, email, status, team_id, expires_at, email_status, email_sent_at")
