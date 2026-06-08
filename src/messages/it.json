@@ -360,13 +360,38 @@
       "urlHint": "Incolla il link del calendario della tua federazione. webcal:// è accettato.",
       "saveAndSync": "Salva e sincronizza",
       "updateAndSync": "Aggiorna e risincronizza",
+      "connectedCalendar": "Calendario collegato",
+      "changeUrl": "Modifica link",
+      "cancelUrlEdit": "Annulla",
+      "frameWarning": "{n, plural, one {1 data importata è fuori dal quadro di questo turno. Mantieni le date del turno corrente e scegli cosa fare con quella fuori quadro.} other {# date importate sono fuori dal quadro di questo turno. Mantieni le date del turno corrente e scegli cosa fare con quelle fuori quadro.}}",
+      "deleteOutOfFrame": "Resta su questo turno ed elimina",
+      "deleteOutOfFrameConfirm": "Eliminare le date importate fuori da questo quadro? Le date nel turno corrente saranno conservate.",
+      "deletedOutOfFrame": "{n, plural, one {1 data fuori quadro eliminata.} other {# date fuori quadro eliminate.}}",
+      "switchFrame": {
+        "first_round": "Passa al 1° turno",
+        "second_round": "Passa al 2° turno",
+        "full": "Pianifica stagione completa"
+      },
       "syncNow": "Sincronizza ora",
       "syncing": "Sincronizzazione…",
       "uploadFile": "Carica file .ics",
+      "addCalendar": "Aggiungi un calendario",
+      "autoRouteHint": "Incolla il link ICS della tua federazione: viene assegnato automaticamente al girone giusto in base alle date delle partite.",
+      "importedOk": "Calendario importato",
+      "icsLinks": "Link ICS",
       "disconnect": "Annulla sottoscrizione",
-      "disconnectConfirm": "Rimuovere la sottoscrizione? Le partite già importate vengono conservate.",
+      "disconnectConfirm": "Rimuovere questo link e le sue partite future? Le partite già giocate e quelle manuali vengono conservate.",
       "matchesTitle": "{n, plural, =0 {Nessuna partita importata} one {1 partita importata} other {# partite importate}}",
       "matchesEmpty": "Ancora nessuna partita. Inserisci un URL o carica un file .ics.",
+      "historyShow": "Storico ({n})",
+      "historyHide": "Nascondi lo storico",
+      "historyHint": "Partite giocate, staccate dal calendario e conservate qui.",
+      "historyEmpty": "Ancora nessuna partita giocata.",
+      "slot": {
+        "first_round": "1° turno",
+        "second_round": "2° turno",
+        "full": "Stagione completa"
+      },
       "syncedCount": "{n, plural, one {1 partita sincronizzata.} other {# partite sincronizzate.}}",
       "ok": "Sincronizzazione completata.",
       "statusOk": "{n, plural, =0 {Nessuna partita} one {1 partita} other {# partite}}",
@@ -385,8 +410,79 @@
         "fetch_timeout": "Il server del calendario non ha risposto in tempo.",
         "fetch_too_large": "File del calendario troppo grande.",
         "db_error": "Errore di salvataggio. Riprova."
+      },
+      "match": {
+        "add": "Aggiungi partita",
+        "edit": "Modifica",
+        "create": "Crea partita",
+        "save": "Salva",
+        "cancel": "Annulla",
+        "saving": "Salvataggio…",
+        "date": "Data",
+        "time": "Ora",
+        "opponent": "Avversario",
+        "opponentPlaceholder": "Nome della squadra avversaria",
+        "homeAway": "Casa / trasferta",
+        "homeAwayUnset": "Non specificato",
+        "home": "Casa",
+        "away": "Trasferta",
+        "competition": "Competizione",
+        "location": "Luogo",
+        "kind": "Tipo",
+        "isAnchor": "Partita di riferimento",
+        "isAnchorHint": "Struttura la stagione (genera un microciclo).",
+        "notAnchor": "Fuori periodizzazione",
+        "manual": "Manuale",
+        "icsHint": "Partita importata dal calendario ufficiale: qui sono modificabili solo tipo e ancoraggio.",
+        "deleteConfirm": "Eliminare questa partita?",
+        "kindOption": {
+          "league": "Campionato",
+          "cup": "Coppa",
+          "friendly": "Amichevole",
+          "tournament": "Torneo",
+          "break": "Pausa"
+        },
+        "err": {
+          "dateRequired": "La data è obbligatoria.",
+          "invalid_date": "Data non valida.",
+          "invalid_input": "Inserimento non valido.",
+          "not_manual": "Solo le partite manuali possono essere eliminate.",
+          "match_not_found": "Partita non trovata.",
+          "forbidden": "Permessi insufficienti.",
+          "db_error": "Errore di salvataggio. Riprova."
+        },
+        "autoTourHint": "La partita viene automaticamente assegnata al turno corretto in base alla sua data — indipendentemente dal turno visualizzato.",
+        "delete": "Elimina"
+      },
+      "settings": {
+        "title": "Ritmo di periodizzazione",
+        "subtitle": "Giorni di allenamento e schema settimanale. Usato per costruire il piano attorno alle partite.",
+        "trainingDays": "Giorni di allenamento",
+        "scheme": "Schema settimanale",
+        "save": "Salva",
+        "saving": "Salvataggio…",
+        "saved": "Impostazioni salvate.",
+        "error": "Errore di salvataggio.",
+        "noDays": "Seleziona almeno un giorno.",
+        "day": {
+          "1": "Lun",
+          "2": "Mar",
+          "3": "Mer",
+          "4": "Gio",
+          "5": "Ven",
+          "6": "Sab",
+          "7": "Dom"
+        },
+        "schemeOption": {
+          "standard": "1 partita / settimana",
+          "congested": "Settimana intensa (2 partite)",
+          "custom": "Personalizzato"
+        }
       }
-    }
+    },
+    "seasonScope": "Stagione {season}",
+    "planned": "Pianificato",
+    "playersCount": "{n, plural, =0 {Nessun giocatore} one {1 giocatore} other {# giocatori}}"
   },
   "exercises": {
     "title": "Libreria di esercizi",
@@ -446,7 +542,11 @@
     "noTeams": "Crea prima una squadra.",
     "view": {
       "tour": "Vista stagione",
-      "weekly": "Settimanale"
+      "weekly": "Settimanale",
+      "season": "Stagione",
+      "calendar": "Calendario",
+      "seasonSelect": "Stagione",
+      "seasonArchived": "{season} (archiviata)"
     },
     "setup": {
       "title": "Configura la tua stagione",
@@ -601,7 +701,196 @@
       "noExercises": "Nessun esercizio collegato. Aggiungine dalla tua libreria.",
       "submit": "Salva la seduta",
       "delete": "Elimina la seduta"
-    }
+    },
+    "season": {
+      "title": "Piano della stagione",
+      "subtitleGenerated": "Piano generato dalle partite. Rigenera dopo aver modificato il calendario.",
+      "subtitleEmpty": "Genera lo scheletro di allenamento dalle partite di riferimento.",
+      "generate": "Genera piano",
+      "regenerate": "Rigenera",
+      "generating": "Generazione…",
+      "generated": "{micro} settimane · {sessions} sedute generate.",
+      "emptyNoMatchesTitle": "Nessuna partita",
+      "emptyNoMatchesHint": "Importa il calendario ICS o aggiungi partite per costruire la stagione.",
+      "emptyNoAnchorsTitle": "Nessuna partita di riferimento",
+      "emptyNoAnchorsHint": "Segna almeno una partita come riferimento nel calendario per generare il piano.",
+      "goToCalendar": "Apri il calendario",
+      "noSessions": "Nessuna seduta questa settimana.",
+      "notGeneratedYet": "Non ancora generato.",
+      "home": "Casa",
+      "away": "Trasferta",
+      "kind": {
+        "league": "Campionato",
+        "cup": "Coppa",
+        "friendly": "Amichevole",
+        "tournament": "Torneo",
+        "break": "Pausa"
+      },
+      "err": {
+        "no_anchor_matches": "Nessuna partita di riferimento da cui partire.",
+        "team_not_found": "Squadra non trovata.",
+        "unauthenticated": "Devi aver effettuato l'accesso.",
+        "forbidden": "Permessi insufficienti.",
+        "db_error": "Errore di generazione. Riprova."
+      },
+      "reprise": "Inizio preparazione",
+      "repriseHint": "Inizio della preparazione. Modificabile.",
+      "overviewTitle": "Panoramica",
+      "seasonFallback": "Stagione da pianificare",
+      "createPlanning": "Pianifica stagione",
+      "editPlanning": "Modifica pianificazione",
+      "matchesMetric": "Partite",
+      "sessionsMetric": "Sedute",
+      "weeksMetric": "settimane",
+      "seasonFilter": "Stagione",
+      "tourFilter": "Turno",
+      "frame": "Quadro",
+      "weeklyOverview": "Settimane",
+      "noWeeksForFilter": "Nessuna settimana pianificata per questa stagione e questo turno.",
+      "noTheme": "Tema non definito",
+      "matchFallback": "Partita"
+    },
+    "wizard": {
+      "title": "Assistente di pianificazione",
+      "subtitle": "Pianifica turno, date, ritmo e cicli nello stesso flusso.",
+      "calendarTitle": "Calendario",
+      "calendarSubtitle": "Importa o sincronizza le partite del turno selezionato.",
+      "stepsLabel": "Passi stagione",
+      "back": "Indietro",
+      "next": "Avanti",
+      "steps": {
+        "segment": "Base",
+        "calendar": "Calendario",
+        "bounds": "Date",
+        "rhythm": "Ritmo",
+        "cycles": "Cicli",
+        "plan": "Pianificazione",
+        "summary": "Riepilogo"
+      },
+      "eyebrow": {
+        "segment": "Stagione, turno e calendario",
+        "calendar": "Partite e date importanti",
+        "bounds": "Ripresa e fine",
+        "rhythm": "Settimana tipo",
+        "cycles": "Temi per blocco",
+        "plan": "Date, slot e cicli",
+        "summary": "Conferma"
+      },
+      "scopeTitle": "Quadro di pianificazione",
+      "segment": {
+        "first_round": "1° turno",
+        "second_round": "2° turno",
+        "full": "Stagione completa"
+      },
+      "segmentHint": {
+        "first_round": "Pianifica solo la prima metà.",
+        "second_round": "Aggiungi o rielabora il ritorno.",
+        "full": "Pianifica tutto il campionato."
+      },
+      "mode": "Modalità",
+      "modeOption": {
+        "replace": "Sostituisci queste date",
+        "merge": "Unisci all'esistente"
+      },
+      "planName": "Nome del piano",
+      "planNamePlaceholder": "Autunno 2026",
+      "seasonLabel": "Stagione",
+      "seasonLabelPlaceholder": "2026/27",
+      "tourLabel": "Turno",
+      "boundsTitle": "Date strutturanti",
+      "seasonStart": "Data di ripresa",
+      "seasonEnd": "Fine del turno",
+      "prepTitle": "Fase di preparazione",
+      "prepWeeks": "Settimane di preparazione",
+      "prepWeeksHint": "Calcolato dalla ripresa e dalla prima partita di riferimento.",
+      "repriseOn": "Inizio il {date}",
+      "prepTheme": "Tema (fase di gioco)",
+      "rhythmTitle": "Slot di allenamento tipo",
+      "weekday": "Giorno",
+      "weekdayOption": {
+        "1": "Lunedì",
+        "2": "Martedì",
+        "3": "Mercoledì",
+        "4": "Giovedì",
+        "5": "Venerdì",
+        "6": "Sabato",
+        "7": "Domenica"
+      },
+      "slotTime": "Ora",
+      "duration": "Durata (min)",
+      "addSlot": "Aggiungi slot",
+      "removeSlot": "Rimuovi slot",
+      "cyclesTitle": "Cicli di lavoro",
+      "mesosTitle": "Mesocicli (cicli)",
+      "coverage": "{defined} / {total} sett. di competizione",
+      "definedWeeks": "{n} sett. definite",
+      "cycleName": "Nome del ciclo",
+      "cyclePlaceholder": "Ciclo {n}",
+      "weeks": "Settimane",
+      "theme": "Tema",
+      "removeCycle": "Rimuovi ciclo",
+      "addCycle": "Aggiungi un ciclo",
+      "noTheme": "Nessun tema",
+      "summaryTitle": "Sintesi prima della generazione",
+      "summarySeason": "Stagione",
+      "summarySegment": "Turno",
+      "summaryMode": "Modalità",
+      "summaryDates": "Date",
+      "summaryAnchors": "Riferimenti",
+      "summaryWeeks": "Settimane",
+      "summarySessions": "Sedute previste",
+      "readyTitle": "Pronto a generare",
+      "readyText": "La generazione scrive settimane e sedute nello stesso modello usato dalla vista settimanale.",
+      "generated": "{micro} settimane · {sessions} sedute generate.",
+      "generating": "Generazione…",
+      "regenerate": "Rigenera",
+      "generate": "Genera piano",
+      "noMatchesForTour": "Nessuna partita ufficiale per {tour} — il calendario non è ancora aggiornato, o è il turno sbagliato.",
+      "err": {
+        "no_anchor_matches": "Nessuna partita di riferimento da cui partire.",
+        "team_not_found": "Squadra non trovata.",
+        "unauthenticated": "Devi aver effettuato l'accesso.",
+        "forbidden": "Permessi insufficienti.",
+        "db_error": "Errore di generazione. Riprova."
+      },
+      "calPrev": "Mese precedente",
+      "calNext": "Mese successivo",
+      "calToday": "Oggi",
+      "calPickHint": "Clicca un giorno per impostare la ripresa.",
+      "calAnchor": "Partita ufficiale",
+      "calMatch": "Partita",
+      "calMonthMatches": "Partite del mese ({n})",
+      "calNoMatchMonth": "Nessuna partita questo mese.",
+      "calSelected": "Data scelta",
+      "timeHours": "Ore",
+      "timeMinutes": "Minuti",
+      "gridTitle": "Panoramica",
+      "gridEmpty": "Nessuna partita di ancoraggio in questo turno — aggiungi partite per vedere le settimane.",
+      "weekN": "{n} sett.",
+      "noMatchWeek": "Nessuna partita",
+      "trainingsCount": "{n, plural, =0 {Nessun allenamento} one {1 allenamento} other {# allenamenti}}",
+      "statsTitle": "Statistiche",
+      "statWeeks": "Settimane",
+      "statPrep": "Prep.",
+      "statComp": "Competizione",
+      "statMatches": "Partite",
+      "statSessions": "Sedute",
+      "phase": {
+        "preparation": "Prep.",
+        "competition": "Comp.",
+        "transition": "Transizione"
+      },
+      "weekBadge": "S{n}",
+      "col": {
+        "week": "Sett.",
+        "date": "Data",
+        "phase": "Fase",
+        "theme": "Tema",
+        "trainings": "Allenamenti",
+        "match": "Partita"
+      }
+    },
+    "seasonScope": "Stagione {season}"
   },
   "common": {
     "cancel": "Annulla",
@@ -1364,7 +1653,8 @@
       "manualHint": "Compila la scheda giocatore",
       "import": "Importa da ClubCorner",
       "importHint": "Da un CSV esportato"
-    }
+    },
+    "seasonScope": "Stagione {season}"
   },
   "playerMe": {
     "title": "La mia scheda",
@@ -1683,5 +1973,37 @@
         "desc": "Punti di forza, aree di miglioramento, valutazione e firme."
       }
     ]
+  },
+  "season": {
+    "label": "Stagione"
+  },
+  "seasonImport": {
+    "button": "Importa da una stagione precedente",
+    "title": "Importa da una stagione",
+    "subtitle": "Ricrea la struttura scelta nella stagione {season}. La stagione di origine non viene modificata.",
+    "sourceLabel": "Stagione di origine",
+    "teamsLabel": "Squadre da importare",
+    "selectAll": "Seleziona tutte",
+    "selectNone": "Deseleziona tutte",
+    "noTeams": "Nessuna squadra in questa stagione.",
+    "includeLabel": "Cosa importare",
+    "includeTeams": "Squadre",
+    "includeTeamsHint": "Rende visibili le squadre selezionate nella stagione attiva.",
+    "includeRosters": "Rose",
+    "includeRostersHint": "Copia le assegnazioni giocatore → squadra.",
+    "includePeriodization": "Periodizzazione",
+    "includePeriodizationHint": "Copia le impostazioni di ritmo (giorni di allenamento, schema MD). Non le partite.",
+    "cancel": "Annulla",
+    "submit": "Importa",
+    "importing": "Importazione…",
+    "success": "Importati: {teams} squadra/e, {rosters} assegnazione/i, {periodization} impostazione/i.",
+    "err": {
+      "no_team": "Seleziona almeno una squadra.",
+      "invalid_season": "Stagione non valida.",
+      "same_season": "La stagione di origine deve essere diversa da quella attiva.",
+      "unauthenticated": "Devi aver effettuato l'accesso.",
+      "no_membership": "Nessun club selezionato.",
+      "db_error": "Importazione non riuscita. Riprova."
+    }
   }
 }
