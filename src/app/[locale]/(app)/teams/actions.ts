@@ -4,10 +4,10 @@ import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 import { resolveCurrentMembership } from "@/lib/club/context";
+import { resolveCurrentSeasonLabel } from "@/lib/club/season";
 
 export async function createTeamAction(formData: FormData) {
   const name = String(formData.get("name") ?? "").trim();
-  const season = String(formData.get("season") ?? "").trim() || null;
   const ageGroup = String(formData.get("ageGroup") ?? "").trim() || null;
   const locale = String(formData.get("locale") ?? "fr");
 
@@ -21,6 +21,10 @@ export async function createTeamAction(formData: FormData) {
 
   const membership = await resolveCurrentMembership();
   if (!membership) redirect(`/${locale}/onboarding/club`);
+
+  // Une équipe est créée DANS la saison active (vue par saison). Le millésime
+  // n'est plus saisi à la main : il suit le sélecteur de saison de la Topbar.
+  const season = await resolveCurrentSeasonLabel();
 
   // Direct RLS-checked INSERT on teams hits a Supabase env quirk where the
   // WITH CHECK evaluates correctly in isolation but PG still rejects. Route
@@ -36,6 +40,13 @@ export async function createTeamAction(formData: FormData) {
   });
 
   if (error) return { error: error.message };
+
+  // Rend l'équipe visible dans la saison active (table d'appartenance). Sans
+  // cette ligne, la nouvelle équipe n'apparaîtrait dans aucune saison.
+  const { error: tsError } = await supabase
+    .from("team_seasons")
+    .insert({ team_id: teamId, season, club_id: membership.club_id });
+  if (tsError) return { error: tsError.message };
 
   revalidatePath(`/${locale}/teams`);
   redirect(`/${locale}/teams/${teamId}`);
