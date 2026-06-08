@@ -250,14 +250,64 @@ function ymd(d: Date): string {
 
 type EnrichedSession = GridSession & { types: SessionType[]; slot: Slot };
 
+export type WeekMatch = {
+  id: string;
+  starts_at: string;
+  opponent: string | null;
+  summary: string | null;
+  home_away: string | null;
+  kind: string | null;
+  is_anchor: boolean;
+};
+
+/** Date locale (Europe/Zurich) `YYYY-MM-DD` d'un instant ISO. */
+function zurichDateKey(iso: string): string {
+  return new Intl.DateTimeFormat("en-CA", {
+    timeZone: "Europe/Zurich",
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  }).format(new Date(iso));
+}
+
+/** Index de mois (année*12+mois) d'une date `YYYY-MM-DD`, ou null. */
+function monthIndexOf(ymdStr?: string): number | null {
+  if (!ymdStr) return null;
+  const [y, m] = ymdStr.split("-").map(Number);
+  return y * 12 + (m - 1);
+}
+
+/** Ramène un mois dans la fenêtre de saison [start, end] (bornes incluses). */
+function clampMonth(
+  cur: { year: number; month: number },
+  start?: string,
+  end?: string,
+): { year: number; month: number } {
+  const idx = cur.year * 12 + cur.month;
+  const min = monthIndexOf(start);
+  const max = monthIndexOf(end);
+  let clamped = idx;
+  if (min !== null && clamped < min) clamped = min;
+  if (max !== null && clamped > max) clamped = max;
+  if (clamped === idx) return cur;
+  return { year: Math.floor(clamped / 12), month: clamped % 12 };
+}
+
 export function PlannerWeeksGrid({
   teamId,
   sessions,
   macrocycles = [],
+  matches = [],
+  seasonStart,
+  seasonEnd,
 }: {
   teamId: string;
   sessions: GridSession[];
   macrocycles?: Macrocycle[];
+  matches?: WeekMatch[];
+  /** Fenêtre de la saison active `YYYY-MM-DD` : borne la navigation mensuelle. */
+  seasonStart?: string;
+  seasonEnd?: string;
 }) {
   const router = useRouter();
   const locale = useLocale();
@@ -317,11 +367,19 @@ export function PlannerWeeksGrid({
           const [ly, lm, ld] = lastKey.split("-").map(Number);
           const lastDate = new Date(ly, lm - 1, ld);
           if (todayDate < firstDate || todayDate > lastDate) {
-            return { year: firstDate.getFullYear(), month: firstDate.getMonth() };
+            return clampMonth(
+              { year: firstDate.getFullYear(), month: firstDate.getMonth() },
+              seasonStart,
+              seasonEnd,
+            );
           }
         }
       }
-      return { year: todayDate.getFullYear(), month: todayDate.getMonth() };
+      return clampMonth(
+        { year: todayDate.getFullYear(), month: todayDate.getMonth() },
+        seasonStart,
+        seasonEnd,
+      );
     },
   );
   const [activeTypes, setActiveTypes] = useState<Set<SessionType>>(
@@ -348,6 +406,15 @@ export function PlannerWeeksGrid({
     }
     return m;
   }, [enriched]);
+
+  const matchByDate = useMemo(() => {
+    const m = new Map<string, WeekMatch>();
+    for (const mt of matches) {
+      const key = zurichDateKey(mt.starts_at);
+      if (!m.has(key)) m.set(key, mt);
+    }
+    return m;
+  }, [matches]);
 
   const weeks = useMemo(
     () => weeksOfMonth(currentMonth.year, currentMonth.month),
@@ -439,15 +506,31 @@ export function PlannerWeeksGrid({
     1,
   ).toLocaleDateString(locale, { month: "long", year: "numeric" });
 
+  const currentMonthIndex = currentMonth.year * 12 + currentMonth.month;
+  const minMonthIndex = monthIndexOf(seasonStart);
+  const maxMonthIndex = monthIndexOf(seasonEnd);
+  const canPrev = minMonthIndex === null || currentMonthIndex > minMonthIndex;
+  const canNext = maxMonthIndex === null || currentMonthIndex < maxMonthIndex;
+
   const shiftMonth = (delta: number) =>
     setCurrentMonth((prev) => {
       const d = new Date(prev.year, prev.month + delta, 1);
-      return { year: d.getFullYear(), month: d.getMonth() };
+      return clampMonth(
+        { year: d.getFullYear(), month: d.getMonth() },
+        seasonStart,
+        seasonEnd,
+      );
     });
 
   const jumpToToday = () => {
     const now = new Date();
-    setCurrentMonth({ year: now.getFullYear(), month: now.getMonth() });
+    setCurrentMonth(
+      clampMonth(
+        { year: now.getFullYear(), month: now.getMonth() },
+        seasonStart,
+        seasonEnd,
+      ),
+    );
   };
 
   const totalHours = Math.floor(stats.totalMin / 60);
@@ -614,6 +697,7 @@ export function PlannerWeeksGrid({
 	          );
           const morning = list.find((s) => s.slot === "morning") ?? null;
           const afternoon = list.find((s) => s.slot === "afternoon") ?? null;
+          const cellMatch = matchByDate.get(dateStr) ?? null;
           const isToday = dateStr === today;
           const isWeekend = di >= 5;
 
@@ -805,6 +889,22 @@ export function PlannerWeeksGrid({
                   {cellDate.getDate()}
                 </span>
               </div>
+              {cellMatch ? (
+                <div
+                  title={cellMatch.opponent ?? cellMatch.summary ?? "Match"}
+                  className={`flex items-center gap-1 truncate rounded-md px-1.5 py-0.5 text-[10px] font-semibold ${
+                    cellMatch.is_anchor
+                      ? "bg-[var(--club-primary)] text-[var(--club-primary-foreground)]"
+                      : "bg-[var(--club-primary-soft)] text-[var(--club-primary)]"
+                  }`}
+                >
+                  <span aria-hidden="true">⚽</span>
+                  {cellMatch.home_away === "away" ? "@" : ""}
+                  <span className="truncate">
+                    {cellMatch.opponent ?? cellMatch.summary ?? "Match"}
+                  </span>
+                </div>
+              ) : null}
               {renderSlot("morning", morning, t("slot.morning"))}
               {renderSlot("afternoon", afternoon, t("slot.afternoon"))}
             </div>
@@ -853,7 +953,8 @@ export function PlannerWeeksGrid({
           <button
             type="button"
             onClick={() => shiftMonth(-1)}
-            className="inline-flex h-8 w-8 items-center justify-center rounded-lg border border-zinc-200 bg-white text-sm font-medium text-zinc-700 shadow-sm transition-all duration-150 hover:bg-zinc-50 hover:text-zinc-900 active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-zinc-300 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-300 dark:hover:bg-zinc-800 dark:hover:text-zinc-100"
+            disabled={!canPrev}
+            className="inline-flex h-8 w-8 items-center justify-center rounded-lg border border-zinc-200 bg-white text-sm font-medium text-zinc-700 shadow-sm transition-all duration-150 hover:bg-zinc-50 hover:text-zinc-900 active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-zinc-300 disabled:cursor-not-allowed disabled:opacity-40 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-300 dark:hover:bg-zinc-800 dark:hover:text-zinc-100"
             aria-label={t("prev")}
           >
             ‹
@@ -864,7 +965,8 @@ export function PlannerWeeksGrid({
           <button
             type="button"
             onClick={() => shiftMonth(1)}
-            className="inline-flex h-8 w-8 items-center justify-center rounded-lg border border-zinc-200 bg-white text-sm font-medium text-zinc-700 shadow-sm transition-all duration-150 hover:bg-zinc-50 hover:text-zinc-900 active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-zinc-300 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-300 dark:hover:bg-zinc-800 dark:hover:text-zinc-100"
+            disabled={!canNext}
+            className="inline-flex h-8 w-8 items-center justify-center rounded-lg border border-zinc-200 bg-white text-sm font-medium text-zinc-700 shadow-sm transition-all duration-150 hover:bg-zinc-50 hover:text-zinc-900 active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-zinc-300 disabled:cursor-not-allowed disabled:opacity-40 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-300 dark:hover:bg-zinc-800 dark:hover:text-zinc-100"
             aria-label={t("next")}
           >
             ›

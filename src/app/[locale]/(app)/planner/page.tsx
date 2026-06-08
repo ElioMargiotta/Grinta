@@ -4,6 +4,7 @@ import { Card } from "@/components/ui/Card";
 import { Link } from "@/i18n/navigation";
 import { requireUser } from "@/lib/auth/getUser";
 import { resolveCurrentMembership } from "@/lib/club/context";
+import { resolveCurrentSeasonLabel } from "@/lib/club/season";
 
 export default async function PlannerIndexPage({
   params,
@@ -19,11 +20,15 @@ export default async function PlannerIndexPage({
   const membership = await resolveCurrentMembership();
   if (!membership) redirect(`/${locale}/onboarding/club`);
 
+  // Vue par saison : seules les équipes présentes dans la saison active (table
+  // d'appartenance team_seasons) sont planifiables.
+  const season = await resolveCurrentSeasonLabel();
   const { data: teams } = await supabase
     .from("teams")
-    .select("id, name, season, age_group")
+    .select("id, name, season, age_group, team_seasons!inner(season)")
     .eq("club_id", membership.club_id)
     .is("archived_at", null)
+    .eq("team_seasons.season", season)
     .order("created_at", { ascending: false });
 
   return (

@@ -580,13 +580,38 @@
       "urlHint": "Copie le lien du calendrier depuis ta fédération. Le schéma webcal:// est aussi accepté.",
       "saveAndSync": "Enregistrer et synchroniser",
       "updateAndSync": "Mettre à jour et resynchroniser",
+      "connectedCalendar": "Calendrier connecté",
+      "changeUrl": "Modifier le lien",
+      "cancelUrlEdit": "Annuler",
+      "frameWarning": "{n, plural, one {1 date importée est hors du cadre de ce tour. Garde les dates du tour courant, puis choisis quoi faire des dates hors cadre.} other {# dates importées sont hors du cadre de ce tour. Garde les dates du tour courant, puis choisis quoi faire des dates hors cadre.}}",
+      "deleteOutOfFrame": "Rester sur ce tour et supprimer",
+      "deleteOutOfFrameConfirm": "Supprimer les dates importées hors cadre ? Les dates dans le tour courant seront conservées.",
+      "deletedOutOfFrame": "{n, plural, one {1 date hors cadre supprimée.} other {# dates hors cadre supprimées.}}",
+      "switchFrame": {
+        "first_round": "Passer au 1er tour",
+        "second_round": "Passer au 2e tour",
+        "full": "Planifier la saison complète"
+      },
       "syncNow": "Synchroniser maintenant",
       "syncing": "Synchronisation…",
       "uploadFile": "Importer un fichier .ics",
+      "addCalendar": "Ajouter un calendrier",
+      "autoRouteHint": "Colle le lien ICS de ta fédération : il est rangé tout seul dans le bon tour selon les dates des matchs.",
+      "importedOk": "Calendrier importé",
+      "icsLinks": "Liens ICS",
       "disconnect": "Désabonner",
-      "disconnectConfirm": "Supprimer l'abonnement ? Les matchs déjà importés sont conservés.",
+      "disconnectConfirm": "Supprimer ce lien et ses matchs à venir ? Les matchs déjà joués et les matchs manuels sont conservés.",
       "matchesTitle": "{n, plural, =0 {Aucun match importé} one {1 match importé} other {# matchs importés}}",
       "matchesEmpty": "Aucun match pour le moment. Renseigne une URL ou importe un fichier .ics.",
+      "historyShow": "Historique ({n})",
+      "historyHide": "Masquer l'historique",
+      "historyHint": "Matchs joués, détachés du calendrier et conservés ici.",
+      "historyEmpty": "Aucun match joué pour l'instant.",
+      "slot": {
+        "first_round": "1er tour",
+        "second_round": "2e tour",
+        "full": "Saison complète"
+      },
       "syncedCount": "{n, plural, one {1 match synchronisé.} other {# matchs synchronisés.}}",
       "ok": "Synchronisation effectuée.",
       "statusOk": "{n, plural, =0 {Aucun match} one {1 match} other {# matchs}}",
@@ -605,8 +630,79 @@
         "fetch_timeout": "Le serveur du calendrier n'a pas répondu à temps.",
         "fetch_too_large": "Fichier calendrier trop volumineux.",
         "db_error": "Erreur d'enregistrement. Réessaie."
+      },
+      "match": {
+        "add": "Ajouter un match",
+        "edit": "Modifier",
+        "create": "Créer le match",
+        "save": "Enregistrer",
+        "cancel": "Annuler",
+        "saving": "Enregistrement…",
+        "date": "Date",
+        "time": "Heure",
+        "opponent": "Adversaire",
+        "opponentPlaceholder": "Nom de l'équipe adverse",
+        "homeAway": "Domicile / extérieur",
+        "homeAwayUnset": "Non précisé",
+        "home": "Domicile",
+        "away": "Extérieur",
+        "competition": "Compétition",
+        "location": "Lieu",
+        "kind": "Type",
+        "isAnchor": "Match d'ancrage",
+        "isAnchorHint": "Structure la saison (génère un microcycle).",
+        "notAnchor": "Hors périodisation",
+        "manual": "Manuel",
+        "icsHint": "Match importé du calendrier officiel : seuls le type et l'ancrage sont modifiables ici.",
+        "deleteConfirm": "Supprimer ce match ?",
+        "kindOption": {
+          "league": "Championnat",
+          "cup": "Coupe",
+          "friendly": "Amical",
+          "tournament": "Tournoi",
+          "break": "Trêve"
+        },
+        "err": {
+          "dateRequired": "La date est requise.",
+          "invalid_date": "Date invalide.",
+          "invalid_input": "Saisie invalide.",
+          "not_manual": "Seuls les matchs manuels sont supprimables.",
+          "match_not_found": "Match introuvable.",
+          "forbidden": "Droits insuffisants.",
+          "db_error": "Erreur d'enregistrement. Réessaie."
+        },
+        "autoTourHint": "Le match se range automatiquement dans le bon tour selon sa date — peu importe le tour affiché.",
+        "delete": "Supprimer"
+      },
+      "settings": {
+        "title": "Rythme de périodisation",
+        "subtitle": "Jours d'entraînement et schéma de semaine. Utilisé pour générer le planning autour des matchs.",
+        "trainingDays": "Jours d'entraînement",
+        "scheme": "Schéma de semaine",
+        "save": "Enregistrer",
+        "saving": "Enregistrement…",
+        "saved": "Réglages enregistrés.",
+        "error": "Erreur d'enregistrement.",
+        "noDays": "Sélectionne au moins un jour.",
+        "day": {
+          "1": "Lun",
+          "2": "Mar",
+          "3": "Mer",
+          "4": "Jeu",
+          "5": "Ven",
+          "6": "Sam",
+          "7": "Dim"
+        },
+        "schemeOption": {
+          "standard": "1 match / semaine",
+          "congested": "Semaine chargée (2 matchs)",
+          "custom": "Personnalisé"
+        }
       }
-    }
+    },
+    "seasonScope": "Saison {season}",
+    "planned": "Planifié",
+    "playersCount": "{n, plural, =0 {Aucun joueur} one {1 joueur} other {# joueurs}}"
   },
   "exercises": {
     "title": "Bibliothèque d'exercices",
@@ -666,7 +762,11 @@
     "noTeams": "Créez d'abord une équipe.",
     "view": {
       "tour": "Vue saison",
-      "weekly": "Hebdomadaire"
+      "weekly": "Hebdomadaire",
+      "season": "Saison",
+      "calendar": "Calendrier",
+      "seasonSelect": "Saison",
+      "seasonArchived": "{season} (archivée)"
     },
     "setup": {
       "title": "Configure ta saison",
@@ -821,7 +921,196 @@
       "noExercises": "Aucun exercice rattaché. Ajoutez-en depuis votre bibliothèque.",
       "submit": "Enregistrer la séance",
       "delete": "Supprimer la séance"
-    }
+    },
+    "season": {
+      "title": "Planning de la saison",
+      "subtitleGenerated": "Planning généré à partir des matchs. Régénère après avoir modifié le calendrier.",
+      "subtitleEmpty": "Génère le squelette d'entraînement à partir de tes matchs d'ancrage.",
+      "generate": "Générer le planning",
+      "regenerate": "Régénérer",
+      "generating": "Génération…",
+      "generated": "{micro} semaines · {sessions} séances générées.",
+      "emptyNoMatchesTitle": "Aucun match",
+      "emptyNoMatchesHint": "Importe ton calendrier ICS ou ajoute des matchs pour construire la saison.",
+      "emptyNoAnchorsTitle": "Aucun match d'ancrage",
+      "emptyNoAnchorsHint": "Marque au moins un match comme « ancre » dans le calendrier pour générer le planning.",
+      "goToCalendar": "Ouvrir le calendrier",
+      "noSessions": "Aucune séance cette semaine.",
+      "notGeneratedYet": "Pas encore généré.",
+      "home": "Domicile",
+      "away": "Extérieur",
+      "kind": {
+        "league": "Championnat",
+        "cup": "Coupe",
+        "friendly": "Amical",
+        "tournament": "Tournoi",
+        "break": "Trêve"
+      },
+      "err": {
+        "no_anchor_matches": "Aucun match d'ancrage pour générer.",
+        "team_not_found": "Équipe introuvable.",
+        "unauthenticated": "Tu dois être connecté.",
+        "forbidden": "Droits insuffisants.",
+        "db_error": "Erreur de génération. Réessaie."
+      },
+      "reprise": "Date de reprise",
+      "repriseHint": "Début de la préparation. Modifiable.",
+      "overviewTitle": "Vue d'ensemble",
+      "seasonFallback": "Saison à planifier",
+      "createPlanning": "Planifier la saison",
+      "editPlanning": "Modifier la planification",
+      "matchesMetric": "Matchs",
+      "sessionsMetric": "Séances",
+      "weeksMetric": "semaines",
+      "seasonFilter": "Saison",
+      "tourFilter": "Tour",
+      "frame": "Cadre",
+      "weeklyOverview": "Semaines",
+      "noWeeksForFilter": "Aucune semaine planifiée pour cette saison et ce tour.",
+      "noTheme": "Thème non défini",
+      "matchFallback": "Match"
+    },
+    "wizard": {
+      "title": "Assistant de planification",
+      "subtitle": "Planifie le tour, les dates, le rythme et les cycles dans le même flux.",
+      "calendarTitle": "Calendrier",
+      "calendarSubtitle": "Importe ou synchronise les matchs du tour sélectionné.",
+      "stepsLabel": "Étapes saison",
+      "back": "Retour",
+      "next": "Suivant",
+      "steps": {
+        "segment": "Base",
+        "calendar": "Calendrier",
+        "bounds": "Bornes",
+        "rhythm": "Rythme",
+        "cycles": "Cycles",
+        "plan": "Planification",
+        "summary": "Résumé"
+      },
+      "eyebrow": {
+        "segment": "Saison, tour et calendrier",
+        "calendar": "Matchs et dates importantes",
+        "bounds": "Reprise et fin",
+        "rhythm": "Semaine type",
+        "cycles": "Thèmes par blocs",
+        "plan": "Dates, créneaux et cycles",
+        "summary": "Validation"
+      },
+      "scopeTitle": "Cadre de planification",
+      "segment": {
+        "first_round": "1er tour",
+        "second_round": "2e tour",
+        "full": "Saison complète"
+      },
+      "segmentHint": {
+        "first_round": "Prépare uniquement la première moitié.",
+        "second_round": "Ajoute ou retravaille le retour.",
+        "full": "Planifie tout le championnat."
+      },
+      "mode": "Mode",
+      "modeOption": {
+        "replace": "Remplacer ces dates",
+        "merge": "Fusionner avec l'existant"
+      },
+      "planName": "Nom du plan",
+      "planNamePlaceholder": "Automne 2026",
+      "seasonLabel": "Saison",
+      "seasonLabelPlaceholder": "2026/27",
+      "tourLabel": "Tour",
+      "boundsTitle": "Dates structurantes",
+      "seasonStart": "Date de reprise",
+      "seasonEnd": "Fin du tour",
+      "prepTitle": "Phase préparatoire",
+      "prepWeeks": "Semaines de préparation",
+      "prepWeeksHint": "Calculé depuis la reprise et le premier match ancre.",
+      "repriseOn": "Reprise le {date}",
+      "prepTheme": "Thème (phase de jeu)",
+      "rhythmTitle": "Créneaux d'entraînement type",
+      "weekday": "Jour",
+      "weekdayOption": {
+        "1": "Lundi",
+        "2": "Mardi",
+        "3": "Mercredi",
+        "4": "Jeudi",
+        "5": "Vendredi",
+        "6": "Samedi",
+        "7": "Dimanche"
+      },
+      "slotTime": "Heure",
+      "duration": "Durée (min)",
+      "addSlot": "Ajouter un créneau",
+      "removeSlot": "Supprimer le créneau",
+      "cyclesTitle": "Cycles de travail",
+      "mesosTitle": "Mésocycles (cycles)",
+      "coverage": "{defined} / {total} sem. de compétition",
+      "definedWeeks": "{n} sem. définies",
+      "cycleName": "Nom du cycle",
+      "cyclePlaceholder": "Cycle {n}",
+      "weeks": "Semaines",
+      "theme": "Thème",
+      "removeCycle": "Supprimer le cycle",
+      "addCycle": "Ajouter un cycle",
+      "noTheme": "Aucun thème",
+      "summaryTitle": "Synthèse avant génération",
+      "summarySeason": "Saison",
+      "summarySegment": "Tour",
+      "summaryMode": "Mode",
+      "summaryDates": "Dates",
+      "summaryAnchors": "Ancres",
+      "summaryWeeks": "Semaines",
+      "summarySessions": "Séances prévues",
+      "readyTitle": "Prêt à générer",
+      "readyText": "La génération écrit les semaines et les séances dans le même modèle que la vue hebdomadaire.",
+      "generated": "{micro} semaines · {sessions} séances générées.",
+      "generating": "Génération…",
+      "regenerate": "Régénérer",
+      "generate": "Générer le planning",
+      "noMatchesForTour": "Aucun match officiel pour {tour} — le calendrier n'est pas encore à jour, ou ce n'est pas le bon tour.",
+      "err": {
+        "no_anchor_matches": "Aucun match d'ancrage pour générer.",
+        "team_not_found": "Équipe introuvable.",
+        "unauthenticated": "Tu dois être connecté.",
+        "forbidden": "Droits insuffisants.",
+        "db_error": "Erreur de génération. Réessaie."
+      },
+      "calPrev": "Mois précédent",
+      "calNext": "Mois suivant",
+      "calToday": "Aujourd'hui",
+      "calPickHint": "Clique un jour pour fixer la reprise.",
+      "calAnchor": "Match officiel",
+      "calMatch": "Match",
+      "calMonthMatches": "Matchs du mois ({n})",
+      "calNoMatchMonth": "Aucun match ce mois-ci.",
+      "calSelected": "Date choisie",
+      "timeHours": "Heures",
+      "timeMinutes": "Minutes",
+      "gridTitle": "Vue d'ensemble",
+      "gridEmpty": "Aucun match d'ancrage sur ce tour — ajoute des matchs pour visualiser les semaines.",
+      "weekN": "{n} sem.",
+      "noMatchWeek": "Pas de match",
+      "trainingsCount": "{n, plural, =0 {Aucun entraînement} one {1 entraînement} other {# entraînements}}",
+      "statsTitle": "Statistiques",
+      "statWeeks": "Semaines",
+      "statPrep": "Prépa",
+      "statComp": "Compétition",
+      "statMatches": "Matchs",
+      "statSessions": "Séances",
+      "phase": {
+        "preparation": "Prépa",
+        "competition": "Compét.",
+        "transition": "Transition"
+      },
+      "weekBadge": "S{n}",
+      "col": {
+        "week": "Sem.",
+        "date": "Date",
+        "phase": "Phase",
+        "theme": "Thème",
+        "trainings": "Entraînements",
+        "match": "Match"
+      }
+    },
+    "seasonScope": "Saison {season}"
   },
   "common": {
     "cancel": "Annuler",
@@ -1584,7 +1873,8 @@
       "manualHint": "Saisir une fiche joueur",
       "import": "Importer depuis ClubCorner",
       "importHint": "Depuis un CSV exporté"
-    }
+    },
+    "seasonScope": "Saison {season}"
   },
   "playerMe": {
     "title": "Ma fiche",
@@ -1903,5 +2193,37 @@
         "desc": "Points forts, points à améliorer, appréciation et signatures."
       }
     ]
+  },
+  "season": {
+    "label": "Saison"
+  },
+  "seasonImport": {
+    "button": "Importer depuis une saison précédente",
+    "title": "Importer depuis une saison",
+    "subtitle": "Recrée la structure choisie dans la saison {season}. La saison source n'est pas modifiée.",
+    "sourceLabel": "Saison source",
+    "teamsLabel": "Équipes à importer",
+    "selectAll": "Tout sélectionner",
+    "selectNone": "Tout désélectionner",
+    "noTeams": "Aucune équipe dans cette saison.",
+    "includeLabel": "Éléments à importer",
+    "includeTeams": "Équipes",
+    "includeTeamsHint": "Rend les équipes sélectionnées visibles dans la saison active.",
+    "includeRosters": "Effectifs",
+    "includeRostersHint": "Recopie les affectations joueurs → équipes.",
+    "includePeriodization": "Périodisation",
+    "includePeriodizationHint": "Recopie les réglages de rythme (jours d'entraînement, schéma MD). Pas les matchs.",
+    "cancel": "Annuler",
+    "submit": "Importer",
+    "importing": "Import…",
+    "success": "Importé : {teams} équipe(s), {rosters} affectation(s), {periodization} réglage(s).",
+    "err": {
+      "no_team": "Sélectionne au moins une équipe.",
+      "invalid_season": "Saison invalide.",
+      "same_season": "La saison source doit différer de la saison active.",
+      "unauthenticated": "Tu dois être connecté.",
+      "no_membership": "Aucun club sélectionné.",
+      "db_error": "Erreur lors de l'import. Réessaie."
+    }
   }
 }

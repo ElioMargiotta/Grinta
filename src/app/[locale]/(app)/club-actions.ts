@@ -3,6 +3,18 @@
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 import { setCurrentClubId } from "@/lib/club/context";
+import { setCurrentSeason } from "@/lib/club/season";
+
+const SEASON_RE = /^\d{4}\/\d{2}$/;
+
+/** Mémorise la saison active (millésime YYYY/YY) et rafraîchit toutes les vues. */
+export async function switchSeasonAction(formData: FormData) {
+  const season = String(formData.get("season") ?? "");
+  if (!SEASON_RE.test(season)) return { error: "Saison invalide." };
+  await setCurrentSeason(season);
+  revalidatePath("/", "layout");
+  return { ok: true as const };
+}
 
 export async function switchClubAction(formData: FormData) {
   const clubId = String(formData.get("clubId") ?? "");

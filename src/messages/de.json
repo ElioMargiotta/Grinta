@@ -575,13 +575,38 @@
       "urlHint": "Füge den Kalenderlink deines Verbands ein. webcal:// ist ebenfalls möglich.",
       "saveAndSync": "Speichern und synchronisieren",
       "updateAndSync": "Aktualisieren und neu synchronisieren",
+      "connectedCalendar": "Kalender verbunden",
+      "changeUrl": "Link ändern",
+      "cancelUrlEdit": "Abbrechen",
+      "frameWarning": "{n, plural, one {1 importiertes Datum liegt ausserhalb des Rahmens dieser Runde. Behalte die Daten der aktuellen Runde und wähle, was mit dem Datum ausserhalb passieren soll.} other {# importierte Daten liegen ausserhalb des Rahmens dieser Runde. Behalte die Daten der aktuellen Runde und wähle, was mit den Daten ausserhalb passieren soll.}}",
+      "deleteOutOfFrame": "Auf dieser Runde bleiben und löschen",
+      "deleteOutOfFrameConfirm": "Importierte Daten ausserhalb dieses Rahmens löschen? Daten innerhalb der aktuellen Runde bleiben erhalten.",
+      "deletedOutOfFrame": "{n, plural, one {1 Datum ausserhalb gelöscht.} other {# Daten ausserhalb gelöscht.}}",
+      "switchFrame": {
+        "first_round": "Zur 1. Runde wechseln",
+        "second_round": "Zur 2. Runde wechseln",
+        "full": "Ganze Saison planen"
+      },
       "syncNow": "Jetzt synchronisieren",
       "syncing": "Synchronisiere…",
       "uploadFile": ".ics-Datei hochladen",
+      "addCalendar": "Kalender hinzufügen",
+      "autoRouteHint": "Füge den ICS-Link deines Verbands ein: Er wird anhand der Spieldaten automatisch der richtigen Runde zugeordnet.",
+      "importedOk": "Kalender importiert",
+      "icsLinks": "ICS-Links",
       "disconnect": "Abo entfernen",
-      "disconnectConfirm": "Abo entfernen? Bereits importierte Spiele bleiben erhalten.",
+      "disconnectConfirm": "Diesen Link und seine kommenden Spiele entfernen? Bereits gespielte und manuelle Spiele bleiben erhalten.",
       "matchesTitle": "{n, plural, =0 {Keine Spiele importiert} one {1 Spiel importiert} other {# Spiele importiert}}",
       "matchesEmpty": "Noch keine Spiele. Gib eine URL ein oder lade eine .ics-Datei hoch.",
+      "historyShow": "Verlauf ({n})",
+      "historyHide": "Verlauf ausblenden",
+      "historyHint": "Gespielte Spiele, vom Kalender gelöst und hier aufbewahrt.",
+      "historyEmpty": "Noch keine gespielten Spiele.",
+      "slot": {
+        "first_round": "1. Runde",
+        "second_round": "2. Runde",
+        "full": "Ganze Saison"
+      },
       "syncedCount": "{n, plural, one {1 Spiel synchronisiert.} other {# Spiele synchronisiert.}}",
       "ok": "Synchronisation abgeschlossen.",
       "statusOk": "{n, plural, =0 {Keine Spiele} one {1 Spiel} other {# Spiele}}",
@@ -600,8 +625,79 @@
         "fetch_timeout": "Kalender-Server antwortet nicht.",
         "fetch_too_large": "Kalenderdatei ist zu groß.",
         "db_error": "Speicherfehler. Bitte erneut versuchen."
+      },
+      "match": {
+        "add": "Spiel hinzufügen",
+        "edit": "Bearbeiten",
+        "create": "Spiel erstellen",
+        "save": "Speichern",
+        "cancel": "Abbrechen",
+        "saving": "Speichern…",
+        "date": "Datum",
+        "time": "Zeit",
+        "opponent": "Gegner",
+        "opponentPlaceholder": "Name des gegnerischen Teams",
+        "homeAway": "Heim / Auswärts",
+        "homeAwayUnset": "Nicht festgelegt",
+        "home": "Heim",
+        "away": "Auswärts",
+        "competition": "Wettbewerb",
+        "location": "Ort",
+        "kind": "Typ",
+        "isAnchor": "Ankerspiel",
+        "isAnchorHint": "Strukturiert die Saison (erzeugt einen Mikrozyklus).",
+        "notAnchor": "Ausserhalb der Periodisierung",
+        "manual": "Manuell",
+        "icsHint": "Aus dem offiziellen Kalender importiertes Spiel: nur Typ und Ankerung sind hier editierbar.",
+        "deleteConfirm": "Dieses Spiel löschen?",
+        "kindOption": {
+          "league": "Meisterschaft",
+          "cup": "Cup",
+          "friendly": "Testspiel",
+          "tournament": "Turnier",
+          "break": "Pause"
+        },
+        "err": {
+          "dateRequired": "Datum ist erforderlich.",
+          "invalid_date": "Ungültiges Datum.",
+          "invalid_input": "Ungültige Eingabe.",
+          "not_manual": "Nur manuelle Spiele können gelöscht werden.",
+          "match_not_found": "Spiel nicht gefunden.",
+          "forbidden": "Keine Berechtigung.",
+          "db_error": "Speicherfehler. Versuche es erneut."
+        },
+        "autoTourHint": "Das Spiel wird anhand seines Datums automatisch der richtigen Runde zugeordnet — unabhängig von der angezeigten Runde.",
+        "delete": "Löschen"
+      },
+      "settings": {
+        "title": "Periodisierungs-Rhythmus",
+        "subtitle": "Trainingstage und Wochenschema. Wird genutzt, um den Plan rund um die Spiele zu erstellen.",
+        "trainingDays": "Trainingstage",
+        "scheme": "Wochenschema",
+        "save": "Speichern",
+        "saving": "Speichern…",
+        "saved": "Einstellungen gespeichert.",
+        "error": "Speicherfehler.",
+        "noDays": "Wähle mindestens einen Tag.",
+        "day": {
+          "1": "Mo",
+          "2": "Di",
+          "3": "Mi",
+          "4": "Do",
+          "5": "Fr",
+          "6": "Sa",
+          "7": "So"
+        },
+        "schemeOption": {
+          "standard": "1 Spiel / Woche",
+          "congested": "Englische Woche (2 Spiele)",
+          "custom": "Benutzerdefiniert"
+        }
       }
-    }
+    },
+    "seasonScope": "Saison {season}",
+    "planned": "Geplant",
+    "playersCount": "{n, plural, =0 {Keine Spieler} one {1 Spieler} other {# Spieler}}"
   },
   "exercises": {
     "title": "Übungsbibliothek",
@@ -661,7 +757,11 @@
     "noTeams": "Erstelle zuerst eine Mannschaft.",
     "view": {
       "tour": "Saisonansicht",
-      "weekly": "Wöchentlich"
+      "weekly": "Wöchentlich",
+      "season": "Saison",
+      "calendar": "Kalender",
+      "seasonSelect": "Saison",
+      "seasonArchived": "{season} (archiviert)"
     },
     "setup": {
       "title": "Richte deine Saison ein",
@@ -816,7 +916,196 @@
       "noExercises": "Keine Übungen verknüpft. Füge welche aus deiner Bibliothek hinzu.",
       "submit": "Einheit speichern",
       "delete": "Einheit löschen"
-    }
+    },
+    "season": {
+      "title": "Saisonplan",
+      "subtitleGenerated": "Aus deinen Spielen generierter Plan. Nach Kalenderänderungen neu generieren.",
+      "subtitleEmpty": "Generiere das Trainingsgerüst aus deinen Ankerspielen.",
+      "generate": "Plan generieren",
+      "regenerate": "Neu generieren",
+      "generating": "Generieren…",
+      "generated": "{micro} Wochen · {sessions} Einheiten generiert.",
+      "emptyNoMatchesTitle": "Keine Spiele",
+      "emptyNoMatchesHint": "Importiere deinen ICS-Kalender oder füge Spiele hinzu, um die Saison aufzubauen.",
+      "emptyNoAnchorsTitle": "Keine Ankerspiele",
+      "emptyNoAnchorsHint": "Markiere im Kalender mindestens ein Spiel als Anker, um den Plan zu generieren.",
+      "goToCalendar": "Kalender öffnen",
+      "noSessions": "Keine Einheit diese Woche.",
+      "notGeneratedYet": "Noch nicht generiert.",
+      "home": "Heim",
+      "away": "Auswärts",
+      "kind": {
+        "league": "Meisterschaft",
+        "cup": "Cup",
+        "friendly": "Testspiel",
+        "tournament": "Turnier",
+        "break": "Pause"
+      },
+      "err": {
+        "no_anchor_matches": "Keine Ankerspiele vorhanden.",
+        "team_not_found": "Team nicht gefunden.",
+        "unauthenticated": "Du musst angemeldet sein.",
+        "forbidden": "Keine Berechtigung.",
+        "db_error": "Generierungsfehler. Versuche es erneut."
+      },
+      "reprise": "Saisonstart",
+      "repriseHint": "Beginn der Vorbereitung. Editierbar.",
+      "overviewTitle": "Übersicht",
+      "seasonFallback": "Zu planende Saison",
+      "createPlanning": "Saison planen",
+      "editPlanning": "Planung bearbeiten",
+      "matchesMetric": "Spiele",
+      "sessionsMetric": "Einheiten",
+      "weeksMetric": "Wochen",
+      "seasonFilter": "Saison",
+      "tourFilter": "Runde",
+      "frame": "Rahmen",
+      "weeklyOverview": "Wochen",
+      "noWeeksForFilter": "Für diese Saison und Runde sind keine Wochen geplant.",
+      "noTheme": "Kein Thema festgelegt",
+      "matchFallback": "Spiel"
+    },
+    "wizard": {
+      "title": "Planungsassistent",
+      "subtitle": "Plane Runde, Daten, Rhythmus und Zyklen in einem Ablauf.",
+      "calendarTitle": "Kalender",
+      "calendarSubtitle": "Importiere oder synchronisiere die Spiele der ausgewählten Runde.",
+      "stepsLabel": "Saisonschritte",
+      "back": "Zurück",
+      "next": "Weiter",
+      "steps": {
+        "segment": "Basis",
+        "calendar": "Kalender",
+        "bounds": "Daten",
+        "rhythm": "Rhythmus",
+        "cycles": "Zyklen",
+        "plan": "Planung",
+        "summary": "Zusammenfassung"
+      },
+      "eyebrow": {
+        "segment": "Saison, Runde und Kalender",
+        "calendar": "Spiele und wichtige Daten",
+        "bounds": "Start und Ende",
+        "rhythm": "Typische Woche",
+        "cycles": "Themen nach Block",
+        "plan": "Daten, Slots und Zyklen",
+        "summary": "Prüfung"
+      },
+      "scopeTitle": "Planungsrahmen",
+      "segment": {
+        "first_round": "1. Runde",
+        "second_round": "2. Runde",
+        "full": "Ganze Saison"
+      },
+      "segmentHint": {
+        "first_round": "Nur die erste Hälfte planen.",
+        "second_round": "Die Rückrunde ergänzen oder überarbeiten.",
+        "full": "Die ganze Meisterschaft planen."
+      },
+      "mode": "Modus",
+      "modeOption": {
+        "replace": "Diese Daten ersetzen",
+        "merge": "Mit Bestehendem zusammenführen"
+      },
+      "planName": "Planname",
+      "planNamePlaceholder": "Herbst 2026",
+      "seasonLabel": "Saison",
+      "seasonLabelPlaceholder": "2026/27",
+      "tourLabel": "Runde",
+      "boundsTitle": "Strukturierende Daten",
+      "seasonStart": "Wiederaufnahme",
+      "seasonEnd": "Ende der Runde",
+      "prepTitle": "Vorbereitungsphase",
+      "prepWeeks": "Vorbereitungswochen",
+      "prepWeeksHint": "Aus Wiederaufnahme und erstem Ankerspiel berechnet.",
+      "repriseOn": "Beginn am {date}",
+      "prepTheme": "Thema (Spielphase)",
+      "rhythmTitle": "Standard-Trainingszeiten",
+      "weekday": "Tag",
+      "weekdayOption": {
+        "1": "Montag",
+        "2": "Dienstag",
+        "3": "Mittwoch",
+        "4": "Donnerstag",
+        "5": "Freitag",
+        "6": "Samstag",
+        "7": "Sonntag"
+      },
+      "slotTime": "Zeit",
+      "duration": "Dauer (Min.)",
+      "addSlot": "Zeit hinzufügen",
+      "removeSlot": "Zeit entfernen",
+      "cyclesTitle": "Arbeitszyklen",
+      "mesosTitle": "Mesozyklen (Zyklen)",
+      "coverage": "{defined} / {total} Wettkampfwochen",
+      "definedWeeks": "{n} Wochen definiert",
+      "cycleName": "Zyklusname",
+      "cyclePlaceholder": "Zyklus {n}",
+      "weeks": "Wochen",
+      "theme": "Thema",
+      "removeCycle": "Zyklus entfernen",
+      "addCycle": "Zyklus hinzufügen",
+      "noTheme": "Kein Thema",
+      "summaryTitle": "Zusammenfassung vor der Generierung",
+      "summarySeason": "Saison",
+      "summarySegment": "Runde",
+      "summaryMode": "Modus",
+      "summaryDates": "Daten",
+      "summaryAnchors": "Anker",
+      "summaryWeeks": "Wochen",
+      "summarySessions": "Geplante Einheiten",
+      "readyTitle": "Bereit zum Generieren",
+      "readyText": "Die Generierung schreibt Wochen und Einheiten in dasselbe Modell wie die Wochenansicht.",
+      "generated": "{micro} Wochen · {sessions} Einheiten generiert.",
+      "generating": "Generieren…",
+      "regenerate": "Neu generieren",
+      "generate": "Plan generieren",
+      "noMatchesForTour": "Keine offiziellen Spiele für {tour} — der Kalender ist noch nicht aktuell, oder es ist die falsche Runde.",
+      "err": {
+        "no_anchor_matches": "Keine Ankerspiele vorhanden.",
+        "team_not_found": "Team nicht gefunden.",
+        "unauthenticated": "Du musst angemeldet sein.",
+        "forbidden": "Keine Berechtigung.",
+        "db_error": "Generierungsfehler. Versuche es erneut."
+      },
+      "calPrev": "Vorheriger Monat",
+      "calNext": "Nächster Monat",
+      "calToday": "Heute",
+      "calPickHint": "Klicke auf einen Tag, um die Wiederaufnahme festzulegen.",
+      "calAnchor": "Offizielles Spiel",
+      "calMatch": "Spiel",
+      "calMonthMatches": "Spiele in diesem Monat ({n})",
+      "calNoMatchMonth": "Kein Spiel in diesem Monat.",
+      "calSelected": "Gewähltes Datum",
+      "timeHours": "Stunden",
+      "timeMinutes": "Minuten",
+      "gridTitle": "Übersicht",
+      "gridEmpty": "Kein Ankerspiel in dieser Runde — füge Spiele hinzu, um die Wochen zu sehen.",
+      "weekN": "{n} Wo.",
+      "noMatchWeek": "Kein Spiel",
+      "trainingsCount": "{n, plural, =0 {Kein Training} one {1 Training} other {# Trainings}}",
+      "statsTitle": "Statistik",
+      "statWeeks": "Wochen",
+      "statPrep": "Vorb.",
+      "statComp": "Wettkampf",
+      "statMatches": "Spiele",
+      "statSessions": "Einheiten",
+      "phase": {
+        "preparation": "Vorb.",
+        "competition": "Wettk.",
+        "transition": "Übergang"
+      },
+      "weekBadge": "W{n}",
+      "col": {
+        "week": "Wo.",
+        "date": "Datum",
+        "phase": "Phase",
+        "theme": "Thema",
+        "trainings": "Trainings",
+        "match": "Spiel"
+      }
+    },
+    "seasonScope": "Saison {season}"
   },
   "common": {
     "cancel": "Abbrechen",
@@ -1579,7 +1868,8 @@
       "manualHint": "Spielerprofil ausfüllen",
       "import": "Aus ClubCorner importieren",
       "importHint": "Aus exportierter CSV"
-    }
+    },
+    "seasonScope": "Saison {season}"
   },
   "playerMe": {
     "title": "Mein Profil",
@@ -1898,5 +2188,37 @@
         "desc": "Stärken, Entwicklungsfelder, Beurteilung und Unterschriften."
       }
     ]
+  },
+  "season": {
+    "label": "Saison"
+  },
+  "seasonImport": {
+    "button": "Aus einer früheren Saison importieren",
+    "title": "Aus einer Saison importieren",
+    "subtitle": "Erstellt die gewählte Struktur in Saison {season} neu. Die Quellsaison bleibt unverändert.",
+    "sourceLabel": "Quellsaison",
+    "teamsLabel": "Zu importierende Teams",
+    "selectAll": "Alle auswählen",
+    "selectNone": "Alle abwählen",
+    "noTeams": "Kein Team in dieser Saison.",
+    "includeLabel": "Was importieren",
+    "includeTeams": "Teams",
+    "includeTeamsHint": "Macht die gewählten Teams in der aktiven Saison sichtbar.",
+    "includeRosters": "Kader",
+    "includeRostersHint": "Kopiert die Zuordnungen Spieler → Team.",
+    "includePeriodization": "Periodisierung",
+    "includePeriodizationHint": "Kopiert die Rhythmus-Einstellungen (Trainingstage, MD-Schema). Nicht die Spiele.",
+    "cancel": "Abbrechen",
+    "submit": "Importieren",
+    "importing": "Import…",
+    "success": "Importiert: {teams} Team(s), {rosters} Zuordnung(en), {periodization} Einstellung(en).",
+    "err": {
+      "no_team": "Wähle mindestens ein Team.",
+      "invalid_season": "Ungültige Saison.",
+      "same_season": "Die Quellsaison muss sich von der aktiven unterscheiden.",
+      "unauthenticated": "Du musst angemeldet sein.",
+      "no_membership": "Kein Club ausgewählt.",
+      "db_error": "Import fehlgeschlagen. Versuche es erneut."
+    }
   }
 }

@@ -4,6 +4,7 @@ import { Card } from "@/components/ui/Card";
 import { Link } from "@/i18n/navigation";
 import { ClubPlayerForm } from "@/components/contingent/ClubPlayerForm";
 import { requireMembership } from "@/lib/auth/getUser";
+import { resolveCurrentSeasonLabel } from "@/lib/club/season";
 import { listClubTeams } from "@/lib/contingent/teams";
 
 export default async function NewContingentPlayerPage({
@@ -18,7 +19,10 @@ export default async function NewContingentPlayerPage({
   setRequestLocale(locale);
   const { membership } = await requireMembership(locale);
   const t = await getTranslations("contingent");
-  const teams = await listClubTeams(membership.club_id);
+  const teams = await listClubTeams(
+    membership.club_id,
+    await resolveCurrentSeasonLabel(),
+  );
   // ?teamId=... vient typiquement du bouton "Ajouter un joueur" depuis la
   // fiche d'une équipe (#39) — on pré-coche l'équipe correspondante.
   const preselected =

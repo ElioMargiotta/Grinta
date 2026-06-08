@@ -2,7 +2,9 @@
 
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
-import { syncTeamCalendar } from "@/lib/calendar/sync";
+import { probeIcsUrl, syncTeamCalendar } from "@/lib/calendar/sync";
+
+type SlotValue = "first_round" | "second_round" | "full";
 
 type ActionResult = {
   ok?: true;
@@ -45,37 +47,60 @@ async function loadTeamAccess(
 }
 
 /**
- * Enregistre / met à jour l'URL d'abonnement ICS d'une équipe, puis lance
- * tout de suite une première synchro. La row `team_calendar_subscriptions`
- * est créée via upsert sur `team_id` (PK) — RLS check passé par le calque
- * staff full/extended/team + club actif.
+ * Ajoute un calendrier ICS (ou modifie l'URL d'un lien existant via
+ * `subscriptionId`), puis lance une première synchro. Le tour (slot) est
+ * auto-détecté depuis les dates du flux — aucune question posée. Plusieurs liens
+ * par tour sont permis (ajout silencieux). Upsert sur `(team_id, ics_url)` ;
+ * RLS = staff full/extended/team + club actif.
  */
 export async function saveCalendarUrlAction(formData: FormData): Promise<ActionResult> {
   const teamId = String(formData.get("teamId") ?? "");
   const url = String(formData.get("url") ?? "").trim();
+  const subscriptionId = String(formData.get("subscriptionId") ?? "");
   if (!URL_RE.test(url)) return { error: "url_invalid" };
 
   const access = await loadTeamAccess(teamId);
   if (!access.ok) return { error: access.error };
 
   const { supabase, clubId } = access;
-  const { error: upsertErr } = await supabase
-    .from("team_calendar_subscriptions")
-    .upsert(
-      {
-        team_id: teamId,
-        club_id: clubId,
-        ics_url: url,
-        last_status: "pending",
-        last_error: null,
-      },
-      { onConflict: "team_id" },
-    );
-  if (upsertErr) {
-    return upsertErr.message.toLowerCase().includes("permission") ||
-      upsertErr.message.toLowerCase().includes("row-level")
-      ? { error: "forbidden" }
-      : { error: "db_error" };
+
+  // Auto-classement : on lit les dates du flux pour le ranger tout seul dans le
+  // bon tour. Le texte est réutilisé pour la synchro (pas de second fetch).
+  const probe = await probeIcsUrl(url);
+  if (!probe.ok) return mapSyncError(probe.errorCode);
+  const slot: SlotValue = probe.slot;
+
+  // Modification d'un lien existant : on met à jour SA row (même id, donc ses
+  // matchs restent rattachés). Sinon : nouvel abonnement (upsert sur l'URL).
+  let id: string;
+  if (subscriptionId) {
+    const { data, error } = await supabase
+      .from("team_calendar_subscriptions")
+      .update({ ics_url: url, slot, last_status: "pending", last_error: null })
+      .eq("team_id", teamId)
+      .eq("id", subscriptionId)
+      .select("id")
+      .maybeSingle();
+    if (error || !data) return mapWriteError(error?.message);
+    id = data.id as string;
+  } else {
+    const { data, error } = await supabase
+      .from("team_calendar_subscriptions")
+      .upsert(
+        {
+          team_id: teamId,
+          club_id: clubId,
+          slot,
+          ics_url: url,
+          last_status: "pending",
+          last_error: null,
+        },
+        { onConflict: "team_id,ics_url" },
+      )
+      .select("id")
+      .single();
+    if (error || !data) return mapWriteError(error?.message);
+    id = data.id as string;
   }
 
   const result = await syncTeamCalendar({
@@ -83,10 +108,13 @@ export async function saveCalendarUrlAction(formData: FormData): Promise<ActionR
     teamId,
     clubId,
     source: "subscription",
+    slot,
+    subscriptionId: id,
     icsUrl: url,
+    icsText: probe.icsText,
   });
 
-  revalidatePath(`/[locale]/teams/${teamId}`, "page");
+  revalidatePath(`/[locale]/planner/${teamId}`, "page");
 
   if (!result.ok) {
     return mapSyncError(result.errorCode);
@@ -95,20 +123,22 @@ export async function saveCalendarUrlAction(formData: FormData): Promise<ActionR
 }
 
 /**
- * Re-synchronise une équipe déjà abonnée. Pas de modif de l'URL, on relit
- * celle déjà en base et on rejoue le pipeline. Sert au bouton "Synchroniser"
- * de la page équipe.
+ * Re-synchronise un abonnement précis (par `subscriptionId`). On relit l'URL en
+ * base et on rejoue le pipeline. Sert au bouton « Synchroniser » d'une ligne de
+ * calendrier connecté.
  */
 export async function syncCalendarNowAction(formData: FormData): Promise<ActionResult> {
   const teamId = String(formData.get("teamId") ?? "");
+  const subscriptionId = String(formData.get("subscriptionId") ?? "");
   const access = await loadTeamAccess(teamId);
   if (!access.ok) return { error: access.error };
 
   const { supabase, clubId } = access;
   const { data: sub } = await supabase
     .from("team_calendar_subscriptions")
-    .select("ics_url")
+    .select("ics_url, slot")
     .eq("team_id", teamId)
+    .eq("id", subscriptionId)
     .maybeSingle();
   if (!sub?.ics_url) return { error: "url_invalid" };
 
@@ -117,10 +147,12 @@ export async function syncCalendarNowAction(formData: FormData): Promise<ActionR
     teamId,
     clubId,
     source: "subscription",
-    icsUrl: sub.ics_url,
+    slot: sub.slot as SlotValue,
+    subscriptionId,
+    icsUrl: sub.ics_url as string,
   });
 
-  revalidatePath(`/[locale]/teams/${teamId}`, "page");
+  revalidatePath(`/[locale]/planner/${teamId}`, "page");
 
   if (!result.ok) return mapSyncError(result.errorCode);
   return { ok: true, upserted: result.upserted };
@@ -149,30 +181,53 @@ export async function uploadCalendarFileAction(formData: FormData): Promise<Acti
     icsText: text,
   });
 
-  revalidatePath(`/[locale]/teams/${teamId}`, "page");
+  revalidatePath(`/[locale]/planner/${teamId}`, "page");
 
   if (!result.ok) return mapSyncError(result.errorCode);
   return { ok: true, upserted: result.upserted };
 }
 
 /**
- * Supprime l'abonnement (mais pas les matchs déjà importés — on les garde
- * pour préserver l'historique et les liens à venir). L'utilisateur peut
- * ensuite ré-abonner avec une autre URL ou tout purger via une future UI.
+ * Supprime un lien ICS ET ses matchs À VENIR. On conserve : les matchs déjà
+ * joués (archived = true, pour l'historique et les liens éval/présences) et les
+ * matchs manuels. L'ordre compte : on retire d'abord les matchs (filtrés par
+ * `subscription_id`), puis l'abonnement.
  */
 export async function disconnectCalendarAction(formData: FormData): Promise<ActionResult> {
   const teamId = String(formData.get("teamId") ?? "");
+  const subscriptionId = String(formData.get("subscriptionId") ?? "");
   const access = await loadTeamAccess(teamId);
   if (!access.ok) return { error: access.error };
 
-  const { error } = await access.supabase
+  const { supabase } = access;
+
+  // Matchs à venir de ce lien (jamais les joués/archivés ni le manuel).
+  const { error: matchErr } = await supabase
+    .from("team_matches")
+    .delete()
+    .eq("team_id", teamId)
+    .eq("subscription_id", subscriptionId)
+    .eq("archived", false)
+    .neq("source", "manual");
+  if (matchErr) return { error: "db_error" };
+
+  const { error } = await supabase
     .from("team_calendar_subscriptions")
     .delete()
-    .eq("team_id", teamId);
+    .eq("team_id", teamId)
+    .eq("id", subscriptionId);
   if (error) return { error: "db_error" };
 
-  revalidatePath(`/[locale]/teams/${teamId}`, "page");
+  revalidatePath(`/[locale]/planner/${teamId}`, "page");
   return { ok: true };
+}
+
+/** Mappe une erreur d'écriture subscription : RLS → forbidden, sinon db_error. */
+function mapWriteError(message: string | undefined): ActionResult {
+  const m = (message ?? "").toLowerCase();
+  return m.includes("permission") || m.includes("row-level")
+    ? { error: "forbidden" }
+    : { error: "db_error" };
 }
 
 function mapSyncError(code: string | undefined): ActionResult {
