@@ -4,9 +4,9 @@ import { CalendarDays, Camera, ChevronRight, Shirt, Users } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { Link } from "@/i18n/navigation";
 import { requireUser } from "@/lib/auth/getUser";
+import { resolveCurrentSeasonLabel } from "@/lib/club/season";
 import { TeamEditForm } from "@/components/teams/TeamEditForm";
 import { DeleteTeamSection } from "@/components/teams/DeleteTeamSection";
-import { TeamCalendarSection } from "@/components/teams/TeamCalendarSection";
 
 export default async function TeamPage({
   params,
@@ -27,31 +27,14 @@ export default async function TeamPage({
 
   if (!team) notFound();
 
-  // L'effectif "actuel" passe désormais par player_team_assignments (#39).
-  // L'ancienne colonne players.team_id est dépréciée depuis #35 et n'est plus
-  // renseignée pour les joueurs créés au niveau club.
+  // Effectif de la SAISON ACTIVE via player_team_assignments (#39), estampillé
+  // par saison. L'ancienne colonne players.team_id est dépréciée depuis #35.
+  const season = await resolveCurrentSeasonLabel();
   const { count: playerCount } = await supabase
     .from("player_team_assignments")
     .select("id", { head: true, count: "exact" })
     .eq("team_id", teamId)
-    .is("season", null);
-
-  const [subscriptionRes, matchesRes] = await Promise.all([
-    supabase
-      .from("team_calendar_subscriptions")
-      .select(
-        "ics_url, last_synced_at, last_status, last_error, event_count",
-      )
-      .eq("team_id", teamId)
-      .maybeSingle(),
-    supabase
-      .from("team_matches")
-      .select("id, starts_at, ends_at, summary, location, match_url")
-      .eq("team_id", teamId)
-      .order("starts_at", { ascending: true }),
-  ]);
-  const subscription = subscriptionRes.data ?? null;
-  const matches = matchesRes.data ?? [];
+    .eq("season", season);
 
   return (
     <div className="mx-auto flex w-full max-w-6xl flex-col gap-8">
@@ -167,12 +150,6 @@ export default async function TeamPage({
         </div>
         <TeamEditForm team={team} />
       </section>
-
-      <TeamCalendarSection
-        teamId={team.id}
-        subscription={subscription}
-        matches={matches}
-      />
 
       <DeleteTeamSection teamId={team.id} teamName={team.name} />
     </div>

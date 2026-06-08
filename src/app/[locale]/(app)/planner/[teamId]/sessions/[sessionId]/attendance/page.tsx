@@ -8,6 +8,7 @@ import {
   type RosterEntry,
 } from "@/components/planner/AttendanceRoster";
 import { requireUser } from "@/lib/auth/getUser";
+import { currentSeasonLabel } from "@/lib/planner/seasons";
 
 type AssignmentRow = {
   player_id: string;
@@ -62,6 +63,9 @@ export default async function SessionAttendancePage({
 
   if (!session || !team || session.team_id !== teamId) notFound();
 
+  // Effectif de la saison de la SÉANCE (déduite de sa date), pour que la liste
+  // de présence reste cohérente même hors saison active.
+  const sessionSeason = currentSeasonLabel(new Date(session.date));
   const [{ data: assignmentsRaw }, { data: attendancesRaw }] = await Promise.all([
     supabase
       .from("player_team_assignments")
@@ -70,7 +74,7 @@ export default async function SessionAttendancePage({
          players (id, first_name, last_name, jersey_number)`,
       )
       .eq("team_id", teamId)
-      .is("season", null),
+      .eq("season", sessionSeason),
     supabase
       .from("session_attendances")
       .select("player_id, announced_status, announced_reason, announced_at, actual_status")
