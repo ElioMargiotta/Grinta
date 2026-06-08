@@ -33,7 +33,7 @@ export async function GET(req: Request): Promise<NextResponse> {
   const supabase = createServiceClient();
   const { data: subs, error } = await supabase
     .from("team_calendar_subscriptions")
-    .select("team_id, club_id, ics_url");
+    .select("id, team_id, club_id, slot, ics_url");
   if (error) {
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
@@ -46,6 +46,8 @@ export async function GET(req: Request): Promise<NextResponse> {
       teamId: sub.team_id as string,
       clubId: sub.club_id as string,
       source: "subscription",
+      slot: sub.slot as "first_round" | "second_round" | "full",
+      subscriptionId: sub.id as string,
       icsUrl: sub.ics_url as string,
     });
     if (r.ok) okCount += 1;
