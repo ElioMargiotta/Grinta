@@ -552,7 +552,7 @@
     "deleteSection": {
       "title": "Delete team",
       "description": "The team is archived immediately and disappears from lists, but its data (players, sessions, planning) remains accessible if you restore it later.",
-      "billing": "Billing: you pay for this team until the end of the current billing cycle. Next month, it disappears from the calculation (12 CHF/team).",
+      "billing": "Billing: you pay for this team until the end of the current billing cycle. Next month, it disappears from the calculation (25 CHF/team).",
       "deleteButton": "Delete team",
       "confirmLabel": "Type the name <strong>{name}</strong> to confirm:",
       "confirmButton": "Confirm deletion",
@@ -905,7 +905,10 @@
       "delete": "Delete",
       "deleteSessionAria": "Delete session",
       "duplicate": "Duplicate",
-      "duplicateSessionAria": "Duplicate session"
+      "duplicateSessionAria": "Duplicate session",
+      "clearSeason": "Clear season",
+      "clearConfirm": "Clear all generated planning for this season? Manually added sessions are kept.",
+      "clearing": "Clearing…"
     },
     "session": {
       "newTitle": "New session",
@@ -969,7 +972,10 @@
       "weeklyOverview": "Weeks",
       "noWeeksForFilter": "No weeks planned for this season and round.",
       "noTheme": "No theme set",
-      "matchFallback": "Match"
+      "matchFallback": "Match",
+      "clearSeason": "Clear season",
+      "clearConfirm": "Clear all generated planning for this season? Manually added sessions are kept.",
+      "clearing": "Clearing…"
     },
     "wizard": {
       "title": "Planning assistant",
@@ -1109,7 +1115,11 @@
         "theme": "Theme",
         "trainings": "Trainings",
         "match": "Match"
-      }
+      },
+      "saveDates": "Save dates",
+      "savingDates": "Saving…",
+      "datesSaved": "Dates saved",
+      "outOfSeasonRange": "Stays within the round"
     },
     "seasonScope": "Season {season}"
   },
@@ -1477,7 +1487,7 @@
     "clubPage": {
       "title": "New club",
       "description": "A club groups your teams, coaches and billing. You can invite members as soon as it's created. You can belong to multiple clubs.",
-      "pricing": "14-day free trial · 12 CHF/team/month thereafter · No card required to get started."
+      "pricing": "14-day free trial · 25 CHF/team/month thereafter · No card required to get started."
     },
     "invitations": {
       "invitedTo": "You have been invited to <strong>{club}</strong>",

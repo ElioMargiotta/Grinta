@@ -546,7 +546,7 @@
     "deleteSection": {
       "title": "Team löschen",
       "description": "Das Team wird sofort archiviert und verschwindet aus den Listen, aber seine Daten (Spieler, Einheiten, Planung) bleiben einsehbar, wenn du es später wiederherstellst.",
-      "billing": "Abrechnung: Du zahlst dieses Team bis zum Ende des aktuellen Abrechnungszeitraums. Nächsten Monat verschwindet es aus der Berechnung (12 CHF/Team).",
+      "billing": "Abrechnung: Du zahlst dieses Team bis zum Ende des aktuellen Abrechnungszeitraums. Nächsten Monat verschwindet es aus der Berechnung (25 CHF/Team).",
       "deleteButton": "Team löschen",
       "confirmLabel": "Gib den Namen <strong>{name}</strong> ein, um zu bestätigen:",
       "confirmButton": "Löschung bestätigen",
@@ -899,7 +899,10 @@
       "delete": "Löschen",
       "deleteSessionAria": "Einheit löschen",
       "duplicate": "Duplizieren",
-      "duplicateSessionAria": "Einheit duplizieren"
+      "duplicateSessionAria": "Einheit duplizieren",
+      "clearSeason": "Saison löschen",
+      "clearConfirm": "Die gesamte generierte Planung dieser Saison löschen? Manuell hinzugefügte Einheiten bleiben erhalten.",
+      "clearing": "Wird gelöscht…"
     },
     "session": {
       "newTitle": "Neue Einheit",
@@ -963,7 +966,10 @@
       "weeklyOverview": "Wochen",
       "noWeeksForFilter": "Für diese Saison und Runde sind keine Wochen geplant.",
       "noTheme": "Kein Thema festgelegt",
-      "matchFallback": "Spiel"
+      "matchFallback": "Spiel",
+      "clearSeason": "Saison löschen",
+      "clearConfirm": "Die gesamte generierte Planung dieser Saison löschen? Manuell hinzugefügte Einheiten bleiben erhalten.",
+      "clearing": "Wird gelöscht…"
     },
     "wizard": {
       "title": "Planungsassistent",
@@ -1103,7 +1109,11 @@
         "theme": "Thema",
         "trainings": "Trainings",
         "match": "Spiel"
-      }
+      },
+      "saveDates": "Daten speichern",
+      "savingDates": "Wird gespeichert…",
+      "datesSaved": "Daten gespeichert",
+      "outOfSeasonRange": "Bleibt im Rahmen der Runde"
     },
     "seasonScope": "Saison {season}"
   },
@@ -1471,7 +1481,7 @@
     "clubPage": {
       "title": "Neuer Club",
       "description": "Ein Club fasst deine Teams, Trainer und Abrechnung zusammen. Du kannst Mitglieder einladen, sobald er erstellt ist. Du kannst mehreren Clubs angehören.",
-      "pricing": "14 Tage kostenlos testen · danach 12 CHF/Team/Monat · Keine Karte zum Start erforderlich."
+      "pricing": "14 Tage kostenlos testen · danach 25CHF/Team/Monat · Keine Karte zum Start erforderlich."
     },
     "invitations": {
       "invitedTo": "Du wurdest zu {club} eingeladen",

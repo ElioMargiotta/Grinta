@@ -219,9 +219,18 @@ export function planSeason(
   const firstMatchIdx = diffWeeks(repriseMonday, firstMatchMonday);
 
   // Nombre total de semaines.
-  const weeksCount = structure
+  let weeksCount = structure
     ? structPrep! + structure.mesos.reduce((s, m) => s + Math.max(0, Math.round(m.weeks)), 0)
     : diffWeeks(repriseMonday, lastMatchMonday) + 1;
+
+  // Bornage sur la fin de saison/tour : les semaines générées ne doivent JAMAIS
+  // déborder de `seasonEnd` (sinon elles tombent dans le tour suivant — bug des
+  // bandes « tour 2, tour 1, tour 2 »). En mode auto, `weeksCount` respecte déjà
+  // `lastMatchMonday` ; en mode structure (Σ mésocycles), on tronque.
+  if (opts.seasonEnd) {
+    const maxWeeks = diffWeeks(repriseMonday, lastMatchMonday) + 1;
+    if (maxWeeks >= 1 && weeksCount > maxWeeks) weeksCount = maxWeeks;
+  }
 
   // Affectation semaine → phase (kind/name/theme), selon le mode.
   // perWeekPhase[i] = { kind, name, theme, phaseKey } ; phaseKey regroupe en blocs.

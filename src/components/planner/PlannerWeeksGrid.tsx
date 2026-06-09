@@ -17,6 +17,7 @@ import {
   duplicatePlannerSessionAction,
   movePlannerSessionAction,
 } from "@/app/[locale]/(app)/planner/actions";
+import { clearSeasonAction } from "@/app/[locale]/(app)/planner/[teamId]/season-actions";
 import type { FocusFamily } from "@/components/sheet/types";
 
 const KNOWN_THEMES: ThemeKey[] = [
@@ -295,6 +296,7 @@ function clampMonth(
 
 export function PlannerWeeksGrid({
   teamId,
+  season,
   sessions,
   macrocycles = [],
   matches = [],
@@ -302,6 +304,8 @@ export function PlannerWeeksGrid({
   seasonEnd,
 }: {
   teamId: string;
+  /** Millésime actif `YYYY/YY` — scope de l'effacement de saison. */
+  season?: string;
   sessions: GridSession[];
   macrocycles?: Macrocycle[];
   matches?: WeekMatch[];
@@ -318,6 +322,20 @@ export function PlannerWeeksGrid({
   const today = ymd(new Date());
   const [isCreatingSlot, startSlotCreate] = useTransition();
   const [isSessionActionPending, startSessionAction] = useTransition();
+  const [isClearing, startClear] = useTransition();
+
+  function clearSeason() {
+    if (isClearing || !season) return;
+    if (!window.confirm(t("clearConfirm"))) return;
+    const fd = new FormData();
+    fd.set("teamId", teamId);
+    fd.set("locale", locale);
+    fd.set("season", season);
+    startClear(async () => {
+      await clearSeasonAction(fd);
+      router.refresh();
+    });
+  }
   const [draggingSessionId, setDraggingSessionId] = useState<string | null>(null);
   const [copiedSessionId, setCopiedSessionId] = useState<string | null>(null);
 
@@ -1002,6 +1020,17 @@ export function PlannerWeeksGrid({
               </button>
             );
           })}
+          {macrocycles.length > 0 && season ? (
+            <button
+              type="button"
+              onClick={clearSeason}
+              disabled={isClearing}
+              className="ml-1 inline-flex h-8 items-center gap-1.5 rounded-lg border border-red-200 bg-white px-3 text-xs font-medium text-red-600 transition-all duration-150 hover:bg-red-50 active:scale-[0.98] disabled:opacity-60 dark:border-red-900/50 dark:bg-zinc-900 dark:text-red-400 dark:hover:bg-red-950/40"
+            >
+              <Trash2 className="h-3.5 w-3.5" />
+              {isClearing ? t("clearing") : t("clearSeason")}
+            </button>
+          ) : null}
         </div>
       </div>
 

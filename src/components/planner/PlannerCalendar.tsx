@@ -10,6 +10,7 @@ import {
   type SeasonMatch,
   type SeasonMicrocycle,
 } from "./PlannerSeasonView";
+import type { SeasonPlanRow } from "./PlannerSeasonWizard";
 import { seasonWindow } from "@/lib/planner/seasons";
 import type { FocusFamily } from "@/components/sheet/types";
 
@@ -57,6 +58,7 @@ export function PlannerCalendar({
   subscriptions,
   periodization,
   seasonMicrocycles,
+  seasonPlans = [],
 }: {
   teamId: string;
   view: PlannerView;
@@ -68,6 +70,7 @@ export function PlannerCalendar({
   subscriptions: Subscription[];
   periodization: Periodization | null;
   seasonMicrocycles: SeasonMicrocycle[];
+  seasonPlans?: SeasonPlanRow[];
 }) {
   const router = useRouter();
   const t = useTranslations("planner.view");
@@ -101,10 +104,12 @@ export function PlannerCalendar({
           subscriptions={subscriptions}
           periodization={periodization}
           seasonMicrocycles={seasonMicrocycles}
+          seasonPlans={seasonPlans}
         />
       ) : (
         <PlannerWeeksGrid
           teamId={teamId}
+          season={season}
           sessions={events.map((e) => ({
             id: e.id,
             title: e.title,
