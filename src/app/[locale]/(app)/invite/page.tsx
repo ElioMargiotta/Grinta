@@ -35,7 +35,7 @@ export default async function InviteLandingPage({
         </p>
       </div>
 
-      <div className="rounded-2xl border border-emerald-200 bg-emerald-50 p-4 text-sm text-emerald-800 dark:border-emerald-500/30 dark:bg-emerald-950/30 dark:text-emerald-200">
+      <div className="rounded-lg border border-emerald-200 bg-emerald-50 p-4 text-sm text-emerald-800 dark:border-emerald-500/30 dark:bg-emerald-950/30 dark:text-emerald-200">
         <div className="flex items-center gap-2 font-medium">
           <Mail className="h-4 w-4" />
           {t("recommendedFlow")}
@@ -45,7 +45,7 @@ export default async function InviteLandingPage({
         </p>
       </div>
 
-      <div className="rounded-2xl border border-zinc-200 bg-white p-6 shadow-sm dark:border-zinc-800 dark:bg-zinc-900">
+      <div className="rounded-lg border border-[var(--club-line)] bg-white p-6 dark:border-zinc-800 dark:bg-zinc-900">
         <div className="text-sm font-medium text-zinc-900 dark:text-zinc-100">
           {t("haveTokenTitle")}
         </div>

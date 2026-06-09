@@ -5,7 +5,7 @@ import { useLocale, useTranslations } from "next-intl";
 import { useRouter } from "@/i18n/navigation";
 import { Users, X } from "lucide-react";
 import { Button } from "@/components/ui/Button";
-import { Card } from "@/components/ui/Card";
+import { Section, SectionHeader } from "@/components/ui/Section";
 import { TeamMultiSelect } from "@/components/contingent/TeamMultiSelect";
 import {
   removePlayerFromTeamAction,
@@ -62,13 +62,8 @@ export function TeamAssignmentsBlock({
   };
 
   return (
-    <Card>
-      <div className="mb-4 flex items-center gap-2">
-        <Users className="h-4 w-4 text-zinc-500" />
-        <h2 className="text-base font-semibold text-zinc-900 dark:text-zinc-100">
-          {t("title")}
-        </h2>
-      </div>
+    <Section>
+      <SectionHeader icon={Users} title={t("title")} className="mb-4" />
 
       {currentTeams.length > 0 && (
         <div className="mb-4 flex flex-col gap-2">
@@ -151,6 +146,6 @@ export function TeamAssignmentsBlock({
           </div>
         )}
       </form>
-    </Card>
+    </Section>
   );
 }

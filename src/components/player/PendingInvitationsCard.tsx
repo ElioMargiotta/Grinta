@@ -4,7 +4,7 @@ import { useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { Mailbox, Check, X } from "lucide-react";
 import { useTranslations } from "next-intl";
-import { Card } from "@/components/ui/Card";
+import { Section, SectionHeader } from "@/components/ui/Section";
 import { Button } from "@/components/ui/Button";
 import {
   acceptInvitationByIdAction,
@@ -62,13 +62,8 @@ export function PendingInvitationsCard({
   if (invitations.length === 0) return null;
 
   return (
-    <Card>
-      <div className="mb-3 flex items-center gap-2">
-        <Mailbox className="h-4 w-4 text-[var(--club-primary)]" />
-        <h2 className="text-base font-semibold text-zinc-900 dark:text-zinc-100">
-          {t("pendingTitle")}
-        </h2>
-      </div>
+    <Section>
+      <SectionHeader icon={Mailbox} title={t("pendingTitle")} className="mb-3" />
       <ul className="flex flex-col gap-2">
         {invitations.map((inv) => (
           <li
@@ -109,6 +104,6 @@ export function PendingInvitationsCard({
           </li>
         ))}
       </ul>
-    </Card>
+    </Section>
   );
 }

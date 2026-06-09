@@ -1,22 +1,16 @@
 import { notFound } from "next/navigation";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { ChevronLeft } from "lucide-react";
-import { Card } from "@/components/ui/Card";
 import { Link } from "@/i18n/navigation";
 import { requireMembership } from "@/lib/auth/getUser";
 import {
-  ClubPlayerForm,
   type EditablePlayer,
 } from "@/components/contingent/ClubPlayerForm";
-import { DeletePlayerSection } from "@/components/contingent/DeletePlayerSection";
-import { DualLicenceBlock } from "@/components/contingent/DualLicenceBlock";
-import { TeamAssignmentsBlock } from "@/components/contingent/TeamAssignmentsBlock";
+import { ContingentPlayerProfile } from "@/components/contingent/ContingentPlayerProfile";
 import {
-  InvitePlayerSection,
   type PlayerInvitation,
 } from "@/components/contingent/InvitePlayerSection";
 import {
-  EvaluationsSection,
   type EvaluationRow,
 } from "@/components/evaluation/EvaluationsSection";
 import {
@@ -26,6 +20,14 @@ import {
 } from "@/components/evaluation/types";
 import { listClubTeams } from "@/lib/contingent/teams";
 import { resolveCurrentSeasonLabel } from "@/lib/club/season";
+
+type EvaluationDbRow = {
+  id: string;
+  season: string | null;
+  evaluation_date: string | null;
+  data: Partial<EvaluationData> | null;
+  shared_with_player?: boolean | null;
+};
 
 export default async function ContingentPlayerPage({
   params,
@@ -59,7 +61,6 @@ export default async function ContingentPlayerPage({
     { data: assignments },
     teams,
     { data: inviteRows },
-    { data: evalRows },
   ] = await Promise.all([
     supabase
       .from("player_team_assignments")
@@ -73,13 +74,31 @@ export default async function ContingentPlayerPage({
       .eq("player_id", playerId)
       .eq("status", "pending")
       .order("created_at", { ascending: false }),
-    supabase
+  ]);
+
+  let evaluationsShareAvailable = true;
+  let evalRows: EvaluationDbRow[] | null = null;
+  const { data: fullEvalRows, error: evalError } = await supabase
+    .from("player_evaluations")
+    .select("id, season, evaluation_date, data, created_at, shared_with_player")
+    .eq("player_id", playerId)
+    .order("evaluation_date", { ascending: false, nullsFirst: false })
+    .order("created_at", { ascending: false })
+    .returns<EvaluationDbRow[]>();
+  evalRows = fullEvalRows;
+
+  if (evalError) {
+    evaluationsShareAvailable = false;
+    const fallback = await supabase
       .from("player_evaluations")
       .select("id, season, evaluation_date, data, created_at")
       .eq("player_id", playerId)
       .order("evaluation_date", { ascending: false, nullsFirst: false })
-      .order("created_at", { ascending: false }),
-  ]);
+      .order("created_at", { ascending: false })
+      .returns<EvaluationDbRow[]>();
+    evalRows = fallback.data;
+  }
+
   const currentTeamIds = (assignments ?? []).map((a) => a.team_id as string);
 
   const evaluations: EvaluationRow[] = (evalRows ?? []).map((row) => {
@@ -90,6 +109,7 @@ export default async function ContingentPlayerPage({
       season: (row.season as string | null) ?? null,
       appreciation: merged.appreciation,
       average: overallAverage(merged.tips),
+      shared_with_player: (row.shared_with_player as boolean) ?? false,
     };
   });
 
@@ -106,58 +126,25 @@ export default async function ContingentPlayerPage({
   const fullName = `${player.first_name} ${player.last_name}`;
 
   return (
-    <div className="mx-auto flex w-full max-w-3xl flex-col gap-6">
-      <div>
-        <Link
-          href="/contingent"
-          className="inline-flex items-center gap-1 text-sm text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100"
-        >
-          <ChevronLeft className="h-4 w-4" />
-          {t("title")}
-        </Link>
-        <h1 className="mt-2 text-2xl font-semibold text-zinc-900 dark:text-zinc-100">
-          {fullName}
-        </h1>
-      </div>
+    <div className="mx-auto flex w-full max-w-5xl flex-col gap-6">
+      <Link
+        href="/contingent"
+        className="inline-flex w-fit items-center gap-1 text-sm text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100"
+      >
+        <ChevronLeft className="h-4 w-4" />
+        {t("title")}
+      </Link>
 
-      <Card>
-        <h2 className="mb-4 text-base font-semibold text-zinc-900 dark:text-zinc-100">
-          {t("editTitle")}
-        </h2>
-        <ClubPlayerForm player={player} />
-      </Card>
-
-      <TeamAssignmentsBlock
-        playerId={player.id}
+      <ContingentPlayerProfile
+        player={player}
+        fullName={fullName}
         teams={teams}
         currentTeamIds={currentTeamIds}
-      />
-
-      <InvitePlayerSection
-        locale={locale}
-        playerId={player.id}
-        defaultEmail={player.email ?? ""}
-        teams={teams.map((t) => ({ id: t.id, name: t.name }))}
         pendingInvitations={pendingInvitations}
-        isLinkedToUser={Boolean(player.user_id)}
-      />
-
-      <DualLicenceBlock
-        playerId={player.id}
-        licence={{
-          club: player.dual_licence_club,
-          level: player.dual_licence_level,
-          team: player.dual_licence_team,
-        }}
-      />
-
-      <EvaluationsSection
-        playerId={player.id}
-        locale={locale}
         evaluations={evaluations}
+        evaluationsShareAvailable={evaluationsShareAvailable}
+        locale={locale}
       />
-
-      <DeletePlayerSection playerId={player.id} playerName={fullName} />
     </div>
   );
 }

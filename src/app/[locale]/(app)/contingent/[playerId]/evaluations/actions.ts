@@ -80,6 +80,38 @@ export async function savePlayerEvaluationAction({
   revalidatePath(`/${locale}/contingent/${playerId}/evaluations/${evaluationId}`);
 }
 
+export async function setEvaluationSharedAction({
+  playerId,
+  evaluationId,
+  locale,
+  shared,
+}: {
+  playerId: string;
+  evaluationId: string;
+  locale: string;
+  shared: boolean;
+}) {
+  if (!playerId || !evaluationId) return { error: "Missing fields" };
+
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) redirect(`/${locale}/login`);
+
+  const { error } = await supabase
+    .from("player_evaluations")
+    .update({ shared_with_player: shared })
+    .eq("id", evaluationId)
+    .eq("player_id", playerId);
+
+  if (error) return { error: error.message };
+
+  revalidatePath(`/${locale}/contingent/${playerId}`);
+  revalidatePath(`/${locale}/contingent/${playerId}/evaluations/${evaluationId}`);
+  return { ok: true as const };
+}
+
 export async function deletePlayerEvaluationAction({
   playerId,
   evaluationId,

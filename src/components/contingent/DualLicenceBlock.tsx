@@ -5,7 +5,7 @@ import { useLocale, useTranslations } from "next-intl";
 import { useRouter } from "@/i18n/navigation";
 import { BadgeCheck, Pencil, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/Button";
-import { Card } from "@/components/ui/Card";
+import { Section, SectionHeader } from "@/components/ui/Section";
 import { Input } from "@/components/ui/Input";
 import { Select } from "@/components/ui/Select";
 import { setPlayerDualLicenceAction } from "@/app/[locale]/(app)/contingent/actions";
@@ -72,13 +72,13 @@ export function DualLicenceBlock({
   };
 
   return (
-    <Card>
-      <div className="mb-4 flex items-center gap-2">
-        <BadgeCheck className="h-4 w-4 text-amber-600" />
-        <h2 className="text-base font-semibold text-zinc-900 dark:text-zinc-100">
-          {t("title")}
-        </h2>
-      </div>
+    <Section>
+      <SectionHeader
+        icon={BadgeCheck}
+        iconClassName="text-amber-600"
+        title={t("title")}
+        className="mb-4"
+      />
 
       {!editing && hasLicence && (
         <div className="flex flex-col gap-3">
@@ -191,6 +191,6 @@ export function DualLicenceBlock({
           </div>
         </form>
       )}
-    </Card>
+    </Section>
   );
 }
