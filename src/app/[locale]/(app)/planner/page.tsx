@@ -1,7 +1,7 @@
 import { redirect } from "next/navigation";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { Card } from "@/components/ui/Card";
-import { Link } from "@/i18n/navigation";
+import { TeamList } from "@/components/teams/TeamList";
 import { requireUser } from "@/lib/auth/getUser";
 import { resolveCurrentMembership } from "@/lib/club/context";
 import { resolveCurrentSeasonLabel } from "@/lib/club/season";
@@ -31,11 +31,41 @@ export default async function PlannerIndexPage({
     .eq("team_seasons.season", season)
     .order("created_at", { ascending: false });
 
+  // Effectif et statut de planification scopés à la saison active — affichés
+  // dans la liste comme dans l'onglet Équipes.
+  const teamIds = (teams ?? []).map((tm) => tm.id);
+  const [assignRes, plansRes] = teamIds.length
+    ? await Promise.all([
+        supabase
+          .from("player_team_assignments")
+          .select("team_id")
+          .in("team_id", teamIds)
+          .eq("season", season),
+        supabase
+          .from("season_plans")
+          .select("team_id")
+          .in("team_id", teamIds)
+          .eq("season_label", season)
+          .neq("status", "archived"),
+      ])
+    : [{ data: [] as { team_id: string }[] }, { data: [] as { team_id: string }[] }];
+
+  const playersByTeam = new Map<string, number>();
+  for (const a of assignRes.data ?? []) {
+    playersByTeam.set(a.team_id, (playersByTeam.get(a.team_id) ?? 0) + 1);
+  }
+  const plannedTeams = new Set((plansRes.data ?? []).map((p) => p.team_id));
+
   return (
     <div className="flex flex-col gap-6">
-      <h1 className="text-2xl font-semibold text-zinc-900 dark:text-zinc-100">
-        {t("title")}
-      </h1>
+      <div>
+        <h1 className="text-2xl font-semibold text-zinc-900 dark:text-zinc-100">
+          {t("title")}
+        </h1>
+        <p className="mt-1 text-sm text-zinc-500 dark:text-zinc-400">
+          {t("seasonScope", { season })}
+        </p>
+      </div>
 
       {!teams || teams.length === 0 ? (
         <Card>
@@ -44,20 +74,12 @@ export default async function PlannerIndexPage({
       ) : (
         <>
           <p className="text-sm text-zinc-600 dark:text-zinc-400">{t("pickTeam")}</p>
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            {teams.map((team) => (
-              <Link key={team.id} href={`/planner/${team.id}`}>
-                <Card className="transition-colors hover:bg-zinc-50 dark:hover:bg-zinc-800">
-                  <div className="text-base font-semibold text-zinc-900 dark:text-zinc-100">
-                    {team.name}
-                  </div>
-                  <div className="mt-1 text-sm text-zinc-500 dark:text-zinc-400">
-                    {[team.age_group, team.season].filter(Boolean).join(" · ") || "—"}
-                  </div>
-                </Card>
-              </Link>
-            ))}
-          </div>
+          <TeamList
+            teams={teams}
+            basePath="/planner"
+            playersByTeam={playersByTeam}
+            plannedTeams={plannedTeams}
+          />
         </>
       )}
     </div>

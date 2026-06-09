@@ -20,18 +20,6 @@ function cleanColor(value: FormDataEntryValue | null, fallback: string): string 
   return HEX_COLOR_RE.test(color) ? color : fallback;
 }
 
-function cleanUrl(value: FormDataEntryValue | null): string | null {
-  const raw = String(value ?? "").trim();
-  if (!raw) return null;
-  try {
-    const url = new URL(raw);
-    if (url.protocol !== "https:") return null;
-    return url.toString();
-  } catch {
-    return null;
-  }
-}
-
 export async function updateClubIdentityAction(formData: FormData) {
   const name = String(formData.get("clubName") ?? "").trim();
   if (name.length < 2) {
@@ -46,23 +34,45 @@ export async function updateClubIdentityAction(formData: FormData) {
     return { error: "Mode invalide." };
   }
 
-  const logoRaw = String(formData.get("logoUrl") ?? "").trim();
-  const logoUrl = cleanUrl(formData.get("logoUrl"));
-  if (logoRaw && !logoUrl) {
-    return { error: "Le logo doit être une URL https valide." };
-  }
-
   const membership = await resolveCurrentMembership();
   if (!membership || !canManageClub(membership.access_level)) {
     return { error: "Action interdite." };
   }
 
   const supabase = await createClient();
+
+  // Logo : import de fichier PNG/JPEG → bucket Storage `club-logos`. À défaut on
+  // garde l'existant, ou on le retire si l'utilisateur l'a demandé.
+  const logoUpdate: { logo_url?: string | null } = {};
+  const removeLogo = String(formData.get("removeLogo") ?? "") === "1";
+  const logoFile = formData.get("logoFile");
+  if (logoFile instanceof File && logoFile.size > 0) {
+    const allowedExt: Record<string, string> = {
+      "image/png": "png",
+      "image/jpeg": "jpg",
+      "image/jpg": "jpg",
+    };
+    const ext = allowedExt[logoFile.type];
+    if (!ext) return { error: "Le logo doit être un PNG ou un JPEG." };
+    if (logoFile.size > 2 * 1024 * 1024) {
+      return { error: "Le logo ne doit pas dépasser 2 Mo." };
+    }
+    const path = `${membership.club_id}/logo-${Date.now()}.${ext}`;
+    const { error: uploadErr } = await supabase.storage
+      .from("club-logos")
+      .upload(path, logoFile, { contentType: logoFile.type, upsert: true });
+    if (uploadErr) return { error: uploadErr.message };
+    const { data: pub } = supabase.storage.from("club-logos").getPublicUrl(path);
+    logoUpdate.logo_url = pub.publicUrl;
+  } else if (removeLogo) {
+    logoUpdate.logo_url = null;
+  }
+
   const { error } = await supabase
     .from("clubs")
     .update({
       name,
-      logo_url: logoUrl,
+      ...logoUpdate,
       theme_mode: themeMode,
       theme_primary_color: cleanColor(
         formData.get("primaryColor"),
@@ -371,12 +381,28 @@ export async function loadClubSettingsData() {
     .eq("id", membership.club_id)
     .single<RawClub>();
 
+  // Rattachement membre → équipes (team_memberships) pour le filtre « par équipe ».
+  const membershipIds = (membersRes.data as RawMember[] | null ?? []).map((m) => m.id);
+  const { data: teamMembershipRows } = membershipIds.length
+    ? await supabase
+        .from("team_memberships")
+        .select("team_id, membership_id")
+        .in("membership_id", membershipIds)
+    : { data: [] as { team_id: string; membership_id: string }[] };
+  const teamIdsByMember = new Map<string, string[]>();
+  for (const row of teamMembershipRows ?? []) {
+    const list = teamIdsByMember.get(row.membership_id) ?? [];
+    list.push(row.team_id);
+    teamIdsByMember.set(row.membership_id, list);
+  }
+
   const members = (membersRes.data as RawMember[] | null ?? []).map((m) => ({
     id: m.id,
     user_id: m.user_id,
     created_at: m.created_at,
     profiles: unwrap(m.profiles),
     club_roles: unwrap(m.club_roles),
+    team_ids: teamIdsByMember.get(m.id) ?? [],
   }));
 
   const invitations = (invitesRes.data as RawInvitation[] | null ?? []).map(

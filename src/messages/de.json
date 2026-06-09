@@ -1507,7 +1507,10 @@
         "nightMode": "Nacht",
         "primaryColor": "Primär",
         "secondaryColor": "Sekundär",
-        "saveIdentity": "Identität speichern"
+        "saveIdentity": "Identität speichern",
+        "uploadLogo": "Logo hochladen",
+        "removeLogo": "Entfernen",
+        "logoHint": "PNG oder JPEG, max. 2 MB."
       },
       "invite": {
         "title": "Mitglied einladen",
@@ -1531,7 +1534,13 @@
       "members": {
         "title": "Mitglieder ({n})",
         "unnamed": "(ohne Namen)",
-        "remove": "Entfernen"
+        "remove": "Entfernen",
+        "emptyRole": "Kein Mitglied für diese Rolle.",
+        "filterRole": "Rolle",
+        "filterAllRoles": "Alle Rollen",
+        "filterTeam": "Team",
+        "filterAllTeams": "Alle Teams",
+        "filteredCount": "{n, plural, =0 {Keine Mitglieder} one {1 Mitglied} other {# Mitglieder}}"
       },
       "roles": {
         "title": "Vereinsrollen",
@@ -1540,7 +1549,8 @@
         "labelPlaceholder": "Ausbildungsverantwortliche/r",
         "accessLevel": "Zugriffsstufe",
         "addRole": "Rolle hinzufügen",
-        "system": "System"
+        "system": "System",
+        "countLabel": "{n, plural, =0 {Keine Rolle} one {1 Rolle} other {# Rollen}}"
       },
       "access": {
         "full": "Vollständig",
@@ -1551,7 +1561,13 @@
         "teamHelp": "Eine oder mehrere spezifische Mannschaften.",
         "team_readonly": "Mannschaft schreibgeschützt",
         "team_readonlyHelp": "Nur Lesezugriff auf eine oder mehrere Mannschaften."
-      }
+      },
+      "tabs": {
+        "general": "Allgemein",
+        "staff": "Mitarbeiter",
+        "roles": "Rollen & Einladungen"
+      },
+      "sectionsLabel": "Bereiche"
     },
     "clubPage": {
       "title": "Club-Einstellungen",

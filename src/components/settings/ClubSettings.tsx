@@ -1,8 +1,8 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { useRef, useState, useTransition } from "react";
 import { useLocale, useTranslations } from "next-intl";
-import { Trash2, UserMinus } from "lucide-react";
+import { ImageUp, Shield, Trash2, UserMinus, Users } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import type { AccessLevel } from "@/lib/club/types";
 import {
@@ -30,6 +30,7 @@ type Member = {
   created_at: string;
   profiles: { full_name: string | null } | null;
   club_roles: { id: string; name: string; access_level: AccessLevel } | null;
+  team_ids: string[];
 };
 
 type Invitation = {
@@ -50,8 +51,26 @@ type Data = {
   invitations: Invitation[];
 };
 
+type Tab = "general" | "staff" | "roles";
+
 const inputClass =
   "h-10 w-full rounded-md border border-zinc-300 bg-white px-3 text-sm text-zinc-900 placeholder:text-zinc-400 focus:border-zinc-900 focus:outline-none focus:ring-2 focus:ring-zinc-900/10";
+
+// Pastille colorée par niveau d'accès — reprend la sémantique du reste de l'app
+// (rouge = plein accès, dégradé jusqu'au gris = lecture seule).
+const ACCESS_BADGE: Record<AccessLevel, string> = {
+  full: "bg-red-50 text-red-700 dark:bg-red-950/40 dark:text-red-300",
+  extended: "bg-amber-50 text-amber-700 dark:bg-amber-950/40 dark:text-amber-300",
+  team: "bg-sky-50 text-sky-700 dark:bg-sky-950/40 dark:text-sky-300",
+  team_readonly: "bg-zinc-100 text-zinc-600 dark:bg-zinc-800 dark:text-zinc-300",
+};
+
+function initials(name: string | null): string {
+  const n = (name ?? "").trim();
+  if (!n) return "—";
+  const parts = n.split(/\s+/);
+  return (parts[0][0] + (parts[1]?.[0] ?? "")).toUpperCase();
+}
 
 export function ClubSettings({ data }: { data: Data }) {
   const locale = useLocale();
@@ -59,6 +78,13 @@ export function ClubSettings({ data }: { data: Data }) {
   const accessLabel = (level: AccessLevel) => t(`access.${level}`);
   const accessHelp = (level: AccessLevel) => t(`access.${level}Help`);
 
+  const [tab, setTab] = useState<Tab>("general");
+  const [filterRoleId, setFilterRoleId] = useState<string>("");
+  const [filterTeamId, setFilterTeamId] = useState<string>("");
+  const logoInputRef = useRef<HTMLInputElement>(null);
+  const [logoPreview, setLogoPreview] = useState<string | null>(null);
+  const [logoRemoved, setLogoRemoved] = useState(false);
+  const shownLogo = logoPreview ?? (logoRemoved ? null : data.clubIdentity.logo_url);
   const [invitedEmail, setInvitedEmail] = useState<string | null>(null);
   const [inviteEmailSent, setInviteEmailSent] = useState<boolean>(true);
   const [inviteLinkFallback, setInviteLinkFallback] = useState<string | null>(null);
@@ -74,83 +100,160 @@ export function ClubSettings({ data }: { data: Data }) {
     (selectedRole.access_level === "team" ||
       selectedRole.access_level === "team_readonly");
 
-  return (
-    <div className="flex flex-col gap-10">
-      {/* IDENTITY */}
-      <section className="border-y border-[var(--club-line)] bg-white/70 px-0 py-6">
-        <div className="flex flex-col gap-5 md:flex-row md:items-start md:justify-between">
-          <div className="max-w-xl">
-            <h2 className="text-lg font-semibold text-zinc-900">
-              {t("identity.title")}
-            </h2>
-            <p className="mt-1 text-sm text-zinc-600">
-              {t("identity.description")}
-            </p>
-          </div>
-          <div className="flex items-center gap-3 rounded-lg border border-[var(--club-line)] bg-white px-3 py-2">
-            {data.clubIdentity.logo_url ? (
-              // eslint-disable-next-line @next/next/no-img-element
-              <img
-                src={data.clubIdentity.logo_url}
-                alt={data.clubIdentity.name}
-                className="h-10 w-10 rounded-md object-contain"
-              />
-            ) : (
-              <div className="h-10 w-10 rounded-md bg-[var(--club-primary)]" />
-            )}
-            <div className="min-w-0">
-              <div className="truncate text-sm font-semibold text-zinc-900">
-                {data.clubIdentity.name}
-              </div>
-              <div className="text-xs text-zinc-500">
-                {t("identity.workspacePreview")}
-              </div>
-            </div>
-          </div>
-        </div>
+  // Un membre « plein accès » (full/extended) couvre toutes les équipes ; un
+  // membre scopé (team/team_readonly) ne matche que ses équipes assignées.
+  const memberMatchesTeam = (m: Member) => {
+    if (!filterTeamId) return true;
+    if (m.club_roles?.access_level === "full" || m.club_roles?.access_level === "extended") {
+      return true;
+    }
+    return m.team_ids.includes(filterTeamId);
+  };
 
+  // Effectif groupé par rôle (coach, staff, …), filtré par rôle et par équipe.
+  const groups = data.roles
+    .filter((role) => !filterRoleId || role.id === filterRoleId)
+    .map((role) => ({
+      role,
+      members: data.members.filter(
+        (m) => m.club_roles?.id === role.id && memberMatchesTeam(m),
+      ),
+    }));
+  const filteredMemberCount = groups.reduce((sum, g) => sum + g.members.length, 0);
+
+  const tabs: { key: Tab; label: string; icon: typeof Users }[] = [
+    { key: "general", label: t("tabs.general"), icon: Shield },
+    { key: "staff", label: t("tabs.staff"), icon: Users },
+    { key: "roles", label: t("tabs.roles"), icon: Shield },
+  ];
+
+  return (
+    <div className="flex flex-col gap-6">
+      {/* Sous-onglets façon sélecteur de tour du wizard (soulignés) */}
+      <div className="flex gap-1 overflow-x-auto border-b border-zinc-200">
+        {tabs.map(({ key, label }) => {
+          const isActive = tab === key;
+          return (
+            <button
+              key={key}
+              type="button"
+              onClick={() => setTab(key)}
+              aria-current={isActive ? "page" : undefined}
+              className={`-mb-px shrink-0 border-b-2 px-3 pb-2.5 text-[13px] font-semibold transition ${
+                isActive
+                  ? "border-[var(--club-primary)] text-zinc-950"
+                  : "border-transparent text-zinc-500 hover:text-zinc-900"
+              }`}
+            >
+              {label}
+            </button>
+          );
+        })}
+      </div>
+
+      {/* =================== GÉNÉRAL =================== */}
+      {tab === "general" && (
         <form
-          className="mt-5 grid gap-4"
+          className="flex flex-col gap-10"
           action={(formData) =>
             startTransition(async () => {
               await updateClubIdentityAction(formData);
             })
           }
         >
-          <label className="flex flex-col gap-1 text-sm">
-            <span className="font-medium text-zinc-700">
-              {t("identity.clubName")}
-            </span>
-            <input
-              name="clubName"
-              required
-              minLength={2}
-              maxLength={80}
-              defaultValue={data.clubIdentity.name}
-              className={inputClass}
-            />
-          </label>
+          <input type="hidden" name="removeLogo" value={logoRemoved ? "1" : "0"} />
 
-          <label className="flex flex-col gap-1 text-sm">
-            <span className="font-medium text-zinc-700">
-              {t("identity.logoUrl")}
-            </span>
-            <input
-              name="logoUrl"
-              type="url"
-              inputMode="url"
-              placeholder={t("identity.logoUrlPlaceholder")}
-              defaultValue={data.clubIdentity.logo_url ?? ""}
-              className={inputClass}
-            />
-          </label>
-
-          <div className="grid gap-4 md:grid-cols-2">
-            <div className="rounded-lg border border-zinc-200 bg-white p-4">
-              <div className="text-sm font-semibold text-zinc-900">
-                {t("identity.dayMode")}
+          {/* Logo + nom */}
+          <section className="flex flex-col gap-5">
+            <div className="flex items-center gap-5">
+              {shownLogo ? (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img
+                  src={shownLogo}
+                  alt={data.clubIdentity.name}
+                  className="h-20 w-20 rounded-2xl object-contain ring-1 ring-[var(--club-line)]"
+                />
+              ) : (
+                <div className="flex h-20 w-20 items-center justify-center rounded-2xl bg-[var(--club-primary)] text-2xl font-bold text-[var(--club-primary-foreground)]">
+                  {initials(data.clubIdentity.name)}
+                </div>
+              )}
+              <div className="flex flex-col gap-2">
+                <div className="flex flex-wrap items-center gap-2">
+                  <Button
+                    type="button"
+                    variant="secondary"
+                    size="sm"
+                    onClick={() => logoInputRef.current?.click()}
+                  >
+                    <ImageUp className="h-4 w-4" />
+                    {t("identity.uploadLogo")}
+                  </Button>
+                  {shownLogo && (
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => {
+                        setLogoPreview(null);
+                        setLogoRemoved(true);
+                        if (logoInputRef.current) logoInputRef.current.value = "";
+                      }}
+                    >
+                      <Trash2 className="h-4 w-4" />
+                      {t("identity.removeLogo")}
+                    </Button>
+                  )}
+                </div>
+                <span className="text-xs text-zinc-500">{t("identity.logoHint")}</span>
               </div>
-              <div className="mt-3 grid gap-3 sm:grid-cols-2">
+              <input
+                ref={logoInputRef}
+                type="file"
+                name="logoFile"
+                accept="image/png,image/jpeg"
+                className="sr-only"
+                onChange={(e) => {
+                  const file = e.target.files?.[0];
+                  if (file) {
+                    setLogoPreview(URL.createObjectURL(file));
+                    setLogoRemoved(false);
+                  }
+                }}
+              />
+            </div>
+
+            <label className="flex max-w-md flex-col gap-1 text-sm">
+              <span className="font-medium text-zinc-700">
+                {t("identity.clubName")}
+              </span>
+              <input
+                name="clubName"
+                required
+                minLength={2}
+                maxLength={80}
+                defaultValue={data.clubIdentity.name}
+                className={inputClass}
+              />
+            </label>
+          </section>
+
+          {/* Couleurs */}
+          <section className="flex flex-col gap-5 border-t border-[var(--club-line)] pt-8">
+            <div className="max-w-xl">
+              <h2 className="text-lg font-semibold text-zinc-900">
+                {t("identity.title")}
+              </h2>
+              <p className="mt-1 text-sm text-zinc-600">
+                {t("identity.description")}
+              </p>
+            </div>
+
+            <div className="grid gap-x-10 gap-y-6 sm:grid-cols-2">
+              <div className="flex flex-col gap-3">
+                <div className="text-xs font-semibold uppercase tracking-wide text-zinc-400">
+                  {t("identity.dayMode")}
+                </div>
                 <ColorField
                   label={t("identity.primaryColor")}
                   name="primaryColor"
@@ -162,334 +265,419 @@ export function ClubSettings({ data }: { data: Data }) {
                   defaultValue={data.clubIdentity.theme_secondary_color}
                 />
               </div>
-            </div>
-            <div className="rounded-lg border border-zinc-200 bg-zinc-950 p-4">
-              <div className="text-sm font-semibold text-white">
-                {t("identity.nightMode")}
-              </div>
-              <div className="mt-3 grid gap-3 sm:grid-cols-2">
+              <div className="flex flex-col gap-3">
+                <div className="text-xs font-semibold uppercase tracking-wide text-zinc-400">
+                  {t("identity.nightMode")}
+                </div>
                 <ColorField
                   label={t("identity.primaryColor")}
                   name="nightPrimaryColor"
                   defaultValue={data.clubIdentity.theme_night_primary_color}
-                  inverse
                 />
                 <ColorField
                   label={t("identity.secondaryColor")}
                   name="nightSecondaryColor"
                   defaultValue={data.clubIdentity.theme_night_secondary_color}
-                  inverse
                 />
               </div>
             </div>
-          </div>
 
-          <div className="flex flex-wrap items-center justify-between gap-3">
-            <fieldset className="inline-flex rounded-lg border border-zinc-200 bg-white p-1">
-              {(["day", "night"] as const).map((mode) => (
-                <label
-                  key={mode}
-                  className="has-[:checked]:bg-[var(--club-primary)] has-[:checked]:text-[var(--club-primary-foreground)] rounded-md px-3 py-1.5 text-sm font-medium text-zinc-600"
-                >
-                  <input
-                    type="radio"
-                    name="themeMode"
-                    value={mode}
-                    defaultChecked={data.clubIdentity.theme_mode === mode}
-                    className="sr-only"
-                  />
-                  {mode === "day" ? t("identity.dayMode") : t("identity.nightMode")}
-                </label>
-              ))}
-            </fieldset>
-            <Button type="submit" loading={isPending}>
-              {t("identity.saveIdentity")}
-            </Button>
-          </div>
+            <div className="flex flex-wrap items-center justify-between gap-3 pt-2">
+              <fieldset className="inline-flex rounded-lg border border-zinc-200 bg-white p-1">
+                {(["day", "night"] as const).map((mode) => (
+                  <label
+                    key={mode}
+                    className="has-[:checked]:bg-[var(--club-primary)] has-[:checked]:text-[var(--club-primary-foreground)] rounded-md px-3 py-1.5 text-sm font-medium text-zinc-600"
+                  >
+                    <input
+                      type="radio"
+                      name="themeMode"
+                      value={mode}
+                      defaultChecked={data.clubIdentity.theme_mode === mode}
+                      className="sr-only"
+                    />
+                    {mode === "day" ? t("identity.dayMode") : t("identity.nightMode")}
+                  </label>
+                ))}
+              </fieldset>
+              <Button type="submit" loading={isPending}>
+                {t("identity.saveIdentity")}
+              </Button>
+            </div>
+          </section>
         </form>
-      </section>
+      )}
 
-      {/* INVITE */}
-      <section className="rounded-lg border border-zinc-200 bg-white p-6">
-        <h2 className="text-lg font-semibold text-zinc-900">
-          {t("invite.title")}
-        </h2>
-        <p className="mt-1 text-sm text-zinc-600">{t("invite.description")}</p>
+      {/* =================== EFFECTIF =================== */}
+      {tab === "staff" && (
+        <div className="flex flex-col gap-8">
+          {/* MEMBERS grouped by role, avec filtres rôle / équipe */}
+          <section>
+            <div className="flex flex-wrap items-end justify-between gap-3">
+              <h2 className="text-lg font-semibold text-zinc-900">
+                {t("members.title", { n: data.members.length })}
+              </h2>
+              <div className="flex flex-wrap items-end gap-3">
+                <label className="flex flex-col gap-1 text-xs">
+                  <span className="font-medium text-zinc-600">
+                    {t("members.filterRole")}
+                  </span>
+                  <select
+                    value={filterRoleId}
+                    onChange={(e) => setFilterRoleId(e.target.value)}
+                    className={`${inputClass} h-9 w-44`}
+                  >
+                    <option value="">{t("members.filterAllRoles")}</option>
+                    {data.roles.map((r) => (
+                      <option key={r.id} value={r.id}>
+                        {r.name}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+                <label className="flex flex-col gap-1 text-xs">
+                  <span className="font-medium text-zinc-600">
+                    {t("members.filterTeam")}
+                  </span>
+                  <select
+                    value={filterTeamId}
+                    onChange={(e) => setFilterTeamId(e.target.value)}
+                    className={`${inputClass} h-9 w-44`}
+                  >
+                    <option value="">{t("members.filterAllTeams")}</option>
+                    {data.teams.map((team) => (
+                      <option key={team.id} value={team.id}>
+                        {team.name}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+              </div>
+            </div>
 
-        <form
-          className="mt-4 flex flex-col gap-4"
-          action={(formData) => {
-            setInviteError(null);
-            setInvitedEmail(null);
-            setInviteLinkFallback(null);
-            formData.set("locale", locale);
-            const email = String(formData.get("email") ?? "");
-            startTransition(async () => {
-              const result = await inviteMemberAction(formData);
-              if ("error" in result) {
-                setInviteError(result.error);
-              } else {
-                setInvitedEmail(email);
-                setInviteEmailSent(result.emailSent);
-                setInviteLinkFallback(result.emailSent ? null : result.url);
-              }
-            });
-          }}
-        >
-          <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
-            <label className="flex flex-col gap-1 text-sm">
-              <span className="font-medium text-zinc-700">{t("invite.email")}</span>
+            {(filterRoleId || filterTeamId) && (
+              <p className="mt-2 text-xs text-zinc-500">
+                {t("members.filteredCount", { n: filteredMemberCount })}
+              </p>
+            )}
+
+            <div className="mt-4 flex flex-col gap-6">
+              {groups.map(({ role, members }) => (
+                <div key={role.id}>
+                  <div className="flex items-center gap-2 px-1 pb-2">
+                    <span className="text-sm font-semibold text-zinc-900">
+                      {role.name}
+                    </span>
+                    <span
+                      className={`rounded px-1.5 py-0.5 text-[10px] font-medium uppercase tracking-wide ${ACCESS_BADGE[role.access_level]}`}
+                    >
+                      {accessLabel(role.access_level)}
+                    </span>
+                    <span className="text-xs text-zinc-400">{members.length}</span>
+                  </div>
+                  {members.length === 0 ? (
+                    <p className="border-y border-[var(--club-line)] bg-white/70 px-4 py-3 text-sm text-zinc-400">
+                      {t("members.emptyRole")}
+                    </p>
+                  ) : (
+                    <div className="overflow-hidden border-y border-[var(--club-line)] bg-white/[0.72]">
+                      {members.map((m) => (
+                        <div
+                          key={m.id}
+                          className="grid gap-3 border-b border-zinc-100 px-4 py-3 last:border-b-0 md:grid-cols-[1fr_auto] md:items-center"
+                        >
+                          <div className="flex min-w-0 items-center gap-3">
+                            <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[var(--club-primary-soft)] text-xs font-semibold text-[var(--club-primary)]">
+                              {initials(m.profiles?.full_name ?? null)}
+                            </span>
+                            <div className="min-w-0">
+                              <div className="truncate text-sm font-medium text-zinc-900">
+                                {m.profiles?.full_name?.trim() || t("members.unnamed")}
+                              </div>
+                              <div className="text-xs text-zinc-500">
+                                {role.name}
+                              </div>
+                            </div>
+                          </div>
+                          <form
+                            className="md:justify-self-end"
+                            action={(formData) =>
+                              startTransition(async () => {
+                                await removeMemberAction(formData);
+                              })
+                            }
+                          >
+                            <input type="hidden" name="userId" value={m.user_id} />
+                            <Button type="submit" variant="ghost" size="sm">
+                              <UserMinus className="h-4 w-4" />
+                              {t("members.remove")}
+                            </Button>
+                          </form>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
+          </section>
+        </div>
+      )}
+
+      {/* =================== RÔLES & INVITATIONS =================== */}
+      {tab === "roles" && (
+        <div className="flex flex-col gap-8">
+        {/* INVITE */}
+        <section className="rounded-lg border border-zinc-200 bg-white p-6">
+          <h2 className="text-lg font-semibold text-zinc-900">
+            {t("invite.title")}
+          </h2>
+          <p className="mt-1 text-sm text-zinc-600">{t("invite.description")}</p>
+
+          <form
+            className="mt-4 flex flex-col gap-4"
+            action={(formData) => {
+              setInviteError(null);
+              setInvitedEmail(null);
+              setInviteLinkFallback(null);
+              formData.set("locale", locale);
+              const email = String(formData.get("email") ?? "");
+              startTransition(async () => {
+                const result = await inviteMemberAction(formData);
+                if ("error" in result) {
+                  setInviteError(result.error);
+                } else {
+                  setInvitedEmail(email);
+                  setInviteEmailSent(result.emailSent);
+                  setInviteLinkFallback(result.emailSent ? null : result.url);
+                }
+              });
+            }}
+          >
+            <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
+              <label className="flex flex-col gap-1 text-sm">
+                <span className="font-medium text-zinc-700">{t("invite.email")}</span>
+                <input
+                  type="email"
+                  name="email"
+                  required
+                  placeholder={t("invite.emailPlaceholder")}
+                  className={inputClass}
+                />
+              </label>
+              <label className="flex flex-col gap-1 text-sm">
+                <span className="font-medium text-zinc-700">{t("invite.role")}</span>
+                <select
+                  name="roleId"
+                  value={selectedRoleId}
+                  onChange={(e) => setSelectedRoleId(e.target.value)}
+                  className={inputClass}
+                >
+                  {data.roles.map((r) => (
+                    <option key={r.id} value={r.id}>
+                      {r.name} · {accessLabel(r.access_level)}
+                    </option>
+                  ))}
+                </select>
+              </label>
+            </div>
+
+            {needsTeams && (
+              <div className="flex flex-col gap-1 text-sm">
+                <span className="font-medium text-zinc-700">
+                  {t("invite.assignedTeams")}
+                </span>
+                {data.teams.length === 0 ? (
+                  <p className="text-xs text-amber-700">
+                    {t("invite.noTeamsInClub")}
+                  </p>
+                ) : (
+                  <div className="flex flex-wrap gap-2">
+                    {data.teams.map((team) => (
+                      <label
+                        key={team.id}
+                        className="flex items-center gap-2 rounded-md border border-zinc-200 px-2 py-1 text-xs"
+                      >
+                        <input type="checkbox" name="teamIds" value={team.id} />
+                        <span>{team.name}</span>
+                      </label>
+                    ))}
+                  </div>
+                )}
+              </div>
+            )}
+
+            {inviteError && (
+              <div className="rounded-md border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700">
+                {inviteError}
+              </div>
+            )}
+
+            {invitedEmail && (
+              <div
+                className={
+                  inviteEmailSent
+                    ? "rounded-md border border-emerald-200 bg-emerald-50 px-3 py-2 text-sm text-emerald-800"
+                    : "rounded-md border border-amber-200 bg-amber-50 px-3 py-2 text-sm text-amber-800"
+                }
+              >
+                {t.rich(inviteEmailSent ? "invite.emailSent" : "invite.emailFailed", {
+                  email: invitedEmail,
+                  strong: (chunks) => <strong>{chunks}</strong>,
+                })}
+                {!inviteEmailSent && inviteLinkFallback && (
+                  <div className="mt-2 break-all font-mono text-[11px] text-amber-900">
+                    {inviteLinkFallback}
+                  </div>
+                )}
+              </div>
+            )}
+
+            <Button
+              type="submit"
+              loading={isPending}
+              loadingLabel={t("invite.sending")}
+              className="self-start"
+            >
+              {t("invite.send")}
+            </Button>
+          </form>
+        </section>
+
+        {/* PENDING INVITATIONS */}
+        {data.invitations.length > 0 && (
+          <section className="rounded-lg border border-zinc-200 bg-white p-6">
+            <h2 className="text-lg font-semibold text-zinc-900">
+              {t("pendingInvitations.title", { n: data.invitations.length })}
+            </h2>
+            <ul className="mt-4 divide-y divide-zinc-100">
+              {data.invitations.map((inv) => (
+                <li
+                  key={inv.id}
+                  className="flex items-center justify-between gap-3 py-3 text-sm"
+                >
+                  <div className="flex min-w-0 flex-col">
+                    <span className="truncate font-medium text-zinc-900">
+                      {inv.email}
+                    </span>
+                    <span className="text-xs text-zinc-500">
+                      {inv.club_roles?.name} ·{" "}
+                      {t("pendingInvitations.expiresOn", {
+                        date: new Date(inv.expires_at).toLocaleDateString(locale),
+                      })}
+                    </span>
+                  </div>
+                  <form
+                    action={(formData) =>
+                      startTransition(async () => {
+                        await revokeInvitationAction(formData);
+                      })
+                    }
+                  >
+                    <input type="hidden" name="invitationId" value={inv.id} />
+                    <Button type="submit" variant="ghost" size="sm">
+                      <Trash2 className="h-4 w-4" />
+                      {t("pendingInvitations.revoke")}
+                    </Button>
+                  </form>
+                </li>
+              ))}
+            </ul>
+          </section>
+        )}
+
+        {/* ROLES */}
+        <section>
+          <h2 className="text-lg font-semibold text-zinc-900">
+            {t("roles.title")}
+          </h2>
+          <p className="mt-1 text-sm text-zinc-600">{t("roles.description")}</p>
+
+          <form
+            className="mt-4 flex flex-wrap items-end gap-3"
+            action={(formData) =>
+              startTransition(async () => {
+                await createRoleAction(formData);
+              })
+            }
+          >
+            <label className="flex min-w-[200px] flex-col gap-1 text-sm">
+              <span className="font-medium text-zinc-700">{t("roles.label")}</span>
               <input
-                type="email"
-                name="email"
+                name="name"
                 required
-                placeholder={t("invite.emailPlaceholder")}
+                maxLength={50}
+                placeholder={t("roles.labelPlaceholder")}
                 className={inputClass}
               />
             </label>
-            <label className="flex flex-col gap-1 text-sm">
-              <span className="font-medium text-zinc-700">{t("invite.role")}</span>
+            <label className="flex min-w-[200px] flex-col gap-1 text-sm">
+              <span className="font-medium text-zinc-700">
+                {t("roles.accessLevel")}
+              </span>
               <select
-                name="roleId"
-                value={selectedRoleId}
-                onChange={(e) => setSelectedRoleId(e.target.value)}
+                name="accessLevel"
+                defaultValue="extended"
                 className={inputClass}
               >
-                {data.roles.map((r) => (
-                  <option key={r.id} value={r.id}>
-                    {r.name} · {accessLabel(r.access_level)}
-                  </option>
-                ))}
+                <option value="full">
+                  {accessLabel("full")} — {accessHelp("full")}
+                </option>
+                <option value="extended">
+                  {accessLabel("extended")} — {accessHelp("extended")}
+                </option>
+                <option value="team">
+                  {accessLabel("team")} — {accessHelp("team")}
+                </option>
+                <option value="team_readonly">
+                  {accessLabel("team_readonly")} — {accessHelp("team_readonly")}
+                </option>
               </select>
             </label>
-          </div>
+            <Button type="submit" loading={isPending}>
+              {t("roles.addRole")}
+            </Button>
+          </form>
 
-          {needsTeams && (
-            <div className="flex flex-col gap-1 text-sm">
-              <span className="font-medium text-zinc-700">
-                {t("invite.assignedTeams")}
-              </span>
-              {data.teams.length === 0 ? (
-                <p className="text-xs text-amber-700">
-                  {t("invite.noTeamsInClub")}
-                </p>
-              ) : (
-                <div className="flex flex-wrap gap-2">
-                  {data.teams.map((team) => (
-                    <label
-                      key={team.id}
-                      className="flex items-center gap-2 rounded-md border border-zinc-200 px-2 py-1 text-xs"
-                    >
-                      <input type="checkbox" name="teamIds" value={team.id} />
-                      <span>{team.name}</span>
-                    </label>
-                  ))}
-                </div>
-              )}
-            </div>
-          )}
-
-          {inviteError && (
-            <div className="rounded-md border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700">
-              {inviteError}
-            </div>
-          )}
-
-          {invitedEmail && (
-            <div
-              className={
-                inviteEmailSent
-                  ? "rounded-md border border-emerald-200 bg-emerald-50 px-3 py-2 text-sm text-emerald-800"
-                  : "rounded-md border border-amber-200 bg-amber-50 px-3 py-2 text-sm text-amber-800"
-              }
-            >
-              {t.rich(inviteEmailSent ? "invite.emailSent" : "invite.emailFailed", {
-                email: invitedEmail,
-                strong: (chunks) => <strong>{chunks}</strong>,
-              })}
-              {!inviteEmailSent && inviteLinkFallback && (
-                <div className="mt-2 break-all font-mono text-[11px] text-amber-900">
-                  {inviteLinkFallback}
-                </div>
-              )}
-            </div>
-          )}
-
-          <Button
-            type="submit"
-            loading={isPending}
-            loadingLabel={t("invite.sending")}
-            className="self-start"
-          >
-            {t("invite.send")}
-          </Button>
-        </form>
-      </section>
-
-      {/* PENDING INVITATIONS */}
-      {data.invitations.length > 0 && (
-        <section className="rounded-lg border border-zinc-200 bg-white p-6">
-          <h2 className="text-lg font-semibold text-zinc-900">
-            {t("pendingInvitations.title", { n: data.invitations.length })}
-          </h2>
-          <ul className="mt-4 divide-y divide-zinc-100">
-            {data.invitations.map((inv) => (
+          <ul className="mt-6 divide-y divide-zinc-100">
+            {data.roles.map((r) => (
               <li
-                key={inv.id}
+                key={r.id}
                 className="flex items-center justify-between gap-3 py-3 text-sm"
               >
-                <div className="flex min-w-0 flex-col">
-                  <span className="truncate font-medium text-zinc-900">
-                    {inv.email}
+                <div className="flex items-center gap-2">
+                  <span className="font-medium text-zinc-900">{r.name}</span>
+                  <span
+                    className={`rounded px-1.5 py-0.5 text-[10px] font-medium uppercase tracking-wide ${ACCESS_BADGE[r.access_level]}`}
+                  >
+                    {accessLabel(r.access_level)}
                   </span>
-                  <span className="text-xs text-zinc-500">
-                    {inv.club_roles?.name} ·{" "}
-                    {t("pendingInvitations.expiresOn", {
-                      date: new Date(inv.expires_at).toLocaleDateString(locale),
-                    })}
-                  </span>
+                  {r.is_system && (
+                    <span className="text-xs text-zinc-400">
+                      {t("roles.system")}
+                    </span>
+                  )}
                 </div>
-                <form
-                  action={(formData) =>
-                    startTransition(async () => {
-                      await revokeInvitationAction(formData);
-                    })
-                  }
-                >
-                  <input type="hidden" name="invitationId" value={inv.id} />
-                  <Button type="submit" variant="ghost" size="sm">
-                    <Trash2 className="h-4 w-4" />
-                    {t("pendingInvitations.revoke")}
-                  </Button>
-                </form>
+                {!r.is_system && (
+                  <form
+                    action={(formData) =>
+                      startTransition(async () => {
+                        await deleteRoleAction(formData);
+                      })
+                    }
+                  >
+                    <input type="hidden" name="roleId" value={r.id} />
+                    <Button type="submit" variant="ghost" size="sm">
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
+                  </form>
+                )}
               </li>
             ))}
           </ul>
         </section>
+        </div>
       )}
-
-      {/* MEMBERS */}
-      <section className="rounded-lg border border-zinc-200 bg-white p-6">
-        <h2 className="text-lg font-semibold text-zinc-900">
-          {t("members.title", { n: data.members.length })}
-        </h2>
-        <ul className="mt-4 divide-y divide-zinc-100">
-          {data.members.map((m) => (
-            <li
-              key={m.id}
-              className="flex items-center justify-between gap-3 py-3 text-sm"
-            >
-              <div className="flex min-w-0 flex-col">
-                <span className="truncate font-medium text-zinc-900">
-                  {m.profiles?.full_name?.trim() || t("members.unnamed")}
-                </span>
-                <span className="text-xs text-zinc-500">
-                  {m.club_roles?.name} ·{" "}
-                  {m.club_roles ? accessLabel(m.club_roles.access_level) : "—"}
-                </span>
-              </div>
-              <form
-                action={(formData) =>
-                  startTransition(async () => {
-                    await removeMemberAction(formData);
-                  })
-                }
-              >
-                <input type="hidden" name="userId" value={m.user_id} />
-                <Button type="submit" variant="ghost" size="sm">
-                  <UserMinus className="h-4 w-4" />
-                  {t("members.remove")}
-                </Button>
-              </form>
-            </li>
-          ))}
-        </ul>
-      </section>
-
-      {/* ROLES */}
-      <section className="rounded-lg border border-zinc-200 bg-white p-6">
-        <h2 className="text-lg font-semibold text-zinc-900">
-          {t("roles.title")}
-        </h2>
-        <p className="mt-1 text-sm text-zinc-600">{t("roles.description")}</p>
-
-        <form
-          className="mt-4 flex flex-wrap items-end gap-3"
-          action={(formData) =>
-            startTransition(async () => {
-              await createRoleAction(formData);
-            })
-          }
-        >
-          <label className="flex min-w-[200px] flex-col gap-1 text-sm">
-            <span className="font-medium text-zinc-700">{t("roles.label")}</span>
-            <input
-              name="name"
-              required
-              maxLength={50}
-              placeholder={t("roles.labelPlaceholder")}
-              className={inputClass}
-            />
-          </label>
-          <label className="flex min-w-[200px] flex-col gap-1 text-sm">
-            <span className="font-medium text-zinc-700">
-              {t("roles.accessLevel")}
-            </span>
-            <select
-              name="accessLevel"
-              defaultValue="extended"
-              className={inputClass}
-            >
-              <option value="full">
-                {accessLabel("full")} — {accessHelp("full")}
-              </option>
-              <option value="extended">
-                {accessLabel("extended")} — {accessHelp("extended")}
-              </option>
-              <option value="team">
-                {accessLabel("team")} — {accessHelp("team")}
-              </option>
-              <option value="team_readonly">
-                {accessLabel("team_readonly")} — {accessHelp("team_readonly")}
-              </option>
-            </select>
-          </label>
-          <Button type="submit" loading={isPending}>
-            {t("roles.addRole")}
-          </Button>
-        </form>
-
-        <ul className="mt-6 divide-y divide-zinc-100">
-          {data.roles.map((r) => (
-            <li
-              key={r.id}
-              className="flex items-center justify-between gap-3 py-3 text-sm"
-            >
-              <div className="flex flex-col">
-                <span className="font-medium text-zinc-900">{r.name}</span>
-                <span className="text-xs text-zinc-500">
-                  {accessLabel(r.access_level)}
-                  {r.is_system && ` · ${t("roles.system")}`}
-                </span>
-              </div>
-              {!r.is_system && (
-                <form
-                  action={(formData) =>
-                    startTransition(async () => {
-                      await deleteRoleAction(formData);
-                    })
-                  }
-                >
-                  <input type="hidden" name="roleId" value={r.id} />
-                  <Button type="submit" variant="ghost" size="sm">
-                    <Trash2 className="h-4 w-4" />
-                  </Button>
-                </form>
-              )}
-            </li>
-          ))}
-        </ul>
-      </section>
     </div>
   );
 }
