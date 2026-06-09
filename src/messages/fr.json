@@ -2235,7 +2235,10 @@
       "notShared": "Non transmise",
       "sharedBadge": "Transmise",
       "shareHint": "Transmettre ce rapport au joueur",
-      "unshareHint": "Ne plus transmettre ce rapport au joueur"
+      "unshareHint": "Ne plus transmettre ce rapport au joueur",
+      "sharing": "Mise à jour du partage",
+      "sharingUnavailable": "Partage joueur indisponible: appliquez la migration shared_with_player.",
+      "sharingUnavailableShort": "Partage indisponible"
     },
     "progress": "Avancement",
     "stepsLabel": "Étapes",

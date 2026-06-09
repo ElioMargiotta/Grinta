@@ -20,3 +20,5 @@ CREATE POLICY player_evaluations_read_self
   );
 
 COMMIT;
+
+NOTIFY pgrst, 'reload schema';

@@ -2230,7 +2230,10 @@
       "notShared": "Nicht geteilt",
       "sharedBadge": "Geteilt",
       "shareHint": "Diesen Bericht mit dem Spieler teilen",
-      "unshareHint": "Diesen Bericht nicht mehr mit dem Spieler teilen"
+      "unshareHint": "Diesen Bericht nicht mehr mit dem Spieler teilen",
+      "sharing": "Freigabe wird aktualisiert",
+      "sharingUnavailable": "Spielerfreigabe nicht verfügbar: Migration shared_with_player anwenden.",
+      "sharingUnavailableShort": "Freigabe nicht verfügbar"
     },
     "progress": "Fortschritt",
     "stepsLabel": "Schritte",

@@ -2236,7 +2236,10 @@
       "notShared": "Not shared",
       "sharedBadge": "Shared",
       "shareHint": "Share this report with the player",
-      "unshareHint": "Stop sharing this report with the player"
+      "unshareHint": "Stop sharing this report with the player",
+      "sharing": "Updating sharing",
+      "sharingUnavailable": "Player sharing unavailable: apply the shared_with_player migration.",
+      "sharingUnavailableShort": "Sharing unavailable"
     },
     "progress": "Progress",
     "stepsLabel": "Steps",

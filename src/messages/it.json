@@ -2230,7 +2230,10 @@
       "notShared": "Non condivisa",
       "sharedBadge": "Condivisa",
       "shareHint": "Condividi questo report con il giocatore",
-      "unshareHint": "Smetti di condividere questo report con il giocatore"
+      "unshareHint": "Smetti di condividere questo report con il giocatore",
+      "sharing": "Aggiornamento condivisione",
+      "sharingUnavailable": "Condivisione giocatore non disponibile: applica la migrazione shared_with_player.",
+      "sharingUnavailableShort": "Condivisione non disponibile"
     },
     "progress": "Avanzamento",
     "stepsLabel": "Passi",
