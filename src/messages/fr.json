@@ -551,7 +551,7 @@
     "deleteSection": {
       "title": "Supprimer l'équipe",
       "description": "L'équipe est archivée immédiatement et disparaît des listes, mais ses données (joueurs, séances, planning) restent consultables si tu la restaures plus tard.",
-      "billing": "Côté facturation : tu paies cette équipe jusqu'à la fin du cycle de facturation en cours. Le mois prochain, elle disparaît du calcul (12 CHF/équipe).",
+      "billing": "Côté facturation : tu paies cette équipe jusqu'à la fin du cycle de facturation en cours. Le mois prochain, elle disparaît du calcul (25 CHF/équipe).",
       "deleteButton": "Supprimer l'équipe",
       "confirmLabel": "Tape le nom <strong>{name}</strong> pour confirmer :",
       "confirmButton": "Confirmer la suppression",
@@ -904,7 +904,10 @@
       "delete": "Supprimer",
       "deleteSessionAria": "Supprimer la séance",
       "duplicate": "Dupliquer",
-      "duplicateSessionAria": "Dupliquer la séance"
+      "duplicateSessionAria": "Dupliquer la séance",
+      "clearSeason": "Effacer la saison",
+      "clearConfirm": "Effacer toute la planification générée de cette saison ? Les séances ajoutées à la main sont conservées.",
+      "clearing": "Effacement…"
     },
     "session": {
       "newTitle": "Nouvelle séance",
@@ -968,7 +971,10 @@
       "weeklyOverview": "Semaines",
       "noWeeksForFilter": "Aucune semaine planifiée pour cette saison et ce tour.",
       "noTheme": "Thème non défini",
-      "matchFallback": "Match"
+      "matchFallback": "Match",
+      "clearSeason": "Effacer la saison",
+      "clearConfirm": "Effacer toute la planification générée de cette saison ? Les séances ajoutées à la main sont conservées.",
+      "clearing": "Effacement…"
     },
     "wizard": {
       "title": "Assistant de planification",
@@ -1108,7 +1114,11 @@
         "theme": "Thème",
         "trainings": "Entraînements",
         "match": "Match"
-      }
+      },
+      "saveDates": "Enregistrer les dates",
+      "savingDates": "Enregistrement…",
+      "datesSaved": "Dates enregistrées",
+      "outOfSeasonRange": "Reste dans les bornes du tour"
     },
     "seasonScope": "Saison {season}"
   },
@@ -1476,7 +1486,7 @@
     "clubPage": {
       "title": "Nouveau club",
       "description": "Un club regroupe tes équipes, tes coachs et ta facturation. Tu peux inviter des membres dès qu'il est créé. Tu peux appartenir à plusieurs clubs.",
-      "pricing": "14 jours d'essai gratuit · 12 CHF/équipe/mois ensuite · Aucune carte requise pour démarrer."
+      "pricing": "14 jours d'essai gratuit · 25 CHF/équipe/mois ensuite · Aucune carte requise pour démarrer."
     },
     "invitations": {
       "invitedTo": "Tu as été invité à <strong>{club}</strong>",

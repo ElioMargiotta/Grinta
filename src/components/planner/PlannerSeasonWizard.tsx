@@ -16,12 +16,14 @@ import {
   Fragment,
   type ReactNode,
   useEffect,
-  useMemo,
   useRef,
   useState,
   useTransition,
 } from "react";
-import { generateSeasonSkeletonAction } from "@/app/[locale]/(app)/planner/[teamId]/season-actions";
+import {
+  generateSeasonSkeletonAction,
+  saveSeasonDatesAction,
+} from "@/app/[locale]/(app)/planner/[teamId]/season-actions";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 import { Select } from "@/components/ui/Select";
@@ -29,6 +31,7 @@ import { TeamCalendarSection } from "@/components/teams/TeamCalendarSection";
 import { PlannerDateField } from "./PlannerSeasonCalendar";
 import { THEME_COLORS, THEME_OPTIONS } from "./MicrocycleThemePicker";
 import { planSeason, type MatchKind, type MdScheme } from "@/lib/planner/season";
+import { segmentBounds } from "@/lib/planner/seasons";
 import type { SeasonMatch } from "./PlannerSeasonView";
 
 type MesoDraft = { id: string; weeks: number; theme: string; name: string };
@@ -89,25 +92,9 @@ function weeksInclusive(startYmd: string, endYmd: string): number {
   return Math.max(1, Math.round((end.getTime() - start.getTime()) / (7 * DAY_MS)) + 1);
 }
 
-function seasonStartYear(label: string): number {
-  const m = /^(\d{4})/.exec(label);
-  return m ? Number(m[1]) : new Date().getFullYear();
-}
-
 /** Tour d'une semaine d'après son mois (modèle ASF) : juil→déc = 1er tour, janv→juin = 2e tour. */
 function tourOfYmd(ymd: string): "first_round" | "second_round" {
   return Number(ymd.slice(5, 7)) >= 7 ? "first_round" : "second_round";
-}
-
-function segmentDefaults(label: string, segment: Segment) {
-  const year = seasonStartYear(label);
-  if (segment === "first_round") {
-    return { start: `${year}-07-01`, end: `${year}-12-25` };
-  }
-  if (segment === "second_round") {
-    return { start: `${year + 1}-01-01`, end: `${year + 1}-07-31` };
-  }
-  return { start: `${year}-07-01`, end: `${year + 1}-07-31` };
 }
 
 function statusDot(status: SectionStatus) {
@@ -141,6 +128,88 @@ function ThemeSelect({
   );
 }
 
+type DraftStructure = {
+  prepWeeks?: number;
+  prepTheme?: string | null;
+  mesos?: { weeks?: number; theme?: string | null; name?: string | null }[];
+} | null;
+
+export type SeasonPlanRow = {
+  segment: Segment;
+  start_date: string;
+  championship_start_date: string | null;
+  end_date: string;
+  status: string;
+  draft: {
+    structure: DraftStructure;
+    trainingSlots: { weekday?: number; time?: string; durationMinutes?: number }[] | null;
+  } | null;
+};
+
+type SegmentDraft = {
+  seasonStart: string;
+  seasonEnd: string;
+  prepTheme: string;
+  slots: TrainingSlotDraft[];
+  mesos: MesoDraft[];
+};
+
+function defaultSlots(periodization: Periodization | null): TrainingSlotDraft[] {
+  const days = periodization?.training_weekdays?.length
+    ? periodization.training_weekdays
+    : [1, 2, 4];
+  return days.map((weekday) => ({
+    id: `slot-${weekday}`,
+    weekday,
+    time: "19:00",
+    durationMinutes: 90,
+  }));
+}
+
+function defaultMesos(): MesoDraft[] {
+  return [
+    { id: "c1", weeks: 6, theme: "", name: "" },
+    { id: "c2", weeks: 4, theme: "", name: "" },
+  ];
+}
+
+/** État initial d'un tour : brouillon DB s'il existe, sinon défauts du segment. */
+function draftFor(
+  label: string,
+  seg: Segment,
+  plan: SeasonPlanRow | undefined,
+  periodization: Periodization | null,
+): SegmentDraft {
+  const b = segmentBounds(label, seg);
+  const structure = plan?.draft?.structure ?? null;
+  const trainingSlots = plan?.draft?.trainingSlots ?? null;
+  const slots =
+    trainingSlots && trainingSlots.length > 0
+      ? trainingSlots.map((s, i) => ({
+          id: `slot-${i}-${s.weekday ?? 1}`,
+          weekday: Number(s.weekday) || 1,
+          time: typeof s.time === "string" ? s.time : "19:00",
+          durationMinutes: Number(s.durationMinutes) || 90,
+        }))
+      : defaultSlots(periodization);
+  const mesos =
+    structure?.mesos && structure.mesos.length > 0
+      ? structure.mesos.map((m, i) => ({
+          id: `c${i}`,
+          weeks: Math.max(1, Math.round(Number(m.weeks) || 1)),
+          theme: m.theme ?? "",
+          name: m.name ?? "",
+        }))
+      : defaultMesos();
+  return {
+    seasonStart: plan?.start_date || b.start,
+    seasonEnd: plan?.end_date || b.end,
+    prepTheme: structure?.prepTheme ?? "",
+    slots,
+    mesos,
+  };
+}
+
 export function PlannerSeasonWizard({
   teamId,
   initialSeasonLabel,
@@ -149,6 +218,7 @@ export function PlannerSeasonWizard({
   archivedMatches = [],
   subscriptions,
   periodization,
+  seasonPlans = [],
   generated,
   onClose,
 }: {
@@ -159,6 +229,7 @@ export function PlannerSeasonWizard({
   archivedMatches?: CalendarMatch[];
   subscriptions: Subscription[];
   periodization: Periodization | null;
+  seasonPlans?: SeasonPlanRow[];
   generated: boolean;
   onClose?: () => void;
 }) {
@@ -178,25 +249,27 @@ export function PlannerSeasonWizard({
       `${new Date().getFullYear()}/${String((new Date().getFullYear() + 1) % 100).padStart(2, "0")}`,
   );
   const planName = "";
-  const defaults = useMemo(() => segmentDefaults(seasonLabel, segment), [seasonLabel, segment]);
-  const [seasonStart, setSeasonStart] = useState(defaults.start);
-  const [seasonEnd, setSeasonEnd] = useState(defaults.end);
-  const [prepTheme, setPrepTheme] = useState("");
-  const [slots, setSlots] = useState<TrainingSlotDraft[]>(() => {
-    const days = periodization?.training_weekdays?.length
-      ? periodization.training_weekdays
-      : [1, 2, 4];
-    return days.map((weekday) => ({
-      id: `slot-${weekday}`,
-      weekday,
-      time: "19:00",
-      durationMinutes: 90,
-    }));
+
+  // Brouillon par tour : prefill depuis la DB (season_plans + draft). `initialDrafts`
+  // est un state stable (calculé une fois) ; `draftsRef` en tient une copie mutable
+  // pour persister les saisies au changement de tour (switchFrame) sans re-render.
+  const [initialDrafts] = useState<Record<Segment, SegmentDraft>>(() => {
+    const bySeg = new Map<Segment, SeasonPlanRow>();
+    for (const p of seasonPlans) bySeg.set(p.segment, p);
+    return {
+      first_round: draftFor(seasonLabel, "first_round", bySeg.get("first_round"), periodization),
+      second_round: draftFor(seasonLabel, "second_round", bySeg.get("second_round"), periodization),
+      full: draftFor(seasonLabel, "full", bySeg.get("full"), periodization),
+    };
   });
-  const [mesos, setMesos] = useState<MesoDraft[]>([
-    { id: "c1", weeks: 6, theme: "", name: "" },
-    { id: "c2", weeks: 4, theme: "", name: "" },
-  ]);
+  const draftsRef = useRef<Record<Segment, SegmentDraft>>(initialDrafts);
+  const initial = initialDrafts[segment];
+  const [seasonStart, setSeasonStart] = useState(initial.seasonStart);
+  const [seasonEnd, setSeasonEnd] = useState(initial.seasonEnd);
+  const [prepTheme, setPrepTheme] = useState(initial.prepTheme);
+  const [slots, setSlots] = useState<TrainingSlotDraft[]>(initial.slots);
+  const [mesos, setMesos] = useState<MesoDraft[]>(initial.mesos);
+  const bounds = segmentBounds(seasonLabel, segment);
 
   useEffect(() => {
     stepBodyRef.current?.scrollTo({ top: 0 });
@@ -251,10 +324,16 @@ export function PlannerSeasonWizard({
   }
 
   function switchFrame(nextSegment: Segment) {
-    const nextDefaults = segmentDefaults(seasonLabel, nextSegment);
+    if (nextSegment === segment) return;
+    // Sauvegarde les saisies du tour courant avant de basculer.
+    draftsRef.current[segment] = { seasonStart, seasonEnd, prepTheme, slots, mesos };
+    const next = draftsRef.current[nextSegment];
     setSegment(nextSegment);
-    setSeasonStart(nextDefaults.start);
-    setSeasonEnd(nextDefaults.end);
+    setSeasonStart(next.seasonStart);
+    setSeasonEnd(next.seasonEnd);
+    setPrepTheme(next.prepTheme);
+    setSlots(next.slots);
+    setMesos(next.mesos);
   }
 
   function addSlot() {
@@ -338,6 +417,51 @@ export function PlannerSeasonWizard({
   function generate() {
     if (noMatchesForTour) return;
     buildAndGenerate(segment, seasonStart, seasonEnd);
+  }
+
+  // Enregistre dates + structure du tour SANS générer (brouillon persistant).
+  function saveDates() {
+    const fd = new FormData();
+    fd.set("teamId", teamId);
+    fd.set("locale", locale);
+    fd.set("segment", segment);
+    fd.set("seasonLabel", seasonLabel.trim());
+    fd.set("seasonStart", seasonStart);
+    fd.set("seasonEnd", seasonEnd);
+    fd.set(
+      "trainingSlots",
+      JSON.stringify(
+        slots.map((s) => ({
+          weekday: s.weekday,
+          time: s.time,
+          durationMinutes: s.durationMinutes,
+        })),
+      ),
+    );
+    fd.set(
+      "structure",
+      JSON.stringify({
+        prepWeeks,
+        prepTheme: prepTheme || null,
+        mesos: mesos.map((m) => ({
+          weeks: m.weeks,
+          theme: m.theme || null,
+          name: m.name.trim() || null,
+        })),
+      }),
+    );
+    // Garde aussi la saisie courante en mémoire (cohérent avec switchFrame).
+    draftsRef.current[segment] = { seasonStart, seasonEnd, prepTheme, slots, mesos };
+
+    startTransition(async () => {
+      setMsg(null);
+      const r = await saveSeasonDatesAction(fd);
+      if (r?.error) {
+        setMsg({ ok: false, text: t.has(`err.${r.error}`) ? t(`err.${r.error}`) : r.error });
+      } else {
+        setMsg({ ok: true, text: t("datesSaved") });
+      }
+    });
   }
 
   const body: ReactNode = (() => {
@@ -425,6 +549,9 @@ export function PlannerSeasonWizard({
                   matches={matches}
                   frameStart={seasonStart}
                   frameEnd={seasonEnd}
+                  minYmd={bounds.start}
+                  maxYmd={bounds.end}
+                  hint={t("outOfSeasonRange")}
                   onChange={setSeasonStart}
                 />
                 <PlannerDateField
@@ -434,6 +561,9 @@ export function PlannerSeasonWizard({
                   matches={matches}
                   frameStart={seasonStart}
                   frameEnd={seasonEnd}
+                  minYmd={bounds.start}
+                  maxYmd={bounds.end}
+                  hint={t("outOfSeasonRange")}
                   onChange={setSeasonEnd}
                 />
                 <Input
@@ -781,21 +911,41 @@ export function PlannerSeasonWizard({
             </div>
             <span className="text-[11px] font-semibold text-zinc-500">{pct}%</span>
           </div>
-          <button
-            type="button"
-            onClick={generate}
-            disabled={isPending || noMatchesForTour || !seasonStart || !seasonEnd}
-            className="inline-flex h-8 min-w-[112px] items-center justify-center gap-1.5 rounded-[8px] border border-zinc-200 bg-white px-3 text-[12px] font-medium text-zinc-900 shadow-[0_1px_2px_rgb(0_0_0/0.05)] transition hover:bg-zinc-50 active:scale-[0.98] disabled:opacity-60"
-          >
-            {isPending ? (
-              t("generating")
-            ) : (
-              <>
-                <Save className="h-3 w-3" />
-                {generated ? t("regenerate") : t("generate")}
-              </>
-            )}
-          </button>
+          {/* Étape Planification : enregistrer les dates (sans générer).
+              Étape Résumé : générer. La génération n'est PLUS accessible avant. */}
+          {step === 1 ? (
+            <button
+              type="button"
+              onClick={saveDates}
+              disabled={isPending || !seasonStart || !seasonEnd}
+              className="inline-flex h-8 min-w-[112px] items-center justify-center gap-1.5 rounded-[8px] border border-zinc-200 bg-white px-3 text-[12px] font-medium text-zinc-900 shadow-[0_1px_2px_rgb(0_0_0/0.05)] transition hover:bg-zinc-50 active:scale-[0.98] disabled:opacity-60"
+            >
+              {isPending ? (
+                t("savingDates")
+              ) : (
+                <>
+                  <Save className="h-3 w-3" />
+                  {t("saveDates")}
+                </>
+              )}
+            </button>
+          ) : step === steps.length - 1 ? (
+            <button
+              type="button"
+              onClick={generate}
+              disabled={isPending || noMatchesForTour || !seasonStart || !seasonEnd}
+              className="inline-flex h-8 min-w-[112px] items-center justify-center gap-1.5 rounded-[8px] border border-zinc-200 bg-white px-3 text-[12px] font-medium text-zinc-900 shadow-[0_1px_2px_rgb(0_0_0/0.05)] transition hover:bg-zinc-50 active:scale-[0.98] disabled:opacity-60"
+            >
+              {isPending ? (
+                t("generating")
+              ) : (
+                <>
+                  <Save className="h-3 w-3" />
+                  {generated ? t("regenerate") : t("generate")}
+                </>
+              )}
+            </button>
+          ) : null}
         </div>
       </header>
 

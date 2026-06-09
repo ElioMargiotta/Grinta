@@ -11,6 +11,7 @@ import {
   type SeasonStructure,
   type TrainingSlot,
 } from "@/lib/planner/season";
+import { seasonWindow } from "@/lib/planner/seasons";
 
 type ActionResult = {
   ok?: true;
@@ -504,4 +505,167 @@ export async function generateSeasonSkeletonAction(
     microcycles: insertedMicros.length,
     sessions: sessionRows.length,
   };
+}
+
+type SimpleResult = { ok?: true; error?: ActionResult["error"] };
+
+/**
+ * Enregistre les dates + la structure d'un tour SANS générer le squelette
+ * (brouillon). Persiste dans `season_plans` : start/end + `draft`
+ * { structure, trainingSlots }. Conserve le `status` si la ligne est déjà
+ * `generated` (on ne « déclasse » pas un tour généré) ; sinon `draft`.
+ */
+export async function saveSeasonDatesAction(
+  formData: FormData,
+): Promise<SimpleResult> {
+  const teamId = String(formData.get("teamId") ?? "");
+  const locale = String(formData.get("locale") ?? "fr");
+  const segment = parseSegment(String(formData.get("segment") ?? "") || null);
+  const seasonStart = String(formData.get("seasonStart") ?? "").trim();
+  const seasonEnd = String(formData.get("seasonEnd") ?? "").trim();
+  const championshipStart =
+    String(formData.get("championshipStart") ?? "").trim() || null;
+  const seasonLabel =
+    String(formData.get("seasonLabel") ?? "").trim() ||
+    `${new Date().getFullYear()}/${String((new Date().getFullYear() + 1) % 100).padStart(2, "0")}`;
+  const structure = parseStructure(String(formData.get("structure") ?? "") || null);
+  const trainingSlots = parseTrainingSlots(String(formData.get("trainingSlots") ?? "") || null);
+
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(seasonStart) || !/^\d{4}-\d{2}-\d{2}$/.test(seasonEnd)) {
+    return { error: "db_error" };
+  }
+  if (seasonEnd < seasonStart) return { error: "db_error" };
+
+  const access = await loadTeamAccess(teamId);
+  if (!access.ok) return { error: access.error };
+  const { supabase, clubId } = access;
+
+  const draft = { structure: structure ?? null, trainingSlots: trainingSlots ?? null };
+
+  const { data: existing } = await supabase
+    .from("season_plans")
+    .select("id, status")
+    .eq("team_id", teamId)
+    .eq("season_label", seasonLabel)
+    .eq("segment", segment)
+    .maybeSingle();
+
+  if (existing?.id) {
+    const { error } = await supabase
+      .from("season_plans")
+      .update({
+        start_date: seasonStart,
+        championship_start_date: championshipStart,
+        end_date: seasonEnd,
+        draft,
+      })
+      .eq("id", existing.id);
+    if (error) return { error: "db_error" };
+  } else {
+    const { error } = await supabase.from("season_plans").insert({
+      team_id: teamId,
+      club_id: clubId,
+      season_label: seasonLabel,
+      segment,
+      mode: "replace",
+      start_date: seasonStart,
+      championship_start_date: championshipStart,
+      end_date: seasonEnd,
+      status: "draft",
+      source: "manual",
+      draft,
+    });
+    if (error) return { error: "db_error" };
+  }
+
+  revalidatePath(`/${locale}/planner/${teamId}`);
+  return { ok: true };
+}
+
+/**
+ * Efface tout le squelette GÉNÉRÉ d'un millésime (les deux tours) : sessions
+ * `source='generated'`, microcycles/mésocycles générés, macrocycle généré, dans
+ * la fenêtre de saison. Les séances MANUELLES sont préservées (détachées du
+ * micro supprimé via FK ON DELETE SET NULL). Les `season_plans` repassent en
+ * `status='draft'` : on garde les dates + le brouillon de structure pour
+ * pouvoir régénérer.
+ */
+export async function clearSeasonAction(
+  formData: FormData,
+): Promise<SimpleResult> {
+  const teamId = String(formData.get("teamId") ?? "");
+  const locale = String(formData.get("locale") ?? "fr");
+  const seasonLabel = String(formData.get("season") ?? "").trim();
+  if (!/^\d{4}\/\d{2}$/.test(seasonLabel)) return { error: "db_error" };
+  const window = seasonWindow(seasonLabel);
+
+  const access = await loadTeamAccess(teamId);
+  if (!access.ok) return { error: access.error };
+  const { supabase } = access;
+
+  // Plans générés du millésime.
+  const { data: plans } = await supabase
+    .from("season_plans")
+    .select("id, status")
+    .eq("team_id", teamId)
+    .eq("season_label", seasonLabel);
+  const planIds = (plans ?? []).map((p) => p.id as string);
+
+  // Microcycles générés de la fenêtre : rattachés à un plan, ou pilotés par un
+  // match (target_match_id) — jamais les micros manuels nus.
+  const microIds = new Set<string>();
+  if (planIds.length > 0) {
+    const { data } = await supabase
+      .from("microcycles")
+      .select("id")
+      .eq("team_id", teamId)
+      .in("season_plan_id", planIds);
+    for (const m of data ?? []) microIds.add(m.id as string);
+  }
+  const { data: matchMicros } = await supabase
+    .from("microcycles")
+    .select("id")
+    .eq("team_id", teamId)
+    .not("target_match_id", "is", null)
+    .gte("start_date", window.start)
+    .lte("start_date", window.end);
+  for (const m of matchMicros ?? []) microIds.add(m.id as string);
+
+  // Sessions générées de la fenêtre (par date) — supprime aussi les sessions
+  // générées rattachées aux micros visés.
+  await supabase
+    .from("sessions")
+    .delete()
+    .eq("team_id", teamId)
+    .eq("source", "generated")
+    .gte("date", window.start)
+    .lte("date", window.end);
+
+  if (microIds.size > 0) {
+    await supabase
+      .from("microcycles")
+      .delete()
+      .eq("team_id", teamId)
+      .in("id", [...microIds]);
+  }
+
+  if (planIds.length > 0) {
+    await supabase.from("mesocycles").delete().in("season_plan_id", planIds);
+  }
+
+  // NB : on NE supprime PAS le macrocycle généré (un seul par équipe, réutilisé
+  // par `generateSeasonSkeletonAction`). Vidé de ses mésocycles, il est de toute
+  // façon masqué par la page (filtre `mesocycles.length > 0`).
+
+  // Repasse les plans en brouillon (dates + draft conservés).
+  if (planIds.length > 0) {
+    await supabase
+      .from("season_plans")
+      .update({ status: "draft" })
+      .in("id", planIds)
+      .eq("status", "generated");
+  }
+
+  revalidatePath(`/${locale}/planner/${teamId}`);
+  return { ok: true };
 }

@@ -225,6 +225,29 @@ export default async function PlannerTeamPage({
     sessionsByMicro.set(s.microcycle_id, arr);
   }
 
+  // Plans saison/tour (cadre + brouillon de structure) du millésime — prefill
+  // du wizard (dates + structure conservées sans génération).
+  const { data: seasonPlanRows } = await supabase
+    .from("season_plans")
+    .select("segment, start_date, championship_start_date, end_date, status, draft")
+    .eq("team_id", teamId)
+    .eq("season_label", season);
+  const seasonPlans = (seasonPlanRows ?? []).map((p) => ({
+    segment: p.segment as "first_round" | "second_round" | "full",
+    start_date: p.start_date as string,
+    championship_start_date: (p.championship_start_date as string | null) ?? null,
+    end_date: p.end_date as string,
+    status: p.status as string,
+    draft: (p.draft as {
+      structure: {
+        prepWeeks?: number;
+        prepTheme?: string | null;
+        mesos?: { weeks?: number; theme?: string | null; name?: string | null }[];
+      } | null;
+      trainingSlots: { weekday?: number; time?: string; durationMinutes?: number }[] | null;
+    } | null) ?? null,
+  }));
+
   const seasonMicrocycles = (seasonMicroRows ?? []).map((mi) => ({
     id: mi.id,
     startDate: mi.start_date,
@@ -259,6 +282,7 @@ export default async function PlannerTeamPage({
         subscriptions={subscriptions}
         periodization={periodization}
         seasonMicrocycles={seasonMicrocycles}
+        seasonPlans={seasonPlans}
       />
     </div>
   );

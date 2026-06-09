@@ -34,3 +34,22 @@ export function seasonWindow(label: string): { start: string; end: string } {
 export function normalizeSeasonLabel(value: string | null | undefined): string {
   return value && /^\d{4}\/\d{2}$/.test(value) ? value : currentSeasonLabel();
 }
+
+export type Segment = "first_round" | "second_round" | "full";
+
+/**
+ * Bornes `YYYY-MM-DD` d'un tour, TOUJOURS comprises dans la fenêtre du millésime
+ * (juil. → juin) : 1er tour = juil. → 31 déc., 2e tour = 1er janv. → 30 juin,
+ * saison complète = fenêtre entière. Source unique de vérité (wizard + vue
+ * Saison) pour que rien ne déborde de la saison.
+ */
+export function segmentBounds(
+  label: string,
+  segment: Segment,
+): { start: string; end: string } {
+  const { start, end } = seasonWindow(label);
+  const year = seasonStartYear(label);
+  if (segment === "first_round") return { start, end: `${year}-12-31` };
+  if (segment === "second_round") return { start: `${year + 1}-01-01`, end };
+  return { start, end };
+}

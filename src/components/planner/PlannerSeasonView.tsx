@@ -1,9 +1,11 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useMemo, useState, useTransition } from "react";
+import { useRouter } from "next/navigation";
 import { useLocale, useTranslations } from "next-intl";
-import { CalendarDays } from "lucide-react";
-import { PlannerSeasonWizard } from "./PlannerSeasonWizard";
+import { CalendarDays, Trash2 } from "lucide-react";
+import { PlannerSeasonWizard, type SeasonPlanRow } from "./PlannerSeasonWizard";
+import { clearSeasonAction } from "@/app/[locale]/(app)/planner/[teamId]/season-actions";
 import { Select } from "@/components/ui/Select";
 import { THEME_COLORS, THEME_OPTIONS } from "./MicrocycleThemePicker";
 
@@ -92,6 +94,7 @@ export function PlannerSeasonView({
   subscriptions,
   periodization,
   seasonMicrocycles,
+  seasonPlans = [],
 }: {
   teamId: string;
   seasonLabel: string | null;
@@ -100,11 +103,14 @@ export function PlannerSeasonView({
   subscriptions: Subscription[];
   periodization: Periodization | null;
   seasonMicrocycles: SeasonMicrocycle[];
+  seasonPlans?: SeasonPlanRow[];
 }) {
   const t = useTranslations("planner.season");
   const tw = useTranslations("planner.wizard");
   const tTheme = useTranslations("planner.theme");
   const locale = useLocale();
+  const router = useRouter();
+  const [isClearing, startClear] = useTransition();
   const [editingSegment, setEditingSegment] = useState<Segment | null>(null);
   // Saison pilotée au niveau page (sélecteur global) — pas de second sélecteur ici.
   const selectedSeason = seasonLabel ?? currentSeasonLabel();
@@ -129,6 +135,19 @@ export function PlannerSeasonView({
     .filter((mc) => mc.startDate >= bounds.start && mc.startDate <= bounds.end)
     .sort((a, b) => a.startDate.localeCompare(b.startDate));
 
+  function clearSeason() {
+    if (!generated || isClearing) return;
+    if (!window.confirm(t("clearConfirm"))) return;
+    const fd = new FormData();
+    fd.set("teamId", teamId);
+    fd.set("locale", locale);
+    fd.set("season", selectedSeason);
+    startClear(async () => {
+      await clearSeasonAction(fd);
+      router.refresh();
+    });
+  }
+
   if (editingSegment) {
     return (
       <PlannerSeasonWizard
@@ -139,6 +158,7 @@ export function PlannerSeasonView({
         archivedMatches={archivedMatches}
         subscriptions={subscriptions}
         periodization={periodization}
+        seasonPlans={seasonPlans}
         generated={generated}
         onClose={() => setEditingSegment(null)}
       />
@@ -159,13 +179,26 @@ export function PlannerSeasonView({
             <option value="second_round">{tw("segment.second_round")}</option>
             <option value="full">{tw("segment.full")}</option>
           </Select>
-          <button
-            type="button"
-            onClick={() => setEditingSegment(selectedSegment)}
-            className="inline-flex h-8 items-center justify-center rounded-[8px] bg-zinc-950 px-3 text-[12px] font-medium text-white transition hover:bg-zinc-800"
-          >
-            {generated ? t("editPlanning") : t("createPlanning")}
-          </button>
+          <div className="flex items-center gap-2">
+            {generated ? (
+              <button
+                type="button"
+                onClick={clearSeason}
+                disabled={isClearing}
+                className="inline-flex h-8 items-center justify-center gap-1.5 rounded-[8px] border border-red-200 bg-white px-3 text-[12px] font-medium text-red-600 transition hover:bg-red-50 disabled:opacity-60"
+              >
+                <Trash2 className="h-3.5 w-3.5" />
+                {isClearing ? t("clearing") : t("clearSeason")}
+              </button>
+            ) : null}
+            <button
+              type="button"
+              onClick={() => setEditingSegment(selectedSegment)}
+              className="inline-flex h-8 items-center justify-center rounded-[8px] bg-zinc-950 px-3 text-[12px] font-medium text-white transition hover:bg-zinc-800"
+            >
+              {generated ? t("editPlanning") : t("createPlanning")}
+            </button>
+          </div>
         </div>
       </section>
 

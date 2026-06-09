@@ -48,12 +48,17 @@ export function PlannerSeasonCalendar({
   matches,
   frameStart,
   frameEnd,
+  minYmd,
+  maxYmd,
   value,
   onPick,
 }: {
   matches: CalendarMatch[];
   frameStart: string;
   frameEnd: string;
+  /** Bornes sélectionnables (`YYYY-MM-DD`) : jours hors plage désactivés. */
+  minYmd?: string;
+  maxYmd?: string;
   /** Jour sélectionné (ymd). */
   value: string;
   /** Fixe la date au jour cliqué (ymd). */
@@ -178,6 +183,8 @@ export function PlannerSeasonCalendar({
             const ymd = ymdOf(day);
             const inMonth = day.getUTCMonth() === cursor.month;
             const inFrame = Boolean(frameStart && frameEnd && ymd >= frameStart && ymd <= frameEnd);
+            const outOfRange =
+              (Boolean(minYmd) && ymd < minYmd!) || (Boolean(maxYmd) && ymd > maxYmd!);
             const isReprise = ymd === value;
             const isToday = ymd === todayYmd;
             const dayMatches = byDay.get(ymd) ?? [];
@@ -189,16 +196,20 @@ export function PlannerSeasonCalendar({
               <button
                 key={ymd}
                 type="button"
+                disabled={outOfRange}
                 onClick={() => onPick(ymd)}
                 title={dayMatches.map((m) => m.opponent ?? m.summary ?? "—").join(" · ") || undefined}
                 className={[
                   "relative flex min-h-[44px] min-w-0 flex-col items-center gap-0.5 overflow-hidden rounded-[7px] px-0.5 py-1 transition",
                   inMonth ? "" : "opacity-30",
+                  outOfRange ? "cursor-not-allowed opacity-20" : "",
                   isReprise
                     ? "bg-red-500 ring-2 ring-red-500"
-                    : inFrame
-                      ? "bg-zinc-50 hover:bg-zinc-100"
-                      : "hover:bg-zinc-100",
+                    : outOfRange
+                      ? ""
+                      : inFrame
+                        ? "bg-zinc-50 hover:bg-zinc-100"
+                        : "hover:bg-zinc-100",
                   isToday && !isReprise ? "ring-1 ring-inset ring-zinc-300" : "",
                 ].join(" ")}
               >
@@ -251,12 +262,15 @@ export function PlannerSeasonCalendar({
                 hour: "2-digit",
                 minute: "2-digit",
               });
+              const outOfRange =
+                (Boolean(minYmd) && ymd < minYmd!) || (Boolean(maxYmd) && ymd > maxYmd!);
               return (
                 <li key={m.id}>
                   <button
                     type="button"
+                    disabled={outOfRange}
                     onClick={() => onPick(ymd)}
-                    className="flex w-full items-center gap-2.5 rounded-[8px] px-2 py-1.5 text-left transition hover:bg-zinc-50"
+                    className="flex w-full items-center gap-2.5 rounded-[8px] px-2 py-1.5 text-left transition hover:bg-zinc-50 disabled:cursor-not-allowed disabled:opacity-30"
                   >
                     <span
                       className={`h-2 w-2 shrink-0 rounded-full ${
@@ -298,6 +312,8 @@ export function PlannerDateField({
   matches,
   frameStart,
   frameEnd,
+  minYmd,
+  maxYmd,
   onChange,
 }: {
   id: string;
@@ -307,6 +323,8 @@ export function PlannerDateField({
   matches: CalendarMatch[];
   frameStart: string;
   frameEnd: string;
+  minYmd?: string;
+  maxYmd?: string;
   onChange: (ymd: string) => void;
 }) {
   const locale = useLocale();
@@ -365,6 +383,8 @@ export function PlannerDateField({
               matches={matches}
               frameStart={frameStart}
               frameEnd={frameEnd}
+              minYmd={minYmd}
+              maxYmd={maxYmd}
               value={value}
               onPick={(ymd) => {
                 onChange(ymd);
