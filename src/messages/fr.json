@@ -1512,7 +1512,10 @@
         "nightMode": "Nuit",
         "primaryColor": "Principale",
         "secondaryColor": "Secondaire",
-        "saveIdentity": "Enregistrer l'identité"
+        "saveIdentity": "Enregistrer l'identité",
+        "uploadLogo": "Importer un logo",
+        "removeLogo": "Retirer",
+        "logoHint": "PNG ou JPEG, 2 Mo max."
       },
       "invite": {
         "title": "Inviter un membre",
@@ -1536,7 +1539,13 @@
       "members": {
         "title": "Membres ({n})",
         "unnamed": "(sans nom)",
-        "remove": "Retirer"
+        "remove": "Retirer",
+        "emptyRole": "Aucun membre pour ce rôle.",
+        "filterRole": "Rôle",
+        "filterAllRoles": "Tous les rôles",
+        "filterTeam": "Équipe",
+        "filterAllTeams": "Toutes les équipes",
+        "filteredCount": "{n, plural, =0 {Aucun membre} one {1 membre} other {# membres}}"
       },
       "roles": {
         "title": "Rôles du club",
@@ -1545,7 +1554,8 @@
         "labelPlaceholder": "Responsable formation",
         "accessLevel": "Niveau d'accès",
         "addRole": "Ajouter le rôle",
-        "system": "système"
+        "system": "système",
+        "countLabel": "{n, plural, =0 {Aucun rôle} one {1 rôle} other {# rôles}}"
       },
       "access": {
         "full": "Total",
@@ -1556,7 +1566,13 @@
         "teamHelp": "Une ou plusieurs équipes spécifiques.",
         "team_readonly": "Lecture seule équipe",
         "team_readonlyHelp": "Lecture seule sur une ou plusieurs équipes."
-      }
+      },
+      "tabs": {
+        "general": "Général",
+        "staff": "Effectif",
+        "roles": "Rôles & invitations"
+      },
+      "sectionsLabel": "Sections"
     },
     "clubPage": {
       "title": "Paramètres du club",

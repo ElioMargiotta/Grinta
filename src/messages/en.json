@@ -1513,7 +1513,10 @@
         "nightMode": "Night",
         "primaryColor": "Primary",
         "secondaryColor": "Secondary",
-        "saveIdentity": "Save identity"
+        "saveIdentity": "Save identity",
+        "uploadLogo": "Upload a logo",
+        "removeLogo": "Remove",
+        "logoHint": "PNG or JPEG, 2 MB max."
       },
       "invite": {
         "title": "Invite a member",
@@ -1537,7 +1540,13 @@
       "members": {
         "title": "Members ({n})",
         "unnamed": "(no name)",
-        "remove": "Remove"
+        "remove": "Remove",
+        "emptyRole": "No member for this role.",
+        "filterRole": "Role",
+        "filterAllRoles": "All roles",
+        "filterTeam": "Team",
+        "filterAllTeams": "All teams",
+        "filteredCount": "{n, plural, =0 {No member} one {1 member} other {# members}}"
       },
       "roles": {
         "title": "Club roles",
@@ -1546,7 +1555,8 @@
         "labelPlaceholder": "Head of training",
         "accessLevel": "Access level",
         "addRole": "Add role",
-        "system": "system"
+        "system": "system",
+        "countLabel": "{n, plural, =0 {No role} one {1 role} other {# roles}}"
       },
       "access": {
         "full": "Full",
@@ -1557,7 +1567,13 @@
         "teamHelp": "One or more specific teams.",
         "team_readonly": "Team read-only",
         "team_readonlyHelp": "Read-only on one or more teams."
-      }
+      },
+      "tabs": {
+        "general": "General",
+        "staff": "Staff",
+        "roles": "Roles & invitations"
+      },
+      "sectionsLabel": "Sections"
     },
     "clubPage": {
       "title": "Club settings",
