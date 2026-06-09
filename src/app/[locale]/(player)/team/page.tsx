@@ -1,5 +1,5 @@
 import { getTranslations, setRequestLocale } from "next-intl/server";
-import { Card } from "@/components/ui/Card";
+import { Section } from "@/components/ui/Section";
 import { requirePersona } from "@/lib/auth/getUser";
 
 type AssignmentRow = {
@@ -24,9 +24,9 @@ export default async function PlayerTeamPage({
         <h1 className="text-2xl font-semibold text-zinc-900 dark:text-zinc-100">
           {t("title")}
         </h1>
-        <Card>
+        <Section>
           <p className="text-sm text-zinc-600 dark:text-zinc-400">{t("empty")}</p>
-        </Card>
+        </Section>
       </div>
     );
   }
@@ -46,24 +46,26 @@ export default async function PlayerTeamPage({
       </h1>
 
       {assignments.length === 0 ? (
-        <Card>
+        <Section>
           <p className="text-sm text-zinc-600 dark:text-zinc-400">{t("empty")}</p>
-        </Card>
+        </Section>
       ) : (
-        <div className="flex flex-col gap-3">
+        <div className="overflow-hidden rounded-lg border border-[var(--club-line)] bg-white dark:border-zinc-800 dark:bg-zinc-900">
           {assignments.map((a) => (
-            <Card key={`${a.team_id}-${a.season ?? "current"}`}>
-              <div className="flex items-center justify-between">
-                <div>
-                  <div className="text-base font-semibold text-zinc-900 dark:text-zinc-100">
-                    {a.teams.name}
-                  </div>
-                  <div className="text-[11px] font-mono uppercase tracking-widest text-zinc-500 dark:text-zinc-400">
-                    {a.season ?? t("currentSeason")}
-                  </div>
+            <div
+              key={`${a.team_id}-${a.season ?? "current"}`}
+              className="flex items-center gap-3 border-b border-zinc-100 px-4 py-3 last:border-b-0 dark:border-zinc-800"
+            >
+              <span className="h-9 w-1 rounded-full bg-[var(--club-primary)]" />
+              <div className="min-w-0">
+                <div className="truncate text-base font-semibold text-zinc-900 dark:text-zinc-100">
+                  {a.teams.name}
+                </div>
+                <div className="text-[11px] font-mono uppercase tracking-widest text-zinc-500 dark:text-zinc-400">
+                  {a.season ?? t("currentSeason")}
                 </div>
               </div>
-            </Card>
+            </div>
           ))}
         </div>
       )}

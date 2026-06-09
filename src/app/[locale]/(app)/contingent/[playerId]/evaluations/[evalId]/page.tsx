@@ -7,6 +7,15 @@ import {
 } from "@/components/evaluation/types";
 import { requireMembership } from "@/lib/auth/getUser";
 
+type EvaluationDbRow = {
+  id: string;
+  player_id: string;
+  season: string | null;
+  evaluation_date: string | null;
+  data: Partial<EvaluationData> | null;
+  shared_with_player?: boolean | null;
+};
+
 export default async function PlayerEvaluationPage({
   params,
 }: {
@@ -16,13 +25,16 @@ export default async function PlayerEvaluationPage({
   setRequestLocale(locale);
   const { supabase, membership } = await requireMembership(locale);
 
-  const [{ data: evaluation }, { data: player }] = await Promise.all([
+  const [
+    { data: evaluationWithSharing, error: evaluationWithSharingError },
+    { data: player },
+  ] = await Promise.all([
     supabase
       .from("player_evaluations")
-      .select("id, player_id, season, evaluation_date, data")
+      .select("id, player_id, season, evaluation_date, data, shared_with_player")
       .eq("id", evalId)
       .eq("player_id", playerId)
-      .maybeSingle(),
+      .maybeSingle<EvaluationDbRow>(),
     supabase
       .from("players")
       .select(
@@ -31,6 +43,19 @@ export default async function PlayerEvaluationPage({
       .eq("id", playerId)
       .single(),
   ]);
+
+  let sharingAvailable = true;
+  let evaluation = evaluationWithSharing;
+  if (evaluationWithSharingError) {
+    sharingAvailable = false;
+    const { data: fallbackEvaluation } = await supabase
+      .from("player_evaluations")
+      .select("id, player_id, season, evaluation_date, data")
+      .eq("id", evalId)
+      .eq("player_id", playerId)
+      .maybeSingle<EvaluationDbRow>();
+    evaluation = fallbackEvaluation;
+  }
 
   if (!evaluation || !player) notFound();
 
@@ -68,6 +93,8 @@ export default async function PlayerEvaluationPage({
       initial={initial}
       backHref={`/${locale}/contingent/${playerId}`}
       teamLogoUrl={membership.logo_url}
+      sharedWithPlayer={Boolean(evaluation.shared_with_player)}
+      sharingAvailable={sharingAvailable}
     />
   );
 }

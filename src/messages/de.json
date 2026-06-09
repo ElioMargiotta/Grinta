@@ -1895,7 +1895,38 @@
       "import": "Aus ClubCorner importieren",
       "importHint": "Aus exportierter CSV"
     },
-    "seasonScope": "Saison {season}"
+    "seasonScope": "Saison {season}",
+    "playerProfile": {
+      "eyebrow": "Spielerprofil",
+      "profileTitle": "Spielerdaten",
+      "tabs": {
+        "profile": "Profil",
+        "assignment": "Zuweisung",
+        "stats": "Statistiken",
+        "followup": "Verlauf",
+        "admin": "Admin"
+      },
+      "stats": {
+        "teams": "Teams",
+        "reports": "Berichte",
+        "invites": "Einladungen"
+      },
+      "statsTitle": "Spielerstatistiken",
+      "metrics": {
+        "presence": {
+          "label": "Anwesenheit",
+          "hint": "Anwesenheitsrate bei Trainings und Spielen."
+        },
+        "sessions": {
+          "label": "Einheiten",
+          "hint": "Trainingsumfang des Spielers in der Saison."
+        },
+        "availability": {
+          "label": "Verfügbarkeit",
+          "hint": "Verletzungen, Absenzen und Rückkehr werden hier verfolgt."
+        }
+      }
+    }
   },
   "playerMe": {
     "title": "Mein Profil",
@@ -1922,7 +1953,10 @@
     "canton": "Kanton",
     "dualLicenceClub": "Partnerverein",
     "dualLicenceLevel": "Niveau",
-    "dualLicenceTeam": "Mannschaft"
+    "dualLicenceTeam": "Mannschaft",
+    "sectionEvaluation": "Meine Entwicklung",
+    "evaluationHint": "Von deinem Staff geteilte Bewertungsberichte.",
+    "evaluationNoDate": "Ohne Datum"
   },
   "playerTeam": {
     "title": "Meine Mannschaften",
@@ -2191,7 +2225,15 @@
         "envisageable": "Möglich",
         "problematic": "Problematisch",
         "veryDifficult": "Sehr schwierig"
-      }
+      },
+      "shared": "Geteilt",
+      "notShared": "Nicht geteilt",
+      "sharedBadge": "Geteilt",
+      "shareHint": "Diesen Bericht mit dem Spieler teilen",
+      "unshareHint": "Diesen Bericht nicht mehr mit dem Spieler teilen",
+      "sharing": "Freigabe wird aktualisiert",
+      "sharingUnavailable": "Spielerfreigabe nicht verfügbar: Migration shared_with_player anwenden.",
+      "sharingUnavailableShort": "Freigabe nicht verfügbar"
     },
     "progress": "Fortschritt",
     "stepsLabel": "Schritte",

@@ -1,10 +1,16 @@
 import { getTranslations, setRequestLocale } from "next-intl/server";
-import { Card } from "@/components/ui/Card";
+import { ClipboardList } from "lucide-react";
+import { Section, SectionHeader } from "@/components/ui/Section";
 import { requirePersona } from "@/lib/auth/getUser";
 import {
   PendingInvitationsCard,
   type PendingInvitation,
 } from "@/components/player/PendingInvitationsCard";
+import { PlayerEvaluationReport } from "@/components/evaluation/PlayerEvaluationReport";
+import {
+  mergeEvaluation,
+  type EvaluationData,
+} from "@/components/evaluation/types";
 
 type PlayerRow = {
   id: string;
@@ -37,6 +43,13 @@ type InvitationRow = {
   clubs: { name: string } | null;
   club_roles: { name: string } | null;
   teams: { name: string } | null;
+};
+
+type SharedEvaluationRow = {
+  id: string;
+  season: string | null;
+  evaluation_date: string | null;
+  data: Partial<EvaluationData> | null;
 };
 
 function Field({ label, value }: { label: string; value: string | number | null }) {
@@ -104,7 +117,7 @@ export default async function PlayerMePage({
           {t("title")}
         </h1>
 
-        <Card>
+        <Section>
           <div className="flex flex-col items-start gap-2">
             <h2 className="text-base font-semibold text-zinc-900 dark:text-zinc-100">
               {tInv("welcomeTitle")}
@@ -115,12 +128,28 @@ export default async function PlayerMePage({
                 : tInv("welcomeNoInvites")}
             </p>
           </div>
-        </Card>
+        </Section>
 
         <PendingInvitationsCard locale={locale} invitations={invitations} />
       </div>
     );
   }
+
+  const { data: sharedEvalRows } = await supabase
+    .from("player_evaluations")
+    .select("id, season, evaluation_date, data")
+    .eq("player_id", player.id)
+    .eq("shared_with_player", true)
+    .order("evaluation_date", { ascending: false, nullsFirst: false })
+    .order("created_at", { ascending: false })
+    .returns<SharedEvaluationRow[]>();
+
+  const sharedEvaluations = (sharedEvalRows ?? []).map((row) => ({
+    id: row.id,
+    season: row.season,
+    evaluationDate: row.evaluation_date,
+    data: mergeEvaluation(row.data),
+  }));
 
   const fullName = `${player.first_name} ${player.last_name}`;
 
@@ -150,22 +179,18 @@ export default async function PlayerMePage({
 
       <PendingInvitationsCard locale={locale} invitations={invitations} />
 
-      <Card>
-        <h2 className="mb-4 text-base font-semibold text-zinc-900 dark:text-zinc-100">
-          {t("sectionIdentity")}
-        </h2>
+      <Section>
+        <SectionHeader title={t("sectionIdentity")} className="mb-4" />
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
           <Field label={t("firstName")} value={player.first_name} />
           <Field label={t("lastName")} value={player.last_name} />
           <Field label={t("birthDate")} value={player.birth_date} />
           <Field label={t("nationality")} value={player.nationality} />
         </div>
-      </Card>
+      </Section>
 
-      <Card>
-        <h2 className="mb-4 text-base font-semibold text-zinc-900 dark:text-zinc-100">
-          {t("sectionGame")}
-        </h2>
+      <Section>
+        <SectionHeader title={t("sectionGame")} className="mb-4" />
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
           <Field label={t("position")} value={player.position} />
           <Field label={t("jerseyNumber")} value={player.jersey_number} />
@@ -173,12 +198,10 @@ export default async function PlayerMePage({
           <Field label={t("licenseNumber")} value={player.license_number} />
           <Field label={t("jsNumber")} value={player.js_number} />
         </div>
-      </Card>
+      </Section>
 
-      <Card>
-        <h2 className="mb-4 text-base font-semibold text-zinc-900 dark:text-zinc-100">
-          {t("sectionContact")}
-        </h2>
+      <Section>
+        <SectionHeader title={t("sectionContact")} className="mb-4" />
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
           <Field label={t("email")} value={player.email} />
           <Field label={t("phone")} value={player.phone} />
@@ -187,19 +210,43 @@ export default async function PlayerMePage({
           <Field label={t("city")} value={player.city} />
           <Field label={t("canton")} value={player.canton} />
         </div>
-      </Card>
+      </Section>
 
       {player.dual_licence_club && (
-        <Card>
-          <h2 className="mb-4 text-base font-semibold text-zinc-900 dark:text-zinc-100">
-            {t("sectionDualLicence")}
-          </h2>
+        <Section>
+          <SectionHeader title={t("sectionDualLicence")} className="mb-4" />
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
             <Field label={t("dualLicenceClub")} value={player.dual_licence_club} />
             <Field label={t("dualLicenceLevel")} value={player.dual_licence_level} />
             <Field label={t("dualLicenceTeam")} value={player.dual_licence_team} />
           </div>
-        </Card>
+        </Section>
+      )}
+
+      {sharedEvaluations.length > 0 && (
+        <div className="flex flex-col gap-2">
+          <h2 className="text-base font-semibold text-zinc-900 dark:text-zinc-100">
+            {t("sectionEvaluation")}
+          </h2>
+          <p className="text-sm text-zinc-500 dark:text-zinc-400">
+            {t("evaluationHint")}
+          </p>
+          {sharedEvaluations.map((ev) => (
+            <Section key={ev.id}>
+              <SectionHeader
+                icon={ClipboardList}
+                title={
+                  ev.evaluationDate
+                    ? new Date(ev.evaluationDate).toLocaleDateString(locale)
+                    : t("evaluationNoDate")
+                }
+                description={ev.season ?? undefined}
+                className="mb-5"
+              />
+              <PlayerEvaluationReport data={ev.data} />
+            </Section>
+          ))}
+        </div>
       )}
     </div>
   );

@@ -5,6 +5,8 @@ import {
   Check,
   ChevronLeft,
   ChevronRight,
+  Eye,
+  EyeOff,
   Hash,
   Loader2,
   MapPin,
@@ -30,6 +32,7 @@ import {
 import {
   deletePlayerEvaluationAction,
   savePlayerEvaluationAction,
+  setEvaluationSharedAction,
 } from "@/app/[locale]/(app)/contingent/[playerId]/evaluations/actions";
 import { useLoading } from "@/components/ui/LoadingProvider";
 import {
@@ -1129,6 +1132,8 @@ export function EvaluationSheet({
   initial,
   backHref,
   teamLogoUrl,
+  sharedWithPlayer = false,
+  sharingAvailable = true,
 }: {
   playerId: string;
   evaluationId: string;
@@ -1136,12 +1141,16 @@ export function EvaluationSheet({
   initial: EvaluationData;
   backHref: string;
   teamLogoUrl?: string | null;
+  sharedWithPlayer?: boolean;
+  sharingAvailable?: boolean;
 }) {
   const [data, setData] = useState<EvaluationData>(initial);
+  const [shared, setShared] = useState(sharedWithPlayer);
   const [dirty, setDirty] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [justSaved, setJustSaved] = useState(false);
   const [isPending, startTransition] = useTransition();
+  const [isSharing, startSharingTransition] = useTransition();
   const [step, setStep] = useState(0);
   const [stepKey, setStepKey] = useState(0);
   const stepBodyRef = useRef<HTMLDivElement | null>(null);
@@ -1203,6 +1212,28 @@ export function EvaluationSheet({
 
   function handlePrint() {
     if (typeof window !== "undefined") window.print();
+  }
+
+  function toggleSharing() {
+    const next = !shared;
+    setError(null);
+    startSharingTransition(async () => {
+      const result = await run(
+        () =>
+          setEvaluationSharedAction({
+            playerId,
+            evaluationId,
+            locale,
+            shared: next,
+          }),
+        { label: t("saving"), message: tCommon("pleaseWait") },
+      );
+      if (result?.error) {
+        setError(result.error);
+        return;
+      }
+      setShared(next);
+    });
   }
 
   useEffect(() => {
@@ -1285,6 +1316,33 @@ export function EvaluationSheet({
                 {pct}%
               </span>
             </div>
+            <button
+              type="button"
+              onClick={toggleSharing}
+              disabled={isSharing}
+              title={
+                sharingAvailable
+                  ? shared
+                    ? t("list.unshareHint")
+                    : t("list.shareHint")
+                  : "Appliquez la migration shared_with_player pour modifier cette visibilité."
+              }
+              aria-pressed={sharingAvailable ? shared : undefined}
+              className={`inline-flex h-8 items-center gap-1.5 rounded-[8px] border px-3 text-[12px] font-medium shadow-[0_1px_2px_rgb(0_0_0/0.05)] transition active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-60 ${
+                shared
+                  ? "border-emerald-200 bg-emerald-50 text-emerald-700 hover:bg-emerald-100"
+                  : "border-zinc-200 bg-white text-zinc-700 hover:bg-zinc-50"
+              }`}
+            >
+              {shared ? (
+                <Eye className="h-3.5 w-3.5" strokeWidth={2} />
+              ) : (
+                <EyeOff className="h-3.5 w-3.5" strokeWidth={2} />
+              )}
+              <span className="hidden sm:inline">
+                {shared ? t("list.shared") : t("list.notShared")}
+              </span>
+            </button>
             <button
               type="button"
               onClick={handlePrint}

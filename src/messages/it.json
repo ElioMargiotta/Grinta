@@ -1895,7 +1895,38 @@
       "import": "Importa da ClubCorner",
       "importHint": "Da un CSV esportato"
     },
-    "seasonScope": "Stagione {season}"
+    "seasonScope": "Stagione {season}",
+    "playerProfile": {
+      "eyebrow": "Scheda giocatore",
+      "profileTitle": "Informazioni giocatore",
+      "tabs": {
+        "profile": "Profilo",
+        "assignment": "Assegnazione",
+        "stats": "Statistiche",
+        "followup": "Percorso",
+        "admin": "Admin"
+      },
+      "stats": {
+        "teams": "squadre",
+        "reports": "report",
+        "invites": "inviti"
+      },
+      "statsTitle": "Statistiche giocatore",
+      "metrics": {
+        "presence": {
+          "label": "Presenza",
+          "hint": "Tasso di presenza ad allenamenti e partite."
+        },
+        "sessions": {
+          "label": "Sedute",
+          "hint": "Volume di sedute nella stagione."
+        },
+        "availability": {
+          "label": "Disponibilità",
+          "hint": "Infortuni, assenze e rientri saranno seguiti qui."
+        }
+      }
+    }
   },
   "playerMe": {
     "title": "La mia scheda",
@@ -1922,7 +1953,10 @@
     "canton": "Cantone",
     "dualLicenceClub": "Club partner",
     "dualLicenceLevel": "Livello",
-    "dualLicenceTeam": "Squadra"
+    "dualLicenceTeam": "Squadra",
+    "sectionEvaluation": "Il mio percorso",
+    "evaluationHint": "Report di valutazione condivisi dal tuo staff.",
+    "evaluationNoDate": "Senza data"
   },
   "playerTeam": {
     "title": "Le mie squadre",
@@ -2191,7 +2225,15 @@
         "envisageable": "Possibile",
         "problematic": "Problematica",
         "veryDifficult": "Molto difficile"
-      }
+      },
+      "shared": "Condivisa",
+      "notShared": "Non condivisa",
+      "sharedBadge": "Condivisa",
+      "shareHint": "Condividi questo report con il giocatore",
+      "unshareHint": "Smetti di condividere questo report con il giocatore",
+      "sharing": "Aggiornamento condivisione",
+      "sharingUnavailable": "Condivisione giocatore non disponibile: applica la migrazione shared_with_player.",
+      "sharingUnavailableShort": "Condivisione non disponibile"
     },
     "progress": "Avanzamento",
     "stepsLabel": "Passi",

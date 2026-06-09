@@ -1,12 +1,21 @@
 "use client";
 
-import { ChevronRight, Plus, ClipboardList } from "lucide-react";
+import {
+  ChevronRight,
+  Plus,
+  ClipboardList,
+  Eye,
+  EyeOff,
+} from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useTransition } from "react";
 import { Link } from "@/i18n/navigation";
-import { Card } from "@/components/ui/Card";
+import { Section, SectionHeader } from "@/components/ui/Section";
 import { useLoading } from "@/components/ui/LoadingProvider";
-import { createPlayerEvaluationAction } from "@/app/[locale]/(app)/contingent/[playerId]/evaluations/actions";
+import {
+  createPlayerEvaluationAction,
+  setEvaluationSharedAction,
+} from "@/app/[locale]/(app)/contingent/[playerId]/evaluations/actions";
 import type { AppreciationLevel } from "./types";
 
 export type EvaluationRow = {
@@ -15,21 +24,25 @@ export type EvaluationRow = {
   season: string | null;
   appreciation: AppreciationLevel[];
   average: number | null;
+  shared_with_player: boolean;
 };
 
 export function EvaluationsSection({
   playerId,
   locale,
   evaluations,
+  sharingAvailable = true,
 }: {
   playerId: string;
   locale: string;
   evaluations: EvaluationRow[];
+  sharingAvailable?: boolean;
 }) {
   const t = useTranslations("evaluation.list");
   const tCommon = useTranslations("common");
   const { run } = useLoading();
   const [isPending, startTransition] = useTransition();
+  const [isSharing, startShareTransition] = useTransition();
 
   function create() {
     startTransition(async () => {
@@ -40,51 +53,70 @@ export function EvaluationsSection({
     });
   }
 
+  function toggleShare(evaluationId: string, next: boolean) {
+    startShareTransition(async () => {
+      await setEvaluationSharedAction({
+        playerId,
+        evaluationId,
+        locale,
+        shared: next,
+      });
+    });
+  }
+
   return (
-    <Card>
-      <div className="mb-4 flex items-center justify-between">
-        <div>
-          <h2 className="text-base font-semibold text-zinc-900 dark:text-zinc-100">
-            {t("title")}
-          </h2>
-          <p className="mt-0.5 text-[12px] text-zinc-500 dark:text-zinc-400">
-            {t("subtitle")}
-          </p>
-        </div>
-        <button
-          type="button"
-          onClick={create}
-          disabled={isPending}
-          className="inline-flex h-9 items-center gap-1.5 rounded-md border border-zinc-200 bg-white px-3 text-sm font-medium text-zinc-900 shadow-sm transition hover:bg-zinc-50 disabled:opacity-60 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100 dark:hover:bg-zinc-800"
-        >
-          <Plus className="h-4 w-4" />
-          {t("create")}
-        </button>
-      </div>
+    <Section>
+      <SectionHeader
+        icon={ClipboardList}
+        title={t("title")}
+        description={t("subtitle")}
+        action={
+          <button
+            type="button"
+            onClick={create}
+            disabled={isPending}
+            className="inline-flex h-9 items-center gap-1.5 rounded-md border border-[var(--club-line)] bg-white px-3 text-sm font-medium text-zinc-900 transition hover:bg-[var(--club-primary-soft)] disabled:opacity-60 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100 dark:hover:bg-zinc-800"
+          >
+            <Plus className="h-4 w-4" />
+            {t("create")}
+          </button>
+        }
+      />
 
       {evaluations.length === 0 ? (
-        <div className="flex flex-col items-center justify-center gap-2 rounded-md border border-dashed border-zinc-200 bg-zinc-50 p-6 text-center dark:border-zinc-800 dark:bg-zinc-900/40">
+        <div className="mt-4 flex flex-col items-center justify-center gap-2 rounded-md border border-dashed border-[var(--club-line)] bg-zinc-50 p-6 text-center dark:border-zinc-800 dark:bg-zinc-900/40">
           <ClipboardList className="h-5 w-5 text-zinc-400" />
           <p className="text-[13px] text-zinc-600 dark:text-zinc-400">
             {t("empty")}
           </p>
         </div>
       ) : (
-        <ul className="flex flex-col divide-y divide-zinc-100 overflow-hidden rounded-md border border-zinc-200 dark:divide-zinc-800 dark:border-zinc-800">
+        <ul className="mt-4 flex flex-col divide-y divide-zinc-100 overflow-hidden rounded-md border border-[var(--club-line)] dark:divide-zinc-800 dark:border-zinc-800">
           {evaluations.map((e) => (
-            <li key={e.id}>
+            <li
+              key={e.id}
+              className="flex items-center gap-2 transition hover:bg-[var(--club-primary-soft)]"
+            >
               <Link
                 href={`/contingent/${playerId}/evaluations/${e.id}`}
-                className="flex items-center gap-3 px-3 py-2.5 transition hover:bg-zinc-50 dark:hover:bg-zinc-900"
+                className="flex min-w-0 flex-1 items-center gap-3 py-2.5 pl-3"
               >
                 <div className="min-w-0 flex-1">
-                  <div className="text-[13px] font-medium text-zinc-900 dark:text-zinc-100">
-                    {e.evaluation_date
-                      ? new Date(e.evaluation_date).toLocaleDateString(locale)
-                      : t("noDate")}
-                    {e.season ? (
-                      <span className="ml-2 text-[11px] font-normal text-zinc-500">
-                        · {e.season}
+                  <div className="flex items-center gap-2 text-[13px] font-medium text-zinc-900 dark:text-zinc-100">
+                    <span className="truncate">
+                      {e.evaluation_date
+                        ? new Date(e.evaluation_date).toLocaleDateString(locale)
+                        : t("noDate")}
+                      {e.season ? (
+                        <span className="ml-2 text-[11px] font-normal text-zinc-500">
+                          · {e.season}
+                        </span>
+                      ) : null}
+                    </span>
+                    {e.shared_with_player ? (
+                      <span className="inline-flex items-center gap-1 rounded bg-emerald-50 px-1.5 py-0.5 text-[10px] font-medium uppercase tracking-wide text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-300">
+                        <Eye className="h-3 w-3" />
+                        {t("sharedBadge")}
                       </span>
                     ) : null}
                   </div>
@@ -105,10 +137,36 @@ export function EvaluationsSection({
                 </div>
                 <ChevronRight className="h-4 w-4 shrink-0 text-zinc-400" />
               </Link>
+              {sharingAvailable ? (
+                <button
+                  type="button"
+                  onClick={() => toggleShare(e.id, !e.shared_with_player)}
+                  disabled={isSharing}
+                  title={e.shared_with_player ? t("unshareHint") : t("shareHint")}
+                  aria-pressed={e.shared_with_player}
+                  className={`mr-2 inline-flex h-8 shrink-0 items-center gap-1.5 rounded-md px-2.5 text-[12px] font-medium transition disabled:opacity-60 ${
+                    e.shared_with_player
+                      ? "text-emerald-700 hover:bg-emerald-50 dark:text-emerald-300 dark:hover:bg-emerald-950/40"
+                      : "text-zinc-500 hover:bg-zinc-100 dark:text-zinc-400 dark:hover:bg-zinc-800"
+                  }`}
+                >
+                  {e.shared_with_player ? (
+                    <>
+                      <Eye className="h-3.5 w-3.5" />
+                      {t("shared")}
+                    </>
+                  ) : (
+                    <>
+                      <EyeOff className="h-3.5 w-3.5" />
+                      {t("notShared")}
+                    </>
+                  )}
+                </button>
+              ) : null}
             </li>
           ))}
         </ul>
       )}
-    </Card>
+    </Section>
   );
 }

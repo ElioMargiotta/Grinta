@@ -1901,7 +1901,38 @@
       "import": "Import from ClubCorner",
       "importHint": "From an exported CSV"
     },
-    "seasonScope": "Season {season}"
+    "seasonScope": "Season {season}",
+    "playerProfile": {
+      "eyebrow": "Player profile",
+      "profileTitle": "Player information",
+      "tabs": {
+        "profile": "Profile",
+        "assignment": "Assignment",
+        "stats": "Statistics",
+        "followup": "Follow-up",
+        "admin": "Admin"
+      },
+      "stats": {
+        "teams": "teams",
+        "reports": "reports",
+        "invites": "invites"
+      },
+      "statsTitle": "Player statistics",
+      "metrics": {
+        "presence": {
+          "label": "Attendance",
+          "hint": "Attendance rate across training and matches."
+        },
+        "sessions": {
+          "label": "Sessions",
+          "hint": "Season training volume for this player."
+        },
+        "availability": {
+          "label": "Availability",
+          "hint": "Injuries, absences and returns will be tracked here."
+        }
+      }
+    }
   },
   "playerMe": {
     "title": "My profile",
@@ -1928,7 +1959,10 @@
     "canton": "Canton",
     "dualLicenceClub": "Partner club",
     "dualLicenceLevel": "Level",
-    "dualLicenceTeam": "Team"
+    "dualLicenceTeam": "Team",
+    "sectionEvaluation": "My progress",
+    "evaluationHint": "Evaluation reports shared by your staff.",
+    "evaluationNoDate": "No date"
   },
   "playerTeam": {
     "title": "My teams",
@@ -2197,7 +2231,15 @@
         "envisageable": "Possible",
         "problematic": "Problematic",
         "veryDifficult": "Very difficult"
-      }
+      },
+      "shared": "Shared",
+      "notShared": "Not shared",
+      "sharedBadge": "Shared",
+      "shareHint": "Share this report with the player",
+      "unshareHint": "Stop sharing this report with the player",
+      "sharing": "Updating sharing",
+      "sharingUnavailable": "Player sharing unavailable: apply the shared_with_player migration.",
+      "sharingUnavailableShort": "Sharing unavailable"
     },
     "progress": "Progress",
     "stepsLabel": "Steps",

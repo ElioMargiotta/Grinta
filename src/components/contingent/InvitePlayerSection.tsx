@@ -4,7 +4,7 @@ import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { Mail, Copy, Check, X, Send } from "lucide-react";
 import { useTranslations } from "next-intl";
-import { Card } from "@/components/ui/Card";
+import { Section, SectionHeader } from "@/components/ui/Section";
 import { Input } from "@/components/ui/Input";
 import { Button } from "@/components/ui/Button";
 import { Select } from "@/components/ui/Select";
@@ -139,13 +139,8 @@ export function InvitePlayerSection({
   }
 
   return (
-    <Card>
-      <div className="mb-3 flex items-center gap-2">
-        <Mail className="h-4 w-4 text-[var(--club-primary)]" />
-        <h2 className="text-base font-semibold text-zinc-900 dark:text-zinc-100">
-          {t("title")}
-        </h2>
-      </div>
+    <Section>
+      <SectionHeader icon={Mail} title={t("title")} className="mb-3" />
 
       {isLinkedToUser ? (
         <p className="text-sm text-zinc-600 dark:text-zinc-400">
@@ -286,6 +281,6 @@ export function InvitePlayerSection({
           </ul>
         </div>
       )}
-    </Card>
+    </Section>
   );
 }

@@ -1900,7 +1900,38 @@
       "import": "Importer depuis ClubCorner",
       "importHint": "Depuis un CSV exporté"
     },
-    "seasonScope": "Saison {season}"
+    "seasonScope": "Saison {season}",
+    "playerProfile": {
+      "eyebrow": "Fiche joueur",
+      "profileTitle": "Informations joueur",
+      "tabs": {
+        "profile": "Profil",
+        "assignment": "Affectation",
+        "stats": "Statistiques",
+        "followup": "Suivi",
+        "admin": "Admin"
+      },
+      "stats": {
+        "teams": "équipes",
+        "reports": "rapports",
+        "invites": "invitations"
+      },
+      "statsTitle": "Statistiques joueur",
+      "metrics": {
+        "presence": {
+          "label": "Présence",
+          "hint": "Taux de présence aux entraînements et matchs."
+        },
+        "sessions": {
+          "label": "Séances",
+          "hint": "Volume de séances suivies sur la saison."
+        },
+        "availability": {
+          "label": "Disponibilité",
+          "hint": "Blessures, absences et retours à suivre ici."
+        }
+      }
+    }
   },
   "playerMe": {
     "title": "Ma fiche",
@@ -1927,7 +1958,10 @@
     "canton": "Canton",
     "dualLicenceClub": "Club partenaire",
     "dualLicenceLevel": "Niveau",
-    "dualLicenceTeam": "Équipe"
+    "dualLicenceTeam": "Équipe",
+    "sectionEvaluation": "Mon suivi",
+    "evaluationHint": "Rapports d'évaluation transmis par ton staff.",
+    "evaluationNoDate": "Sans date"
   },
   "playerTeam": {
     "title": "Mes équipes",
@@ -2196,7 +2230,15 @@
         "envisageable": "Envisageable",
         "problematic": "Problématique",
         "veryDifficult": "Très difficile"
-      }
+      },
+      "shared": "Transmise",
+      "notShared": "Non transmise",
+      "sharedBadge": "Transmise",
+      "shareHint": "Transmettre ce rapport au joueur",
+      "unshareHint": "Ne plus transmettre ce rapport au joueur",
+      "sharing": "Mise à jour du partage",
+      "sharingUnavailable": "Partage joueur indisponible: appliquez la migration shared_with_player.",
+      "sharingUnavailableShort": "Partage indisponible"
     },
     "progress": "Avancement",
     "stepsLabel": "Étapes",
