@@ -3,6 +3,7 @@
 import { useMemo, useState } from "react";
 import { useTranslations } from "next-intl";
 import {
+  Activity,
   BadgeCheck,
   BarChart3,
   ClipboardList,
@@ -19,10 +20,15 @@ import {
   EvaluationsSection,
   type EvaluationRow,
 } from "@/components/evaluation/EvaluationsSection";
+import {
+  PhysicalTrackingSection,
+  type PhysicalMetric,
+  type PhysicalMeasurement,
+} from "@/components/contingent/PhysicalTrackingSection";
 import { Section, SectionHeader } from "@/components/ui/Section";
 import type { ClubTeamOption } from "@/lib/contingent/teams";
 
-type Tab = "profile" | "assignment" | "stats" | "followup" | "admin";
+type Tab = "profile" | "assignment" | "stats" | "physical" | "followup" | "admin";
 
 type PlayerWithUser = EditablePlayer & { user_id: string | null };
 
@@ -51,6 +57,10 @@ export function ContingentPlayerProfile({
   pendingInvitations,
   evaluations,
   evaluationsShareAvailable,
+  physicalMetrics,
+  physicalMeasurements,
+  canManageMetrics,
+  canRecordPhysical,
   locale,
 }: {
   player: PlayerWithUser;
@@ -60,6 +70,10 @@ export function ContingentPlayerProfile({
   pendingInvitations: PlayerInvitation[];
   evaluations: EvaluationRow[];
   evaluationsShareAvailable: boolean;
+  physicalMetrics: PhysicalMetric[];
+  physicalMeasurements: PhysicalMeasurement[];
+  canManageMetrics: boolean;
+  canRecordPhysical: boolean;
   locale: string;
 }) {
   const t = useTranslations("contingent.playerProfile");
@@ -83,6 +97,7 @@ export function ContingentPlayerProfile({
       count: assignedTeams.length,
     },
     { key: "stats", label: t("tabs.stats"), icon: BarChart3 },
+    { key: "physical", label: t("tabs.physical"), icon: Activity },
     { key: "followup", label: t("tabs.followup"), icon: ClipboardList, count: evaluations.length },
     { key: "admin", label: t("tabs.admin"), icon: ShieldAlert, count: pendingInvitations.length },
   ];
@@ -214,6 +229,17 @@ export function ContingentPlayerProfile({
             ))}
           </div>
         </Section>
+      ) : null}
+
+      {tab === "physical" ? (
+        <PhysicalTrackingSection
+          playerId={player.id}
+          locale={locale}
+          metrics={physicalMetrics}
+          measurements={physicalMeasurements}
+          canManageMetrics={canManageMetrics}
+          canRecord={canRecordPhysical}
+        />
       ) : null}
 
       {tab === "followup" ? (

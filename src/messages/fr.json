@@ -1908,6 +1908,7 @@
         "profile": "Profil",
         "assignment": "Affectation",
         "stats": "Statistiques",
+        "physical": "Physique",
         "followup": "Suivi",
         "admin": "Admin"
       },
@@ -1930,6 +1931,50 @@
           "label": "Disponibilité",
           "hint": "Blessures, absences et retours à suivre ici."
         }
+      }
+    },
+    "physical": {
+      "title": "Suivi physique",
+      "intro": "Crée tes propres tests (VMA, sprint, Yo-Yo…) avec protocole, puis saisis les résultats à chaque date — manuellement ou depuis une séance du planning.",
+      "manage": "Gérer les indicateurs",
+      "empty": "Aucun indicateur pour l'instant.",
+      "createFirst": "Créer un indicateur",
+      "addDate": "Ajouter une date",
+      "noDates": "Aucun test saisi. Ajoute une date ou rattache un test à une séance du planning.",
+      "earlier": "Semaines antérieures",
+      "trend": "Évolution",
+      "prevWeeks": "Semaines précédentes",
+      "nextWeeks": "Semaines suivantes",
+      "today": "Aujourd'hui",
+      "record": "Saisie",
+      "recordWeek": "Enregistrer la semaine",
+      "prevWeek": "Semaine précédente",
+      "nextWeek": "Semaine suivante",
+      "weekLabel": "Sem. du {date}",
+      "previous": "préc.",
+      "history": "Historique",
+      "viewChart": "Voir la courbe",
+      "noData": "Aucune donnée saisie pour l'instant.",
+      "sinceStart": "depuis le {date}",
+      "close": "Fermer",
+      "newMetric": "Nouvel indicateur",
+      "editMetric": "Modifier l'indicateur",
+      "cancelEdit": "Annuler",
+      "archive": "Archiver",
+      "add": "Ajouter",
+      "save": "Enregistrer",
+      "field": {
+        "name": "Nom",
+        "namePlaceholder": "ex. VMA",
+        "unit": "Unité",
+        "unitPlaceholder": "ex. km/h",
+        "category": "Catégorie",
+        "categoryPlaceholder": "ex. endurance",
+        "description": "Description",
+        "descriptionPlaceholder": "ex. Vitesse maximale aérobie",
+        "protocol": "Protocole",
+        "protocolPlaceholder": "ex. Échauffement 10 min, paliers de 1 min…",
+        "higherIsBetter": "Une valeur plus élevée = meilleur"
       }
     }
   },
@@ -1993,6 +2038,15 @@
       "missing_session": "Séance manquante",
       "invalid_status": "Statut invalide",
       "unknown": "Erreur — réessaie"
+    },
+    "physicalTests": {
+      "title": "Tests physiques",
+      "intro": "Rattache des tests à cette séance et saisis les résultats. Ils remontent dans la fiche de chaque joueur.",
+      "addTest": "Ajouter un test…",
+      "none": "Aucun test rattaché à cette séance.",
+      "detach": "Retirer",
+      "colPlayer": "Joueur",
+      "emptyRoster": "Aucun joueur dans l'effectif."
     },
     "coach": {
       "title": "Présences",

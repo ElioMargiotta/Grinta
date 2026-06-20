@@ -1903,6 +1903,7 @@
         "profile": "Profil",
         "assignment": "Zuweisung",
         "stats": "Statistiken",
+        "physical": "Physis",
         "followup": "Verlauf",
         "admin": "Admin"
       },
@@ -1925,6 +1926,50 @@
           "label": "Verfügbarkeit",
           "hint": "Verletzungen, Absenzen und Rückkehr werden hier verfolgt."
         }
+      }
+    },
+    "physical": {
+      "title": "Körperliches Monitoring",
+      "intro": "Erstelle eigene Tests (MAS, Sprint, Yo-Yo…) mit Protokoll und erfasse die Ergebnisse pro Datum — manuell oder aus einer Trainingseinheit.",
+      "manage": "Indikatoren verwalten",
+      "empty": "Noch kein Indikator.",
+      "createFirst": "Indikator erstellen",
+      "addDate": "Datum hinzufügen",
+      "noDates": "Noch kein Test erfasst. Füge ein Datum hinzu oder hänge einen Test an eine Trainingseinheit.",
+      "earlier": "Frühere Wochen",
+      "trend": "Verlauf",
+      "prevWeeks": "Frühere Wochen",
+      "nextWeeks": "Spätere Wochen",
+      "today": "Heute",
+      "record": "Erfassung",
+      "recordWeek": "Woche speichern",
+      "prevWeek": "Vorherige Woche",
+      "nextWeek": "Nächste Woche",
+      "weekLabel": "Woche vom {date}",
+      "previous": "vorh.",
+      "history": "Verlauf",
+      "viewChart": "Kurve anzeigen",
+      "noData": "Noch keine Daten erfasst.",
+      "sinceStart": "seit {date}",
+      "close": "Schliessen",
+      "newMetric": "Neuer Indikator",
+      "editMetric": "Indikator bearbeiten",
+      "cancelEdit": "Abbrechen",
+      "archive": "Archivieren",
+      "add": "Hinzufügen",
+      "save": "Speichern",
+      "field": {
+        "name": "Name",
+        "namePlaceholder": "z. B. MAS",
+        "unit": "Einheit",
+        "unitPlaceholder": "z. B. km/h",
+        "category": "Kategorie",
+        "categoryPlaceholder": "z. B. Ausdauer",
+        "description": "Beschreibung",
+        "descriptionPlaceholder": "z. B. Maximale aerobe Geschwindigkeit",
+        "protocol": "Protokoll",
+        "protocolPlaceholder": "z. B. 10 Min. Aufwärmen, 1-Min.-Stufen…",
+        "higherIsBetter": "Höherer Wert = besser"
       }
     }
   },
@@ -1988,6 +2033,15 @@
       "missing_session": "Training fehlt",
       "invalid_status": "Ungültiger Status",
       "unknown": "Etwas ist schiefgelaufen — bitte erneut versuchen"
+    },
+    "physicalTests": {
+      "title": "Körpertests",
+      "intro": "Tests an diese Einheit anhängen und Ergebnisse erfassen. Sie erscheinen im Profil jedes Spielers.",
+      "addTest": "Test hinzufügen…",
+      "none": "Kein Test an diese Einheit angehängt.",
+      "detach": "Entfernen",
+      "colPlayer": "Spieler",
+      "emptyRoster": "Kein Spieler im Kader."
     },
     "coach": {
       "title": "Anwesenheit",

@@ -14,6 +14,11 @@ import {
   type EvaluationRow,
 } from "@/components/evaluation/EvaluationsSection";
 import {
+  type PhysicalMetric,
+  type PhysicalMeasurement,
+} from "@/components/contingent/PhysicalTrackingSection";
+import { isClubWideLevel } from "@/lib/club/types";
+import {
   overallAverage,
   mergeEvaluation,
   type EvaluationData,
@@ -99,6 +104,28 @@ export default async function ContingentPlayerPage({
     evalRows = fallback.data;
   }
 
+  // Suivi physique — indicateurs du club + mesures du joueur.
+  const [{ data: metricRows }, { data: measurementRows }] = await Promise.all([
+    supabase
+      .from("physical_metrics")
+      .select("id, name, unit, category, description, protocol, higher_is_better, sort_order, archived")
+      .eq("club_id", membership.club_id)
+      .order("sort_order", { ascending: true })
+      .order("name", { ascending: true })
+      .returns<PhysicalMetric[]>(),
+    supabase
+      .from("physical_measurements")
+      .select("metric_id, measured_on, value, note")
+      .eq("player_id", playerId)
+      .order("measured_on", { ascending: true })
+      .returns<PhysicalMeasurement[]>(),
+  ]);
+
+  const physicalMetrics = metricRows ?? [];
+  const physicalMeasurements = measurementRows ?? [];
+  const canManageMetrics = isClubWideLevel(membership.access_level);
+  const canRecordPhysical = membership.access_level !== "team_readonly";
+
   const currentTeamIds = (assignments ?? []).map((a) => a.team_id as string);
 
   const evaluations: EvaluationRow[] = (evalRows ?? []).map((row) => {
@@ -143,6 +170,10 @@ export default async function ContingentPlayerPage({
         pendingInvitations={pendingInvitations}
         evaluations={evaluations}
         evaluationsShareAvailable={evaluationsShareAvailable}
+        physicalMetrics={physicalMetrics}
+        physicalMeasurements={physicalMeasurements}
+        canManageMetrics={canManageMetrics}
+        canRecordPhysical={canRecordPhysical}
         locale={locale}
       />
     </div>
