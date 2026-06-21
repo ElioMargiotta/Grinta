@@ -18,10 +18,10 @@ export default async function PlannerTeamPage({
   searchParams,
 }: {
   params: Promise<{ locale: string; teamId: string }>;
-  searchParams: Promise<{ view?: string; season?: string }>;
+  searchParams: Promise<{ view?: string; season?: string; placeEval?: string }>;
 }) {
   const { locale, teamId } = await params;
-  const { view: viewParam, season: seasonParam } = await searchParams;
+  const { view: viewParam, season: seasonParam, placeEval } = await searchParams;
   setRequestLocale(locale);
   const { supabase } = await requireUser(locale);
   const t = await getTranslations("planner");
@@ -32,7 +32,7 @@ export default async function PlannerTeamPage({
 
   const { data: team } = await supabase
     .from("teams")
-    .select("id, name, season")
+    .select("id, name, season, club_id")
     .eq("id", teamId)
     .single();
   if (!team) notFound();
@@ -92,15 +92,55 @@ export default async function PlannerTeamPage({
     .order("starts_at", { ascending: false });
   const archivedMatches = archivedMatchesData ?? [];
 
-	  const { data: sessions } = await supabase
+	  const { data: allSessions } = await supabase
 	    .from("sessions")
-	    .select("id, date, start_time, theme, duration_minutes, microcycle_id, md_offset")
+	    .select("id, date, start_time, theme, duration_minutes, microcycle_id, md_offset, kind")
 	    .eq("team_id", teamId)
 	    .gte("date", window.start)
 	    .lte("date", window.end)
 	    .order("date", { ascending: true });
 
-	  const sessionIds = (sessions ?? []).map((s) => s.id);
+	  // Les évals physiques ne sont pas des entraînements : on les sépare pour ne
+	  // pas fausser les comptages (microcycles, vue saison, créneaux jour).
+	  const sessions = (allSessions ?? []).filter((s) => s.kind !== "physical_eval");
+	  const evalSessions = (allSessions ?? []).filter((s) => s.kind === "physical_eval");
+
+	  // Tests rattachés à chaque éval (pour le badge « n tests ») + catalogue des
+	  // tests du club (wizard de placement d'éval).
+	  const evalIds = evalSessions.map((s) => s.id);
+	  const [{ data: evalTestRows }, { data: evalMetricRows }] = await Promise.all([
+	    evalIds.length
+	      ? supabase
+	          .from("session_physical_tests")
+	          .select("session_id")
+	          .in("session_id", evalIds)
+	      : Promise.resolve({ data: [] as { session_id: string }[] }),
+	    supabase
+	      .from("physical_metrics")
+	      .select("id, name, unit, category")
+	      .eq("club_id", team.club_id)
+	      .eq("archived", false)
+	      .order("sort_order", { ascending: true })
+	      .order("name", { ascending: true }),
+	  ]);
+
+	  const testCountByEval = new Map<string, number>();
+	  for (const r of evalTestRows ?? []) {
+	    testCountByEval.set(r.session_id, (testCountByEval.get(r.session_id) ?? 0) + 1);
+	  }
+	  const evals = evalSessions.map((s) => ({
+	    id: s.id,
+	    date: s.date,
+	    testCount: testCountByEval.get(s.id) ?? 0,
+	  }));
+	  const evalMetrics = (evalMetricRows ?? []).map((m) => ({
+	    id: m.id as string,
+	    name: m.name as string,
+	    unit: (m.unit as string | null) ?? null,
+	    category: (m.category as string | null) ?? null,
+	  }));
+
+	  const sessionIds = sessions.map((s) => s.id);
 	  const { data: preparationRows } = sessionIds.length
 	    ? await supabase
 	        .from("session_preparations")
@@ -283,6 +323,9 @@ export default async function PlannerTeamPage({
         periodization={periodization}
         seasonMicrocycles={seasonMicrocycles}
         seasonPlans={seasonPlans}
+        evals={evals}
+        evalMetrics={evalMetrics}
+        placeEval={placeEval === "1"}
       />
     </div>
   );

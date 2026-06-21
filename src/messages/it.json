@@ -412,9 +412,77 @@
     "logout": "Esci",
     "account": "Account",
     "contingent": "Rosa",
+    "physical": "Valutazione",
     "playerMe": "La mia scheda",
     "playerTeam": "Le mie squadre",
     "playerSchedule": "Il mio calendario"
+  },
+  "physicalHub": {
+    "title": "Valutazione",
+    "subtitle": "Test e valutazioni di {club}",
+    "seasonScope": "stagione {season}",
+    "emptyMetrics": "Nessun test per ora. Crea il tuo primo test (VMA, sprint, palleggi…) con il protocollo di valutazione.",
+    "createFirst": "Crea un test",
+    "manageTests": "Gestisci i test",
+    "noData": "Nessun risultato registrato per questo test nel periodo e nella squadra selezionati.",
+    "evolution": "Andamento",
+    "ranking": "Classifica",
+    "clickRowHint": "Clicca una riga per vedere la curva del giocatore",
+    "viewProfile": "Vedi scheda",
+    "createEval": "Crea valutazione",
+    "pickTeam": "Scegli la squadra",
+    "evals": {
+      "title": "Valutazioni da completare",
+      "testCount": "{count, plural, =0 {nessun test} one {# test} other {# test}}",
+      "enter": "Inserisci i risultati",
+      "delete": "Elimina valutazione",
+      "deleteConfirm": "Eliminare questa valutazione? I risultati già inseriti verranno conservati nello storico dei giocatori."
+    },
+    "library": {
+      "title": "Libreria predefinita",
+      "intro": "Attiva indicatori pronti all'uso. Potrai poi modificarli come i tuoi test.",
+      "add": "Aggiungi",
+      "remove": "Rimuovi",
+      "category": {
+        "physical": "Fisico",
+        "technical": "Tecnico",
+        "medical": "Medico"
+      }
+    },
+    "meta": {
+      "trials": "Tentativi",
+      "frequency": "Frequenza",
+      "material": "Materiale",
+      "alertThreshold": "Soglia di allerta",
+      "validity": "Validità"
+    },
+    "filter": {
+      "test": "Test",
+      "team": "Squadra",
+      "allTeams": "Tutte le squadre",
+      "category": "Categoria",
+      "allCategories": "Tutte",
+      "period": "Periodo"
+    },
+    "period": {
+      "all": "Tutto lo storico",
+      "12m": "Ultimi 12 mesi",
+      "6m": "Ultimi 6 mesi",
+      "3m": "Ultimi 3 mesi"
+    },
+    "stats": {
+      "evaluated": "Giocatori valutati",
+      "average": "Media",
+      "best": "Migliore",
+      "worst": "Più basso"
+    },
+    "col": {
+      "player": "Giocatore",
+      "value": "Ultima valut.",
+      "trend": "Andamento",
+      "date": "Data",
+      "tests": "N. test"
+    }
   },
   "auth": {
     "tabLogin": "Accedi",
@@ -755,6 +823,10 @@
     "title": "Pianificazione della stagione",
     "pickTeam": "Scegli una squadra da pianificare",
     "noTeams": "Crea prima una squadra.",
+    "eval": {
+      "title": "Valutazione fisica",
+      "backToPlanner": "Torna alla pianificazione"
+    },
     "view": {
       "tour": "Vista stagione",
       "weekly": "Settimanale",
@@ -869,6 +941,17 @@
       "typeDistribution": "Distribuzione per tipo",
       "emptyMonth": "Niente in programma in queste settimane — aggiungi un ciclo o configura una stagione per iniziare a riempirle.",
       "emptyMonthCta": "Apri la vista stagione",
+      "eval": {
+        "badge": "Valut.",
+        "open": "Apri la valutazione",
+        "placementHint": "Clicca un giorno per inserire la valutazione fisica.",
+        "wizardTitle": "Nuova valutazione fisica",
+        "wizardSubtitle": "Test valutati il {date}",
+        "noTests": "Nessun test. Creane uno dalla pagina Fisico.",
+        "createTest": "+ Crea un test",
+        "confirm": "Crea valutazione",
+        "close": "Chiudi"
+      },
       "tag": {
         "current": "In corso"
       },
@@ -1903,7 +1986,7 @@
         "profile": "Profilo",
         "assignment": "Assegnazione",
         "stats": "Statistiche",
-        "physical": "Fisico",
+        "physical": "Valutazione",
         "followup": "Percorso",
         "admin": "Admin"
       },
@@ -1929,9 +2012,15 @@
       }
     },
     "physical": {
-      "title": "Monitoraggio fisico",
+      "title": "Valutazione",
       "intro": "Crea i tuoi test (MAS, sprint, Yo-Yo…) con protocollo e inserisci i risultati per ogni data — manualmente o da una seduta del planning.",
       "manage": "Gestisci indicatori",
+      "restore": "Riattiva",
+      "table": {
+        "name": "Nome",
+        "category": "Categoria",
+        "unit": "Unità"
+      },
       "empty": "Ancora nessun indicatore.",
       "createFirst": "Crea un indicatore",
       "addDate": "Aggiungi una data",
@@ -1965,12 +2054,50 @@
         "unitPlaceholder": "es. km/h",
         "category": "Categoria",
         "categoryPlaceholder": "es. resistenza",
+        "categoryOption": {
+          "physical": "Fisico",
+          "technical": "Tecnico",
+          "medical": "Medico"
+        },
+        "subcategory": "Sottocategoria",
+        "subcategoryPlaceholder": "es. resistenza aerobica",
+        "valueType": "Tipo di valore",
+        "valueTypeOption": {
+          "integer": "Numero intero",
+          "decimal": "Numero decimale",
+          "percentage": "Percentuale",
+          "score": "Punteggio",
+          "number": "Numero"
+        },
+        "interpretation": "Senso",
+        "interpretationOption": {
+          "higher": "Più alto = migliore",
+          "lower": "Più basso = migliore",
+          "target": "Zona obiettivo"
+        },
+        "display": "Visualizzazione",
+        "displayOption": {
+          "primary": "Principale",
+          "secondary": "Secondario"
+        },
+        "alertThreshold": "Soglia di allerta",
+        "alertThresholdPlaceholder": "es. 5",
         "description": "Descrizione",
         "descriptionPlaceholder": "es. Velocità aerobica massima",
         "protocol": "Protocollo",
         "protocolPlaceholder": "es. Riscaldamento 10 min, livelli da 1 min…",
+        "material": "Materiale",
+        "materialPlaceholder": "es. coni, cronometro (separati da virgola)",
+        "trials": "Tentativi",
+        "trialsPlaceholder": "es. 3 tentativi, si tiene il migliore",
+        "frequency": "Frequenza consigliata",
+        "frequencyPlaceholder": "es. 6-8 settimane",
+        "validity": "Condizioni di validità",
+        "validityPlaceholder": "es. giocatore fresco, superficie stabile",
         "higherIsBetter": "Valore più alto = migliore"
-      }
+      },
+      "delete": "Elimina",
+      "deleteConfirm": "Eliminare definitivamente questo indicatore? Anche le misurazioni registrate verranno eliminate."
     }
   },
   "playerMe": {
@@ -2041,7 +2168,9 @@
       "none": "Nessun test collegato a questa seduta.",
       "detach": "Rimuovi",
       "colPlayer": "Giocatore",
-      "emptyRoster": "Nessun giocatore in rosa."
+      "emptyRoster": "Nessun giocatore in rosa.",
+      "absent": "Assente",
+      "declareUnavailable": "Indispo…"
     },
     "coach": {
       "title": "Presenze",
@@ -2341,6 +2470,37 @@
       "unauthenticated": "Devi aver effettuato l'accesso.",
       "no_membership": "Nessun club selezionato.",
       "db_error": "Importazione non riuscita. Riprova."
+    }
+  },
+  "medical": {
+    "tab": "Medico",
+    "title": "Disponibilità & medico",
+    "intro": "Infortuni, malattie, squalifiche e altre indisponibilità. Un periodo copre automaticamente tutte le sedute e valutazioni interessate.",
+    "add": "Aggiungi",
+    "empty": "Nessuna indisponibilità registrata.",
+    "deleteConfirm": "Eliminare questa indisponibilità?",
+    "ongoing": "In corso",
+    "openEnd": "senza data di fine",
+    "endToday": "Termina oggi",
+    "edit": "Modifica",
+    "delete": "Elimina",
+    "addTitle": "Nuova indisponibilità",
+    "editTitle": "Modifica indisponibilità",
+    "cancel": "Annulla",
+    "save": "Salva",
+    "excused": "Giustificato",
+    "field": {
+      "kind": "Tipo",
+      "startDate": "Inizio",
+      "endDate": "Fine (opzionale)",
+      "reason": "Motivo",
+      "reasonPlaceholder": "Dettaglio (opzionale)"
+    },
+    "kind": {
+      "injury": "🩹 Infortunato",
+      "illness": "Malato",
+      "suspension": "Squalificato",
+      "other": "Indisponibile"
     }
   }
 }

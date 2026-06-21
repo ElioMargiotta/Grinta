@@ -8,6 +8,12 @@ import {
   detachTestFromSessionAction,
   recordSessionMeasurementAction,
 } from "@/app/[locale]/(app)/contingent/[playerId]/physical/actions";
+import { declareUnavailabilityFromSessionAction } from "@/app/[locale]/(app)/contingent/[playerId]/medical/actions";
+import { KindBadge } from "@/components/contingent/MedicalSection";
+import {
+  UNAVAILABILITY_KINDS,
+  type PlayerAvailability,
+} from "@/lib/medical/unavailability";
 
 export type SessionTestMetric = {
   id: string;
@@ -50,6 +56,8 @@ export function SessionPhysicalTests({
   metrics,
   attachedIds,
   results,
+  availability = {},
+  evalDate,
   canRecord,
 }: {
   locale: string;
@@ -59,9 +67,12 @@ export function SessionPhysicalTests({
   metrics: SessionTestMetric[];
   attachedIds: string[];
   results: SessionTestResult[];
+  availability?: Record<string, PlayerAvailability>;
+  evalDate: string;
   canRecord: boolean;
 }) {
   const t = useTranslations("attendance.physicalTests");
+  const tMed = useTranslations("medical");
   const [pending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
   const [picker, setPicker] = useState("");
@@ -114,6 +125,22 @@ export function SessionPhysicalTests({
         playerId,
         metricId,
         value,
+      });
+      if (res?.error) setError(res.error);
+    });
+  }
+
+  function declare(playerId: string, kind: string) {
+    if (!kind) return;
+    setError(null);
+    startTransition(async () => {
+      const res = await declareUnavailabilityFromSessionAction({
+        locale,
+        teamId,
+        sessionId,
+        playerId,
+        kind,
+        startDate: evalDate,
       });
       if (res?.error) setError(res.error);
     });
@@ -226,50 +253,109 @@ export function SessionPhysicalTests({
                       </div>
                     </th>
                   ))}
+                  {canRecord ? <th className="px-2 py-2" /> : null}
                 </tr>
               </thead>
               <tbody className="divide-y divide-zinc-200 dark:divide-zinc-800">
-                {players.map((p) => (
-                  <tr key={p.playerId} className="bg-white dark:bg-zinc-950">
-                    <td className="px-3 py-2">
-                      <div className="flex items-center gap-2">
-                        {p.jerseyNumber !== null && (
-                          <span className="flex h-6 w-6 items-center justify-center rounded-full bg-[var(--club-primary-soft)] text-[11px] font-semibold text-[var(--club-primary)]">
-                            {p.jerseyNumber}
-                          </span>
-                        )}
-                        <span className="font-medium text-zinc-900 dark:text-zinc-100">{p.fullName}</span>
-                      </div>
-                    </td>
-                    {attached.map((m) => {
-                      const key = `${p.playerId}|${m.id}`;
-                      const val = byKey.get(key) ?? null;
-                      return (
-                        <td key={m.id} className="px-2 py-1 text-center">
-                          {canRecord ? (
-                            <input
-                              type="text"
-                              inputMode="decimal"
-                              key={key}
-                              defaultValue={fmt(val)}
-                              disabled={pending}
-                              onBlur={(e) => commit(p.playerId, m.id, e.target.value)}
-                              placeholder="—"
-                              className="w-16 rounded-md border border-transparent bg-zinc-50 px-2 py-1 text-center font-mono tabular-nums text-zinc-900 hover:border-zinc-300 focus:border-[var(--club-primary)] focus:bg-white focus:outline-none dark:bg-zinc-800/50 dark:text-zinc-100 dark:focus:bg-zinc-800"
-                            />
-                          ) : (
-                            <span className="font-mono tabular-nums text-zinc-700 dark:text-zinc-300">
-                              {fmt(val) || "—"}
+                {players.map((p) => {
+                  const avail = availability[p.playerId] ?? { status: "available" };
+                  const unavailable = avail.status !== "available";
+                  return (
+                    <tr key={p.playerId} className="bg-white dark:bg-zinc-950">
+                      <td className="px-3 py-2">
+                        <div className="flex items-center gap-2">
+                          {p.jerseyNumber !== null && (
+                            <span className="flex h-6 w-6 items-center justify-center rounded-full bg-[var(--club-primary-soft)] text-[11px] font-semibold text-[var(--club-primary)]">
+                              {p.jerseyNumber}
                             </span>
                           )}
+                          <span
+                            className={
+                              unavailable
+                                ? "font-medium text-zinc-400 line-through dark:text-zinc-500"
+                                : "font-medium text-zinc-900 dark:text-zinc-100"
+                            }
+                          >
+                            {p.fullName}
+                          </span>
+                        </div>
+                      </td>
+                      {unavailable ? (
+                        <td
+                          colSpan={attached.length}
+                          className="px-3 py-2 text-left"
+                        >
+                          <div className="flex flex-wrap items-center gap-2">
+                            {avail.status === "unavailable" ? (
+                              <KindBadge
+                                kind={avail.kind}
+                                label={tMed(`kind.${avail.kind}`)}
+                              />
+                            ) : (
+                              <span className="inline-flex items-center gap-1 rounded-full bg-zinc-100 px-2 py-0.5 text-[11px] font-semibold text-zinc-600 dark:bg-zinc-800 dark:text-zinc-300">
+                                {t("absent")}
+                              </span>
+                            )}
+                            {avail.reason ? (
+                              <span className="text-[12px] italic text-zinc-400">
+                                {avail.reason}
+                              </span>
+                            ) : null}
+                          </div>
                         </td>
-                      );
-                    })}
-                  </tr>
-                ))}
+                      ) : (
+                        attached.map((m) => {
+                          const key = `${p.playerId}|${m.id}`;
+                          const val = byKey.get(key) ?? null;
+                          return (
+                            <td key={m.id} className="px-2 py-1 text-center">
+                              {canRecord ? (
+                                <input
+                                  type="text"
+                                  inputMode="decimal"
+                                  key={key}
+                                  defaultValue={fmt(val)}
+                                  disabled={pending}
+                                  onBlur={(e) => commit(p.playerId, m.id, e.target.value)}
+                                  placeholder="—"
+                                  className="w-16 rounded-md border border-transparent bg-zinc-50 px-2 py-1 text-center font-mono tabular-nums text-zinc-900 hover:border-zinc-300 focus:border-[var(--club-primary)] focus:bg-white focus:outline-none dark:bg-zinc-800/50 dark:text-zinc-100 dark:focus:bg-zinc-800"
+                                />
+                              ) : (
+                                <span className="font-mono tabular-nums text-zinc-700 dark:text-zinc-300">
+                                  {fmt(val) || "—"}
+                                </span>
+                              )}
+                            </td>
+                          );
+                        })
+                      )}
+                      {canRecord ? (
+                        <td className="px-2 py-1 text-right">
+                          {unavailable ? null : (
+                            <select
+                              value=""
+                              disabled={pending}
+                              onChange={(e) => declare(p.playerId, e.target.value)}
+                              title={t("declareUnavailable")}
+                              aria-label={t("declareUnavailable")}
+                              className="rounded-md border border-zinc-200 bg-white px-1.5 py-1 text-[11px] text-zinc-500 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-400"
+                            >
+                              <option value="">{t("declareUnavailable")}</option>
+                              {UNAVAILABILITY_KINDS.map((k) => (
+                                <option key={k} value={k}>
+                                  {tMed(`kind.${k}`)}
+                                </option>
+                              ))}
+                            </select>
+                          )}
+                        </td>
+                      ) : null}
+                    </tr>
+                  );
+                })}
                 {players.length === 0 && (
                   <tr>
-                    <td colSpan={attached.length + 1} className="px-3 py-6 text-center text-zinc-500">
+                    <td colSpan={attached.length + (canRecord ? 2 : 1)} className="px-3 py-6 text-center text-zinc-500">
                       {t("emptyRoster")}
                     </td>
                   </tr>

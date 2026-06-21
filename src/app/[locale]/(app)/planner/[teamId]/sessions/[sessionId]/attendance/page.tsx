@@ -7,13 +7,21 @@ import {
   AttendanceRoster,
   type RosterEntry,
 } from "@/components/planner/AttendanceRoster";
-import {
-  SessionPhysicalTests,
-  type SessionTestMetric,
-  type SessionTestResult,
-} from "@/components/planner/SessionPhysicalTests";
 import { requireMembership } from "@/lib/auth/getUser";
 import { currentSeasonLabel } from "@/lib/planner/seasons";
+import {
+  activeUnavailability,
+  type Unavailability,
+  type UnavailabilityKind,
+} from "@/lib/medical/unavailability";
+
+type UnavailabilityDbRow = {
+  player_id: string;
+  kind: UnavailabilityKind;
+  reason: string | null;
+  start_date: string;
+  end_date: string | null;
+};
 
 type AssignmentRow = {
   player_id: string;
@@ -53,10 +61,9 @@ export default async function SessionAttendancePage({
 }) {
   const { locale, teamId, sessionId } = await params;
   setRequestLocale(locale);
-  const { supabase, membership } = await requireMembership(locale);
+  const { supabase } = await requireMembership(locale);
   const t = await getTranslations("attendance.coach");
   const currentLocale = await getLocale();
-  const canRecordPhysical = membership.access_level !== "team_readonly";
 
   const [{ data: session }, { data: team }] = await Promise.all([
     supabase
@@ -91,11 +98,41 @@ export default async function SessionAttendancePage({
   const attendances = (attendancesRaw ?? []) as AttendanceRow[];
   const attByPlayer = new Map(attendances.map((a) => [a.player_id, a]));
 
+  // Indisponibilités (médical/discipline) couvrant la date de la séance.
+  const sessionDate = session.date as string;
+  const rosterPlayerIds = assignments
+    .map((a) => a.players?.id)
+    .filter((id): id is string => Boolean(id));
+  const { data: unavailRows } = rosterPlayerIds.length
+    ? await supabase
+        .from("player_unavailability")
+        .select("player_id, kind, reason, start_date, end_date")
+        .in("player_id", rosterPlayerIds)
+        .lte("start_date", sessionDate)
+        .or(`end_date.is.null,end_date.gte.${sessionDate}`)
+        .returns<UnavailabilityDbRow[]>()
+    : { data: [] as UnavailabilityDbRow[] };
+
+  const unavailByPlayer = new Map<string, Unavailability[]>();
+  for (const u of unavailRows ?? []) {
+    const arr = unavailByPlayer.get(u.player_id) ?? [];
+    arr.push({
+      id: "",
+      playerId: u.player_id,
+      kind: u.kind,
+      reason: u.reason,
+      startDate: u.start_date,
+      endDate: u.end_date,
+    });
+    unavailByPlayer.set(u.player_id, arr);
+  }
+
   const roster: RosterEntry[] = assignments
     .map((a) => {
       const p = a.players;
       if (!p) return null;
       const att = attByPlayer.get(p.id);
+      const active = activeUnavailability(unavailByPlayer.get(p.id) ?? [], sessionDate);
       return {
         playerId: p.id,
         fullName: `${p.first_name} ${p.last_name}`.trim(),
@@ -104,6 +141,9 @@ export default async function SessionAttendancePage({
         announcedReason: att?.announced_reason ?? null,
         announcedAt: att?.announced_at ?? null,
         actualStatus: att?.actual_status ?? null,
+        unavailability: active
+          ? { kind: active.kind, reason: active.reason }
+          : null,
       };
     })
     .filter((r): r is RosterEntry => r !== null)
@@ -115,38 +155,6 @@ export default async function SessionAttendancePage({
       if (b.jerseyNumber !== null) return 1;
       return a.fullName.localeCompare(b.fullName);
     });
-
-  // Tests physiques : indicateurs du club + tests rattachés à la séance +
-  // résultats déjà saisis pour cette séance (préremplissage).
-  const [{ data: metricRows }, { data: attachedRows }, { data: resultRows }] =
-    await Promise.all([
-      supabase
-        .from("physical_metrics")
-        .select("id, name, unit, category, description, protocol")
-        .eq("club_id", membership.club_id)
-        .eq("archived", false)
-        .order("sort_order", { ascending: true })
-        .order("name", { ascending: true })
-        .returns<SessionTestMetric[]>(),
-      supabase
-        .from("session_physical_tests")
-        .select("metric_id")
-        .eq("session_id", sessionId),
-      supabase
-        .from("physical_measurements")
-        .select("player_id, metric_id, value")
-        .eq("session_id", sessionId)
-        .returns<SessionTestResult[]>(),
-    ]);
-
-  const physicalMetrics = metricRows ?? [];
-  const attachedTestIds = (attachedRows ?? []).map((r) => r.metric_id as string);
-  const testResults = resultRows ?? [];
-  const testPlayers = roster.map((r) => ({
-    playerId: r.playerId,
-    fullName: r.fullName,
-    jerseyNumber: r.jerseyNumber,
-  }));
 
   return (
     <div className="mx-auto flex w-full max-w-4xl flex-col gap-6">
@@ -176,21 +184,6 @@ export default async function SessionAttendancePage({
           roster={roster}
         />
       </Card>
-
-      {physicalMetrics.length > 0 || attachedTestIds.length > 0 ? (
-        <Card>
-          <SessionPhysicalTests
-            locale={locale}
-            teamId={teamId}
-            sessionId={sessionId}
-            players={testPlayers}
-            metrics={physicalMetrics}
-            attachedIds={attachedTestIds}
-            results={testResults}
-            canRecord={canRecordPhysical}
-          />
-        </Card>
-      ) : null}
     </div>
   );
 }

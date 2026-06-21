@@ -3,6 +3,7 @@
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
+import { type MetricFields, metricFieldsToRow } from "@/lib/physical/defaultLibrary";
 
 async function requireUser(locale: string) {
   const supabase = await createClient();
@@ -51,24 +52,13 @@ async function sessionClub(
 export async function createMetricAction({
   playerId,
   locale,
-  name,
-  unit,
-  category,
-  description,
-  protocol,
-  higherIsBetter,
+  fields,
 }: {
   playerId: string;
   locale: string;
-  name: string;
-  unit: string | null;
-  category: string | null;
-  description: string | null;
-  protocol: string | null;
-  higherIsBetter: boolean;
+  fields: MetricFields;
 }) {
-  const trimmed = name.trim();
-  if (!trimmed) return { error: "Missing name" };
+  if (!fields.name.trim()) return { error: "Missing name" };
 
   const { supabase, user } = await requireUser(locale);
   const player = await playerClub(supabase, playerId);
@@ -77,12 +67,7 @@ export async function createMetricAction({
   const { error } = await supabase.from("physical_metrics").insert({
     club_id: player.club_id,
     created_by: user.id,
-    name: trimmed,
-    unit: unit?.trim() || null,
-    category: category?.trim() || null,
-    description: description?.trim() || null,
-    protocol: protocol?.trim() || null,
-    higher_is_better: higherIsBetter,
+    ...metricFieldsToRow(fields),
   });
 
   if (error) return { error: error.message };
@@ -94,39 +79,20 @@ export async function updateMetricAction({
   playerId,
   locale,
   metricId,
-  name,
-  unit,
-  category,
-  description,
-  protocol,
-  higherIsBetter,
+  fields,
 }: {
   playerId: string;
   locale: string;
   metricId: string;
-  name: string;
-  unit: string | null;
-  category: string | null;
-  description: string | null;
-  protocol: string | null;
-  higherIsBetter: boolean;
+  fields: MetricFields;
 }) {
-  const trimmed = name.trim();
-  if (!trimmed || !metricId) return { error: "Missing fields" };
+  if (!fields.name.trim() || !metricId) return { error: "Missing fields" };
 
   const { supabase } = await requireUser(locale);
 
   const { error } = await supabase
     .from("physical_metrics")
-    .update({
-      name: trimmed,
-      unit: unit?.trim() || null,
-      category: category?.trim() || null,
-      description: description?.trim() || null,
-      protocol: protocol?.trim() || null,
-      higher_is_better: higherIsBetter,
-      updated_at: new Date().toISOString(),
-    })
+    .update({ ...metricFieldsToRow(fields), updated_at: new Date().toISOString() })
     .eq("id", metricId);
 
   if (error) return { error: error.message };
@@ -309,7 +275,7 @@ export async function attachTestToSessionAction({
     );
 
   if (error) return { error: error.message };
-  revalidatePath(`/${locale}/planner/${teamId}/sessions/${sessionId}/attendance`);
+  revalidatePath(`/${locale}/planner/${teamId}/sessions/${sessionId}/eval`);
   return { ok: true as const };
 }
 
@@ -334,11 +300,11 @@ export async function detachTestFromSessionAction({
     .eq("metric_id", metricId);
 
   if (error) return { error: error.message };
-  revalidatePath(`/${locale}/planner/${teamId}/sessions/${sessionId}/attendance`);
+  revalidatePath(`/${locale}/planner/${teamId}/sessions/${sessionId}/eval`);
   return { ok: true as const };
 }
 
-/** Saisie d'un résultat depuis la page présences d'une séance. */
+/** Saisie d'un résultat depuis la page éval physique d'une séance. */
 export async function recordSessionMeasurementAction({
   locale,
   teamId,
@@ -370,7 +336,7 @@ export async function recordSessionMeasurementAction({
     userId: user.id,
   });
   if (res.error) return { error: res.error };
-  revalidatePath(`/${locale}/planner/${teamId}/sessions/${sessionId}/attendance`);
+  revalidatePath(`/${locale}/planner/${teamId}/sessions/${sessionId}/eval`);
   revalidatePath(`/${locale}/contingent/${playerId}`);
   return { ok: true as const };
 }

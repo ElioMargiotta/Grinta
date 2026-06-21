@@ -7,6 +7,7 @@ import {
   BadgeCheck,
   BarChart3,
   ClipboardList,
+  HeartPulse,
   KeyRound,
   ShieldAlert,
   UserRound,
@@ -25,10 +26,19 @@ import {
   type PhysicalMetric,
   type PhysicalMeasurement,
 } from "@/components/contingent/PhysicalTrackingSection";
+import { MedicalSection } from "@/components/contingent/MedicalSection";
 import { Section, SectionHeader } from "@/components/ui/Section";
 import type { ClubTeamOption } from "@/lib/contingent/teams";
+import type { Unavailability } from "@/lib/medical/unavailability";
 
-type Tab = "profile" | "assignment" | "stats" | "physical" | "followup" | "admin";
+type Tab =
+  | "profile"
+  | "assignment"
+  | "stats"
+  | "physical"
+  | "medical"
+  | "followup"
+  | "admin";
 
 type PlayerWithUser = EditablePlayer & { user_id: string | null };
 
@@ -59,6 +69,7 @@ export function ContingentPlayerProfile({
   evaluationsShareAvailable,
   physicalMetrics,
   physicalMeasurements,
+  unavailabilities,
   canManageMetrics,
   canRecordPhysical,
   locale,
@@ -72,12 +83,14 @@ export function ContingentPlayerProfile({
   evaluationsShareAvailable: boolean;
   physicalMetrics: PhysicalMetric[];
   physicalMeasurements: PhysicalMeasurement[];
+  unavailabilities: Unavailability[];
   canManageMetrics: boolean;
   canRecordPhysical: boolean;
   locale: string;
 }) {
   const t = useTranslations("contingent.playerProfile");
   const tc = useTranslations("contingent.form");
+  const tMed = useTranslations("medical");
   const [tab, setTab] = useState<Tab>("profile");
 
   const assignedTeams = useMemo(
@@ -98,6 +111,12 @@ export function ContingentPlayerProfile({
     },
     { key: "stats", label: t("tabs.stats"), icon: BarChart3 },
     { key: "physical", label: t("tabs.physical"), icon: Activity },
+    {
+      key: "medical",
+      label: tMed("tab"),
+      icon: HeartPulse,
+      count: unavailabilities.length,
+    },
     { key: "followup", label: t("tabs.followup"), icon: ClipboardList, count: evaluations.length },
     { key: "admin", label: t("tabs.admin"), icon: ShieldAlert, count: pendingInvitations.length },
   ];
@@ -239,6 +258,15 @@ export function ContingentPlayerProfile({
           measurements={physicalMeasurements}
           canManageMetrics={canManageMetrics}
           canRecord={canRecordPhysical}
+        />
+      ) : null}
+
+      {tab === "medical" ? (
+        <MedicalSection
+          playerId={player.id}
+          locale={locale}
+          unavailabilities={unavailabilities}
+          canManage={canRecordPhysical}
         />
       ) : null}
 

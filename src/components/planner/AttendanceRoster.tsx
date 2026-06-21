@@ -9,6 +9,8 @@ import {
   markActualAttendanceAction,
   setSessionDeadlineAction,
 } from "@/app/[locale]/(app)/planner/attendance-actions";
+import { KindBadge } from "@/components/contingent/MedicalSection";
+import type { UnavailabilityKind } from "@/lib/medical/unavailability";
 
 export type RosterEntry = {
   playerId: string;
@@ -18,6 +20,7 @@ export type RosterEntry = {
   announcedReason: string | null;
   announcedAt: string | null;
   actualStatus: "present" | "absent" | null;
+  unavailability: { kind: UnavailabilityKind; reason: string | null } | null;
 };
 
 type Props = {
@@ -158,9 +161,11 @@ function RosterRow({
   locale: string;
 }) {
   const t = useTranslations("attendance.coach");
+  const tMed = useTranslations("medical");
   const [actual, setActual] = useState(entry.actualStatus);
   const [isPending, startTransition] = useTransition();
   const [rowError, setRowError] = useState<string | null>(null);
+  const unavail = entry.unavailability;
 
   const mark = (next: "present" | "absent" | null) => {
     setRowError(null);
@@ -196,7 +201,17 @@ function RosterRow({
         </div>
       </td>
       <td className="px-3 py-3">
-        {entry.announcedStatus === null ? (
+        {unavail ? (
+          <div className="flex flex-col gap-1">
+            <KindBadge kind={unavail.kind} label={tMed(`kind.${unavail.kind}`)} />
+            {unavail.reason ? (
+              <span className="flex items-start gap-1 text-[11px] italic text-zinc-500 dark:text-zinc-400">
+                <MessageSquare className="mt-0.5 h-3 w-3 shrink-0" />
+                {unavail.reason}
+              </span>
+            ) : null}
+          </div>
+        ) : entry.announcedStatus === null ? (
           <span className="text-[12px] text-zinc-400">{t("noResponse")}</span>
         ) : (
           <div className="flex flex-col gap-1">
@@ -225,6 +240,9 @@ function RosterRow({
       </td>
       <td className="px-3 py-3">
         <div className="flex flex-col gap-1">
+          {unavail ? (
+            <span className="text-[12px] italic text-zinc-400">{tMed("excused")}</span>
+          ) : null}
           <div className="flex gap-1">
             <IconToggle
               active={actual === "present"}

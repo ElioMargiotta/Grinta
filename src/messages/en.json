@@ -412,9 +412,77 @@
     "logout": "Log out",
     "account": "Account",
     "contingent": "Squad",
+    "physical": "Evaluation",
     "playerMe": "My profile",
     "playerTeam": "My teams",
     "playerSchedule": "My schedule"
+  },
+  "physicalHub": {
+    "title": "Evaluation",
+    "subtitle": "Tests & evaluations for {club}",
+    "seasonScope": "{season} season",
+    "emptyMetrics": "No test yet. Create your first test (VMA, sprint, juggling…) with its evaluation protocol.",
+    "createFirst": "Create a test",
+    "manageTests": "Manage tests",
+    "noData": "No result recorded for this test in the selected period and team.",
+    "evolution": "Trend",
+    "ranking": "Ranking",
+    "clickRowHint": "Click a row to see the player's chart",
+    "viewProfile": "View profile",
+    "createEval": "New evaluation",
+    "pickTeam": "Pick a team",
+    "evals": {
+      "title": "Evaluations to fill",
+      "testCount": "{count, plural, =0 {no test} one {# test} other {# tests}}",
+      "enter": "Enter results",
+      "delete": "Delete evaluation",
+      "deleteConfirm": "Delete this evaluation? Results already entered will be kept in the players' history."
+    },
+    "library": {
+      "title": "Default library",
+      "intro": "Activate ready-to-use indicators. You can then edit them like your own tests.",
+      "add": "Add",
+      "remove": "Remove",
+      "category": {
+        "physical": "Physical",
+        "technical": "Technical",
+        "medical": "Medical"
+      }
+    },
+    "meta": {
+      "trials": "Trials",
+      "frequency": "Frequency",
+      "material": "Equipment",
+      "alertThreshold": "Alert threshold",
+      "validity": "Validity"
+    },
+    "filter": {
+      "test": "Test",
+      "team": "Team",
+      "allTeams": "All teams",
+      "category": "Category",
+      "allCategories": "All",
+      "period": "Period"
+    },
+    "period": {
+      "all": "All history",
+      "12m": "Last 12 months",
+      "6m": "Last 6 months",
+      "3m": "Last 3 months"
+    },
+    "stats": {
+      "evaluated": "Players evaluated",
+      "average": "Average",
+      "best": "Best",
+      "worst": "Lowest"
+    },
+    "col": {
+      "player": "Player",
+      "value": "Latest",
+      "trend": "Trend",
+      "date": "Date",
+      "tests": "Tests"
+    }
   },
   "auth": {
     "tabLogin": "Log in",
@@ -761,6 +829,10 @@
     "title": "Season planner",
     "pickTeam": "Pick a team to plan",
     "noTeams": "Create a team first.",
+    "eval": {
+      "title": "Physical evaluation",
+      "backToPlanner": "Back to planner"
+    },
     "view": {
       "tour": "Season overview",
       "weekly": "Weekly",
@@ -875,6 +947,17 @@
       "typeDistribution": "Type distribution",
       "emptyMonth": "Nothing planned for these weeks yet — add a cycle or set up a season to start filling them in.",
       "emptyMonthCta": "Open season overview",
+      "eval": {
+        "badge": "Eval",
+        "open": "Open evaluation",
+        "placementHint": "Click a day to place the physical evaluation there.",
+        "wizardTitle": "New physical evaluation",
+        "wizardSubtitle": "Tests assessed on {date}",
+        "noTests": "No test yet. Create one from the Physical page.",
+        "createTest": "+ Create a test",
+        "confirm": "Create evaluation",
+        "close": "Close"
+      },
       "tag": {
         "current": "Current"
       },
@@ -1909,7 +1992,7 @@
         "profile": "Profile",
         "assignment": "Assignment",
         "stats": "Statistics",
-        "physical": "Physical",
+        "physical": "Evaluation",
         "followup": "Follow-up",
         "admin": "Admin"
       },
@@ -1935,9 +2018,15 @@
       }
     },
     "physical": {
-      "title": "Physical tracking",
+      "title": "Evaluation",
       "intro": "Create your own tests (MAS, sprint, Yo-Yo…) with a protocol, then record results on each date — manually or from a planner session.",
       "manage": "Manage indicators",
+      "restore": "Restore",
+      "table": {
+        "name": "Name",
+        "category": "Category",
+        "unit": "Unit"
+      },
       "empty": "No indicator yet.",
       "createFirst": "Create an indicator",
       "addDate": "Add a date",
@@ -1971,12 +2060,50 @@
         "unitPlaceholder": "e.g. km/h",
         "category": "Category",
         "categoryPlaceholder": "e.g. endurance",
+        "categoryOption": {
+          "physical": "Physical",
+          "technical": "Technical",
+          "medical": "Medical"
+        },
+        "subcategory": "Subcategory",
+        "subcategoryPlaceholder": "e.g. aerobic endurance",
+        "valueType": "Value type",
+        "valueTypeOption": {
+          "integer": "Integer",
+          "decimal": "Decimal",
+          "percentage": "Percentage",
+          "score": "Score",
+          "number": "Number"
+        },
+        "interpretation": "Direction",
+        "interpretationOption": {
+          "higher": "Higher = better",
+          "lower": "Lower = better",
+          "target": "Target zone"
+        },
+        "display": "Display",
+        "displayOption": {
+          "primary": "Primary",
+          "secondary": "Secondary"
+        },
+        "alertThreshold": "Alert threshold",
+        "alertThresholdPlaceholder": "e.g. 5",
         "description": "Description",
         "descriptionPlaceholder": "e.g. Maximal aerobic speed",
         "protocol": "Protocol",
         "protocolPlaceholder": "e.g. 10 min warm-up, 1 min stages…",
+        "material": "Equipment",
+        "materialPlaceholder": "e.g. cones, stopwatch (comma-separated)",
+        "trials": "Trials",
+        "trialsPlaceholder": "e.g. 3 trials, best kept",
+        "frequency": "Recommended frequency",
+        "frequencyPlaceholder": "e.g. 6-8 weeks",
+        "validity": "Validity conditions",
+        "validityPlaceholder": "e.g. fresh player, stable surface",
         "higherIsBetter": "Higher value = better"
-      }
+      },
+      "delete": "Delete",
+      "deleteConfirm": "Permanently delete this indicator? The measurements recorded for it will also be deleted."
     }
   },
   "playerMe": {
@@ -2047,7 +2174,9 @@
       "none": "No test attached to this session.",
       "detach": "Remove",
       "colPlayer": "Player",
-      "emptyRoster": "No player in the roster."
+      "emptyRoster": "No player in the roster.",
+      "absent": "Absent",
+      "declareUnavailable": "Unavailable…"
     },
     "coach": {
       "title": "Attendance",
@@ -2347,6 +2476,37 @@
       "unauthenticated": "You must be signed in.",
       "no_membership": "No club selected.",
       "db_error": "Import failed. Try again."
+    }
+  },
+  "medical": {
+    "tab": "Medical",
+    "title": "Availability & medical",
+    "intro": "Injuries, illness, suspensions and other unavailabilities. A period automatically covers all relevant sessions and evaluations.",
+    "add": "Add",
+    "empty": "No unavailability recorded.",
+    "deleteConfirm": "Delete this unavailability?",
+    "ongoing": "Ongoing",
+    "openEnd": "no end date",
+    "endToday": "End today",
+    "edit": "Edit",
+    "delete": "Delete",
+    "addTitle": "New unavailability",
+    "editTitle": "Edit unavailability",
+    "cancel": "Cancel",
+    "save": "Save",
+    "excused": "Excused",
+    "field": {
+      "kind": "Type",
+      "startDate": "Start",
+      "endDate": "End (optional)",
+      "reason": "Reason",
+      "reasonPlaceholder": "Detail (optional)"
+    },
+    "kind": {
+      "injury": "🩹 Injured",
+      "illness": "Ill",
+      "suspension": "Suspended",
+      "other": "Unavailable"
     }
   }
 }

@@ -143,6 +143,81 @@ export async function createSessionForSlotAction({
   redirect(`/${locale}/planner/${teamId}/sessions/${data.id}/preparation`);
 }
 
+/**
+ * Crée une éval physique (kind = 'physical_eval') sur le planning d'une équipe
+ * à une date donnée, avec les tests choisis. Une seule éval par équipe/jour.
+ * Redirige vers la page présences pour la saisie des résultats.
+ */
+export async function createPhysicalEvalAction({
+  teamId,
+  date,
+  metricIds,
+  locale,
+}: {
+  teamId: string;
+  date: string;
+  metricIds: string[];
+  locale: string;
+}) {
+  if (!teamId || !date) return { error: "Missing fields" };
+  if (!metricIds || metricIds.length === 0) return { error: "No test selected" };
+
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) redirect(`/${locale}/login`);
+
+  const { data: team } = await supabase
+    .from("teams")
+    .select("id, club_id")
+    .eq("id", teamId)
+    .single();
+  if (!team?.club_id) return { error: "Not found" };
+
+  const { data: existing } = await supabase
+    .from("sessions")
+    .select("id")
+    .eq("team_id", teamId)
+    .eq("date", date)
+    .eq("kind", "physical_eval")
+    .maybeSingle();
+  if (existing) {
+    return { error: "An evaluation already exists for this day." };
+  }
+
+  const { data: created, error } = await supabase
+    .from("sessions")
+    .insert({
+      team_id: teamId,
+      trainer_id: user.id,
+      date,
+      start_time: null,
+      duration_minutes: null,
+      theme: null,
+      notes: null,
+      kind: "physical_eval",
+      microcycle_id: null,
+    })
+    .select("id")
+    .single();
+  if (error) return { error: error.message };
+
+  const rows = metricIds.map((metricId) => ({
+    club_id: team.club_id,
+    session_id: created.id,
+    metric_id: metricId,
+    created_by: user.id,
+  }));
+  const { error: testsError } = await supabase
+    .from("session_physical_tests")
+    .insert(rows);
+  if (testsError) return { error: testsError.message };
+
+  revalidatePath(`/${locale}/planner/${teamId}`);
+  redirect(`/${locale}/planner/${teamId}/sessions/${created.id}/eval`);
+}
+
 export async function cancelSessionAction({
   teamId,
   sessionId,

@@ -412,9 +412,77 @@
     "logout": "Abmelden",
     "account": "Konto",
     "contingent": "Kader",
+    "physical": "Bewertung",
     "playerMe": "Mein Profil",
     "playerTeam": "Meine Mannschaften",
     "playerSchedule": "Mein Plan"
+  },
+  "physicalHub": {
+    "title": "Bewertung",
+    "subtitle": "Tests & Bewertungen von {club}",
+    "seasonScope": "Saison {season}",
+    "emptyMetrics": "Noch kein Test. Erstelle deinen ersten Test (VMA, Sprint, Jonglieren…) mit Bewertungsprotokoll.",
+    "createFirst": "Test erstellen",
+    "manageTests": "Tests verwalten",
+    "noData": "Für diesen Test im gewählten Zeitraum und Team kein Ergebnis erfasst.",
+    "evolution": "Verlauf",
+    "ranking": "Rangliste",
+    "clickRowHint": "Zeile anklicken, um die Kurve des Spielers zu sehen",
+    "viewProfile": "Profil ansehen",
+    "createEval": "Bewertung erstellen",
+    "pickTeam": "Mannschaft wählen",
+    "evals": {
+      "title": "Auszufüllende Bewertungen",
+      "testCount": "{count, plural, =0 {kein Test} one {# Test} other {# Tests}}",
+      "enter": "Ergebnisse erfassen",
+      "delete": "Bewertung löschen",
+      "deleteConfirm": "Diese Bewertung löschen? Bereits erfasste Ergebnisse bleiben im Verlauf der Spieler erhalten."
+    },
+    "library": {
+      "title": "Standardbibliothek",
+      "intro": "Aktiviere gebrauchsfertige Indikatoren. Du kannst sie danach wie eigene Tests bearbeiten.",
+      "add": "Hinzufügen",
+      "remove": "Entfernen",
+      "category": {
+        "physical": "Physisch",
+        "technical": "Technisch",
+        "medical": "Medizinisch"
+      }
+    },
+    "meta": {
+      "trials": "Versuche",
+      "frequency": "Häufigkeit",
+      "material": "Material",
+      "alertThreshold": "Alarmschwelle",
+      "validity": "Gültigkeit"
+    },
+    "filter": {
+      "test": "Test",
+      "team": "Mannschaft",
+      "allTeams": "Alle Mannschaften",
+      "category": "Kategorie",
+      "allCategories": "Alle",
+      "period": "Zeitraum"
+    },
+    "period": {
+      "all": "Gesamter Verlauf",
+      "12m": "Letzte 12 Monate",
+      "6m": "Letzte 6 Monate",
+      "3m": "Letzte 3 Monate"
+    },
+    "stats": {
+      "evaluated": "Bewertete Spieler",
+      "average": "Durchschnitt",
+      "best": "Bester",
+      "worst": "Schwächster"
+    },
+    "col": {
+      "player": "Spieler",
+      "value": "Letzte Bewertung",
+      "trend": "Verlauf",
+      "date": "Datum",
+      "tests": "Tests"
+    }
   },
   "auth": {
     "tabLogin": "Anmelden",
@@ -755,6 +823,10 @@
     "title": "Saisonplanung",
     "pickTeam": "Wähle eine Mannschaft zum Planen",
     "noTeams": "Erstelle zuerst eine Mannschaft.",
+    "eval": {
+      "title": "Physische Bewertung",
+      "backToPlanner": "Zurück zur Planung"
+    },
     "view": {
       "tour": "Saisonansicht",
       "weekly": "Wöchentlich",
@@ -869,6 +941,17 @@
       "typeDistribution": "Verteilung nach Typ",
       "emptyMonth": "In diesen Wochen ist nichts geplant — füge einen Zyklus hinzu oder richte eine Saison ein, um sie zu füllen.",
       "emptyMonthCta": "Saisonansicht öffnen",
+      "eval": {
+        "badge": "Test",
+        "open": "Bewertung öffnen",
+        "placementHint": "Klicke auf einen Tag, um die physische Bewertung zu platzieren.",
+        "wizardTitle": "Neue physische Bewertung",
+        "wizardSubtitle": "Tests am {date}",
+        "noTests": "Noch kein Test. Erstelle einen über die Physis-Seite.",
+        "createTest": "+ Test erstellen",
+        "confirm": "Bewertung erstellen",
+        "close": "Schließen"
+      },
       "tag": {
         "current": "Aktuell"
       },
@@ -1903,7 +1986,7 @@
         "profile": "Profil",
         "assignment": "Zuweisung",
         "stats": "Statistiken",
-        "physical": "Physis",
+        "physical": "Bewertung",
         "followup": "Verlauf",
         "admin": "Admin"
       },
@@ -1929,9 +2012,15 @@
       }
     },
     "physical": {
-      "title": "Körperliches Monitoring",
+      "title": "Bewertung",
       "intro": "Erstelle eigene Tests (MAS, Sprint, Yo-Yo…) mit Protokoll und erfasse die Ergebnisse pro Datum — manuell oder aus einer Trainingseinheit.",
       "manage": "Indikatoren verwalten",
+      "restore": "Reaktivieren",
+      "table": {
+        "name": "Name",
+        "category": "Kategorie",
+        "unit": "Einheit"
+      },
       "empty": "Noch kein Indikator.",
       "createFirst": "Indikator erstellen",
       "addDate": "Datum hinzufügen",
@@ -1965,12 +2054,50 @@
         "unitPlaceholder": "z. B. km/h",
         "category": "Kategorie",
         "categoryPlaceholder": "z. B. Ausdauer",
+        "categoryOption": {
+          "physical": "Physisch",
+          "technical": "Technisch",
+          "medical": "Medizinisch"
+        },
+        "subcategory": "Unterkategorie",
+        "subcategoryPlaceholder": "z. B. aerobe Ausdauer",
+        "valueType": "Werttyp",
+        "valueTypeOption": {
+          "integer": "Ganzzahl",
+          "decimal": "Dezimalzahl",
+          "percentage": "Prozent",
+          "score": "Score",
+          "number": "Zahl"
+        },
+        "interpretation": "Richtung",
+        "interpretationOption": {
+          "higher": "Höher = besser",
+          "lower": "Niedriger = besser",
+          "target": "Zielzone"
+        },
+        "display": "Anzeige",
+        "displayOption": {
+          "primary": "Primär",
+          "secondary": "Sekundär"
+        },
+        "alertThreshold": "Alarmschwelle",
+        "alertThresholdPlaceholder": "z. B. 5",
         "description": "Beschreibung",
         "descriptionPlaceholder": "z. B. Maximale aerobe Geschwindigkeit",
         "protocol": "Protokoll",
         "protocolPlaceholder": "z. B. 10 Min. Aufwärmen, 1-Min.-Stufen…",
+        "material": "Material",
+        "materialPlaceholder": "z. B. Hütchen, Stoppuhr (durch Komma getrennt)",
+        "trials": "Versuche",
+        "trialsPlaceholder": "z. B. 3 Versuche, bester zählt",
+        "frequency": "Empfohlene Häufigkeit",
+        "frequencyPlaceholder": "z. B. 6-8 Wochen",
+        "validity": "Gültigkeitsbedingungen",
+        "validityPlaceholder": "z. B. frischer Spieler, stabiler Untergrund",
         "higherIsBetter": "Höherer Wert = besser"
-      }
+      },
+      "delete": "Löschen",
+      "deleteConfirm": "Diesen Indikator endgültig löschen? Die dafür erfassten Messwerte werden ebenfalls gelöscht."
     }
   },
   "playerMe": {
@@ -2041,7 +2168,9 @@
       "none": "Kein Test an diese Einheit angehängt.",
       "detach": "Entfernen",
       "colPlayer": "Spieler",
-      "emptyRoster": "Kein Spieler im Kader."
+      "emptyRoster": "Kein Spieler im Kader.",
+      "absent": "Abwesend",
+      "declareUnavailable": "Ausfall…"
     },
     "coach": {
       "title": "Anwesenheit",
@@ -2341,6 +2470,37 @@
       "unauthenticated": "Du musst angemeldet sein.",
       "no_membership": "Kein Club ausgewählt.",
       "db_error": "Import fehlgeschlagen. Versuche es erneut."
+    }
+  },
+  "medical": {
+    "tab": "Medizin",
+    "title": "Verfügbarkeit & Medizin",
+    "intro": "Verletzungen, Krankheiten, Sperren und andere Ausfälle. Ein Zeitraum gilt automatisch für alle betroffenen Einheiten und Bewertungen.",
+    "add": "Hinzufügen",
+    "empty": "Keine Ausfälle erfasst.",
+    "deleteConfirm": "Diesen Ausfall löschen?",
+    "ongoing": "Laufend",
+    "openEnd": "kein Enddatum",
+    "endToday": "Heute beenden",
+    "edit": "Bearbeiten",
+    "delete": "Löschen",
+    "addTitle": "Neuer Ausfall",
+    "editTitle": "Ausfall bearbeiten",
+    "cancel": "Abbrechen",
+    "save": "Speichern",
+    "excused": "Entschuldigt",
+    "field": {
+      "kind": "Typ",
+      "startDate": "Beginn",
+      "endDate": "Ende (optional)",
+      "reason": "Grund",
+      "reasonPlaceholder": "Detail (optional)"
+    },
+    "kind": {
+      "injury": "🩹 Verletzt",
+      "illness": "Krank",
+      "suspension": "Gesperrt",
+      "other": "Nicht verfügbar"
     }
   }
 }

@@ -25,6 +25,15 @@ import {
 } from "@/components/evaluation/types";
 import { listClubTeams } from "@/lib/contingent/teams";
 import { resolveCurrentSeasonLabel } from "@/lib/club/season";
+import type { Unavailability, UnavailabilityKind } from "@/lib/medical/unavailability";
+
+type UnavailabilityDbRow = {
+  id: string;
+  kind: UnavailabilityKind;
+  reason: string | null;
+  start_date: string;
+  end_date: string | null;
+};
 
 type EvaluationDbRow = {
   id: string;
@@ -104,25 +113,40 @@ export default async function ContingentPlayerPage({
     evalRows = fallback.data;
   }
 
-  // Suivi physique — indicateurs du club + mesures du joueur.
-  const [{ data: metricRows }, { data: measurementRows }] = await Promise.all([
-    supabase
-      .from("physical_metrics")
-      .select("id, name, unit, category, description, protocol, higher_is_better, sort_order, archived")
-      .eq("club_id", membership.club_id)
-      .order("sort_order", { ascending: true })
-      .order("name", { ascending: true })
-      .returns<PhysicalMetric[]>(),
-    supabase
-      .from("physical_measurements")
-      .select("metric_id, measured_on, value, note")
-      .eq("player_id", playerId)
-      .order("measured_on", { ascending: true })
-      .returns<PhysicalMeasurement[]>(),
-  ]);
+  // Suivi physique — indicateurs du club + mesures du joueur + indisponibilités.
+  const [{ data: metricRows }, { data: measurementRows }, { data: unavailRows }] =
+    await Promise.all([
+      supabase
+        .from("physical_metrics")
+        .select("id, name, unit, category, description, protocol, higher_is_better, sort_order, archived")
+        .eq("club_id", membership.club_id)
+        .order("sort_order", { ascending: true })
+        .order("name", { ascending: true })
+        .returns<PhysicalMetric[]>(),
+      supabase
+        .from("physical_measurements")
+        .select("metric_id, measured_on, value, note")
+        .eq("player_id", playerId)
+        .order("measured_on", { ascending: true })
+        .returns<PhysicalMeasurement[]>(),
+      supabase
+        .from("player_unavailability")
+        .select("id, kind, reason, start_date, end_date")
+        .eq("player_id", playerId)
+        .order("start_date", { ascending: false })
+        .returns<UnavailabilityDbRow[]>(),
+    ]);
 
   const physicalMetrics = metricRows ?? [];
   const physicalMeasurements = measurementRows ?? [];
+  const unavailabilities: Unavailability[] = (unavailRows ?? []).map((u) => ({
+    id: u.id,
+    playerId,
+    kind: u.kind,
+    reason: u.reason,
+    startDate: u.start_date,
+    endDate: u.end_date,
+  }));
   const canManageMetrics = isClubWideLevel(membership.access_level);
   const canRecordPhysical = membership.access_level !== "team_readonly";
 
@@ -172,6 +196,7 @@ export default async function ContingentPlayerPage({
         evaluationsShareAvailable={evaluationsShareAvailable}
         physicalMetrics={physicalMetrics}
         physicalMeasurements={physicalMeasurements}
+        unavailabilities={unavailabilities}
         canManageMetrics={canManageMetrics}
         canRecordPhysical={canRecordPhysical}
         locale={locale}
