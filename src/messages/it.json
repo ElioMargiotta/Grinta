@@ -1903,6 +1903,7 @@
         "profile": "Profilo",
         "assignment": "Assegnazione",
         "stats": "Statistiche",
+        "physical": "Fisico",
         "followup": "Percorso",
         "admin": "Admin"
       },
@@ -1925,6 +1926,50 @@
           "label": "Disponibilità",
           "hint": "Infortuni, assenze e rientri saranno seguiti qui."
         }
+      }
+    },
+    "physical": {
+      "title": "Monitoraggio fisico",
+      "intro": "Crea i tuoi test (MAS, sprint, Yo-Yo…) con protocollo e inserisci i risultati per ogni data — manualmente o da una seduta del planning.",
+      "manage": "Gestisci indicatori",
+      "empty": "Ancora nessun indicatore.",
+      "createFirst": "Crea un indicatore",
+      "addDate": "Aggiungi una data",
+      "noDates": "Nessun test inserito. Aggiungi una data o collega un test a una seduta del planning.",
+      "earlier": "Settimane precedenti",
+      "trend": "Andamento",
+      "prevWeeks": "Settimane precedenti",
+      "nextWeeks": "Settimane successive",
+      "today": "Oggi",
+      "record": "Inserimento",
+      "recordWeek": "Salva settimana",
+      "prevWeek": "Settimana precedente",
+      "nextWeek": "Settimana successiva",
+      "weekLabel": "Sett. del {date}",
+      "previous": "prec.",
+      "history": "Cronologia",
+      "viewChart": "Vedi grafico",
+      "noData": "Nessun dato inserito.",
+      "sinceStart": "da {date}",
+      "close": "Chiudi",
+      "newMetric": "Nuovo indicatore",
+      "editMetric": "Modifica indicatore",
+      "cancelEdit": "Annulla",
+      "archive": "Archivia",
+      "add": "Aggiungi",
+      "save": "Salva",
+      "field": {
+        "name": "Nome",
+        "namePlaceholder": "es. MAS",
+        "unit": "Unità",
+        "unitPlaceholder": "es. km/h",
+        "category": "Categoria",
+        "categoryPlaceholder": "es. resistenza",
+        "description": "Descrizione",
+        "descriptionPlaceholder": "es. Velocità aerobica massima",
+        "protocol": "Protocollo",
+        "protocolPlaceholder": "es. Riscaldamento 10 min, livelli da 1 min…",
+        "higherIsBetter": "Valore più alto = migliore"
       }
     }
   },
@@ -1988,6 +2033,15 @@
       "missing_session": "Sessione mancante",
       "invalid_status": "Stato non valido",
       "unknown": "Qualcosa è andato storto — riprova"
+    },
+    "physicalTests": {
+      "title": "Test fisici",
+      "intro": "Collega test a questa seduta e inserisci i risultati. Vengono riportati nella scheda di ogni giocatore.",
+      "addTest": "Aggiungi un test…",
+      "none": "Nessun test collegato a questa seduta.",
+      "detach": "Rimuovi",
+      "colPlayer": "Giocatore",
+      "emptyRoster": "Nessun giocatore in rosa."
     },
     "coach": {
       "title": "Presenze",

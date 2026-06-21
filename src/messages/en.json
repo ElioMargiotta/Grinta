@@ -1909,6 +1909,7 @@
         "profile": "Profile",
         "assignment": "Assignment",
         "stats": "Statistics",
+        "physical": "Physical",
         "followup": "Follow-up",
         "admin": "Admin"
       },
@@ -1931,6 +1932,50 @@
           "label": "Availability",
           "hint": "Injuries, absences and returns will be tracked here."
         }
+      }
+    },
+    "physical": {
+      "title": "Physical tracking",
+      "intro": "Create your own tests (MAS, sprint, Yo-Yo…) with a protocol, then record results on each date — manually or from a planner session.",
+      "manage": "Manage indicators",
+      "empty": "No indicator yet.",
+      "createFirst": "Create an indicator",
+      "addDate": "Add a date",
+      "noDates": "No test recorded yet. Add a date or attach a test to a planner session.",
+      "earlier": "Earlier weeks",
+      "trend": "Trend",
+      "prevWeeks": "Previous weeks",
+      "nextWeeks": "Next weeks",
+      "today": "Today",
+      "record": "Entry",
+      "recordWeek": "Save week",
+      "prevWeek": "Previous week",
+      "nextWeek": "Next week",
+      "weekLabel": "Week of {date}",
+      "previous": "prev.",
+      "history": "History",
+      "viewChart": "View chart",
+      "noData": "No data recorded yet.",
+      "sinceStart": "since {date}",
+      "close": "Close",
+      "newMetric": "New indicator",
+      "editMetric": "Edit indicator",
+      "cancelEdit": "Cancel",
+      "archive": "Archive",
+      "add": "Add",
+      "save": "Save",
+      "field": {
+        "name": "Name",
+        "namePlaceholder": "e.g. MAS",
+        "unit": "Unit",
+        "unitPlaceholder": "e.g. km/h",
+        "category": "Category",
+        "categoryPlaceholder": "e.g. endurance",
+        "description": "Description",
+        "descriptionPlaceholder": "e.g. Maximal aerobic speed",
+        "protocol": "Protocol",
+        "protocolPlaceholder": "e.g. 10 min warm-up, 1 min stages…",
+        "higherIsBetter": "Higher value = better"
       }
     }
   },
@@ -1994,6 +2039,15 @@
       "missing_session": "Missing session",
       "invalid_status": "Invalid status",
       "unknown": "Something went wrong — try again"
+    },
+    "physicalTests": {
+      "title": "Physical tests",
+      "intro": "Attach tests to this session and record results. They flow back to each player's profile.",
+      "addTest": "Add a test…",
+      "none": "No test attached to this session.",
+      "detach": "Remove",
+      "colPlayer": "Player",
+      "emptyRoster": "No player in the roster."
     },
     "coach": {
       "title": "Attendance",

@@ -7,7 +7,12 @@ import {
   AttendanceRoster,
   type RosterEntry,
 } from "@/components/planner/AttendanceRoster";
-import { requireUser } from "@/lib/auth/getUser";
+import {
+  SessionPhysicalTests,
+  type SessionTestMetric,
+  type SessionTestResult,
+} from "@/components/planner/SessionPhysicalTests";
+import { requireMembership } from "@/lib/auth/getUser";
 import { currentSeasonLabel } from "@/lib/planner/seasons";
 
 type AssignmentRow = {
@@ -48,9 +53,10 @@ export default async function SessionAttendancePage({
 }) {
   const { locale, teamId, sessionId } = await params;
   setRequestLocale(locale);
-  const { supabase } = await requireUser(locale);
+  const { supabase, membership } = await requireMembership(locale);
   const t = await getTranslations("attendance.coach");
   const currentLocale = await getLocale();
+  const canRecordPhysical = membership.access_level !== "team_readonly";
 
   const [{ data: session }, { data: team }] = await Promise.all([
     supabase
@@ -110,6 +116,38 @@ export default async function SessionAttendancePage({
       return a.fullName.localeCompare(b.fullName);
     });
 
+  // Tests physiques : indicateurs du club + tests rattachés à la séance +
+  // résultats déjà saisis pour cette séance (préremplissage).
+  const [{ data: metricRows }, { data: attachedRows }, { data: resultRows }] =
+    await Promise.all([
+      supabase
+        .from("physical_metrics")
+        .select("id, name, unit, category, description, protocol")
+        .eq("club_id", membership.club_id)
+        .eq("archived", false)
+        .order("sort_order", { ascending: true })
+        .order("name", { ascending: true })
+        .returns<SessionTestMetric[]>(),
+      supabase
+        .from("session_physical_tests")
+        .select("metric_id")
+        .eq("session_id", sessionId),
+      supabase
+        .from("physical_measurements")
+        .select("player_id, metric_id, value")
+        .eq("session_id", sessionId)
+        .returns<SessionTestResult[]>(),
+    ]);
+
+  const physicalMetrics = metricRows ?? [];
+  const attachedTestIds = (attachedRows ?? []).map((r) => r.metric_id as string);
+  const testResults = resultRows ?? [];
+  const testPlayers = roster.map((r) => ({
+    playerId: r.playerId,
+    fullName: r.fullName,
+    jerseyNumber: r.jerseyNumber,
+  }));
+
   return (
     <div className="mx-auto flex w-full max-w-4xl flex-col gap-6">
       <div className="flex flex-col gap-2">
@@ -138,6 +176,21 @@ export default async function SessionAttendancePage({
           roster={roster}
         />
       </Card>
+
+      {physicalMetrics.length > 0 || attachedTestIds.length > 0 ? (
+        <Card>
+          <SessionPhysicalTests
+            locale={locale}
+            teamId={teamId}
+            sessionId={sessionId}
+            players={testPlayers}
+            metrics={physicalMetrics}
+            attachedIds={attachedTestIds}
+            results={testResults}
+            canRecord={canRecordPhysical}
+          />
+        </Card>
+      ) : null}
     </div>
   );
 }
