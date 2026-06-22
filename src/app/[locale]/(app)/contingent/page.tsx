@@ -7,6 +7,7 @@ import { AddPlayerMenu } from "@/components/contingent/AddPlayerMenu";
 import { requireMembership } from "@/lib/auth/getUser";
 import { resolveCurrentSeasonLabel } from "@/lib/club/season";
 import { listClubTeams } from "@/lib/contingent/teams";
+import { getPlayersOverview } from "@/lib/contingent/playerStats";
 
 type AssignmentRow = {
   team_id: string;
@@ -58,20 +59,30 @@ export default async function ContingentPage({
     listClubTeams(membership.club_id, season),
   ]);
 
-  const players: ContingentPlayer[] = (data ?? []).map((p) => ({
-    id: p.id,
-    first_name: p.first_name,
-    last_name: p.last_name,
-    position: p.position,
-    jersey_number: p.jersey_number,
-    birth_date: p.birth_date,
-    has_dual_licence: Boolean(p.dual_licence_club),
-    assignments: (p.player_team_assignments ?? []).map((a) => ({
-      team_id: a.team_id,
-      team_name: a.teams?.name ?? null,
-      age_group: a.teams?.age_group ?? null,
-    })),
-  }));
+  const overview = await getPlayersOverview(supabase, {
+    season,
+    playerIds: (data ?? []).map((p) => p.id),
+  });
+
+  const players: ContingentPlayer[] = (data ?? []).map((p) => {
+    const stat = overview.get(p.id);
+    return {
+      id: p.id,
+      first_name: p.first_name,
+      last_name: p.last_name,
+      position: p.position,
+      jersey_number: p.jersey_number,
+      birth_date: p.birth_date,
+      has_dual_licence: Boolean(p.dual_licence_club),
+      assignments: (p.player_team_assignments ?? []).map((a) => ({
+        team_id: a.team_id,
+        team_name: a.teams?.name ?? null,
+        age_group: a.teams?.age_group ?? null,
+      })),
+      unavailabilityKind: stat?.activeUnavailability?.kind ?? null,
+      presenceRate: stat?.presenceRate ?? null,
+    };
+  });
 
   return (
     <div className="flex flex-col gap-6">

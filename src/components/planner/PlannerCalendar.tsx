@@ -43,6 +43,14 @@ type CalendarMatch = SeasonMatch & {
   match_url: string | null;
 };
 
+export type PlannerEval = { id: string; date: string; testCount: number };
+export type EvalMetric = {
+  id: string;
+  name: string;
+  unit: string | null;
+  category: string | null;
+};
+
 export type PlannerView = "season" | "weekly";
 
 const VIEW_ORDER: PlannerView[] = ["season", "weekly"];
@@ -59,6 +67,9 @@ export function PlannerCalendar({
   periodization,
   seasonMicrocycles,
   seasonPlans = [],
+  evals = [],
+  evalMetrics = [],
+  placeEval = false,
 }: {
   teamId: string;
   view: PlannerView;
@@ -71,6 +82,9 @@ export function PlannerCalendar({
   periodization: Periodization | null;
   seasonMicrocycles: SeasonMicrocycle[];
   seasonPlans?: SeasonPlanRow[];
+  evals?: PlannerEval[];
+  evalMetrics?: EvalMetric[];
+  placeEval?: boolean;
 }) {
   const router = useRouter();
   const t = useTranslations("planner.view");
@@ -130,6 +144,9 @@ export function PlannerCalendar({
             kind: m.kind,
             is_anchor: m.is_anchor,
           }))}
+          evals={evals}
+          evalMetrics={evalMetrics}
+          placeEval={placeEval}
         />
       )}
     </div>

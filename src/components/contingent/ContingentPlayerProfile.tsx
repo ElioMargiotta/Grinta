@@ -7,7 +7,8 @@ import {
   BadgeCheck,
   BarChart3,
   ClipboardList,
-  KeyRound,
+  HeartPulse,
+  LayoutDashboard,
   ShieldAlert,
   UserRound,
 } from "lucide-react";
@@ -25,10 +26,21 @@ import {
   type PhysicalMetric,
   type PhysicalMeasurement,
 } from "@/components/contingent/PhysicalTrackingSection";
+import { AvailabilitySection } from "@/components/contingent/AvailabilitySection";
+import { PlayerOverviewSection } from "@/components/contingent/PlayerOverviewSection";
 import { Section, SectionHeader } from "@/components/ui/Section";
 import type { ClubTeamOption } from "@/lib/contingent/teams";
+import type { Unavailability } from "@/lib/availability/unavailability";
 
-type Tab = "profile" | "assignment" | "stats" | "physical" | "followup" | "admin";
+type Tab =
+  | "overview"
+  | "profile"
+  | "assignment"
+  | "stats"
+  | "physical"
+  | "availability"
+  | "followup"
+  | "admin";
 
 type PlayerWithUser = EditablePlayer & { user_id: string | null };
 
@@ -59,7 +71,10 @@ export function ContingentPlayerProfile({
   evaluationsShareAvailable,
   physicalMetrics,
   physicalMeasurements,
-  canManageMetrics,
+  unavailabilities,
+  stats,
+  nextSession,
+  lastTestDate,
   canRecordPhysical,
   locale,
 }: {
@@ -72,13 +87,28 @@ export function ContingentPlayerProfile({
   evaluationsShareAvailable: boolean;
   physicalMetrics: PhysicalMetric[];
   physicalMeasurements: PhysicalMeasurement[];
-  canManageMetrics: boolean;
+  unavailabilities: Unavailability[];
+  stats: {
+    presenceRate: number | null;
+    sessionsPresent: number;
+    sessionsTotal: number;
+    availabilityRate: number;
+  };
+  nextSession: {
+    date: string;
+    theme: string | null;
+    kind: string;
+    teamName: string | null;
+  } | null;
+  lastTestDate: string | null;
   canRecordPhysical: boolean;
   locale: string;
 }) {
   const t = useTranslations("contingent.playerProfile");
   const tc = useTranslations("contingent.form");
-  const [tab, setTab] = useState<Tab>("profile");
+  const tMed = useTranslations("availability");
+  const tOverview = useTranslations("playerOverview");
+  const [tab, setTab] = useState<Tab>("overview");
 
   const assignedTeams = useMemo(
     () =>
@@ -89,6 +119,7 @@ export function ContingentPlayerProfile({
   );
 
   const tabs: { key: Tab; label: string; icon: typeof UserRound; count?: number }[] = [
+    { key: "overview", label: tOverview("tab"), icon: LayoutDashboard },
     { key: "profile", label: t("tabs.profile"), icon: UserRound },
     {
       key: "assignment",
@@ -98,6 +129,12 @@ export function ContingentPlayerProfile({
     },
     { key: "stats", label: t("tabs.stats"), icon: BarChart3 },
     { key: "physical", label: t("tabs.physical"), icon: Activity },
+    {
+      key: "availability",
+      label: tMed("tab"),
+      icon: HeartPulse,
+      count: unavailabilities.length,
+    },
     { key: "followup", label: t("tabs.followup"), icon: ClipboardList, count: evaluations.length },
     { key: "admin", label: t("tabs.admin"), icon: ShieldAlert, count: pendingInvitations.length },
   ];
@@ -182,6 +219,17 @@ export function ContingentPlayerProfile({
         })}
       </div>
 
+      {tab === "overview" ? (
+        <PlayerOverviewSection
+          stats={stats}
+          unavailabilities={unavailabilities}
+          evaluations={evaluations}
+          nextSession={nextSession}
+          lastTestDate={lastTestDate}
+          onOpenTab={setTab}
+        />
+      ) : null}
+
       {tab === "profile" ? (
         <Section>
           <SectionHeader icon={UserRound} title={t("profileTitle")} className="mb-4" />
@@ -211,19 +259,35 @@ export function ContingentPlayerProfile({
         <Section>
           <SectionHeader icon={BarChart3} title={t("statsTitle")} className="mb-4" />
           <div className="grid gap-3 sm:grid-cols-3">
-            {(["presence", "sessions", "availability"] as const).map((metric) => (
+            {([
+              {
+                key: "presence" as const,
+                value:
+                  stats.presenceRate === null
+                    ? "—"
+                    : `${Math.round(stats.presenceRate * 100)}%`,
+              },
+              {
+                key: "sessions" as const,
+                value: `${stats.sessionsPresent}/${stats.sessionsTotal}`,
+              },
+              {
+                key: "availability" as const,
+                value: `${Math.round(stats.availabilityRate * 100)}%`,
+              },
+            ]).map(({ key, value }) => (
               <div
-                key={metric}
+                key={key}
                 className="rounded-md border border-[var(--club-line)] bg-zinc-50/60 p-4 dark:border-zinc-800 dark:bg-zinc-900/40"
               >
                 <div className="text-[11px] font-mono uppercase tracking-widest text-zinc-500 dark:text-zinc-400">
-                  {t(`metrics.${metric}.label`)}
+                  {t(`metrics.${key}.label`)}
                 </div>
                 <div className="mt-3 font-mono text-2xl font-semibold tabular-nums text-zinc-950 dark:text-zinc-100">
-                  -
+                  {value}
                 </div>
                 <p className="mt-2 text-xs text-zinc-500 dark:text-zinc-400">
-                  {t(`metrics.${metric}.hint`)}
+                  {t(`metrics.${key}.hint`)}
                 </p>
               </div>
             ))}
@@ -233,12 +297,17 @@ export function ContingentPlayerProfile({
 
       {tab === "physical" ? (
         <PhysicalTrackingSection
-          playerId={player.id}
-          locale={locale}
           metrics={physicalMetrics}
           measurements={physicalMeasurements}
-          canManageMetrics={canManageMetrics}
-          canRecord={canRecordPhysical}
+        />
+      ) : null}
+
+      {tab === "availability" ? (
+        <AvailabilitySection
+          playerId={player.id}
+          locale={locale}
+          unavailabilities={unavailabilities}
+          canManage={canRecordPhysical}
         />
       ) : null}
 

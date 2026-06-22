@@ -1,27 +1,29 @@
 "use client";
 
-import { useMemo, useState, useTransition } from "react";
+import { useMemo, useState } from "react";
 import { useTranslations } from "next-intl";
 import {
   Activity,
-  ArrowDownRight,
-  ArrowRight,
-  ArrowUpRight,
-  CalendarPlus,
+  Archive,
   LineChart as LineChartIcon,
   Plus,
-  Settings2,
   Trash2,
   X,
 } from "lucide-react";
 import { Section, SectionHeader } from "@/components/ui/Section";
 import { formatDay, todayISO } from "@/lib/contingent/week";
 import {
-  archiveMetricAction,
-  createMetricAction,
-  updateMetricAction,
-  upsertMeasurementAction,
-} from "@/app/[locale]/(app)/contingent/[playerId]/physical/actions";
+  fmt,
+  MetricChart,
+  type Point,
+  Sparkline,
+  type Trend,
+  TrendArrow,
+  trendOf,
+} from "@/components/physical/charts";
+import type { MetricFields } from "@/lib/physical/defaultLibrary";
+
+export type { MetricFields };
 
 export type PhysicalMetric = {
   id: string;
@@ -33,6 +35,17 @@ export type PhysicalMetric = {
   higher_is_better: boolean;
   sort_order: number;
   archived: boolean;
+  // Métadonnées bibliothèque (peuvent être absentes pour d'anciens indicateurs).
+  subcategory?: string | null;
+  value_type?: string | null;
+  interpretation?: string | null;
+  material?: string[] | null;
+  trials?: string | null;
+  validity_conditions?: string | null;
+  recommended_frequency?: string | null;
+  display?: string | null;
+  alert_threshold?: number | null;
+  default_key?: string | null;
 };
 
 export type PhysicalMeasurement = {
@@ -42,195 +55,106 @@ export type PhysicalMeasurement = {
   note: string | null;
 };
 
-type Point = { date: string; value: number };
-
-function parseValue(raw: string): number | null {
-  const t = raw.trim().replace(",", ".");
-  if (t === "") return null;
-  const n = Number(t);
-  return Number.isFinite(n) ? n : null;
-}
-
-function fmt(value: number | null): string {
-  if (value === null || value === undefined) return "";
-  return String(value);
-}
-
-type Trend = "up" | "down" | "flat";
-
-function trendOf(
-  first: number,
-  last: number,
-  higherIsBetter: boolean,
-): { trend: Trend; color: string } {
-  const delta = last - first;
-  if (delta === 0) return { trend: "flat", color: "#a1a1aa" };
-  const improved = higherIsBetter ? delta > 0 : delta < 0;
-  return { trend: improved ? "up" : "down", color: improved ? "#16a34a" : "#dc2626" };
-}
-
-function TrendArrow({ trend, className }: { trend: Trend; className?: string }) {
-  if (trend === "flat") return <ArrowRight className={className ?? "h-3.5 w-3.5 text-zinc-400"} />;
-  if (trend === "up") return <ArrowUpRight className={className ?? "h-3.5 w-3.5 text-green-600"} />;
-  return <ArrowDownRight className={className ?? "h-3.5 w-3.5 text-red-600"} />;
-}
-
-/** Petite courbe SVG maison (pas de lib de charting dans le repo). */
-function Sparkline({ points, higherIsBetter }: { points: Point[]; higherIsBetter: boolean }) {
-  if (points.length < 2) {
-    return <span className="text-[11px] text-zinc-400">—</span>;
-  }
-  const W = 96;
-  const H = 28;
-  const PAD = 3;
-  const values = points.map((p) => p.value);
-  const min = Math.min(...values);
-  const max = Math.max(...values);
-  const span = max - min || 1;
-  const stepX = (W - PAD * 2) / (points.length - 1);
-  const coords = points.map((p, i) => {
-    const x = PAD + i * stepX;
-    const y = PAD + (H - PAD * 2) * (1 - (p.value - min) / span);
-    return { x, y };
-  });
-  const d = coords
-    .map((c, i) => `${i === 0 ? "M" : "L"} ${c.x.toFixed(1)} ${c.y.toFixed(1)}`)
-    .join(" ");
-
-  const { trend, color } = trendOf(values[0], values[values.length - 1], higherIsBetter);
-
-  return (
-    <div className="flex items-center gap-1.5">
-      <svg width={W} height={H} viewBox={`0 0 ${W} ${H}`} aria-hidden>
-        <path d={d} fill="none" stroke={color} strokeWidth={1.5} strokeLinejoin="round" strokeLinecap="round" />
-        {coords.map((c, i) => (
-          <circle key={i} cx={c.x} cy={c.y} r={1.4} fill={color} />
-        ))}
-      </svg>
-      <TrendArrow trend={trend} />
-    </div>
-  );
-}
-
-/** Courbe plein format avec axes pour la modale d'un test. */
-function MetricChart({
-  points,
-  unit,
-  higherIsBetter,
-}: {
-  points: Point[];
-  unit: string | null;
-  higherIsBetter: boolean;
-}) {
-  const W = 520;
-  const H = 240;
-  const padL = 44;
-  const padR = 16;
-  const padT = 16;
-  const padB = 34;
-  const plotW = W - padL - padR;
-  const plotH = H - padT - padB;
-
-  const values = points.map((p) => p.value);
-  const rawMin = Math.min(...values);
-  const rawMax = Math.max(...values);
-  const pad = (rawMax - rawMin) * 0.12 || Math.abs(rawMax) * 0.12 || 1;
-  const min = rawMin - pad;
-  const max = rawMax + pad;
-  const span = max - min || 1;
-
-  const x = (i: number) =>
-    padL + (points.length === 1 ? plotW / 2 : (plotW * i) / (points.length - 1));
-  const y = (v: number) => padT + plotH * (1 - (v - min) / span);
-
-  const line = points
-    .map((p, i) => `${i === 0 ? "M" : "L"} ${x(i).toFixed(1)} ${y(p.value).toFixed(1)}`)
-    .join(" ");
-  const { color } = trendOf(values[0], values[values.length - 1], higherIsBetter);
-
-  const yTicks = Array.from({ length: 4 }, (_, i) => min + (span * i) / 3);
-  const xStep = Math.ceil(points.length / 8);
-
-  return (
-    <svg width="100%" viewBox={`0 0 ${W} ${H}`} role="img" className="select-none">
-      {yTicks.map((tv, i) => {
-        const yy = y(tv);
-        return (
-          <g key={i}>
-            <line x1={padL} y1={yy} x2={W - padR} y2={yy} stroke="currentColor" className="text-zinc-200 dark:text-zinc-700" strokeWidth={1} />
-            <text x={padL - 6} y={yy + 3} textAnchor="end" className="fill-zinc-400 text-[10px]">
-              {Number(tv.toFixed(2))}
-            </text>
-          </g>
-        );
-      })}
-      {points.map((p, i) =>
-        i % xStep === 0 || i === points.length - 1 ? (
-          <text key={p.date} x={x(i)} y={H - padB + 16} textAnchor="middle" className="fill-zinc-400 text-[10px]">
-            {formatDay(p.date)}
-          </text>
-        ) : null,
-      )}
-      <path d={line} fill="none" stroke={color} strokeWidth={2} strokeLinejoin="round" strokeLinecap="round" />
-      {points.map((p, i) => (
-        <g key={p.date}>
-          <circle cx={x(i)} cy={y(p.value)} r={3} fill={color} />
-          <text x={x(i)} y={y(p.value) - 8} textAnchor="middle" className="fill-zinc-500 text-[10px] dark:fill-zinc-400">
-            {p.value}
-          </text>
-        </g>
-      ))}
-      {unit ? (
-        <text x={padL - 6} y={padT - 4} textAnchor="end" className="fill-zinc-400 text-[10px]">
-          {unit}
-        </text>
-      ) : null}
-    </svg>
-  );
-}
-
-type MetricDraft = {
+export type MetricDraft = {
   id?: string;
   name: string;
+  category: string; // physical | technical | medical
+  subcategory: string;
   unit: string;
-  category: string;
+  valueType: string; // integer | decimal | percentage | score | number
+  interpretation: string; // higher | lower | target
   description: string;
   protocol: string;
-  higherIsBetter: boolean;
+  material: string; // saisie libre, séparée par des virgules
+  trials: string;
+  validityConditions: string;
+  recommendedFrequency: string;
+  display: string; // primary | secondary
+  alertThreshold: string; // texte → numérique | null
 };
 
 function emptyDraft(): MetricDraft {
-  return { name: "", unit: "", category: "", description: "", protocol: "", higherIsBetter: true };
+  return {
+    name: "",
+    category: "physical",
+    subcategory: "",
+    unit: "",
+    valueType: "number",
+    interpretation: "higher",
+    description: "",
+    protocol: "",
+    material: "",
+    trials: "",
+    validityConditions: "",
+    recommendedFrequency: "",
+    display: "primary",
+    alertThreshold: "",
+  };
+}
+
+function draftFromMetric(m: PhysicalMetric): MetricDraft {
+  return {
+    id: m.id,
+    name: m.name,
+    category: m.category ?? "physical",
+    subcategory: m.subcategory ?? "",
+    unit: m.unit ?? "",
+    valueType: m.value_type ?? "number",
+    interpretation: m.interpretation ?? (m.higher_is_better ? "higher" : "lower"),
+    description: m.description ?? "",
+    protocol: m.protocol ?? "",
+    material: (m.material ?? []).join(", "),
+    trials: m.trials ?? "",
+    validityConditions: m.validity_conditions ?? "",
+    recommendedFrequency: m.recommended_frequency ?? "",
+    display: m.display ?? "primary",
+    alertThreshold:
+      m.alert_threshold !== null && m.alert_threshold !== undefined
+        ? String(m.alert_threshold)
+        : "",
+  };
+}
+
+const CATEGORY_OPTIONS = ["physical", "technical", "medical"] as const;
+const VALUE_TYPE_OPTIONS = ["integer", "decimal", "percentage", "score", "number"] as const;
+const INTERPRETATION_OPTIONS = ["higher", "lower", "target"] as const;
+const DISPLAY_OPTIONS = ["primary", "secondary"] as const;
+
+export function metricFieldsFromDraft(draft: MetricDraft): MetricFields {
+  const thr = draft.alertThreshold.trim().replace(",", ".");
+  const alertThreshold =
+    thr === "" ? null : Number.isFinite(Number(thr)) ? Number(thr) : null;
+  const material = draft.material
+    .split(",")
+    .map((s) => s.trim())
+    .filter(Boolean);
+  return {
+    name: draft.name.trim(),
+    category: draft.category.trim() || null,
+    subcategory: draft.subcategory.trim() || null,
+    unit: draft.unit.trim() || null,
+    valueType: draft.valueType || null,
+    interpretation: draft.interpretation || "higher",
+    description: draft.description.trim() || null,
+    protocol: draft.protocol.trim() || null,
+    material: material.length ? material : null,
+    trials: draft.trials.trim() || null,
+    validityConditions: draft.validityConditions.trim() || null,
+    recommendedFrequency: draft.recommendedFrequency.trim() || null,
+    display: draft.display || "primary",
+    alertThreshold,
+  };
 }
 
 export function PhysicalTrackingSection({
-  playerId,
-  locale,
   metrics,
   measurements,
-  canManageMetrics,
-  canRecord,
 }: {
-  playerId: string;
-  locale: string;
   metrics: PhysicalMetric[];
   measurements: PhysicalMeasurement[];
-  canManageMetrics: boolean;
-  canRecord: boolean;
 }) {
   const t = useTranslations("contingent.physical");
-  const [pending, startTransition] = useTransition();
-  const [managerOpen, setManagerOpen] = useState(false);
   const [chartMetric, setChartMetric] = useState<PhysicalMetric | null>(null);
-  const [error, setError] = useState<string | null>(null);
-
-  const activeMetrics = useMemo(
-    () =>
-      metrics
-        .filter((m) => !m.archived)
-        .sort((a, b) => a.sort_order - b.sort_order || a.name.localeCompare(b.name)),
-    [metrics],
-  );
 
   // Index des mesures : `${metricId}|${date}` -> value
   const byKey = useMemo(() => {
@@ -251,225 +175,113 @@ export function PhysicalTrackingSection({
     return map;
   }, [measurements]);
 
-  // Colonnes = dates de test existantes ∪ dates ajoutées à la volée.
-  const [extraDates, setExtraDates] = useState<string[]>([]);
+  // Lecture seule : on n'affiche QUE les tests ayant au moins une mesure pour ce
+  // joueur. La saisie passe exclusivement par les séances de test du planning.
+  const measuredMetricIds = useMemo(
+    () => new Set(measurements.map((m) => m.metric_id)),
+    [measurements],
+  );
+  const activeMetrics = useMemo(
+    () =>
+      metrics
+        .filter((m) => measuredMetricIds.has(m.id))
+        .sort((a, b) => a.sort_order - b.sort_order || a.name.localeCompare(b.name)),
+    [metrics, measuredMetricIds],
+  );
+
+  // Colonnes = dates de test existantes.
   const dates = useMemo(() => {
     const set = new Set<string>();
     for (const m of measurements) set.add(m.measured_on);
-    for (const d of extraDates) set.add(d);
     return Array.from(set).sort();
-  }, [measurements, extraDates]);
-
-  function addDate(date: string) {
-    if (!date) return;
-    setExtraDates((prev) => (prev.includes(date) ? prev : [...prev, date]));
-  }
-
-  function commitCell(metricId: string, date: string, raw: string) {
-    const value = parseValue(raw);
-    const prev = byKey.get(`${metricId}|${date}`) ?? null;
-    if (value === prev) return;
-    setError(null);
-    startTransition(async () => {
-      const res = await upsertMeasurementAction({
-        playerId,
-        locale,
-        metricId,
-        measuredOn: date,
-        value,
-        note: null,
-      });
-      if (res?.error) setError(res.error);
-    });
-  }
-
-  function saveMetric(metricDraft: MetricDraft) {
-    setError(null);
-    startTransition(async () => {
-      const res = metricDraft.id
-        ? await updateMetricAction({
-            playerId,
-            locale,
-            metricId: metricDraft.id,
-            name: metricDraft.name,
-            unit: metricDraft.unit || null,
-            category: metricDraft.category || null,
-            description: metricDraft.description || null,
-            protocol: metricDraft.protocol || null,
-            higherIsBetter: metricDraft.higherIsBetter,
-          })
-        : await createMetricAction({
-            playerId,
-            locale,
-            name: metricDraft.name,
-            unit: metricDraft.unit || null,
-            category: metricDraft.category || null,
-            description: metricDraft.description || null,
-            protocol: metricDraft.protocol || null,
-            higherIsBetter: metricDraft.higherIsBetter,
-          });
-      if (res?.error) setError(res.error);
-    });
-  }
-
-  function archiveMetric(metricId: string, archived: boolean) {
-    startTransition(async () => {
-      const res = await archiveMetricAction({ playerId, locale, metricId, archived });
-      if (res?.error) setError(res.error);
-    });
-  }
+  }, [measurements]);
 
   const today = todayISO();
 
   return (
     <Section>
-      <div className="mb-4 flex items-center justify-between gap-3">
+      <div className="mb-4">
         <SectionHeader icon={Activity} title={t("title")} />
-        {canManageMetrics ? (
-          <button
-            type="button"
-            onClick={() => setManagerOpen(true)}
-            className="inline-flex items-center gap-2 rounded-md border border-[var(--club-line)] px-3 py-1.5 text-[13px] font-semibold text-zinc-700 hover:bg-zinc-50 dark:border-zinc-800 dark:text-zinc-200 dark:hover:bg-zinc-800/50"
-          >
-            <Settings2 className="h-4 w-4" />
-            {t("manage")}
-          </button>
-        ) : null}
       </div>
 
       <p className="mb-4 text-sm text-zinc-500 dark:text-zinc-400">{t("intro")}</p>
 
-      {error ? (
-        <div className="mb-4 rounded-md border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700 dark:border-red-900/50 dark:bg-red-950/30 dark:text-red-300">
-          {error}
-        </div>
-      ) : null}
-
       {activeMetrics.length === 0 ? (
         <div className="rounded-md border border-dashed border-[var(--club-line)] p-8 text-center">
           <p className="text-sm text-zinc-500 dark:text-zinc-400">{t("empty")}</p>
-          {canManageMetrics ? (
-            <button
-              type="button"
-              onClick={() => setManagerOpen(true)}
-              className="mt-3 inline-flex items-center gap-2 rounded-md bg-[var(--club-primary)] px-3 py-1.5 text-[13px] font-semibold text-[var(--club-primary-foreground)]"
-            >
-              <Plus className="h-4 w-4" />
-              {t("createFirst")}
-            </button>
-          ) : null}
         </div>
       ) : (
-        <>
-          {/* ---- Barre d'action : ajouter une date de test ---- */}
-          {canRecord ? (
-            <div className="mb-2 flex items-center justify-end">
-              <AddDateButton t={t} today={today} onAdd={addDate} />
-            </div>
-          ) : null}
-
-          {/* ---- Grille tests × dates ---- */}
-          {dates.length === 0 ? (
-            <div className="rounded-md border border-dashed border-[var(--club-line)] p-6 text-center text-sm text-zinc-500 dark:text-zinc-400">
-              {t("noDates")}
-            </div>
-          ) : (
-            <div className="overflow-x-auto">
-              <table className="w-full border-collapse text-sm">
-                <thead>
-                  <tr className="border-b border-[var(--club-line)] text-left">
-                    <th className="sticky left-0 z-10 bg-white py-2 pr-3 dark:bg-zinc-900" />
+        <div className="overflow-x-auto">
+          <table className="w-full border-collapse text-sm">
+            <thead>
+              <tr className="border-b border-[var(--club-line)] text-left">
+                <th className="sticky left-0 z-10 bg-white py-2 pr-3 dark:bg-zinc-900" />
+                {dates.map((d) => {
+                  const isToday = d === today;
+                  return (
+                    <th
+                      key={d}
+                      className={`px-2 py-2 text-center text-[11px] font-mono font-medium uppercase tracking-wide ${
+                        isToday ? "text-[var(--club-primary)]" : "text-zinc-500"
+                      }`}
+                    >
+                      {formatDay(d)}
+                    </th>
+                  );
+                })}
+                <th className="px-2 py-2 text-center text-[11px] font-medium uppercase tracking-wide text-zinc-400">
+                  {t("trend")}
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              {activeMetrics.map((metric) => {
+                const series = seriesByMetric.get(metric.id) ?? [];
+                return (
+                  <tr key={metric.id} className="border-b border-[var(--club-line)]/60">
+                    <td className="sticky left-0 z-10 bg-white py-2 pr-3 dark:bg-zinc-900">
+                      <button
+                        type="button"
+                        onClick={() => setChartMetric(metric)}
+                        title={t("viewChart")}
+                        className="group flex items-center gap-1.5 text-left"
+                      >
+                        <span className="font-medium text-zinc-900 group-hover:text-[var(--club-primary)] dark:text-zinc-100">
+                          {metric.name}
+                        </span>
+                        <LineChartIcon className="h-3.5 w-3.5 text-zinc-300 group-hover:text-[var(--club-primary)]" />
+                      </button>
+                      {(metric.unit || metric.category) && (
+                        <div className="text-[11px] text-zinc-400">
+                          {[metric.category, metric.unit].filter(Boolean).join(" · ")}
+                        </div>
+                      )}
+                    </td>
                     {dates.map((d) => {
+                      const key = `${metric.id}|${d}`;
+                      const val = byKey.get(key) ?? null;
                       const isToday = d === today;
                       return (
-                        <th
+                        <td
                           key={d}
-                          className={`px-2 py-2 text-center text-[11px] font-mono font-medium uppercase tracking-wide ${
-                            isToday ? "text-[var(--club-primary)]" : "text-zinc-500"
-                          }`}
+                          className={`px-1 py-1 text-center ${isToday ? "bg-[var(--club-primary)]/5" : ""}`}
                         >
-                          {formatDay(d)}
-                        </th>
+                          <span className="font-mono tabular-nums text-zinc-700 dark:text-zinc-300">
+                            {fmt(val) || "—"}
+                          </span>
+                        </td>
                       );
                     })}
-                    <th className="px-2 py-2 text-center text-[11px] font-medium uppercase tracking-wide text-zinc-400">
-                      {t("trend")}
-                    </th>
+                    <td className="px-2 py-1">
+                      <Sparkline points={series} higherIsBetter={metric.higher_is_better} />
+                    </td>
                   </tr>
-                </thead>
-                <tbody>
-                  {activeMetrics.map((metric) => {
-                    const series = seriesByMetric.get(metric.id) ?? [];
-                    return (
-                      <tr key={metric.id} className="border-b border-[var(--club-line)]/60">
-                        <td className="sticky left-0 z-10 bg-white py-2 pr-3 dark:bg-zinc-900">
-                          <button
-                            type="button"
-                            onClick={() => setChartMetric(metric)}
-                            title={t("viewChart")}
-                            className="group flex items-center gap-1.5 text-left"
-                          >
-                            <span className="font-medium text-zinc-900 group-hover:text-[var(--club-primary)] dark:text-zinc-100">
-                              {metric.name}
-                            </span>
-                            <LineChartIcon className="h-3.5 w-3.5 text-zinc-300 group-hover:text-[var(--club-primary)]" />
-                          </button>
-                          {(metric.unit || metric.category) && (
-                            <div className="text-[11px] text-zinc-400">
-                              {[metric.category, metric.unit].filter(Boolean).join(" · ")}
-                            </div>
-                          )}
-                        </td>
-                        {dates.map((d) => {
-                          const key = `${metric.id}|${d}`;
-                          const val = byKey.get(key) ?? null;
-                          const isToday = d === today;
-                          return (
-                            <td
-                              key={d}
-                              className={`px-1 py-1 text-center ${isToday ? "bg-[var(--club-primary)]/5" : ""}`}
-                            >
-                              {canRecord ? (
-                                <input
-                                  type="text"
-                                  inputMode="decimal"
-                                  key={key}
-                                  defaultValue={fmt(val)}
-                                  disabled={pending}
-                                  onBlur={(e) => commitCell(metric.id, d, e.target.value)}
-                                  className="w-16 rounded-md border border-transparent bg-zinc-50 px-2 py-1 text-center font-mono tabular-nums text-zinc-900 hover:border-[var(--club-line)] focus:border-[var(--club-primary)] focus:bg-white focus:outline-none dark:bg-zinc-800/50 dark:text-zinc-100 dark:focus:bg-zinc-800"
-                                />
-                              ) : (
-                                <span className="font-mono tabular-nums text-zinc-700 dark:text-zinc-300">
-                                  {fmt(val) || "—"}
-                                </span>
-                              )}
-                            </td>
-                          );
-                        })}
-                        <td className="px-2 py-1">
-                          <Sparkline points={series} higherIsBetter={metric.higher_is_better} />
-                        </td>
-                      </tr>
-                    );
-                  })}
-                </tbody>
-              </table>
-            </div>
-          )}
-        </>
+                );
+              })}
+            </tbody>
+          </table>
+        </div>
       )}
-
-      {managerOpen ? (
-        <MetricManager
-          t={t}
-          metrics={metrics}
-          pending={pending}
-          onClose={() => setManagerOpen(false)}
-          onSave={saveMetric}
-          onArchive={archiveMetric}
-        />
-      ) : null}
 
       {chartMetric ? (
         <ChartModal
@@ -480,62 +292,6 @@ export function PhysicalTrackingSection({
         />
       ) : null}
     </Section>
-  );
-}
-
-function AddDateButton({
-  t,
-  today,
-  onAdd,
-}: {
-  t: ReturnType<typeof useTranslations>;
-  today: string;
-  onAdd: (date: string) => void;
-}) {
-  const [open, setOpen] = useState(false);
-  const [date, setDate] = useState(today);
-
-  if (!open) {
-    return (
-      <button
-        type="button"
-        onClick={() => setOpen(true)}
-        className="inline-flex items-center gap-1.5 rounded-md border border-[var(--club-line)] px-2.5 py-1.5 text-[12px] font-medium text-zinc-600 hover:bg-zinc-50 dark:border-zinc-800 dark:text-zinc-300 dark:hover:bg-zinc-800/50"
-      >
-        <CalendarPlus className="h-3.5 w-3.5" />
-        {t("addDate")}
-      </button>
-    );
-  }
-
-  return (
-    <div className="flex items-center gap-2">
-      <input
-        type="date"
-        value={date}
-        max={today}
-        onChange={(e) => setDate(e.target.value)}
-        className="rounded-md border border-[var(--club-line)] bg-white px-2 py-1 text-[13px] text-zinc-900 dark:bg-zinc-900 dark:text-zinc-100"
-      />
-      <button
-        type="button"
-        onClick={() => {
-          onAdd(date);
-          setOpen(false);
-        }}
-        className="rounded-md bg-[var(--club-primary)] px-3 py-1.5 text-[12px] font-semibold text-[var(--club-primary-foreground)]"
-      >
-        {t("add")}
-      </button>
-      <button
-        type="button"
-        onClick={() => setOpen(false)}
-        className="rounded-md p-1 text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-200"
-        aria-label={t("close")}
-      >
-        <X className="h-4 w-4" />
-      </button>
-    </div>
   );
 }
 
@@ -617,13 +373,19 @@ function ChartModal({
   );
 }
 
-function MetricManager({
+const FORM_FIELD =
+  "rounded-md border border-[var(--club-line)] bg-white px-2 py-1.5 text-sm text-zinc-900 dark:bg-zinc-900 dark:text-zinc-100";
+const FORM_LABEL =
+  "flex flex-col gap-1 text-xs font-medium text-zinc-600 dark:text-zinc-300";
+
+export function MetricManager({
   t,
   metrics,
   pending,
   onClose,
   onSave,
   onArchive,
+  onDelete,
 }: {
   t: ReturnType<typeof useTranslations>;
   metrics: PhysicalMetric[];
@@ -631,155 +393,347 @@ function MetricManager({
   onClose: () => void;
   onSave: (draft: MetricDraft) => void;
   onArchive: (metricId: string, archived: boolean) => void;
+  // Suppression définitive (indicateurs personnalisés uniquement). Optionnel :
+  // absent côté fiche joueur, fourni depuis la page Évaluation.
+  onDelete?: (metricId: string) => void;
 }) {
-  const [draft, setDraft] = useState<MetricDraft>(emptyDraft());
-  const active = metrics.filter((m) => !m.archived);
+  const [draft, setDraft] = useState<MetricDraft | null>(null);
+
+  const sorted = useMemo(
+    () =>
+      [...metrics].sort(
+        (a, b) =>
+          Number(a.archived) - Number(b.archived) ||
+          a.sort_order - b.sort_order ||
+          a.name.localeCompare(b.name),
+      ),
+    [metrics],
+  );
+
+  function set<K extends keyof MetricDraft>(key: K, value: MetricDraft[K]) {
+    setDraft((d) => (d ? { ...d, [key]: value } : d));
+  }
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
-      <div className="max-h-[90vh] w-full max-w-lg overflow-y-auto rounded-lg border border-[var(--club-line)] bg-white p-5 shadow-xl dark:border-zinc-800 dark:bg-zinc-900">
+      <div className="max-h-[90vh] w-full max-w-2xl overflow-y-auto rounded-lg border border-[var(--club-line)] bg-white p-5 shadow-xl dark:border-zinc-800 dark:bg-zinc-900">
         <div className="mb-4 flex items-center justify-between">
           <h3 className="text-base font-semibold text-zinc-900 dark:text-zinc-100">
             {t("manage")}
           </h3>
-          <button
-            type="button"
-            onClick={onClose}
-            className="rounded-md p-1 text-zinc-400 hover:bg-zinc-100 hover:text-zinc-700 dark:hover:bg-zinc-800"
-            aria-label={t("close")}
-          >
-            <X className="h-5 w-5" />
-          </button>
-        </div>
-
-        {active.length > 0 ? (
-          <ul className="mb-4 flex flex-col gap-1.5">
-            {active.map((m) => (
-              <li
-                key={m.id}
-                className="flex items-center justify-between gap-3 rounded-md border border-[var(--club-line)] px-3 py-2"
-              >
-                <button
-                  type="button"
-                  className="min-w-0 flex-1 text-left"
-                  onClick={() =>
-                    setDraft({
-                      id: m.id,
-                      name: m.name,
-                      unit: m.unit ?? "",
-                      category: m.category ?? "",
-                      description: m.description ?? "",
-                      protocol: m.protocol ?? "",
-                      higherIsBetter: m.higher_is_better,
-                    })
-                  }
-                >
-                  <span className="font-medium text-zinc-900 dark:text-zinc-100">{m.name}</span>
-                  {(m.unit || m.category) && (
-                    <span className="ml-2 text-[11px] text-zinc-400">
-                      {[m.category, m.unit].filter(Boolean).join(" · ")}
-                    </span>
-                  )}
-                </button>
-                <button
-                  type="button"
-                  disabled={pending}
-                  onClick={() => onArchive(m.id, true)}
-                  title={t("archive")}
-                  className="rounded-md p-1 text-zinc-400 hover:bg-red-50 hover:text-red-600 dark:hover:bg-red-950/30"
-                >
-                  <Trash2 className="h-4 w-4" />
-                </button>
-              </li>
-            ))}
-          </ul>
-        ) : null}
-
-        <div className="rounded-md border border-[var(--club-line)] bg-zinc-50/60 p-3 dark:bg-zinc-800/30">
-          <div className="mb-3 text-[11px] font-mono uppercase tracking-widest text-zinc-500">
-            {draft.id ? t("editMetric") : t("newMetric")}
-          </div>
-          <div className="grid grid-cols-2 gap-3">
-            <label className="col-span-2 flex flex-col gap-1 text-xs font-medium text-zinc-600 dark:text-zinc-300">
-              {t("field.name")}
-              <input
-                value={draft.name}
-                onChange={(e) => setDraft((d) => ({ ...d, name: e.target.value }))}
-                placeholder={t("field.namePlaceholder")}
-                className="rounded-md border border-[var(--club-line)] bg-white px-2 py-1.5 text-sm text-zinc-900 dark:bg-zinc-900 dark:text-zinc-100"
-              />
-            </label>
-            <label className="flex flex-col gap-1 text-xs font-medium text-zinc-600 dark:text-zinc-300">
-              {t("field.unit")}
-              <input
-                value={draft.unit}
-                onChange={(e) => setDraft((d) => ({ ...d, unit: e.target.value }))}
-                placeholder={t("field.unitPlaceholder")}
-                className="rounded-md border border-[var(--club-line)] bg-white px-2 py-1.5 text-sm text-zinc-900 dark:bg-zinc-900 dark:text-zinc-100"
-              />
-            </label>
-            <label className="flex flex-col gap-1 text-xs font-medium text-zinc-600 dark:text-zinc-300">
-              {t("field.category")}
-              <input
-                value={draft.category}
-                onChange={(e) => setDraft((d) => ({ ...d, category: e.target.value }))}
-                placeholder={t("field.categoryPlaceholder")}
-                className="rounded-md border border-[var(--club-line)] bg-white px-2 py-1.5 text-sm text-zinc-900 dark:bg-zinc-900 dark:text-zinc-100"
-              />
-            </label>
-            <label className="col-span-2 flex flex-col gap-1 text-xs font-medium text-zinc-600 dark:text-zinc-300">
-              {t("field.description")}
-              <input
-                value={draft.description}
-                onChange={(e) => setDraft((d) => ({ ...d, description: e.target.value }))}
-                placeholder={t("field.descriptionPlaceholder")}
-                className="rounded-md border border-[var(--club-line)] bg-white px-2 py-1.5 text-sm text-zinc-900 dark:bg-zinc-900 dark:text-zinc-100"
-              />
-            </label>
-            <label className="col-span-2 flex flex-col gap-1 text-xs font-medium text-zinc-600 dark:text-zinc-300">
-              {t("field.protocol")}
-              <textarea
-                value={draft.protocol}
-                onChange={(e) => setDraft((d) => ({ ...d, protocol: e.target.value }))}
-                placeholder={t("field.protocolPlaceholder")}
-                rows={3}
-                className="rounded-md border border-[var(--club-line)] bg-white px-2 py-1.5 text-sm text-zinc-900 dark:bg-zinc-900 dark:text-zinc-100"
-              />
-            </label>
-            <label className="col-span-2 flex items-center gap-2 text-xs font-medium text-zinc-600 dark:text-zinc-300">
-              <input
-                type="checkbox"
-                checked={draft.higherIsBetter}
-                onChange={(e) => setDraft((d) => ({ ...d, higherIsBetter: e.target.checked }))}
-                className="h-4 w-4 rounded border-zinc-300"
-              />
-              {t("field.higherIsBetter")}
-            </label>
-          </div>
-          <div className="mt-3 flex justify-end gap-2">
-            {draft.id ? (
-              <button
-                type="button"
-                onClick={() => setDraft(emptyDraft())}
-                className="rounded-md px-3 py-1.5 text-[13px] font-semibold text-zinc-500 hover:text-zinc-800 dark:hover:text-zinc-200"
-              >
-                {t("cancelEdit")}
-              </button>
-            ) : null}
+          <div className="flex items-center gap-2">
             <button
               type="button"
-              disabled={pending || !draft.name.trim()}
-              onClick={() => {
-                onSave(draft);
-                setDraft(emptyDraft());
-              }}
-              className="inline-flex items-center gap-2 rounded-md bg-[var(--club-primary)] px-3 py-1.5 text-[13px] font-semibold text-[var(--club-primary-foreground)] disabled:opacity-50"
+              onClick={() => setDraft(emptyDraft())}
+              className="inline-flex items-center gap-1.5 rounded-md bg-[var(--club-primary)] px-2.5 py-1.5 text-[12px] font-semibold text-[var(--club-primary-foreground)]"
             >
-              <Plus className="h-4 w-4" />
-              {draft.id ? t("save") : t("add")}
+              <Plus className="h-3.5 w-3.5" />
+              {t("newMetric")}
+            </button>
+            <button
+              type="button"
+              onClick={onClose}
+              className="rounded-md p-1 text-zinc-400 hover:bg-zinc-100 hover:text-zinc-700 dark:hover:bg-zinc-800"
+              aria-label={t("close")}
+            >
+              <X className="h-5 w-5" />
             </button>
           </div>
         </div>
+
+        {/* ---- Formulaire de création / édition (fluide, façon wizard) ---- */}
+        {draft ? (
+          <MetricForm
+            t={t}
+            draft={draft}
+            pending={pending}
+            set={set}
+            onCancel={() => setDraft(null)}
+            onSubmit={() => {
+              onSave(draft);
+              setDraft(null);
+            }}
+          />
+        ) : null}
+
+        {/* ---- Tableau compact des tests ---- */}
+        <div className="overflow-hidden rounded-md border border-[var(--club-line)]">
+          <table className="w-full text-sm">
+            <thead className="bg-zinc-50 text-left text-[10px] uppercase tracking-wider text-zinc-500 dark:bg-zinc-950 dark:text-zinc-400">
+              <tr>
+                <th className="px-3 py-2 font-medium">{t("table.name")}</th>
+                <th className="px-3 py-2 font-medium">{t("table.category")}</th>
+                <th className="px-3 py-2 font-medium">{t("table.unit")}</th>
+                <th className="px-2 py-2" />
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-[var(--club-line)]">
+              {sorted.map((m) => (
+                <tr
+                  key={m.id}
+                  className={m.archived ? "opacity-50" : "bg-white dark:bg-zinc-900"}
+                >
+                  <td className="px-3 py-1.5">
+                    <button
+                      type="button"
+                      onClick={() => setDraft(draftFromMetric(m))}
+                      className="text-left font-medium text-zinc-900 hover:text-[var(--club-primary)] dark:text-zinc-100"
+                    >
+                      {m.name}
+                    </button>
+                  </td>
+                  <td className="px-3 py-1.5 text-[12px] text-zinc-500">
+                    {m.category
+                      ? (CATEGORY_OPTIONS as readonly string[]).includes(m.category)
+                        ? t(`field.categoryOption.${m.category}`)
+                        : m.category
+                      : "—"}
+                  </td>
+                  <td className="px-3 py-1.5 text-[12px] text-zinc-500">{m.unit || "—"}</td>
+                  <td className="px-2 py-1.5">
+                    <div className="flex items-center justify-end gap-1">
+                      {m.archived ? (
+                        <button
+                          type="button"
+                          disabled={pending}
+                          onClick={() => onArchive(m.id, false)}
+                          className="rounded-md px-2 py-1 text-[12px] font-semibold text-[var(--club-primary)] hover:bg-zinc-50 dark:hover:bg-zinc-800/50"
+                        >
+                          {t("restore")}
+                        </button>
+                      ) : (
+                        <button
+                          type="button"
+                          disabled={pending}
+                          onClick={() => onArchive(m.id, true)}
+                          title={t("archive")}
+                          aria-label={t("archive")}
+                          className="rounded-md p-1 text-zinc-400 hover:bg-amber-50 hover:text-amber-600 dark:hover:bg-amber-950/30"
+                        >
+                          <Archive className="h-4 w-4" />
+                        </button>
+                      )}
+                      {/* Suppression définitive : indicateurs personnalisés seulement. */}
+                      {onDelete && !m.default_key ? (
+                        <button
+                          type="button"
+                          disabled={pending}
+                          onClick={() => {
+                            if (window.confirm(t("deleteConfirm"))) onDelete(m.id);
+                          }}
+                          title={t("delete")}
+                          aria-label={t("delete")}
+                          className="rounded-md p-1 text-zinc-400 hover:bg-red-50 hover:text-red-600 dark:hover:bg-red-950/30"
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </button>
+                      ) : null}
+                    </div>
+                  </td>
+                </tr>
+              ))}
+              {sorted.length === 0 ? (
+                <tr>
+                  <td colSpan={4} className="px-3 py-6 text-center text-sm text-zinc-400">
+                    {t("empty")}
+                  </td>
+                </tr>
+              ) : null}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function MetricForm({
+  t,
+  draft,
+  pending,
+  set,
+  onCancel,
+  onSubmit,
+}: {
+  t: ReturnType<typeof useTranslations>;
+  draft: MetricDraft;
+  pending: boolean;
+  set: <K extends keyof MetricDraft>(key: K, value: MetricDraft[K]) => void;
+  onCancel: () => void;
+  onSubmit: () => void;
+}) {
+  return (
+    <div className="mb-4 rounded-md border border-[var(--club-line)] bg-zinc-50/60 p-3 dark:bg-zinc-800/30">
+      <div className="mb-3 text-[11px] font-mono uppercase tracking-widest text-zinc-500">
+        {draft.id ? t("editMetric") : t("newMetric")}
+      </div>
+      <div className="grid grid-cols-2 gap-3">
+        <label className={`col-span-2 ${FORM_LABEL}`}>
+          {t("field.name")}
+          <input
+            value={draft.name}
+            onChange={(e) => set("name", e.target.value)}
+            placeholder={t("field.namePlaceholder")}
+            className={FORM_FIELD}
+          />
+        </label>
+        <label className={FORM_LABEL}>
+          {t("field.category")}
+          <select
+            value={draft.category}
+            onChange={(e) => set("category", e.target.value)}
+            className={FORM_FIELD}
+          >
+            {CATEGORY_OPTIONS.map((c) => (
+              <option key={c} value={c}>
+                {t(`field.categoryOption.${c}`)}
+              </option>
+            ))}
+          </select>
+        </label>
+        <label className={FORM_LABEL}>
+          {t("field.subcategory")}
+          <input
+            value={draft.subcategory}
+            onChange={(e) => set("subcategory", e.target.value)}
+            placeholder={t("field.subcategoryPlaceholder")}
+            className={FORM_FIELD}
+          />
+        </label>
+        <label className={FORM_LABEL}>
+          {t("field.unit")}
+          <input
+            value={draft.unit}
+            onChange={(e) => set("unit", e.target.value)}
+            placeholder={t("field.unitPlaceholder")}
+            className={FORM_FIELD}
+          />
+        </label>
+        <label className={FORM_LABEL}>
+          {t("field.valueType")}
+          <select
+            value={draft.valueType}
+            onChange={(e) => set("valueType", e.target.value)}
+            className={FORM_FIELD}
+          >
+            {VALUE_TYPE_OPTIONS.map((v) => (
+              <option key={v} value={v}>
+                {t(`field.valueTypeOption.${v}`)}
+              </option>
+            ))}
+          </select>
+        </label>
+        <label className={FORM_LABEL}>
+          {t("field.interpretation")}
+          <select
+            value={draft.interpretation}
+            onChange={(e) => set("interpretation", e.target.value)}
+            className={FORM_FIELD}
+          >
+            {INTERPRETATION_OPTIONS.map((i) => (
+              <option key={i} value={i}>
+                {t(`field.interpretationOption.${i}`)}
+              </option>
+            ))}
+          </select>
+        </label>
+        <label className={FORM_LABEL}>
+          {t("field.display")}
+          <select
+            value={draft.display}
+            onChange={(e) => set("display", e.target.value)}
+            className={FORM_FIELD}
+          >
+            {DISPLAY_OPTIONS.map((d) => (
+              <option key={d} value={d}>
+                {t(`field.displayOption.${d}`)}
+              </option>
+            ))}
+          </select>
+        </label>
+        <label className={FORM_LABEL}>
+          {t("field.alertThreshold")}
+          <input
+            value={draft.alertThreshold}
+            onChange={(e) => set("alertThreshold", e.target.value)}
+            inputMode="decimal"
+            placeholder={t("field.alertThresholdPlaceholder")}
+            className={FORM_FIELD}
+          />
+        </label>
+        <label className={`col-span-2 ${FORM_LABEL}`}>
+          {t("field.description")}
+          <input
+            value={draft.description}
+            onChange={(e) => set("description", e.target.value)}
+            placeholder={t("field.descriptionPlaceholder")}
+            className={FORM_FIELD}
+          />
+        </label>
+        <label className={`col-span-2 ${FORM_LABEL}`}>
+          {t("field.protocol")}
+          <textarea
+            value={draft.protocol}
+            onChange={(e) => set("protocol", e.target.value)}
+            placeholder={t("field.protocolPlaceholder")}
+            rows={3}
+            className={FORM_FIELD}
+          />
+        </label>
+        <label className={`col-span-2 ${FORM_LABEL}`}>
+          {t("field.material")}
+          <input
+            value={draft.material}
+            onChange={(e) => set("material", e.target.value)}
+            placeholder={t("field.materialPlaceholder")}
+            className={FORM_FIELD}
+          />
+        </label>
+        <label className={FORM_LABEL}>
+          {t("field.trials")}
+          <input
+            value={draft.trials}
+            onChange={(e) => set("trials", e.target.value)}
+            placeholder={t("field.trialsPlaceholder")}
+            className={FORM_FIELD}
+          />
+        </label>
+        <label className={FORM_LABEL}>
+          {t("field.frequency")}
+          <input
+            value={draft.recommendedFrequency}
+            onChange={(e) => set("recommendedFrequency", e.target.value)}
+            placeholder={t("field.frequencyPlaceholder")}
+            className={FORM_FIELD}
+          />
+        </label>
+        <label className={`col-span-2 ${FORM_LABEL}`}>
+          {t("field.validity")}
+          <input
+            value={draft.validityConditions}
+            onChange={(e) => set("validityConditions", e.target.value)}
+            placeholder={t("field.validityPlaceholder")}
+            className={FORM_FIELD}
+          />
+        </label>
+      </div>
+      <div className="mt-3 flex justify-end gap-2">
+        <button
+          type="button"
+          onClick={onCancel}
+          className="rounded-md px-3 py-1.5 text-[13px] font-semibold text-zinc-500 hover:text-zinc-800 dark:hover:text-zinc-200"
+        >
+          {t("cancelEdit")}
+        </button>
+        <button
+          type="button"
+          disabled={pending || !draft.name.trim()}
+          onClick={onSubmit}
+          className="inline-flex items-center gap-2 rounded-md bg-[var(--club-primary)] px-3 py-1.5 text-[13px] font-semibold text-[var(--club-primary-foreground)] disabled:opacity-50"
+        >
+          <Plus className="h-4 w-4" />
+          {draft.id ? t("save") : t("add")}
+        </button>
       </div>
     </div>
   );

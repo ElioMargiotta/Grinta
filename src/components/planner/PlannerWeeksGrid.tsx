@@ -4,14 +4,16 @@ import { useMemo, useState, useTransition } from "react";
 import type { DragEvent } from "react";
 import { useTranslations, useLocale } from "next-intl";
 import { useRouter } from "@/i18n/navigation";
-import { Copy, Trash2, Users } from "lucide-react";
+import { Activity, Copy, Trash2, Users, X } from "lucide-react";
 import type { Macrocycle, Mesocycle } from "./PlannerTourView";
+import type { EvalMetric, PlannerEval } from "./PlannerCalendar";
 import {
   MicrocycleThemePicker,
   THEME_COLORS,
   type ThemeKey,
 } from "./MicrocycleThemePicker";
 import {
+  createPhysicalTestAction,
   createSessionForSlotAction,
   deletePlannerSessionAction,
   duplicatePlannerSessionAction,
@@ -302,6 +304,9 @@ export function PlannerWeeksGrid({
   matches = [],
   seasonStart,
   seasonEnd,
+  evals = [],
+  evalMetrics = [],
+  placeEval = false,
 }: {
   teamId: string;
   /** Millésime actif `YYYY/YY` — scope de l'effacement de saison. */
@@ -312,6 +317,12 @@ export function PlannerWeeksGrid({
   /** Fenêtre de la saison active `YYYY-MM-DD` : borne la navigation mensuelle. */
   seasonStart?: string;
   seasonEnd?: string;
+  /** Évals physiques posées sur le planning (1 max/jour, hors entraînements). */
+  evals?: PlannerEval[];
+  /** Catalogue des tests du club pour le wizard de placement d'éval. */
+  evalMetrics?: EvalMetric[];
+  /** Mode « placement d'éval » : un clic sur un jour ouvre le wizard. */
+  placeEval?: boolean;
 }) {
   const router = useRouter();
   const locale = useLocale();
@@ -424,6 +435,40 @@ export function PlannerWeeksGrid({
     }
     return m;
   }, [enriched]);
+
+  // Évals physiques posées (1 max/jour) + état du wizard de placement.
+  const evalByDate = useMemo(
+    () => new Map(evals.map((e) => [e.date, e])),
+    [evals],
+  );
+  const [wizardDate, setWizardDate] = useState<string | null>(null);
+  const [evalSelected, setEvalSelected] = useState<Set<string>>(new Set());
+  const [evalError, setEvalError] = useState<string | null>(null);
+  const [evalPending, startEvalTransition] = useTransition();
+
+  function toggleEvalMetric(id: string) {
+    setEvalSelected((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  }
+
+  function submitEval() {
+    if (!wizardDate || evalSelected.size === 0) return;
+    setEvalError(null);
+    startEvalTransition(async () => {
+      const res = await createPhysicalTestAction({
+        teamId,
+        date: wizardDate,
+        metricIds: [...evalSelected],
+        locale,
+      });
+      if (res?.error) setEvalError(res.error);
+      // En cas de succès, l'action redirige vers la page présences.
+    });
+  }
 
   const matchByDate = useMemo(() => {
     const m = new Map<string, WeekMatch>();
@@ -716,8 +761,10 @@ export function PlannerWeeksGrid({
           const morning = list.find((s) => s.slot === "morning") ?? null;
           const afternoon = list.find((s) => s.slot === "afternoon") ?? null;
           const cellMatch = matchByDate.get(dateStr) ?? null;
+          const cellEval = evalByDate.get(dateStr) ?? null;
           const isToday = dateStr === today;
           const isWeekend = di >= 5;
+          const canPlaceEval = placeEval && !cellEval;
 
           const goToNew = (slot: Slot) => {
             if (isCreatingSlot) return;
@@ -894,7 +941,12 @@ export function PlannerWeeksGrid({
           return (
             <div
               key={dateStr}
-              className={`group relative flex min-h-[110px] flex-col gap-1 border-b border-r border-zinc-200 p-1.5 text-left transition-colors dark:border-zinc-800 ${baseBg} ${pastWeekClass}`}
+              onClick={canPlaceEval ? () => setWizardDate(dateStr) : undefined}
+              className={`group relative flex min-h-[110px] flex-col gap-1 border-b border-r border-zinc-200 p-1.5 text-left transition-colors dark:border-zinc-800 ${baseBg} ${pastWeekClass} ${
+                canPlaceEval
+                  ? "cursor-pointer ring-1 ring-inset ring-transparent hover:ring-[var(--club-primary)] hover:bg-[var(--club-primary-soft)]/40"
+                  : ""
+              }`}
             >
               <div className="flex items-center justify-between">
                 <span
@@ -906,7 +958,31 @@ export function PlannerWeeksGrid({
                 >
                   {cellDate.getDate()}
                 </span>
+                {canPlaceEval ? (
+                  <span className="rounded bg-[var(--club-primary)] px-1 py-px text-[9px] font-semibold uppercase tracking-wide text-[var(--club-primary-foreground)] opacity-0 group-hover:opacity-100">
+                    + {t("physicalTest.badge")}
+                  </span>
+                ) : null}
               </div>
+              {cellEval ? (
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    router.push(
+                      `/planner/${teamId}/sessions/${cellEval.id}/test`,
+                    );
+                  }}
+                  title={t("physicalTest.open")}
+                  className="flex items-center gap-1 truncate rounded-md bg-[#c94a4a] px-1.5 py-0.5 text-[10px] font-semibold text-white"
+                >
+                  <Activity className="h-3 w-3 shrink-0" />
+                  <span className="truncate">
+                    {t("physicalTest.badge")}
+                    {cellEval.testCount > 0 ? ` · ${cellEval.testCount}` : ""}
+                  </span>
+                </button>
+              ) : null}
               {cellMatch ? (
                 <div
                   title={cellMatch.opponent ?? cellMatch.summary ?? "Match"}
@@ -966,6 +1042,12 @@ export function PlannerWeeksGrid({
 
   return (
     <div className="flex flex-col gap-3">
+      {placeEval ? (
+        <div className="flex items-center gap-2 rounded-lg border border-[var(--club-primary)] bg-[var(--club-primary-soft)]/60 px-3 py-2 text-[13px] font-medium text-[var(--club-primary)]">
+          <Activity className="h-4 w-4 shrink-0" />
+          {t("physicalTest.placementHint")}
+        </div>
+      ) : null}
       <div className="flex flex-wrap items-center gap-3 rounded-lg border border-zinc-200 bg-zinc-50/60 p-3 dark:border-zinc-800 dark:bg-zinc-950/40">
         <div className="flex items-center gap-2 px-1">
           <button
@@ -1177,6 +1259,92 @@ export function PlannerWeeksGrid({
           </div>
         </div>
       </div>
+
+      {wizardDate ? (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4"
+          onClick={() => setWizardDate(null)}
+        >
+          <div
+            className="w-full max-w-md rounded-lg border border-zinc-200 bg-white p-5 shadow-xl dark:border-zinc-800 dark:bg-zinc-900"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="mb-1 flex items-start justify-between gap-3">
+              <h3 className="flex items-center gap-2 text-base font-semibold text-zinc-900 dark:text-zinc-100">
+                <Activity className="h-4 w-4 text-[var(--club-primary)]" />
+                {t("physicalTest.wizardTitle")}
+              </h3>
+              <button
+                type="button"
+                onClick={() => setWizardDate(null)}
+                className="rounded-md p-1 text-zinc-400 hover:bg-zinc-100 hover:text-zinc-700 dark:hover:bg-zinc-800"
+                aria-label={t("physicalTest.close")}
+              >
+                <X className="h-5 w-5" />
+              </button>
+            </div>
+            <p className="mb-3 text-[13px] text-zinc-500 dark:text-zinc-400">
+              {t("physicalTest.wizardSubtitle", { date: wizardDate })}
+            </p>
+
+            {evalError ? (
+              <div className="mb-3 rounded-md border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700 dark:border-red-900/50 dark:bg-red-950/30 dark:text-red-300">
+                {evalError}
+              </div>
+            ) : null}
+
+            {evalMetrics.length === 0 ? (
+              <p className="rounded-md border border-dashed border-zinc-300 p-4 text-center text-sm text-zinc-500 dark:border-zinc-700 dark:text-zinc-400">
+                {t("physicalTest.noTests")}
+              </p>
+            ) : (
+              <ul className="flex max-h-64 flex-col gap-1 overflow-y-auto">
+                {evalMetrics.map((m) => {
+                  const checked = evalSelected.has(m.id);
+                  return (
+                    <li key={m.id}>
+                      <label className="flex cursor-pointer items-center gap-2 rounded-md border border-zinc-200 px-3 py-2 text-sm hover:bg-zinc-50 dark:border-zinc-800 dark:hover:bg-zinc-800/50">
+                        <input
+                          type="checkbox"
+                          checked={checked}
+                          onChange={() => toggleEvalMetric(m.id)}
+                          className="h-4 w-4 rounded border-zinc-300"
+                        />
+                        <span className="font-medium text-zinc-900 dark:text-zinc-100">
+                          {m.name}
+                        </span>
+                        {(m.category || m.unit) && (
+                          <span className="text-[11px] text-zinc-400">
+                            {[m.category, m.unit].filter(Boolean).join(" · ")}
+                          </span>
+                        )}
+                      </label>
+                    </li>
+                  );
+                })}
+              </ul>
+            )}
+
+            <div className="mt-4 flex items-center justify-between gap-2">
+              <button
+                type="button"
+                onClick={() => router.push("/tracking")}
+                className="text-[13px] font-medium text-[var(--club-primary)] hover:underline"
+              >
+                {t("physicalTest.createTest")}
+              </button>
+              <button
+                type="button"
+                disabled={evalPending || evalSelected.size === 0}
+                onClick={submitEval}
+                className="inline-flex items-center gap-2 rounded-md bg-[var(--club-primary)] px-3 py-1.5 text-[13px] font-semibold text-[var(--club-primary-foreground)] disabled:opacity-50"
+              >
+                {t("physicalTest.confirm")}
+              </button>
+            </div>
+          </div>
+        </div>
+      ) : null}
     </div>
   );
 }

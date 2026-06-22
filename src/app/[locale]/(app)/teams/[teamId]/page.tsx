@@ -1,6 +1,6 @@
 import { notFound } from "next/navigation";
 import { getTranslations, setRequestLocale } from "next-intl/server";
-import { CalendarDays, Camera, ChevronRight, Shirt, Users } from "lucide-react";
+import { CalendarCheck, CalendarDays, Camera, ChevronRight, Shirt, Users } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { Link } from "@/i18n/navigation";
 import { requireUser } from "@/lib/auth/getUser";
@@ -107,7 +107,7 @@ export default async function TeamPage({
         </div>
       </section>
 
-      <section className="grid gap-3 md:grid-cols-2">
+      <section className="grid gap-3 md:grid-cols-3">
         <TeamAction
           href={`/contingent?team=${team.id}`}
           icon={Users}
@@ -119,6 +119,12 @@ export default async function TeamPage({
           icon={CalendarDays}
           title={t("planner.title")}
           description={td("plannerDesc")}
+        />
+        <TeamAction
+          href={`/planner/${team.id}/availability`}
+          icon={CalendarCheck}
+          title={t("availabilityBoard.title")}
+          description={t("availabilityBoard.subtitle")}
         />
       </section>
 

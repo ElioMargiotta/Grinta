@@ -3,6 +3,7 @@
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
+import { type MetricFields, metricFieldsToRow } from "@/lib/physical/defaultLibrary";
 
 async function requireUser(locale: string) {
   const supabase = await createClient();
@@ -51,24 +52,13 @@ async function sessionClub(
 export async function createMetricAction({
   playerId,
   locale,
-  name,
-  unit,
-  category,
-  description,
-  protocol,
-  higherIsBetter,
+  fields,
 }: {
   playerId: string;
   locale: string;
-  name: string;
-  unit: string | null;
-  category: string | null;
-  description: string | null;
-  protocol: string | null;
-  higherIsBetter: boolean;
+  fields: MetricFields;
 }) {
-  const trimmed = name.trim();
-  if (!trimmed) return { error: "Missing name" };
+  if (!fields.name.trim()) return { error: "Missing name" };
 
   const { supabase, user } = await requireUser(locale);
   const player = await playerClub(supabase, playerId);
@@ -77,12 +67,7 @@ export async function createMetricAction({
   const { error } = await supabase.from("physical_metrics").insert({
     club_id: player.club_id,
     created_by: user.id,
-    name: trimmed,
-    unit: unit?.trim() || null,
-    category: category?.trim() || null,
-    description: description?.trim() || null,
-    protocol: protocol?.trim() || null,
-    higher_is_better: higherIsBetter,
+    ...metricFieldsToRow(fields),
   });
 
   if (error) return { error: error.message };
@@ -94,39 +79,20 @@ export async function updateMetricAction({
   playerId,
   locale,
   metricId,
-  name,
-  unit,
-  category,
-  description,
-  protocol,
-  higherIsBetter,
+  fields,
 }: {
   playerId: string;
   locale: string;
   metricId: string;
-  name: string;
-  unit: string | null;
-  category: string | null;
-  description: string | null;
-  protocol: string | null;
-  higherIsBetter: boolean;
+  fields: MetricFields;
 }) {
-  const trimmed = name.trim();
-  if (!trimmed || !metricId) return { error: "Missing fields" };
+  if (!fields.name.trim() || !metricId) return { error: "Missing fields" };
 
   const { supabase } = await requireUser(locale);
 
   const { error } = await supabase
     .from("physical_metrics")
-    .update({
-      name: trimmed,
-      unit: unit?.trim() || null,
-      category: category?.trim() || null,
-      description: description?.trim() || null,
-      protocol: protocol?.trim() || null,
-      higher_is_better: higherIsBetter,
-      updated_at: new Date().toISOString(),
-    })
+    .update({ ...metricFieldsToRow(fields), updated_at: new Date().toISOString() })
     .eq("id", metricId);
 
   if (error) return { error: error.message };
@@ -309,7 +275,7 @@ export async function attachTestToSessionAction({
     );
 
   if (error) return { error: error.message };
-  revalidatePath(`/${locale}/planner/${teamId}/sessions/${sessionId}/attendance`);
+  revalidatePath(`/${locale}/planner/${teamId}/sessions/${sessionId}/test`);
   return { ok: true as const };
 }
 
@@ -334,11 +300,107 @@ export async function detachTestFromSessionAction({
     .eq("metric_id", metricId);
 
   if (error) return { error: error.message };
-  revalidatePath(`/${locale}/planner/${teamId}/sessions/${sessionId}/attendance`);
+  revalidatePath(`/${locale}/planner/${teamId}/sessions/${sessionId}/test`);
   return { ok: true as const };
 }
 
-/** Saisie d'un résultat depuis la page présences d'une séance. */
+/**
+ * Statut de présence/dispo d'un joueur POUR une éval.
+ * Écrit `session_attendances.actual_status` (present/absent/injured) ET
+ * synchronise une blessure « propagée partout » :
+ *   - `injured` → crée une période d'indisponibilité ouverte (si aucune ne
+ *     couvre déjà la date de l'éval) → visible contingent / board / fiche ;
+ *   - `present`/`absent` → clôture la blessure en cours (période ouverte) :
+ *     supprimée si elle démarrait ce jour-là, sinon close la veille.
+ */
+export async function setTestAttendanceAction({
+  locale,
+  teamId,
+  sessionId,
+  playerId,
+  status,
+}: {
+  locale: string;
+  teamId: string;
+  sessionId: string;
+  playerId: string;
+  status: "present" | "absent" | "injured" | null;
+}) {
+  if (!sessionId || !playerId) return { error: "Missing fields" };
+  const { supabase, user } = await requireUser(locale);
+  const session = await sessionClub(supabase, sessionId);
+  if (!session) return { error: "Not found" };
+  const evalDate = session.date;
+
+  if (status === null) {
+    const { error } = await supabase
+      .from("session_attendances")
+      .update({ actual_status: null, actual_marked_at: null, actual_marked_by: null })
+      .eq("session_id", sessionId)
+      .eq("player_id", playerId);
+    if (error) return { error: error.message };
+  } else {
+    const { error } = await supabase.from("session_attendances").upsert(
+      {
+        session_id: sessionId,
+        player_id: playerId,
+        actual_status: status,
+        actual_marked_at: new Date().toISOString(),
+        actual_marked_by: user.id,
+      },
+      { onConflict: "session_id,player_id" },
+    );
+    if (error) return { error: error.message };
+  }
+
+  // Synchronisation avec les périodes médicales (« blessé = blessé partout »).
+  if (status === "injured") {
+    const { data: covering } = await supabase
+      .from("player_unavailability")
+      .select("id")
+      .eq("player_id", playerId)
+      .lte("start_date", evalDate)
+      .or(`end_date.is.null,end_date.gte.${evalDate}`)
+      .limit(1);
+    if (!covering || covering.length === 0) {
+      await supabase.from("player_unavailability").insert({
+        club_id: session.club_id,
+        player_id: playerId,
+        kind: "injury",
+        reason: null,
+        start_date: evalDate,
+        end_date: null,
+        created_by: user.id,
+      });
+    }
+  } else if (status === "present" || status === "absent") {
+    // Clôture des blessures « en cours » (période ouverte) couvrant l'éval.
+    const dayBefore = new Date(evalDate);
+    dayBefore.setDate(dayBefore.getDate() - 1);
+    const dayBeforeIso = dayBefore.toISOString().slice(0, 10);
+    // Démarrée ce jour-là (ou après) → erreur de saisie : on supprime.
+    await supabase
+      .from("player_unavailability")
+      .delete()
+      .eq("player_id", playerId)
+      .is("end_date", null)
+      .gte("start_date", evalDate);
+    // Démarrée avant → on la clôt la veille de l'éval.
+    await supabase
+      .from("player_unavailability")
+      .update({ end_date: dayBeforeIso })
+      .eq("player_id", playerId)
+      .is("end_date", null)
+      .lt("start_date", evalDate);
+  }
+
+  revalidatePath(`/${locale}/planner/${teamId}/sessions/${sessionId}/test`);
+  revalidatePath(`/${locale}/contingent/${playerId}`);
+  revalidatePath(`/${locale}/contingent`);
+  return { ok: true as const };
+}
+
+/** Saisie d'un résultat depuis la page éval physique d'une séance. */
 export async function recordSessionMeasurementAction({
   locale,
   teamId,
@@ -370,7 +432,7 @@ export async function recordSessionMeasurementAction({
     userId: user.id,
   });
   if (res.error) return { error: res.error };
-  revalidatePath(`/${locale}/planner/${teamId}/sessions/${sessionId}/attendance`);
+  revalidatePath(`/${locale}/planner/${teamId}/sessions/${sessionId}/test`);
   revalidatePath(`/${locale}/contingent/${playerId}`);
   return { ok: true as const };
 }

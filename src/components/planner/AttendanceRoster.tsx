@@ -1,14 +1,20 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { useMemo, useState, useTransition } from "react";
 import { useLocale, useTranslations } from "next-intl";
 import { Check, X, Minus, MessageSquare } from "lucide-react";
+import { useRouter } from "@/i18n/navigation";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 import {
   markActualAttendanceAction,
+  markAllActualAttendanceAction,
   setSessionDeadlineAction,
 } from "@/app/[locale]/(app)/planner/attendance-actions";
+
+type ActualStatus = "present" | "absent" | null;
+import { KindBadge } from "@/components/contingent/AvailabilitySection";
+import type { UnavailabilityKind } from "@/lib/availability/unavailability";
 
 export type RosterEntry = {
   playerId: string;
@@ -18,6 +24,7 @@ export type RosterEntry = {
   announcedReason: string | null;
   announcedAt: string | null;
   actualStatus: "present" | "absent" | null;
+  unavailability: { kind: UnavailabilityKind; reason: string | null } | null;
 };
 
 type Props = {
@@ -35,20 +42,56 @@ export function AttendanceRoster({
 }: Props) {
   const t = useTranslations("attendance.coach");
   const locale = useLocale();
+  const router = useRouter();
   const [hours, setHours] = useState(deadlineHours);
   const [savingDeadline, startDeadline] = useTransition();
+  const [bulkPending, startBulk] = useTransition();
   const [error, setError] = useState<string | null>(null);
 
-  const counts = roster.reduce(
-    (acc, r) => {
+  // État « présence réelle » remonté au parent : permet le pointage en masse.
+  // Par défaut = statut saisi, sinon réponse RSVP du joueur (auto-lien) : le
+  // coach ne corrige que les exceptions.
+  const [actualMap, setActualMap] = useState<Map<string, ActualStatus>>(
+    () => new Map(roster.map((r) => [r.playerId, r.actualStatus ?? r.announcedStatus])),
+  );
+
+  const setActual = (playerId: string, next: ActualStatus) =>
+    setActualMap((prev) => new Map(prev).set(playerId, next));
+
+  const counts = useMemo(() => {
+    const acc = { announcedPresent: 0, announcedAbsent: 0, noResponse: 0, actualPresent: 0 };
+    for (const r of roster) {
       if (r.announcedStatus === "present") acc.announcedPresent += 1;
       if (r.announcedStatus === "absent") acc.announcedAbsent += 1;
       if (r.announcedStatus === null) acc.noResponse += 1;
-      if (r.actualStatus === "present") acc.actualPresent += 1;
-      return acc;
-    },
-    { announcedPresent: 0, announcedAbsent: 0, noResponse: 0, actualPresent: 0 },
-  );
+      if (actualMap.get(r.playerId) === "present") acc.actualPresent += 1;
+    }
+    return acc;
+  }, [roster, actualMap]);
+
+  // Pointage en masse : applique le statut aux joueurs disponibles (les indispos
+  // restent excusés). Optimiste, puis refresh serveur.
+  const markAll = (status: "present" | "absent") => {
+    const targets = roster.filter((r) => !r.unavailability).map((r) => r.playerId);
+    if (targets.length === 0) return;
+    setError(null);
+    setActualMap((prev) => {
+      const next = new Map(prev);
+      for (const id of targets) next.set(id, status);
+      return next;
+    });
+    startBulk(async () => {
+      const res = await markAllActualAttendanceAction({
+        sessionId,
+        teamId,
+        playerIds: targets,
+        status,
+        locale,
+      });
+      if (res.error) setError(res.error);
+      router.refresh();
+    });
+  };
 
   const saveDeadline = () => {
     setError(null);
@@ -100,6 +143,32 @@ export function AttendanceRoster({
 
       {error && <p className="text-sm text-red-600">{error}</p>}
 
+      {roster.length > 0 ? (
+        <div className="flex flex-wrap items-center gap-2">
+          <span className="text-[12px] text-zinc-500 dark:text-zinc-400">
+            {t("bulkLabel")}
+          </span>
+          <button
+            type="button"
+            disabled={bulkPending}
+            onClick={() => markAll("present")}
+            className="inline-flex items-center gap-1.5 rounded-md border border-emerald-200 bg-emerald-50 px-2.5 py-1 text-[12px] font-semibold text-emerald-700 hover:bg-emerald-100 disabled:opacity-50 dark:border-emerald-900/40 dark:bg-emerald-950/30 dark:text-emerald-300"
+          >
+            <Check className="h-3.5 w-3.5" />
+            {t("markAllPresent")}
+          </button>
+          <button
+            type="button"
+            disabled={bulkPending}
+            onClick={() => markAll("absent")}
+            className="inline-flex items-center gap-1.5 rounded-md border border-red-200 bg-red-50 px-2.5 py-1 text-[12px] font-semibold text-red-700 hover:bg-red-100 disabled:opacity-50 dark:border-red-900/40 dark:bg-red-950/30 dark:text-red-300"
+          >
+            <X className="h-3.5 w-3.5" />
+            {t("markAllAbsent")}
+          </button>
+        </div>
+      ) : null}
+
       <div className="overflow-hidden rounded-md border border-zinc-200 dark:border-zinc-800">
         <table className="w-full text-sm">
           <thead className="bg-zinc-50 text-left text-[11px] uppercase tracking-widest text-zinc-500 dark:bg-zinc-900 dark:text-zinc-400">
@@ -117,6 +186,8 @@ export function AttendanceRoster({
                 sessionId={sessionId}
                 teamId={teamId}
                 locale={locale}
+                actual={actualMap.get(entry.playerId) ?? null}
+                onChange={setActual}
               />
             ))}
             {roster.length === 0 && (
@@ -151,21 +222,26 @@ function RosterRow({
   sessionId,
   teamId,
   locale,
+  actual,
+  onChange,
 }: {
   entry: RosterEntry;
   sessionId: string;
   teamId: string;
   locale: string;
+  actual: ActualStatus;
+  onChange: (playerId: string, next: ActualStatus) => void;
 }) {
   const t = useTranslations("attendance.coach");
-  const [actual, setActual] = useState(entry.actualStatus);
+  const tMed = useTranslations("availability");
   const [isPending, startTransition] = useTransition();
   const [rowError, setRowError] = useState<string | null>(null);
+  const unavail = entry.unavailability;
 
-  const mark = (next: "present" | "absent" | null) => {
+  const mark = (next: ActualStatus) => {
     setRowError(null);
     const previous = actual;
-    setActual(next);
+    onChange(entry.playerId, next);
     startTransition(async () => {
       const result = await markActualAttendanceAction({
         sessionId,
@@ -175,7 +251,7 @@ function RosterRow({
         locale,
       });
       if (result.error) {
-        setActual(previous);
+        onChange(entry.playerId, previous);
         setRowError(result.error);
       }
     });
@@ -196,7 +272,17 @@ function RosterRow({
         </div>
       </td>
       <td className="px-3 py-3">
-        {entry.announcedStatus === null ? (
+        {unavail ? (
+          <div className="flex flex-col gap-1">
+            <KindBadge kind={unavail.kind} label={tMed(`kind.${unavail.kind}`)} />
+            {unavail.reason ? (
+              <span className="flex items-start gap-1 text-[11px] italic text-zinc-500 dark:text-zinc-400">
+                <MessageSquare className="mt-0.5 h-3 w-3 shrink-0" />
+                {unavail.reason}
+              </span>
+            ) : null}
+          </div>
+        ) : entry.announcedStatus === null ? (
           <span className="text-[12px] text-zinc-400">{t("noResponse")}</span>
         ) : (
           <div className="flex flex-col gap-1">
@@ -225,6 +311,9 @@ function RosterRow({
       </td>
       <td className="px-3 py-3">
         <div className="flex flex-col gap-1">
+          {unavail ? (
+            <span className="text-[12px] italic text-zinc-400">{tMed("excused")}</span>
+          ) : null}
           <div className="flex gap-1">
             <IconToggle
               active={actual === "present"}

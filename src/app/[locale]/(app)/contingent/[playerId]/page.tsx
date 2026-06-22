@@ -17,7 +17,6 @@ import {
   type PhysicalMetric,
   type PhysicalMeasurement,
 } from "@/components/contingent/PhysicalTrackingSection";
-import { isClubWideLevel } from "@/lib/club/types";
 import {
   overallAverage,
   mergeEvaluation,
@@ -25,6 +24,20 @@ import {
 } from "@/components/evaluation/types";
 import { listClubTeams } from "@/lib/contingent/teams";
 import { resolveCurrentSeasonLabel } from "@/lib/club/season";
+import { getPlayersOverview } from "@/lib/contingent/playerStats";
+import {
+  coversDate,
+  type Unavailability,
+  type UnavailabilityKind,
+} from "@/lib/availability/unavailability";
+
+type UnavailabilityDbRow = {
+  id: string;
+  kind: UnavailabilityKind;
+  reason: string | null;
+  start_date: string;
+  end_date: string | null;
+};
 
 type EvaluationDbRow = {
   id: string;
@@ -104,29 +117,103 @@ export default async function ContingentPlayerPage({
     evalRows = fallback.data;
   }
 
-  // Suivi physique — indicateurs du club + mesures du joueur.
-  const [{ data: metricRows }, { data: measurementRows }] = await Promise.all([
-    supabase
-      .from("physical_metrics")
-      .select("id, name, unit, category, description, protocol, higher_is_better, sort_order, archived")
-      .eq("club_id", membership.club_id)
-      .order("sort_order", { ascending: true })
-      .order("name", { ascending: true })
-      .returns<PhysicalMetric[]>(),
-    supabase
-      .from("physical_measurements")
-      .select("metric_id, measured_on, value, note")
-      .eq("player_id", playerId)
-      .order("measured_on", { ascending: true })
-      .returns<PhysicalMeasurement[]>(),
-  ]);
+  // Suivi physique — indicateurs du club + mesures du joueur + indisponibilités.
+  const [{ data: metricRows }, { data: measurementRows }, { data: unavailRows }] =
+    await Promise.all([
+      supabase
+        .from("physical_metrics")
+        .select("id, name, unit, category, description, protocol, higher_is_better, sort_order, archived")
+        .eq("club_id", membership.club_id)
+        .order("sort_order", { ascending: true })
+        .order("name", { ascending: true })
+        .returns<PhysicalMetric[]>(),
+      supabase
+        .from("physical_measurements")
+        .select("metric_id, measured_on, value, note")
+        .eq("player_id", playerId)
+        .order("measured_on", { ascending: true })
+        .returns<PhysicalMeasurement[]>(),
+      supabase
+        .from("player_unavailability")
+        .select("id, kind, reason, start_date, end_date")
+        .eq("player_id", playerId)
+        .order("start_date", { ascending: false })
+        .returns<UnavailabilityDbRow[]>(),
+    ]);
 
   const physicalMetrics = metricRows ?? [];
   const physicalMeasurements = measurementRows ?? [];
-  const canManageMetrics = isClubWideLevel(membership.access_level);
+  const unavailabilities: Unavailability[] = (unavailRows ?? []).map((u) => ({
+    id: u.id,
+    playerId,
+    kind: u.kind,
+    reason: u.reason,
+    startDate: u.start_date,
+    endDate: u.end_date,
+  }));
+
+  // KPIs de la fiche (présence + disponibilité). Présence/séances depuis
+  // l'agrégateur serveur ; disponibilité = jours sans indispo sur la saison.
+  const overview = (await getPlayersOverview(supabase, { season, playerIds: [playerId] })).get(
+    playerId,
+  );
+  const todayKpi = new Date().toISOString().slice(0, 10);
+  const seasonStartKpi = `${Number(season.slice(0, 4)) || 1970}-07-01`;
+  const unavailableDays = new Set<string>();
+  for (const u of unavailabilities) {
+    const from = u.startDate > seasonStartKpi ? u.startDate : seasonStartKpi;
+    const to = u.endDate && u.endDate < todayKpi ? u.endDate : todayKpi;
+    for (let d = new Date(from); d <= new Date(to); d.setDate(d.getDate() + 1)) {
+      const iso = d.toISOString().slice(0, 10);
+      if (iso >= seasonStartKpi && iso <= todayKpi && coversDate(u, iso)) {
+        unavailableDays.add(iso);
+      }
+    }
+  }
+  const elapsedDays = Math.max(
+    1,
+    Math.round(
+      (new Date(todayKpi).getTime() - new Date(seasonStartKpi).getTime()) / 86_400_000,
+    ) + 1,
+  );
+  const playerStats = {
+    presenceRate: overview?.presenceRate ?? null,
+    sessionsPresent: overview?.sessionsPresent ?? 0,
+    sessionsTotal: overview?.sessionsTotal ?? 0,
+    availabilityRate: Math.max(0, (elapsedDays - unavailableDays.size) / elapsedDays),
+  };
   const canRecordPhysical = membership.access_level !== "team_readonly";
 
   const currentTeamIds = (assignments ?? []).map((a) => a.team_id as string);
+
+  // Prochaine séance (toutes équipes du joueur) pour l'onglet Aperçu.
+  const { data: nextSessionRow } = currentTeamIds.length
+    ? await supabase
+        .from("sessions")
+        .select("id, date, theme, kind, teams(name)")
+        .in("team_id", currentTeamIds)
+        .gte("date", todayKpi)
+        .order("date", { ascending: true })
+        .order("start_time", { ascending: true, nullsFirst: true })
+        .limit(1)
+        .maybeSingle()
+    : { data: null };
+  const nextSessionTeam = (nextSessionRow as { teams?: { name: string } | { name: string }[] | null } | null)?.teams;
+  const nextSession = nextSessionRow
+    ? {
+        date: nextSessionRow.date as string,
+        theme: (nextSessionRow.theme as string | null) ?? null,
+        kind: (nextSessionRow.kind as string) ?? "training",
+        teamName:
+          (Array.isArray(nextSessionTeam) ? nextSessionTeam[0]?.name : nextSessionTeam?.name) ??
+          null,
+      }
+    : null;
+
+  const lastTestDate =
+    physicalMeasurements.length > 0
+      ? physicalMeasurements[physicalMeasurements.length - 1].measured_on
+      : null;
 
   const evaluations: EvaluationRow[] = (evalRows ?? []).map((row) => {
     const merged = mergeEvaluation(row.data as Partial<EvaluationData> | null);
@@ -172,7 +259,10 @@ export default async function ContingentPlayerPage({
         evaluationsShareAvailable={evaluationsShareAvailable}
         physicalMetrics={physicalMetrics}
         physicalMeasurements={physicalMeasurements}
-        canManageMetrics={canManageMetrics}
+        unavailabilities={unavailabilities}
+        stats={playerStats}
+        nextSession={nextSession}
+        lastTestDate={lastTestDate}
         canRecordPhysical={canRecordPhysical}
         locale={locale}
       />

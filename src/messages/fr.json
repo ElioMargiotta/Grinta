@@ -411,9 +411,85 @@
     "logout": "Quitter",
     "account": "Compte",
     "contingent": "Contingent",
+    "physical": "Suivi joueurs",
     "playerMe": "Ma fiche",
     "playerTeam": "Mes équipes",
     "playerSchedule": "Mon planning"
+  },
+  "physicalHub": {
+    "title": "Suivi joueurs",
+    "subtitle": "Tests des joueurs de {club}",
+    "seasonScope": "saison {season}",
+    "emptyMetrics": "Aucun test pour l'instant. Crée ton premier test (VMA, sprint, jonglage…) avec son protocole d'évaluation.",
+    "createFirst": "Créer un test",
+    "manageTests": "Gérer les tests",
+    "noData": "Aucun résultat saisi pour ce test sur la période et l'équipe sélectionnées.",
+    "evolution": "Évolution",
+    "ranking": "Classement",
+    "clickRowHint": "Clique une ligne pour voir la courbe du joueur",
+    "viewProfile": "Voir la fiche",
+    "createEval": "Créer un test",
+    "pickTeam": "Choisir l'équipe",
+    "evals": {
+      "title": "Tests à compléter",
+      "testCount": "{count, plural, =0 {aucun test} one {# test} other {# tests}}",
+      "enter": "Saisir les résultats",
+      "delete": "Supprimer le test",
+      "deleteConfirm": "Supprimer ce test ? Les résultats déjà saisis seront conservés dans l'historique des joueurs.",
+      "view": "Voir"
+    },
+    "library": {
+      "title": "Bibliothèque par défaut",
+      "intro": "Active des indicateurs prêts à l'emploi. Tu pourras ensuite les modifier comme tes propres tests.",
+      "add": "Ajouter",
+      "remove": "Retirer",
+      "category": {
+        "physical": "Physique",
+        "technical": "Technique",
+        "medical": "Médical"
+      }
+    },
+    "meta": {
+      "trials": "Essais",
+      "frequency": "Fréquence",
+      "material": "Matériel",
+      "alertThreshold": "Seuil d'alerte",
+      "validity": "Validité"
+    },
+    "filter": {
+      "test": "Test",
+      "team": "Équipe",
+      "allTeams": "Toutes les équipes",
+      "category": "Catégorie",
+      "allCategories": "Toutes",
+      "period": "Période"
+    },
+    "period": {
+      "all": "Tout l'historique",
+      "12m": "12 derniers mois",
+      "6m": "6 derniers mois",
+      "3m": "3 derniers mois"
+    },
+    "stats": {
+      "evaluated": "Joueurs testés",
+      "average": "Moyenne",
+      "best": "Meilleur",
+      "worst": "Plus faible"
+    },
+    "col": {
+      "player": "Joueur",
+      "value": "Dernière mesure",
+      "trend": "Évolution",
+      "date": "Date",
+      "tests": "Nb tests"
+    },
+    "evalForm": {
+      "date": "Date",
+      "tests": "Tests",
+      "submit": "Créer le test",
+      "cancel": "Annuler"
+    },
+    "exportCsv": "Export CSV"
   },
   "auth": {
     "tabLogin": "S'identifier",
@@ -760,6 +836,10 @@
     "title": "Planning de saison",
     "pickTeam": "Choisissez une équipe à planifier",
     "noTeams": "Créez d'abord une équipe.",
+    "physicalTest": {
+      "title": "Test physique",
+      "backToPlanner": "Retour au planning"
+    },
     "view": {
       "tour": "Vue saison",
       "weekly": "Hebdomadaire",
@@ -874,6 +954,17 @@
       "typeDistribution": "Répartition par type",
       "emptyMonth": "Rien de prévu sur ces semaines — ajoute un cycle ou paramètre une saison pour commencer à les remplir.",
       "emptyMonthCta": "Ouvrir la vue saison",
+      "physicalTest": {
+        "badge": "Test",
+        "open": "Ouvrir le test",
+        "placementHint": "Clique un jour pour y placer le test physique.",
+        "wizardTitle": "Nouveau test physique",
+        "wizardSubtitle": "Tests du {date}",
+        "noTests": "Aucun test. Crée un test depuis la page Suivi joueurs.",
+        "createTest": "+ Créer un test",
+        "confirm": "Créer le test",
+        "close": "Fermer"
+      },
       "tag": {
         "current": "En cours"
       },
@@ -1908,8 +1999,8 @@
         "profile": "Profil",
         "assignment": "Affectation",
         "stats": "Statistiques",
-        "physical": "Physique",
-        "followup": "Suivi",
+        "physical": "Suivi",
+        "followup": "Évaluations",
         "admin": "Admin"
       },
       "stats": {
@@ -1934,10 +2025,16 @@
       }
     },
     "physical": {
-      "title": "Suivi physique",
-      "intro": "Crée tes propres tests (VMA, sprint, Yo-Yo…) avec protocole, puis saisis les résultats à chaque date — manuellement ou depuis une séance du planning.",
+      "title": "Suivi",
+      "intro": "Résultats des tests de ce joueur. La saisie se fait depuis les séances de test du planning.",
       "manage": "Gérer les indicateurs",
-      "empty": "Aucun indicateur pour l'instant.",
+      "restore": "Réactiver",
+      "table": {
+        "name": "Nom",
+        "category": "Catégorie",
+        "unit": "Unité"
+      },
+      "empty": "Aucun test enregistré pour ce joueur.",
       "createFirst": "Créer un indicateur",
       "addDate": "Ajouter une date",
       "noDates": "Aucun test saisi. Ajoute une date ou rattache un test à une séance du planning.",
@@ -1970,13 +2067,53 @@
         "unitPlaceholder": "ex. km/h",
         "category": "Catégorie",
         "categoryPlaceholder": "ex. endurance",
+        "categoryOption": {
+          "physical": "Physique",
+          "technical": "Technique",
+          "medical": "Médical"
+        },
+        "subcategory": "Sous-catégorie",
+        "subcategoryPlaceholder": "ex. endurance aérobie",
+        "valueType": "Type de valeur",
+        "valueTypeOption": {
+          "integer": "Nombre entier",
+          "decimal": "Nombre décimal",
+          "percentage": "Pourcentage",
+          "score": "Score",
+          "number": "Nombre"
+        },
+        "interpretation": "Sens",
+        "interpretationOption": {
+          "higher": "Plus haut = meilleur",
+          "lower": "Plus bas = meilleur",
+          "target": "Zone cible"
+        },
+        "display": "Affichage",
+        "displayOption": {
+          "primary": "Principal",
+          "secondary": "Secondaire"
+        },
+        "alertThreshold": "Seuil d'alerte",
+        "alertThresholdPlaceholder": "ex. 5",
         "description": "Description",
         "descriptionPlaceholder": "ex. Vitesse maximale aérobie",
         "protocol": "Protocole",
         "protocolPlaceholder": "ex. Échauffement 10 min, paliers de 1 min…",
+        "material": "Matériel",
+        "materialPlaceholder": "ex. plots, chrono (séparés par des virgules)",
+        "trials": "Essais",
+        "trialsPlaceholder": "ex. 3 essais, meilleur retenu",
+        "frequency": "Fréquence recommandée",
+        "frequencyPlaceholder": "ex. 6-8 semaines",
+        "validity": "Conditions de validité",
+        "validityPlaceholder": "ex. joueur frais, surface stable",
         "higherIsBetter": "Une valeur plus élevée = meilleur"
-      }
-    }
+      },
+      "delete": "Supprimer",
+      "deleteConfirm": "Supprimer définitivement cet indicateur ? Les mesures enregistrées pour cet indicateur seront aussi supprimées."
+    },
+    "presence": "Présence",
+    "available": "Dispo"
   },
   "playerMe": {
     "title": "Ma fiche",
@@ -2046,7 +2183,11 @@
       "none": "Aucun test rattaché à cette séance.",
       "detach": "Retirer",
       "colPlayer": "Joueur",
-      "emptyRoster": "Aucun joueur dans l'effectif."
+      "emptyRoster": "Aucun joueur dans l'effectif.",
+      "colStatus": "Statut",
+      "statusPresent": "Présent",
+      "statusAbsent": "Absent",
+      "statusInjured": "Blessé"
     },
     "coach": {
       "title": "Présences",
@@ -2068,7 +2209,10 @@
       "markPresent": "Marquer présent",
       "markAbsent": "Marquer absent",
       "markUnknown": "Effacer",
-      "emptyRoster": "Aucun joueur affecté à cette équipe."
+      "emptyRoster": "Aucun joueur affecté à cette équipe.",
+      "bulkLabel": "Pointage rapide :",
+      "markAllPresent": "Tous présents",
+      "markAllAbsent": "Tous absents"
     }
   },
   "email": {
@@ -2346,6 +2490,81 @@
       "unauthenticated": "Tu dois être connecté.",
       "no_membership": "Aucun club sélectionné.",
       "db_error": "Erreur lors de l'import. Réessaie."
+    }
+  },
+  "availability": {
+    "tab": "Disponibilité",
+    "title": "Disponibilité",
+    "intro": "Blessures, maladies, suspensions et autres indisponibilités. Une période couvre automatiquement toutes les séances et évals concernées.",
+    "add": "Ajouter",
+    "empty": "Aucune indisponibilité enregistrée.",
+    "deleteConfirm": "Supprimer cette indisponibilité ?",
+    "ongoing": "En cours",
+    "openEnd": "sans date de fin",
+    "endToday": "Terminer aujourd'hui",
+    "edit": "Modifier",
+    "delete": "Supprimer",
+    "addTitle": "Nouvelle indisponibilité",
+    "editTitle": "Modifier l'indisponibilité",
+    "cancel": "Annuler",
+    "save": "Enregistrer",
+    "excused": "Excusé",
+    "field": {
+      "kind": "Type",
+      "startDate": "Début",
+      "endDate": "Fin (optionnel)",
+      "reason": "Motif",
+      "reasonPlaceholder": "Détail (optionnel)"
+    },
+    "kind": {
+      "injury": "🩹 Blessé",
+      "illness": "Malade",
+      "suspension": "Suspendu",
+      "other": "Indispo"
+    }
+  },
+  "playerOverview": {
+    "tab": "Aperçu",
+    "status": {
+      "available": "Disponible",
+      "since": "depuis le {date}",
+      "until": "jusqu'au {date}"
+    },
+    "kpi": {
+      "presence": "Présence",
+      "sessions": "Séances",
+      "availability": "Disponibilité"
+    },
+    "card": {
+      "nextSession": "Prochaine séance",
+      "nextSessionEmpty": "Aucune séance à venir",
+      "lastTest": "Dernière éval physique",
+      "lastTestEmpty": "Aucun test",
+      "lastReport": "Dernier suivi",
+      "lastReportEmpty": "Aucun suivi",
+      "average": "Moyenne : {value}",
+      "injuries": "Indisponibilités en cours",
+      "injuriesNone": "Aucune"
+    },
+    "timeline": {
+      "title": "Activité récente",
+      "empty": "Aucune activité",
+      "report": "Suivi créé"
+    }
+  },
+  "availabilityBoard": {
+    "title": "Disponibilités",
+    "subtitle": "Vue d'ensemble des présences sur les prochaines séances.",
+    "player": "Joueur",
+    "presence": "Présence",
+    "back": "Retour au planning",
+    "empty": "Aucune séance à venir ou aucun joueur.",
+    "legend": {
+      "present": "Présent",
+      "absent": "Absent",
+      "announced": "Annoncé",
+      "injured": "Indispo",
+      "none": "Non renseigné"
     }
   }
 }
