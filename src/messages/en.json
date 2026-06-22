@@ -1299,6 +1299,85 @@
           "db_error": "Could not save",
           "match_not_found": "Match not found"
         }
+      },
+      "tab": {
+        "prematch": "Pre-match",
+        "result": "Result"
+      },
+      "prematch": {
+        "lineupTitle": "Line-up",
+        "tacticsTitle": "Tactical instructions",
+        "formation": "Formation",
+        "startersOf": "{count}/11 starters",
+        "removeStarter": "Remove",
+        "addStarter": "Add starter",
+        "bench": "Bench",
+        "benchEmpty": "All called-up players are starters.",
+        "benchRole": {
+          "substitute": "Substitute",
+          "unused": "Stand"
+        },
+        "print": "Print",
+        "save": "Save line-up",
+        "saved": "Line-up saved",
+        "noConvened": "Call up players above first to build the line-up.",
+        "tactics": {
+          "general": "General",
+          "generalPlaceholder": "Game plan, mindset…",
+          "possession": "In possession",
+          "possessionPlaceholder": "Build-up, width, finishing…",
+          "defense": "Out of possession",
+          "defensePlaceholder": "Block, pressing, marking…",
+          "transition": "Transitions",
+          "transitionPlaceholder": "Reactions on loss/recovery…"
+        },
+        "callup": {
+          "title": "Call-up",
+          "convenedCount": "{count} called up",
+          "emptyRoster": "No players assigned to this team for the season.",
+          "present": "Available",
+          "absent": "Unavailable",
+          "pending": "Pending",
+          "save": "Save call-up",
+          "saved": "Call-up saved"
+        }
+      },
+      "result": {
+        "events": {
+          "title": "Match facts",
+          "empty": "No events yet. Add goals, subs, cards…",
+          "add": "Add event",
+          "save": "Save facts",
+          "saved": "Facts saved",
+          "remove": "Remove",
+          "minuteShort": "min",
+          "selectPlayer": "Player…",
+          "scorer": "Scorer",
+          "player": "Player",
+          "playerIn": "In",
+          "playerOut": "Out",
+          "assist": "Assist",
+          "noAssist": "No assist",
+          "penalty": "Pen.",
+          "notePlaceholder": "Match fact…",
+          "type": {
+            "goal": "Goal",
+            "own_goal": "Own goal",
+            "yellow": "Yellow card",
+            "red": "Red card",
+            "substitution": "Substitution",
+            "note": "Match fact"
+          }
+        },
+        "recap": {
+          "title": "Match sheet",
+          "empty": "No sheet yet. Call up and pick the team in the Pre-match tab.",
+          "group": {
+            "starter": "Starters",
+            "substitute": "Substitutes",
+            "unused": "Bench"
+          }
+        }
       }
     }
   },
@@ -2243,7 +2322,10 @@
     "title": "My schedule",
     "empty": "No team — nothing to display.",
     "emptyUpcoming": "No upcoming session.",
-    "untitled": "Session"
+    "untitled": "Session",
+    "matchesTitle": "My matches",
+    "matchUntitled": "Match",
+    "matchBadge": "Match"
   },
   "attendance": {
     "present": "Going",
@@ -2654,6 +2736,27 @@
       "announced": "Announced",
       "injured": "Unavailable",
       "none": "Not set"
+    }
+  },
+  "matchRsvp": {
+    "present": "Available",
+    "absent": "Unavailable",
+    "answeredPresent": "You confirmed you're available",
+    "answeredAbsent": "You marked yourself unavailable",
+    "reasonLabel": "Reason for absence",
+    "confirmAbsent": "Confirm unavailable",
+    "cancel": "Cancel",
+    "errors": {
+      "unauthenticated": "Not authenticated",
+      "invalid_status": "Invalid status",
+      "reason_required_when_unavailable": "A reason is required if unavailable",
+      "match_not_found": "Match not found",
+      "club_inactive": "Club inactive",
+      "match_finished": "The match has already taken place",
+      "not_assigned_to_team": "You're not assigned to this team",
+      "not_called_up": "You're not called up for this match",
+      "missing_match": "Missing match",
+      "unknown": "Something went wrong"
     }
   }
 }

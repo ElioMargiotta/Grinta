@@ -1293,6 +1293,85 @@
           "db_error": "Speichern fehlgeschlagen",
           "match_not_found": "Spiel nicht gefunden"
         }
+      },
+      "tab": {
+        "prematch": "Vor dem Spiel",
+        "result": "Ergebnis"
+      },
+      "prematch": {
+        "lineupTitle": "Aufstellung",
+        "tacticsTitle": "Taktische Anweisungen",
+        "formation": "Formation",
+        "startersOf": "{count}/11 in der Startelf",
+        "removeStarter": "Entfernen",
+        "addStarter": "Stammspieler hinzufügen",
+        "bench": "Bank",
+        "benchEmpty": "Alle aufgebotenen Spieler sind in der Startelf.",
+        "benchRole": {
+          "substitute": "Ersatz",
+          "unused": "Tribüne"
+        },
+        "print": "Drucken",
+        "save": "Aufstellung speichern",
+        "saved": "Aufstellung gespeichert",
+        "noConvened": "Biete zuerst oben Spieler auf, um die Aufstellung zu erstellen.",
+        "tactics": {
+          "general": "Allgemein",
+          "generalPlaceholder": "Spielplan, Einstellung…",
+          "possession": "Im Ballbesitz",
+          "possessionPlaceholder": "Spielaufbau, Breite, Abschluss…",
+          "defense": "Ohne Ball",
+          "defensePlaceholder": "Block, Pressing, Manndeckung…",
+          "transition": "Umschalten",
+          "transitionPlaceholder": "Reaktionen bei Verlust/Eroberung…"
+        },
+        "callup": {
+          "title": "Aufgebot",
+          "convenedCount": "{count} aufgeboten",
+          "emptyRoster": "Keine Spieler dieser Mannschaft für die Saison zugewiesen.",
+          "present": "Verfügbar",
+          "absent": "Nicht verfügbar",
+          "pending": "Ausstehend",
+          "save": "Aufgebot speichern",
+          "saved": "Aufgebot gespeichert"
+        }
+      },
+      "result": {
+        "events": {
+          "title": "Spielereignisse",
+          "empty": "Noch keine Ereignisse. Füge Tore, Wechsel, Karten hinzu…",
+          "add": "Ereignis hinzufügen",
+          "save": "Ereignisse speichern",
+          "saved": "Ereignisse gespeichert",
+          "remove": "Entfernen",
+          "minuteShort": "Min.",
+          "selectPlayer": "Spieler…",
+          "scorer": "Torschütze",
+          "player": "Spieler",
+          "playerIn": "Ein",
+          "playerOut": "Aus",
+          "assist": "Vorlage",
+          "noAssist": "Keine Vorlage",
+          "penalty": "Elf.",
+          "notePlaceholder": "Spielereignis…",
+          "type": {
+            "goal": "Tor",
+            "own_goal": "Eigentor",
+            "yellow": "Gelbe Karte",
+            "red": "Rote Karte",
+            "substitution": "Wechsel",
+            "note": "Spielereignis"
+          }
+        },
+        "recap": {
+          "title": "Spielbericht",
+          "empty": "Noch kein Bericht. Biete auf und stelle die Mannschaft im Tab „Vor dem Spiel“ auf.",
+          "group": {
+            "starter": "Startelf",
+            "substitute": "Ersatz",
+            "unused": "Bank"
+          }
+        }
       }
     }
   },
@@ -2237,7 +2316,10 @@
     "title": "Mein Plan",
     "empty": "Keine Mannschaft — nichts anzuzeigen.",
     "emptyUpcoming": "Kein anstehendes Training.",
-    "untitled": "Training"
+    "untitled": "Training",
+    "matchesTitle": "Meine Spiele",
+    "matchUntitled": "Spiel",
+    "matchBadge": "Spiel"
   },
   "attendance": {
     "present": "Dabei",
@@ -2648,6 +2730,27 @@
       "announced": "Angekündigt",
       "injured": "Ausfall",
       "none": "Nicht gesetzt"
+    }
+  },
+  "matchRsvp": {
+    "present": "Verfügbar",
+    "absent": "Nicht verfügbar",
+    "answeredPresent": "Du hast deine Verfügbarkeit bestätigt",
+    "answeredAbsent": "Du hast dich als nicht verfügbar gemeldet",
+    "reasonLabel": "Grund der Abwesenheit",
+    "confirmAbsent": "Abwesenheit bestätigen",
+    "cancel": "Abbrechen",
+    "errors": {
+      "unauthenticated": "Nicht authentifiziert",
+      "invalid_status": "Ungültiger Status",
+      "reason_required_when_unavailable": "Bei Nichtverfügbarkeit ist ein Grund erforderlich",
+      "match_not_found": "Spiel nicht gefunden",
+      "club_inactive": "Verein inaktiv",
+      "match_finished": "Das Spiel hat bereits stattgefunden",
+      "not_assigned_to_team": "Du bist dieser Mannschaft nicht zugewiesen",
+      "not_called_up": "Du bist für dieses Spiel nicht aufgeboten",
+      "missing_match": "Spiel fehlt",
+      "unknown": "Etwas ist schiefgelaufen"
     }
   }
 }
