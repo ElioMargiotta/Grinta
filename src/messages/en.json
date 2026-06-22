@@ -412,14 +412,14 @@
     "logout": "Log out",
     "account": "Account",
     "contingent": "Squad",
-    "physical": "Evaluation",
+    "physical": "Player tracking",
     "playerMe": "My profile",
     "playerTeam": "My teams",
     "playerSchedule": "My schedule"
   },
   "physicalHub": {
-    "title": "Evaluation",
-    "subtitle": "Tests & evaluations for {club}",
+    "title": "Player tracking",
+    "subtitle": "Player tests for {club}",
     "seasonScope": "{season} season",
     "emptyMetrics": "No test yet. Create your first test (VMA, sprint, juggling…) with its evaluation protocol.",
     "createFirst": "Create a test",
@@ -429,14 +429,15 @@
     "ranking": "Ranking",
     "clickRowHint": "Click a row to see the player's chart",
     "viewProfile": "View profile",
-    "createEval": "New evaluation",
+    "createEval": "New test",
     "pickTeam": "Pick a team",
     "evals": {
-      "title": "Evaluations to fill",
+      "title": "Tests to fill",
       "testCount": "{count, plural, =0 {no test} one {# test} other {# tests}}",
       "enter": "Enter results",
-      "delete": "Delete evaluation",
-      "deleteConfirm": "Delete this evaluation? Results already entered will be kept in the players' history."
+      "delete": "Delete test",
+      "deleteConfirm": "Delete this test? Results already entered will be kept in the players' history.",
+      "view": "View"
     },
     "library": {
       "title": "Default library",
@@ -471,7 +472,7 @@
       "3m": "Last 3 months"
     },
     "stats": {
-      "evaluated": "Players evaluated",
+      "evaluated": "Players tested",
       "average": "Average",
       "best": "Best",
       "worst": "Lowest"
@@ -482,7 +483,14 @@
       "trend": "Trend",
       "date": "Date",
       "tests": "Tests"
-    }
+    },
+    "evalForm": {
+      "date": "Date",
+      "tests": "Tests",
+      "submit": "Create test",
+      "cancel": "Cancel"
+    },
+    "exportCsv": "Export CSV"
   },
   "auth": {
     "tabLogin": "Log in",
@@ -829,8 +837,8 @@
     "title": "Season planner",
     "pickTeam": "Pick a team to plan",
     "noTeams": "Create a team first.",
-    "eval": {
-      "title": "Physical evaluation",
+    "physicalTest": {
+      "title": "Physical test",
       "backToPlanner": "Back to planner"
     },
     "view": {
@@ -947,15 +955,15 @@
       "typeDistribution": "Type distribution",
       "emptyMonth": "Nothing planned for these weeks yet — add a cycle or set up a season to start filling them in.",
       "emptyMonthCta": "Open season overview",
-      "eval": {
-        "badge": "Eval",
-        "open": "Open evaluation",
-        "placementHint": "Click a day to place the physical evaluation there.",
-        "wizardTitle": "New physical evaluation",
-        "wizardSubtitle": "Tests assessed on {date}",
-        "noTests": "No test yet. Create one from the Physical page.",
+      "physicalTest": {
+        "badge": "Test",
+        "open": "Open test",
+        "placementHint": "Click a day to place the physical test there.",
+        "wizardTitle": "New physical test",
+        "wizardSubtitle": "Tests on {date}",
+        "noTests": "No test yet. Create one from the Player tracking page.",
         "createTest": "+ Create a test",
-        "confirm": "Create evaluation",
+        "confirm": "Create test",
         "close": "Close"
       },
       "tag": {
@@ -1992,8 +2000,8 @@
         "profile": "Profile",
         "assignment": "Assignment",
         "stats": "Statistics",
-        "physical": "Evaluation",
-        "followup": "Follow-up",
+        "physical": "Tracking",
+        "followup": "Evaluations",
         "admin": "Admin"
       },
       "stats": {
@@ -2018,8 +2026,8 @@
       }
     },
     "physical": {
-      "title": "Evaluation",
-      "intro": "Create your own tests (MAS, sprint, Yo-Yo…) with a protocol, then record results on each date — manually or from a planner session.",
+      "title": "Tracking",
+      "intro": "Test results for this player. Data is entered from planner test sessions.",
       "manage": "Manage indicators",
       "restore": "Restore",
       "table": {
@@ -2027,7 +2035,7 @@
         "category": "Category",
         "unit": "Unit"
       },
-      "empty": "No indicator yet.",
+      "empty": "No test recorded for this player.",
       "createFirst": "Create an indicator",
       "addDate": "Add a date",
       "noDates": "No test recorded yet. Add a date or attach a test to a planner session.",
@@ -2104,7 +2112,9 @@
       },
       "delete": "Delete",
       "deleteConfirm": "Permanently delete this indicator? The measurements recorded for it will also be deleted."
-    }
+    },
+    "presence": "Attendance",
+    "available": "Available"
   },
   "playerMe": {
     "title": "My profile",
@@ -2175,8 +2185,10 @@
       "detach": "Remove",
       "colPlayer": "Player",
       "emptyRoster": "No player in the roster.",
-      "absent": "Absent",
-      "declareUnavailable": "Unavailable…"
+      "colStatus": "Status",
+      "statusPresent": "Present",
+      "statusAbsent": "Absent",
+      "statusInjured": "Injured"
     },
     "coach": {
       "title": "Attendance",
@@ -2198,7 +2210,10 @@
       "markPresent": "Mark present",
       "markAbsent": "Mark absent",
       "markUnknown": "Clear",
-      "emptyRoster": "No players assigned to this team."
+      "emptyRoster": "No players assigned to this team.",
+      "bulkLabel": "Quick mark:",
+      "markAllPresent": "All present",
+      "markAllAbsent": "All absent"
     }
   },
   "email": {
@@ -2478,9 +2493,9 @@
       "db_error": "Import failed. Try again."
     }
   },
-  "medical": {
-    "tab": "Medical",
-    "title": "Availability & medical",
+  "availability": {
+    "tab": "Availability",
+    "title": "Availability",
     "intro": "Injuries, illness, suspensions and other unavailabilities. A period automatically covers all relevant sessions and evaluations.",
     "add": "Add",
     "empty": "No unavailability recorded.",
@@ -2507,6 +2522,50 @@
       "illness": "Ill",
       "suspension": "Suspended",
       "other": "Unavailable"
+    }
+  },
+  "playerOverview": {
+    "tab": "Overview",
+    "status": {
+      "available": "Available",
+      "since": "since {date}",
+      "until": "until {date}"
+    },
+    "kpi": {
+      "presence": "Attendance",
+      "sessions": "Sessions",
+      "availability": "Availability"
+    },
+    "card": {
+      "nextSession": "Next session",
+      "nextSessionEmpty": "No upcoming session",
+      "lastTest": "Last physical test",
+      "lastTestEmpty": "No test",
+      "lastReport": "Last report",
+      "lastReportEmpty": "No report",
+      "average": "Average: {value}",
+      "injuries": "Current unavailabilities",
+      "injuriesNone": "None"
+    },
+    "timeline": {
+      "title": "Recent activity",
+      "empty": "No activity",
+      "report": "Report created"
+    }
+  },
+  "availabilityBoard": {
+    "title": "Availability",
+    "subtitle": "Attendance overview across upcoming sessions.",
+    "player": "Player",
+    "presence": "Attendance",
+    "back": "Back to planner",
+    "empty": "No upcoming session or no player.",
+    "legend": {
+      "present": "Present",
+      "absent": "Absent",
+      "announced": "Announced",
+      "injured": "Unavailable",
+      "none": "Not set"
     }
   }
 }

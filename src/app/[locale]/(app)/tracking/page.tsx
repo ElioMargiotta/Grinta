@@ -89,26 +89,54 @@ export default async function PhysiquePage({
         .returns<EvalRow[]>(),
     ]);
 
-  // Comptage des tests par éval pour l'affichage de la liste.
+  // Comptage des tests par éval + mesures saisies, pour le % de complétion.
   const evalIds = (evalRows ?? []).map((e) => e.id);
-  const { data: evalTestRows } = evalIds.length
-    ? await supabase
-        .from("session_physical_tests")
-        .select("session_id")
-        .in("session_id", evalIds)
-    : { data: [] as { session_id: string }[] };
+  const [{ data: evalTestRows }, { data: evalMeasRows }] = evalIds.length
+    ? await Promise.all([
+        supabase
+          .from("session_physical_tests")
+          .select("session_id")
+          .in("session_id", evalIds),
+        supabase
+          .from("physical_measurements")
+          .select("session_id, value")
+          .in("session_id", evalIds),
+      ])
+    : [
+        { data: [] as { session_id: string }[] },
+        { data: [] as { session_id: string; value: number | null }[] },
+      ];
   const testCountByEval = new Map<string, number>();
   for (const r of evalTestRows ?? []) {
     testCountByEval.set(r.session_id, (testCountByEval.get(r.session_id) ?? 0) + 1);
   }
+  const filledByEval = new Map<string, number>();
+  for (const r of evalMeasRows ?? []) {
+    if (r.value !== null) {
+      filledByEval.set(r.session_id, (filledByEval.get(r.session_id) ?? 0) + 1);
+    }
+  }
+  // Effectif par équipe (saison active) pour le dénominateur de complétion.
+  const rosterSizeByTeam = new Map<string, number>();
+  for (const p of playerRows ?? []) {
+    for (const a of p.player_team_assignments ?? []) {
+      rosterSizeByTeam.set(a.team_id, (rosterSizeByTeam.get(a.team_id) ?? 0) + 1);
+    }
+  }
 
-  const evals: HubEval[] = (evalRows ?? []).map((e) => ({
-    id: e.id,
-    teamId: e.team_id,
-    teamName: e.teams?.name ?? "—",
-    date: e.date,
-    testCount: testCountByEval.get(e.id) ?? 0,
-  }));
+  const evals: HubEval[] = (evalRows ?? []).map((e) => {
+    const testCount = testCountByEval.get(e.id) ?? 0;
+    const expected = testCount * (rosterSizeByTeam.get(e.team_id) ?? 0);
+    const filled = filledByEval.get(e.id) ?? 0;
+    return {
+      id: e.id,
+      teamId: e.team_id,
+      teamName: e.teams?.name ?? "—",
+      date: e.date,
+      testCount,
+      completion: expected > 0 ? Math.min(1, filled / expected) : 0,
+    };
+  });
 
   const players: HubPlayer[] = (playerRows ?? []).map((p) => ({
     id: p.id,

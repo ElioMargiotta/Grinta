@@ -13,7 +13,7 @@ import {
   activeUnavailability,
   type Unavailability,
   type UnavailabilityKind,
-} from "@/lib/medical/unavailability";
+} from "@/lib/availability/unavailability";
 
 type UnavailabilityDbRow = {
   player_id: string;

@@ -275,7 +275,7 @@ export async function attachTestToSessionAction({
     );
 
   if (error) return { error: error.message };
-  revalidatePath(`/${locale}/planner/${teamId}/sessions/${sessionId}/eval`);
+  revalidatePath(`/${locale}/planner/${teamId}/sessions/${sessionId}/test`);
   return { ok: true as const };
 }
 
@@ -300,7 +300,103 @@ export async function detachTestFromSessionAction({
     .eq("metric_id", metricId);
 
   if (error) return { error: error.message };
-  revalidatePath(`/${locale}/planner/${teamId}/sessions/${sessionId}/eval`);
+  revalidatePath(`/${locale}/planner/${teamId}/sessions/${sessionId}/test`);
+  return { ok: true as const };
+}
+
+/**
+ * Statut de présence/dispo d'un joueur POUR une éval.
+ * Écrit `session_attendances.actual_status` (present/absent/injured) ET
+ * synchronise une blessure « propagée partout » :
+ *   - `injured` → crée une période d'indisponibilité ouverte (si aucune ne
+ *     couvre déjà la date de l'éval) → visible contingent / board / fiche ;
+ *   - `present`/`absent` → clôture la blessure en cours (période ouverte) :
+ *     supprimée si elle démarrait ce jour-là, sinon close la veille.
+ */
+export async function setTestAttendanceAction({
+  locale,
+  teamId,
+  sessionId,
+  playerId,
+  status,
+}: {
+  locale: string;
+  teamId: string;
+  sessionId: string;
+  playerId: string;
+  status: "present" | "absent" | "injured" | null;
+}) {
+  if (!sessionId || !playerId) return { error: "Missing fields" };
+  const { supabase, user } = await requireUser(locale);
+  const session = await sessionClub(supabase, sessionId);
+  if (!session) return { error: "Not found" };
+  const evalDate = session.date;
+
+  if (status === null) {
+    const { error } = await supabase
+      .from("session_attendances")
+      .update({ actual_status: null, actual_marked_at: null, actual_marked_by: null })
+      .eq("session_id", sessionId)
+      .eq("player_id", playerId);
+    if (error) return { error: error.message };
+  } else {
+    const { error } = await supabase.from("session_attendances").upsert(
+      {
+        session_id: sessionId,
+        player_id: playerId,
+        actual_status: status,
+        actual_marked_at: new Date().toISOString(),
+        actual_marked_by: user.id,
+      },
+      { onConflict: "session_id,player_id" },
+    );
+    if (error) return { error: error.message };
+  }
+
+  // Synchronisation avec les périodes médicales (« blessé = blessé partout »).
+  if (status === "injured") {
+    const { data: covering } = await supabase
+      .from("player_unavailability")
+      .select("id")
+      .eq("player_id", playerId)
+      .lte("start_date", evalDate)
+      .or(`end_date.is.null,end_date.gte.${evalDate}`)
+      .limit(1);
+    if (!covering || covering.length === 0) {
+      await supabase.from("player_unavailability").insert({
+        club_id: session.club_id,
+        player_id: playerId,
+        kind: "injury",
+        reason: null,
+        start_date: evalDate,
+        end_date: null,
+        created_by: user.id,
+      });
+    }
+  } else if (status === "present" || status === "absent") {
+    // Clôture des blessures « en cours » (période ouverte) couvrant l'éval.
+    const dayBefore = new Date(evalDate);
+    dayBefore.setDate(dayBefore.getDate() - 1);
+    const dayBeforeIso = dayBefore.toISOString().slice(0, 10);
+    // Démarrée ce jour-là (ou après) → erreur de saisie : on supprime.
+    await supabase
+      .from("player_unavailability")
+      .delete()
+      .eq("player_id", playerId)
+      .is("end_date", null)
+      .gte("start_date", evalDate);
+    // Démarrée avant → on la clôt la veille de l'éval.
+    await supabase
+      .from("player_unavailability")
+      .update({ end_date: dayBeforeIso })
+      .eq("player_id", playerId)
+      .is("end_date", null)
+      .lt("start_date", evalDate);
+  }
+
+  revalidatePath(`/${locale}/planner/${teamId}/sessions/${sessionId}/test`);
+  revalidatePath(`/${locale}/contingent/${playerId}`);
+  revalidatePath(`/${locale}/contingent`);
   return { ok: true as const };
 }
 
@@ -336,7 +432,7 @@ export async function recordSessionMeasurementAction({
     userId: user.id,
   });
   if (res.error) return { error: res.error };
-  revalidatePath(`/${locale}/planner/${teamId}/sessions/${sessionId}/eval`);
+  revalidatePath(`/${locale}/planner/${teamId}/sessions/${sessionId}/test`);
   revalidatePath(`/${locale}/contingent/${playerId}`);
   return { ok: true as const };
 }

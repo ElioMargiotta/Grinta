@@ -7,12 +7,14 @@ import { Card } from "@/components/ui/Card";
 import { Input } from "@/components/ui/Input";
 import { Select } from "@/components/ui/Select";
 import { Button } from "@/components/ui/Button";
-import { Trash2 } from "lucide-react";
+import { ArrowDown, ArrowUp, Trash2 } from "lucide-react";
 import {
   bulkAssignPlayersToTeamAction,
   bulkDeletePlayersAction,
 } from "@/app/[locale]/(app)/contingent/actions";
 import type { ClubTeamOption } from "@/lib/contingent/teams";
+import { KindBadge } from "@/components/contingent/AvailabilitySection";
+import type { UnavailabilityKind } from "@/lib/availability/unavailability";
 
 export type ContingentAssignment = {
   team_id: string;
@@ -30,7 +32,13 @@ export type ContingentPlayer = {
   /** True iff `players.dual_licence_club IS NOT NULL` — drives the "DL" badge (EPIC #34). */
   has_dual_licence: boolean;
   assignments: ContingentAssignment[];
+  /** Indisponibilité active aujourd'hui (médical/discipline), sinon null. */
+  unavailabilityKind: UnavailabilityKind | null;
+  /** Taux de présence saison (0–1), null si aucune séance. */
+  presenceRate: number | null;
 };
+
+type SortKey = "name" | "position" | "presence" | "availability";
 
 const ALL = "__all__";
 const UNASSIGNED = "__unassigned__";
@@ -51,10 +59,13 @@ export function ContingentList({
   const tDual = useTranslations("contingent.dualLicence");
   const locale = useLocale();
   const router = useRouter();
+  const tMed = useTranslations("availability");
   const [query, setQuery] = useState("");
   const [teamFilter, setTeamFilter] = useState(initialTeamFilter ?? ALL);
   const [category, setCategory] = useState(ALL);
   const [status, setStatus] = useState(ALL);
+  const [sortKey, setSortKey] = useState<SortKey>("name");
+  const [sortDir, setSortDir] = useState<"asc" | "desc">("asc");
   const [selected, setSelected] = useState<Set<string>>(new Set());
   const [bulkTeamId, setBulkTeamId] = useState<string>("");
   const [bulkError, setBulkError] = useState<string | null>(null);
@@ -102,6 +113,43 @@ export function ContingentList({
       return true;
     });
   }, [players, query, teamFilter, category, status]);
+
+  const sorted = useMemo(() => {
+    const arr = [...filtered];
+    const dir = sortDir === "asc" ? 1 : -1;
+    arr.sort((a, b) => {
+      let cmp = 0;
+      switch (sortKey) {
+        case "name":
+          cmp = `${a.last_name} ${a.first_name}`.localeCompare(
+            `${b.last_name} ${b.first_name}`,
+          );
+          break;
+        case "position":
+          cmp = (a.position ?? "").localeCompare(b.position ?? "");
+          break;
+        case "presence":
+          cmp = (a.presenceRate ?? -1) - (b.presenceRate ?? -1);
+          break;
+        case "availability":
+          cmp =
+            Number(Boolean(a.unavailabilityKind)) -
+            Number(Boolean(b.unavailabilityKind));
+          break;
+      }
+      return cmp * dir;
+    });
+    return arr;
+  }, [filtered, sortKey, sortDir]);
+
+  function toggleSort(key: SortKey) {
+    if (key === sortKey) {
+      setSortDir((d) => (d === "asc" ? "desc" : "asc"));
+    } else {
+      setSortKey(key);
+      setSortDir("asc");
+    }
+  }
 
   const filteredIds = useMemo(() => filtered.map((p) => p.id), [filtered]);
   const allSelected =
@@ -357,14 +405,16 @@ export function ContingentList({
                   />
                 </th>
                 <th className="px-4 py-2">#</th>
-                <th className="px-4 py-2">{t("name")}</th>
-                <th className="px-4 py-2">{t("position")}</th>
+                <SortHeader label={t("name")} active={sortKey === "name"} dir={sortDir} onClick={() => toggleSort("name")} />
+                <SortHeader label={t("position")} active={sortKey === "position"} dir={sortDir} onClick={() => toggleSort("position")} />
+                <SortHeader label={tMed("tab")} active={sortKey === "availability"} dir={sortDir} onClick={() => toggleSort("availability")} />
+                <SortHeader label={t("presence")} active={sortKey === "presence"} dir={sortDir} onClick={() => toggleSort("presence")} />
                 <th className="px-4 py-2">{t("teams")}</th>
                 <th className="px-4 py-2">{t("birthDate")}</th>
               </tr>
             </thead>
             <tbody>
-              {filtered.map((p) => {
+              {sorted.map((p) => {
                 const isOn = selected.has(p.id);
                 return (
                   <tr
@@ -408,6 +458,27 @@ export function ContingentList({
                       {p.position ?? "—"}
                     </td>
                     <td className="px-4 py-2">
+                      {p.unavailabilityKind ? (
+                        <KindBadge
+                          kind={p.unavailabilityKind}
+                          label={tMed(`kind.${p.unavailabilityKind}`)}
+                        />
+                      ) : (
+                        <span className="inline-flex items-center gap-1 rounded-full bg-emerald-50 px-2 py-0.5 text-[11px] font-medium text-emerald-700 dark:bg-emerald-950/30 dark:text-emerald-300">
+                          {t("available")}
+                        </span>
+                      )}
+                    </td>
+                    <td className="px-4 py-2 text-zinc-500">
+                      {p.presenceRate === null ? (
+                        <span className="text-zinc-400">—</span>
+                      ) : (
+                        <span className="font-mono tabular-nums">
+                          {Math.round(p.presenceRate * 100)}%
+                        </span>
+                      )}
+                    </td>
+                    <td className="px-4 py-2">
                       {p.assignments.length === 0 ? (
                         <span className="text-zinc-400 italic">
                           {t("statusUnassigned")}
@@ -437,5 +508,38 @@ export function ContingentList({
         </Card>
       )}
     </div>
+  );
+}
+
+function SortHeader({
+  label,
+  active,
+  dir,
+  onClick,
+}: {
+  label: string;
+  active: boolean;
+  dir: "asc" | "desc";
+  onClick: () => void;
+}) {
+  return (
+    <th className="px-4 py-2">
+      <button
+        type="button"
+        onClick={onClick}
+        className={`inline-flex items-center gap-1 transition-colors hover:text-zinc-900 dark:hover:text-zinc-100 ${
+          active ? "text-zinc-900 dark:text-zinc-100" : ""
+        }`}
+      >
+        {label}
+        {active ? (
+          dir === "asc" ? (
+            <ArrowUp className="h-3 w-3" />
+          ) : (
+            <ArrowDown className="h-3 w-3" />
+          )
+        ) : null}
+      </button>
+    </th>
   );
 }

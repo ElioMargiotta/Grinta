@@ -13,7 +13,7 @@ import {
   type ThemeKey,
 } from "./MicrocycleThemePicker";
 import {
-  createPhysicalEvalAction,
+  createPhysicalTestAction,
   createSessionForSlotAction,
   deletePlannerSessionAction,
   duplicatePlannerSessionAction,
@@ -459,7 +459,7 @@ export function PlannerWeeksGrid({
     if (!wizardDate || evalSelected.size === 0) return;
     setEvalError(null);
     startEvalTransition(async () => {
-      const res = await createPhysicalEvalAction({
+      const res = await createPhysicalTestAction({
         teamId,
         date: wizardDate,
         metricIds: [...evalSelected],
@@ -960,7 +960,7 @@ export function PlannerWeeksGrid({
                 </span>
                 {canPlaceEval ? (
                   <span className="rounded bg-[var(--club-primary)] px-1 py-px text-[9px] font-semibold uppercase tracking-wide text-[var(--club-primary-foreground)] opacity-0 group-hover:opacity-100">
-                    + {t("eval.badge")}
+                    + {t("physicalTest.badge")}
                   </span>
                 ) : null}
               </div>
@@ -970,15 +970,15 @@ export function PlannerWeeksGrid({
                   onClick={(e) => {
                     e.stopPropagation();
                     router.push(
-                      `/planner/${teamId}/sessions/${cellEval.id}/eval`,
+                      `/planner/${teamId}/sessions/${cellEval.id}/test`,
                     );
                   }}
-                  title={t("eval.open")}
+                  title={t("physicalTest.open")}
                   className="flex items-center gap-1 truncate rounded-md bg-[#c94a4a] px-1.5 py-0.5 text-[10px] font-semibold text-white"
                 >
                   <Activity className="h-3 w-3 shrink-0" />
                   <span className="truncate">
-                    {t("eval.badge")}
+                    {t("physicalTest.badge")}
                     {cellEval.testCount > 0 ? ` · ${cellEval.testCount}` : ""}
                   </span>
                 </button>
@@ -1045,7 +1045,7 @@ export function PlannerWeeksGrid({
       {placeEval ? (
         <div className="flex items-center gap-2 rounded-lg border border-[var(--club-primary)] bg-[var(--club-primary-soft)]/60 px-3 py-2 text-[13px] font-medium text-[var(--club-primary)]">
           <Activity className="h-4 w-4 shrink-0" />
-          {t("eval.placementHint")}
+          {t("physicalTest.placementHint")}
         </div>
       ) : null}
       <div className="flex flex-wrap items-center gap-3 rounded-lg border border-zinc-200 bg-zinc-50/60 p-3 dark:border-zinc-800 dark:bg-zinc-950/40">
@@ -1272,19 +1272,19 @@ export function PlannerWeeksGrid({
             <div className="mb-1 flex items-start justify-between gap-3">
               <h3 className="flex items-center gap-2 text-base font-semibold text-zinc-900 dark:text-zinc-100">
                 <Activity className="h-4 w-4 text-[var(--club-primary)]" />
-                {t("eval.wizardTitle")}
+                {t("physicalTest.wizardTitle")}
               </h3>
               <button
                 type="button"
                 onClick={() => setWizardDate(null)}
                 className="rounded-md p-1 text-zinc-400 hover:bg-zinc-100 hover:text-zinc-700 dark:hover:bg-zinc-800"
-                aria-label={t("eval.close")}
+                aria-label={t("physicalTest.close")}
               >
                 <X className="h-5 w-5" />
               </button>
             </div>
             <p className="mb-3 text-[13px] text-zinc-500 dark:text-zinc-400">
-              {t("eval.wizardSubtitle", { date: wizardDate })}
+              {t("physicalTest.wizardSubtitle", { date: wizardDate })}
             </p>
 
             {evalError ? (
@@ -1295,7 +1295,7 @@ export function PlannerWeeksGrid({
 
             {evalMetrics.length === 0 ? (
               <p className="rounded-md border border-dashed border-zinc-300 p-4 text-center text-sm text-zinc-500 dark:border-zinc-700 dark:text-zinc-400">
-                {t("eval.noTests")}
+                {t("physicalTest.noTests")}
               </p>
             ) : (
               <ul className="flex max-h-64 flex-col gap-1 overflow-y-auto">
@@ -1328,10 +1328,10 @@ export function PlannerWeeksGrid({
             <div className="mt-4 flex items-center justify-between gap-2">
               <button
                 type="button"
-                onClick={() => router.push("/evaluation")}
+                onClick={() => router.push("/tracking")}
                 className="text-[13px] font-medium text-[var(--club-primary)] hover:underline"
               >
-                {t("eval.createTest")}
+                {t("physicalTest.createTest")}
               </button>
               <button
                 type="button"
@@ -1339,7 +1339,7 @@ export function PlannerWeeksGrid({
                 onClick={submitEval}
                 className="inline-flex items-center gap-2 rounded-md bg-[var(--club-primary)] px-3 py-1.5 text-[13px] font-semibold text-[var(--club-primary-foreground)] disabled:opacity-50"
               >
-                {t("eval.confirm")}
+                {t("physicalTest.confirm")}
               </button>
             </div>
           </div>

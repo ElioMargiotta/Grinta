@@ -6,7 +6,7 @@ import { createClient } from "@/lib/supabase/server";
 import {
   UNAVAILABILITY_KINDS,
   type UnavailabilityKind,
-} from "@/lib/medical/unavailability";
+} from "@/lib/availability/unavailability";
 
 /**
  * Indisponibilités joueur (blessure / maladie / suspension / autre).
@@ -83,6 +83,7 @@ export async function createUnavailabilityAction({
 
   if (error) return { error: error.message };
   revalidatePath(`/${locale}/contingent/${playerId}`);
+  revalidatePath(`/${locale}/contingent`);
   return { ok: true as const };
 }
 
@@ -124,6 +125,7 @@ export async function updateUnavailabilityAction({
 
   if (error) return { error: error.message };
   revalidatePath(`/${locale}/contingent/${playerId}`);
+  revalidatePath(`/${locale}/contingent`);
   return { ok: true as const };
 }
 
@@ -147,6 +149,7 @@ export async function deleteUnavailabilityAction({
 
   if (error) return { error: error.message };
   revalidatePath(`/${locale}/contingent/${playerId}`);
+  revalidatePath(`/${locale}/contingent`);
   return { ok: true as const };
 }
 
@@ -188,7 +191,7 @@ export async function declareUnavailabilityFromSessionAction({
   });
 
   if (error) return { error: error.message };
-  revalidatePath(`/${locale}/planner/${teamId}/sessions/${sessionId}/eval`);
+  revalidatePath(`/${locale}/planner/${teamId}/sessions/${sessionId}/test`);
   revalidatePath(`/${locale}/contingent/${playerId}`);
   return { ok: true as const };
 }

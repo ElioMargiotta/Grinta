@@ -1,13 +1,12 @@
 "use client";
 
-import { useMemo, useState, useTransition } from "react";
+import { useMemo, useState } from "react";
 import { useTranslations } from "next-intl";
 import {
   Activity,
   Archive,
   LineChart as LineChartIcon,
   Plus,
-  Settings2,
   Trash2,
   X,
 } from "lucide-react";
@@ -16,19 +15,12 @@ import { formatDay, todayISO } from "@/lib/contingent/week";
 import {
   fmt,
   MetricChart,
-  parseValue,
   type Point,
   Sparkline,
   type Trend,
   TrendArrow,
   trendOf,
 } from "@/components/physical/charts";
-import {
-  archiveMetricAction,
-  createMetricAction,
-  updateMetricAction,
-  upsertMeasurementAction,
-} from "@/app/[locale]/(app)/contingent/[playerId]/physical/actions";
 import type { MetricFields } from "@/lib/physical/defaultLibrary";
 
 export type { MetricFields };
@@ -155,33 +147,14 @@ export function metricFieldsFromDraft(draft: MetricDraft): MetricFields {
 }
 
 export function PhysicalTrackingSection({
-  playerId,
-  locale,
   metrics,
   measurements,
-  canManageMetrics,
-  canRecord,
 }: {
-  playerId: string;
-  locale: string;
   metrics: PhysicalMetric[];
   measurements: PhysicalMeasurement[];
-  canManageMetrics: boolean;
-  canRecord: boolean;
 }) {
   const t = useTranslations("contingent.physical");
-  const [pending, startTransition] = useTransition();
-  const [managerOpen, setManagerOpen] = useState(false);
   const [chartMetric, setChartMetric] = useState<PhysicalMetric | null>(null);
-  const [error, setError] = useState<string | null>(null);
-
-  const activeMetrics = useMemo(
-    () =>
-      metrics
-        .filter((m) => !m.archived)
-        .sort((a, b) => a.sort_order - b.sort_order || a.name.localeCompare(b.name)),
-    [metrics],
-  );
 
   // Index des mesures : `${metricId}|${date}` -> value
   const byKey = useMemo(() => {
@@ -202,194 +175,113 @@ export function PhysicalTrackingSection({
     return map;
   }, [measurements]);
 
-  // Colonnes = dates de test existantes. La saisie est pilotée par les évals
-  // (page Évaluation / planning) : pas d'ajout de date ad-hoc depuis la fiche.
+  // Lecture seule : on n'affiche QUE les tests ayant au moins une mesure pour ce
+  // joueur. La saisie passe exclusivement par les séances de test du planning.
+  const measuredMetricIds = useMemo(
+    () => new Set(measurements.map((m) => m.metric_id)),
+    [measurements],
+  );
+  const activeMetrics = useMemo(
+    () =>
+      metrics
+        .filter((m) => measuredMetricIds.has(m.id))
+        .sort((a, b) => a.sort_order - b.sort_order || a.name.localeCompare(b.name)),
+    [metrics, measuredMetricIds],
+  );
+
+  // Colonnes = dates de test existantes.
   const dates = useMemo(() => {
     const set = new Set<string>();
     for (const m of measurements) set.add(m.measured_on);
     return Array.from(set).sort();
   }, [measurements]);
 
-  function commitCell(metricId: string, date: string, raw: string) {
-    const value = parseValue(raw);
-    const prev = byKey.get(`${metricId}|${date}`) ?? null;
-    if (value === prev) return;
-    setError(null);
-    startTransition(async () => {
-      const res = await upsertMeasurementAction({
-        playerId,
-        locale,
-        metricId,
-        measuredOn: date,
-        value,
-        note: null,
-      });
-      if (res?.error) setError(res.error);
-    });
-  }
-
-  function saveMetric(metricDraft: MetricDraft) {
-    setError(null);
-    const fields = metricFieldsFromDraft(metricDraft);
-    startTransition(async () => {
-      const res = metricDraft.id
-        ? await updateMetricAction({ playerId, locale, metricId: metricDraft.id, fields })
-        : await createMetricAction({ playerId, locale, fields });
-      if (res?.error) setError(res.error);
-    });
-  }
-
-  function archiveMetric(metricId: string, archived: boolean) {
-    startTransition(async () => {
-      const res = await archiveMetricAction({ playerId, locale, metricId, archived });
-      if (res?.error) setError(res.error);
-    });
-  }
-
   const today = todayISO();
 
   return (
     <Section>
-      <div className="mb-4 flex items-center justify-between gap-3">
+      <div className="mb-4">
         <SectionHeader icon={Activity} title={t("title")} />
-        {canManageMetrics ? (
-          <button
-            type="button"
-            onClick={() => setManagerOpen(true)}
-            className="inline-flex items-center gap-2 rounded-md border border-[var(--club-line)] px-3 py-1.5 text-[13px] font-semibold text-zinc-700 hover:bg-zinc-50 dark:border-zinc-800 dark:text-zinc-200 dark:hover:bg-zinc-800/50"
-          >
-            <Settings2 className="h-4 w-4" />
-            {t("manage")}
-          </button>
-        ) : null}
       </div>
 
       <p className="mb-4 text-sm text-zinc-500 dark:text-zinc-400">{t("intro")}</p>
 
-      {error ? (
-        <div className="mb-4 rounded-md border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700 dark:border-red-900/50 dark:bg-red-950/30 dark:text-red-300">
-          {error}
-        </div>
-      ) : null}
-
       {activeMetrics.length === 0 ? (
         <div className="rounded-md border border-dashed border-[var(--club-line)] p-8 text-center">
           <p className="text-sm text-zinc-500 dark:text-zinc-400">{t("empty")}</p>
-          {canManageMetrics ? (
-            <button
-              type="button"
-              onClick={() => setManagerOpen(true)}
-              className="mt-3 inline-flex items-center gap-2 rounded-md bg-[var(--club-primary)] px-3 py-1.5 text-[13px] font-semibold text-[var(--club-primary-foreground)]"
-            >
-              <Plus className="h-4 w-4" />
-              {t("createFirst")}
-            </button>
-          ) : null}
         </div>
       ) : (
-        <>
-          {/* ---- Grille tests × dates ---- */}
-          {dates.length === 0 ? (
-            <div className="rounded-md border border-dashed border-[var(--club-line)] p-6 text-center text-sm text-zinc-500 dark:text-zinc-400">
-              {t("noDates")}
-            </div>
-          ) : (
-            <div className="overflow-x-auto">
-              <table className="w-full border-collapse text-sm">
-                <thead>
-                  <tr className="border-b border-[var(--club-line)] text-left">
-                    <th className="sticky left-0 z-10 bg-white py-2 pr-3 dark:bg-zinc-900" />
+        <div className="overflow-x-auto">
+          <table className="w-full border-collapse text-sm">
+            <thead>
+              <tr className="border-b border-[var(--club-line)] text-left">
+                <th className="sticky left-0 z-10 bg-white py-2 pr-3 dark:bg-zinc-900" />
+                {dates.map((d) => {
+                  const isToday = d === today;
+                  return (
+                    <th
+                      key={d}
+                      className={`px-2 py-2 text-center text-[11px] font-mono font-medium uppercase tracking-wide ${
+                        isToday ? "text-[var(--club-primary)]" : "text-zinc-500"
+                      }`}
+                    >
+                      {formatDay(d)}
+                    </th>
+                  );
+                })}
+                <th className="px-2 py-2 text-center text-[11px] font-medium uppercase tracking-wide text-zinc-400">
+                  {t("trend")}
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              {activeMetrics.map((metric) => {
+                const series = seriesByMetric.get(metric.id) ?? [];
+                return (
+                  <tr key={metric.id} className="border-b border-[var(--club-line)]/60">
+                    <td className="sticky left-0 z-10 bg-white py-2 pr-3 dark:bg-zinc-900">
+                      <button
+                        type="button"
+                        onClick={() => setChartMetric(metric)}
+                        title={t("viewChart")}
+                        className="group flex items-center gap-1.5 text-left"
+                      >
+                        <span className="font-medium text-zinc-900 group-hover:text-[var(--club-primary)] dark:text-zinc-100">
+                          {metric.name}
+                        </span>
+                        <LineChartIcon className="h-3.5 w-3.5 text-zinc-300 group-hover:text-[var(--club-primary)]" />
+                      </button>
+                      {(metric.unit || metric.category) && (
+                        <div className="text-[11px] text-zinc-400">
+                          {[metric.category, metric.unit].filter(Boolean).join(" · ")}
+                        </div>
+                      )}
+                    </td>
                     {dates.map((d) => {
+                      const key = `${metric.id}|${d}`;
+                      const val = byKey.get(key) ?? null;
                       const isToday = d === today;
                       return (
-                        <th
+                        <td
                           key={d}
-                          className={`px-2 py-2 text-center text-[11px] font-mono font-medium uppercase tracking-wide ${
-                            isToday ? "text-[var(--club-primary)]" : "text-zinc-500"
-                          }`}
+                          className={`px-1 py-1 text-center ${isToday ? "bg-[var(--club-primary)]/5" : ""}`}
                         >
-                          {formatDay(d)}
-                        </th>
+                          <span className="font-mono tabular-nums text-zinc-700 dark:text-zinc-300">
+                            {fmt(val) || "—"}
+                          </span>
+                        </td>
                       );
                     })}
-                    <th className="px-2 py-2 text-center text-[11px] font-medium uppercase tracking-wide text-zinc-400">
-                      {t("trend")}
-                    </th>
+                    <td className="px-2 py-1">
+                      <Sparkline points={series} higherIsBetter={metric.higher_is_better} />
+                    </td>
                   </tr>
-                </thead>
-                <tbody>
-                  {activeMetrics.map((metric) => {
-                    const series = seriesByMetric.get(metric.id) ?? [];
-                    return (
-                      <tr key={metric.id} className="border-b border-[var(--club-line)]/60">
-                        <td className="sticky left-0 z-10 bg-white py-2 pr-3 dark:bg-zinc-900">
-                          <button
-                            type="button"
-                            onClick={() => setChartMetric(metric)}
-                            title={t("viewChart")}
-                            className="group flex items-center gap-1.5 text-left"
-                          >
-                            <span className="font-medium text-zinc-900 group-hover:text-[var(--club-primary)] dark:text-zinc-100">
-                              {metric.name}
-                            </span>
-                            <LineChartIcon className="h-3.5 w-3.5 text-zinc-300 group-hover:text-[var(--club-primary)]" />
-                          </button>
-                          {(metric.unit || metric.category) && (
-                            <div className="text-[11px] text-zinc-400">
-                              {[metric.category, metric.unit].filter(Boolean).join(" · ")}
-                            </div>
-                          )}
-                        </td>
-                        {dates.map((d) => {
-                          const key = `${metric.id}|${d}`;
-                          const val = byKey.get(key) ?? null;
-                          const isToday = d === today;
-                          return (
-                            <td
-                              key={d}
-                              className={`px-1 py-1 text-center ${isToday ? "bg-[var(--club-primary)]/5" : ""}`}
-                            >
-                              {canRecord ? (
-                                <input
-                                  type="text"
-                                  inputMode="decimal"
-                                  key={key}
-                                  defaultValue={fmt(val)}
-                                  disabled={pending}
-                                  onBlur={(e) => commitCell(metric.id, d, e.target.value)}
-                                  className="w-16 rounded-md border border-transparent bg-zinc-50 px-2 py-1 text-center font-mono tabular-nums text-zinc-900 hover:border-[var(--club-line)] focus:border-[var(--club-primary)] focus:bg-white focus:outline-none dark:bg-zinc-800/50 dark:text-zinc-100 dark:focus:bg-zinc-800"
-                                />
-                              ) : (
-                                <span className="font-mono tabular-nums text-zinc-700 dark:text-zinc-300">
-                                  {fmt(val) || "—"}
-                                </span>
-                              )}
-                            </td>
-                          );
-                        })}
-                        <td className="px-2 py-1">
-                          <Sparkline points={series} higherIsBetter={metric.higher_is_better} />
-                        </td>
-                      </tr>
-                    );
-                  })}
-                </tbody>
-              </table>
-            </div>
-          )}
-        </>
+                );
+              })}
+            </tbody>
+          </table>
+        </div>
       )}
-
-      {managerOpen ? (
-        <MetricManager
-          t={t}
-          metrics={metrics}
-          pending={pending}
-          onClose={() => setManagerOpen(false)}
-          onSave={saveMetric}
-          onArchive={archiveMetric}
-        />
-      ) : null}
 
       {chartMetric ? (
         <ChartModal

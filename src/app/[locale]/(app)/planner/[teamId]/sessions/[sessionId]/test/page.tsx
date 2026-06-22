@@ -15,7 +15,7 @@ import {
   type PlayerAvailability,
   type Unavailability,
   type UnavailabilityKind,
-} from "@/lib/medical/unavailability";
+} from "@/lib/availability/unavailability";
 
 type AssignmentRow = {
   player_id: string;
@@ -39,7 +39,7 @@ type AttendanceDbRow = {
   player_id: string;
   announced_status: "present" | "absent" | null;
   announced_reason: string | null;
-  actual_status: "present" | "absent" | null;
+  actual_status: "present" | "absent" | "injured" | null;
 };
 
 function formatDate(iso: string, locale: string) {
@@ -55,7 +55,7 @@ function formatDate(iso: string, locale: string) {
   }
 }
 
-export default async function SessionEvalPage({
+export default async function SessionTestPage({
   params,
 }: {
   params: Promise<{ locale: string; teamId: string; sessionId: string }>;
@@ -63,7 +63,7 @@ export default async function SessionEvalPage({
   const { locale, teamId, sessionId } = await params;
   setRequestLocale(locale);
   const { supabase, membership } = await requireMembership(locale);
-  const t = await getTranslations("planner.eval");
+  const t = await getTranslations("planner.physicalTest");
   const currentLocale = await getLocale();
   const canRecordPhysical = membership.access_level !== "team_readonly";
 
@@ -145,8 +145,8 @@ export default async function SessionEvalPage({
   const testResults = resultRows ?? [];
 
   // Disponibilité par joueur à la date de l'éval : périodes médicales (couvrant
-  // la date) + présence saisie pour la séance. Source de vérité = lib/medical.
-  const evalDate = session.date as string;
+  // la date) + présence saisie pour la séance. Source de vérité = lib/availability.
+  const testDate = session.date as string;
   const playerIds = testPlayers.map((p) => p.playerId);
   const [{ data: unavailRows }, { data: attendanceRows }] = playerIds.length
     ? await Promise.all([
@@ -154,8 +154,8 @@ export default async function SessionEvalPage({
           .from("player_unavailability")
           .select("player_id, kind, reason, start_date, end_date")
           .in("player_id", playerIds)
-          .lte("start_date", evalDate)
-          .or(`end_date.is.null,end_date.gte.${evalDate}`)
+          .lte("start_date", testDate)
+          .or(`end_date.is.null,end_date.gte.${testDate}`)
           .returns<UnavailabilityDbRow[]>(),
         supabase
           .from("session_attendances")
@@ -190,13 +190,10 @@ export default async function SessionEvalPage({
     const att = attendanceByPlayer.get(p.playerId);
     availability[p.playerId] = resolveAvailability({
       unavailabilities: unavailByPlayer.get(p.playerId) ?? [],
-      date: evalDate,
-      attendance: att
-        ? {
-            status: att.actual_status ?? att.announced_status,
-            reason: att.announced_reason,
-          }
-        : null,
+      date: testDate,
+      actualStatus: att?.actual_status ?? null,
+      announcedStatus: att?.announced_status ?? null,
+      announcedReason: att?.announced_reason ?? null,
     });
   }
 
@@ -229,7 +226,6 @@ export default async function SessionEvalPage({
           attachedIds={attachedTestIds}
           results={testResults}
           availability={availability}
-          evalDate={evalDate}
           canRecord={canRecordPhysical}
         />
       </Card>

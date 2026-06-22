@@ -2,8 +2,8 @@
 
 import { useMemo, useState, useTransition } from "react";
 import { useTranslations } from "next-intl";
-import { Activity, ChevronDown, ChevronRight, LineChart as LineChartIcon, Plus, Settings2, Trash2, X } from "lucide-react";
-import { Link, useRouter } from "@/i18n/navigation";
+import { Activity, ChevronDown, ChevronRight, Download, LineChart as LineChartIcon, Plus, Settings2, Trash2, X } from "lucide-react";
+import { Link } from "@/i18n/navigation";
 import { Section, SectionHeader } from "@/components/ui/Section";
 import { formatDay } from "@/lib/contingent/week";
 import {
@@ -23,9 +23,10 @@ import {
   archiveClubMetricAction,
   createClubMetricAction,
   deleteClubMetricAction,
-  deletePhysicalEvalAction,
+  deletePhysicalTestAction,
   updateClubMetricAction,
-} from "@/app/[locale]/(app)/evaluation/actions";
+} from "@/app/[locale]/(app)/tracking/actions";
+import { createPhysicalTestAction } from "@/app/[locale]/(app)/planner/actions";
 
 export type HubPlayer = {
   id: string;
@@ -46,6 +47,8 @@ export type HubEval = {
   teamName: string;
   date: string;
   testCount: number;
+  /** Taux de complétion des saisies (0–1). */
+  completion: number;
 };
 
 type Period = "all" | "12m" | "6m" | "3m";
@@ -87,13 +90,12 @@ export function PhysicalHubView({
 }) {
   const t = useTranslations("physicalHub");
   const tm = useTranslations("contingent.physical");
-  const router = useRouter();
   const [pending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
   const [managerOpen, setManagerOpen] = useState(false);
   const [protocolOpen, setProtocolOpen] = useState(false);
   const [chartPlayerId, setChartPlayerId] = useState<string | null>(null);
-  const [evalPickerOpen, setEvalPickerOpen] = useState(false);
+  const [createEvalOpen, setCreateEvalOpen] = useState(false);
 
   const activeMetrics = useMemo(
     () =>
@@ -232,9 +234,56 @@ export function PhysicalHubView({
     if (!window.confirm(t("evals.deleteConfirm"))) return;
     setError(null);
     startTransition(async () => {
-      const res = await deletePhysicalEvalAction({ locale, sessionId: id });
+      const res = await deletePhysicalTestAction({ locale, sessionId: id });
       if (res?.error) setError(res.error);
     });
+  }
+
+  function createEval(teamId: string, date: string, metricIds: string[]) {
+    setError(null);
+    startTransition(async () => {
+      // Succès → redirection serveur vers la page de saisie de l'éval.
+      const res = await createPhysicalTestAction({ locale, teamId, date, metricIds });
+      if (res?.error) setError(res.error);
+      else setCreateEvalOpen(false);
+    });
+  }
+
+  // Couleur de la valeur selon le seuil d'alerte (prioritaire) puis vs moyenne.
+  function valueClass(value: number): string {
+    if (!metric) return "text-zinc-900 dark:text-zinc-100";
+    const thr = metric.alert_threshold;
+    if (thr !== null && thr !== undefined) {
+      const beyond = metric.higher_is_better ? value < thr : value > thr;
+      if (beyond) return "text-red-600 dark:text-red-400";
+    }
+    if (stats) {
+      const better = metric.higher_is_better ? value >= stats.avg : value <= stats.avg;
+      return better
+        ? "text-emerald-600 dark:text-emerald-400"
+        : "text-zinc-500 dark:text-zinc-400";
+    }
+    return "text-zinc-900 dark:text-zinc-100";
+  }
+
+  function exportCsv() {
+    if (!metric) return;
+    const header = [t("col.player"), t("col.value"), "Δ", t("col.date"), t("col.tests")];
+    const lines = ranking.map((r) =>
+      [r.name, r.latest, r.delta ?? "", r.latestDate, r.count]
+        .map((c) => `"${String(c).replace(/"/g, '""')}"`)
+        .join(","),
+    );
+    const csv = [header.join(","), ...lines].join("\n");
+    const blob = new Blob([`﻿${csv}`], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `${metric.name.replace(/[^\w-]+/g, "_")}_${new Date()
+      .toISOString()
+      .slice(0, 10)}.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
   }
 
   function categoryLabel(cat: string): string {
@@ -357,39 +406,14 @@ export function PhysicalHubView({
 
           <div className="ml-auto flex items-center gap-2">
             {canManageMetrics && teams.length > 0 ? (
-              <div className="relative">
-                <button
-                  type="button"
-                  onClick={() => setEvalPickerOpen((v) => !v)}
-                  className="inline-flex items-center gap-2 rounded-md bg-[var(--club-primary)] px-3 py-1.5 text-[13px] font-semibold text-[var(--club-primary-foreground)]"
-                >
-                  <Plus className="h-4 w-4" />
-                  {t("createEval")}
-                </button>
-                {evalPickerOpen ? (
-                  <div className="absolute right-0 z-20 mt-1 w-56 rounded-md border border-[var(--club-line)] bg-white p-1 shadow-lg dark:border-zinc-800 dark:bg-zinc-900">
-                    <div className="px-2 py-1.5 text-[11px] font-medium uppercase tracking-wide text-zinc-400">
-                      {t("pickTeam")}
-                    </div>
-                    {teams.map((tm2) => (
-                      <button
-                        key={tm2.id}
-                        type="button"
-                        onClick={() => {
-                          setEvalPickerOpen(false);
-                          router.push({
-                            pathname: `/planner/${tm2.id}`,
-                            query: { view: "weekly", placeEval: "1" },
-                          });
-                        }}
-                        className="block w-full rounded px-2 py-1.5 text-left text-[13px] text-zinc-700 hover:bg-zinc-100 dark:text-zinc-200 dark:hover:bg-zinc-800"
-                      >
-                        {tm2.name}
-                      </button>
-                    ))}
-                  </div>
-                ) : null}
-              </div>
+              <button
+                type="button"
+                onClick={() => setCreateEvalOpen(true)}
+                className="inline-flex items-center gap-2 rounded-md bg-[var(--club-primary)] px-3 py-1.5 text-[13px] font-semibold text-[var(--club-primary-foreground)]"
+              >
+                <Plus className="h-4 w-4" />
+                {t("createEval")}
+              </button>
             ) : null}
             {canManageMetrics ? (
               <button
@@ -419,7 +443,7 @@ export function PhysicalHubView({
                 className="flex items-center gap-1 pr-2 hover:bg-zinc-50 dark:hover:bg-zinc-900/60"
               >
                 <Link
-                  href={`/planner/${e.teamId}/sessions/${e.id}/eval`}
+                  href={`/planner/${e.teamId}/sessions/${e.id}/test`}
                   className="flex flex-1 items-center justify-between gap-3 px-4 py-2.5"
                 >
                   <span className="flex items-center gap-2">
@@ -433,8 +457,19 @@ export function PhysicalHubView({
                     <span className="text-[12px] text-zinc-500">
                       {t("evals.testCount", { count: e.testCount })}
                     </span>
+                    <span
+                      className={`inline-flex items-center gap-1.5 rounded-full px-2 py-0.5 text-[11px] font-semibold tabular-nums ${
+                        e.completion >= 1
+                          ? "bg-emerald-50 text-emerald-700 dark:bg-emerald-950/30 dark:text-emerald-300"
+                          : e.completion > 0
+                            ? "bg-amber-50 text-amber-700 dark:bg-amber-950/30 dark:text-amber-300"
+                            : "bg-zinc-100 text-zinc-500 dark:bg-zinc-800 dark:text-zinc-400"
+                      }`}
+                    >
+                      {Math.round(e.completion * 100)}%
+                    </span>
                     <span className="text-[12px] font-semibold text-[var(--club-primary)]">
-                      {t("evals.enter")}
+                      {e.completion >= 1 ? t("evals.view") : t("evals.enter")}
                     </span>
                   </span>
                 </Link>
@@ -560,7 +595,19 @@ export function PhysicalHubView({
                   <h3 className="text-sm font-semibold tracking-tight text-zinc-900 dark:text-zinc-100">
                     {t("ranking")}
                   </h3>
-                  <span className="text-[11px] text-zinc-400">{t("clickRowHint")}</span>
+                  <div className="flex items-center gap-3">
+                    <span className="hidden text-[11px] text-zinc-400 sm:inline">
+                      {t("clickRowHint")}
+                    </span>
+                    <button
+                      type="button"
+                      onClick={exportCsv}
+                      className="inline-flex items-center gap-1.5 rounded-md border border-[var(--club-line)] px-2.5 py-1 text-[12px] font-semibold text-zinc-600 hover:bg-zinc-50 dark:border-zinc-700 dark:text-zinc-300 dark:hover:bg-zinc-800"
+                    >
+                      <Download className="h-3.5 w-3.5" />
+                      {t("exportCsv")}
+                    </button>
+                  </div>
                 </div>
                 <div className="overflow-x-auto">
                   <table className="w-full text-sm">
@@ -586,7 +633,9 @@ export function PhysicalHubView({
                           <td className="px-3 py-2 font-medium text-zinc-900 dark:text-zinc-100">
                             {r.name}
                           </td>
-                          <td className="px-3 py-2 text-right font-mono tabular-nums text-zinc-900 dark:text-zinc-100">
+                          <td
+                            className={`px-3 py-2 text-right font-mono font-semibold tabular-nums ${valueClass(r.latest)}`}
+                          >
                             {r.latest}
                           </td>
                           <td className="px-3 py-2">
@@ -645,6 +694,149 @@ export function PhysicalHubView({
           onDelete={deleteMetric}
         />
       ) : null}
+
+      {createEvalOpen ? (
+        <EvalCreateModal
+          t={t}
+          teams={teams}
+          metrics={activeMetrics}
+          pending={pending}
+          onClose={() => setCreateEvalOpen(false)}
+          onSubmit={createEval}
+        />
+      ) : null}
+    </div>
+  );
+}
+
+function EvalCreateModal({
+  t,
+  teams,
+  metrics,
+  pending,
+  onClose,
+  onSubmit,
+}: {
+  t: ReturnType<typeof useTranslations>;
+  teams: { id: string; name: string }[];
+  metrics: PhysicalMetric[];
+  pending: boolean;
+  onClose: () => void;
+  onSubmit: (teamId: string, date: string, metricIds: string[]) => void;
+}) {
+  const today = new Date().toISOString().slice(0, 10);
+  const [teamId, setTeamId] = useState(teams[0]?.id ?? "");
+  const [date, setDate] = useState(today);
+  const [selected, setSelected] = useState<Set<string>>(
+    () => new Set(metrics.map((m) => m.id)),
+  );
+
+  const toggle = (id: string) =>
+    setSelected((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+
+  const canSubmit = teamId && date && selected.size > 0 && !pending;
+
+  return (
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4"
+      onClick={onClose}
+    >
+      <div
+        className="max-h-[90vh] w-full max-w-md overflow-y-auto rounded-lg border border-[var(--club-line)] bg-white p-5 shadow-xl dark:border-zinc-800 dark:bg-zinc-900"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <div className="mb-4 flex items-center justify-between">
+          <h3 className="text-base font-semibold text-zinc-900 dark:text-zinc-100">
+            {t("createEval")}
+          </h3>
+          <button
+            type="button"
+            onClick={onClose}
+            className="rounded-md p-1 text-zinc-400 hover:bg-zinc-100 hover:text-zinc-700 dark:hover:bg-zinc-800"
+            aria-label={t("evalForm.cancel")}
+          >
+            <X className="h-5 w-5" />
+          </button>
+        </div>
+
+        <div className="flex flex-col gap-3">
+          <label className="flex flex-col gap-1 text-[11px] font-medium uppercase tracking-wide text-zinc-500">
+            {t("pickTeam")}
+            <select
+              value={teamId}
+              onChange={(e) => setTeamId(e.target.value)}
+              className="rounded-md border border-[var(--club-line)] bg-white px-2.5 py-1.5 text-[13px] text-zinc-900 dark:bg-zinc-900 dark:text-zinc-100"
+            >
+              {teams.map((tm2) => (
+                <option key={tm2.id} value={tm2.id}>
+                  {tm2.name}
+                </option>
+              ))}
+            </select>
+          </label>
+
+          <label className="flex flex-col gap-1 text-[11px] font-medium uppercase tracking-wide text-zinc-500">
+            {t("evalForm.date")}
+            <input
+              type="date"
+              value={date}
+              onChange={(e) => setDate(e.target.value)}
+              className="rounded-md border border-[var(--club-line)] bg-white px-2.5 py-1.5 text-[13px] text-zinc-900 dark:bg-zinc-900 dark:text-zinc-100"
+            />
+          </label>
+
+          <div className="flex flex-col gap-1">
+            <span className="text-[11px] font-medium uppercase tracking-wide text-zinc-500">
+              {t("evalForm.tests")} ({selected.size})
+            </span>
+            <div className="max-h-48 overflow-y-auto rounded-md border border-[var(--club-line)] p-1">
+              {metrics.length === 0 ? (
+                <p className="p-2 text-[12px] text-zinc-400">{t("emptyMetrics")}</p>
+              ) : (
+                metrics.map((m) => (
+                  <label
+                    key={m.id}
+                    className="flex items-center gap-2 rounded px-2 py-1.5 text-[13px] text-zinc-700 hover:bg-zinc-50 dark:text-zinc-200 dark:hover:bg-zinc-800/50"
+                  >
+                    <input
+                      type="checkbox"
+                      checked={selected.has(m.id)}
+                      onChange={() => toggle(m.id)}
+                    />
+                    {m.name}
+                    {m.unit ? (
+                      <span className="text-zinc-400">({m.unit})</span>
+                    ) : null}
+                  </label>
+                ))
+              )}
+            </div>
+          </div>
+        </div>
+
+        <div className="mt-5 flex justify-end gap-2">
+          <button
+            type="button"
+            onClick={onClose}
+            className="rounded-md border border-[var(--club-line)] px-3 py-1.5 text-[13px] font-semibold text-zinc-700 hover:bg-zinc-50 dark:text-zinc-200 dark:hover:bg-zinc-800/50"
+          >
+            {t("evalForm.cancel")}
+          </button>
+          <button
+            type="button"
+            disabled={!canSubmit}
+            onClick={() => onSubmit(teamId, date, Array.from(selected))}
+            className="rounded-md bg-[var(--club-primary)] px-3 py-1.5 text-[13px] font-semibold text-[var(--club-primary-foreground)] disabled:opacity-50"
+          >
+            {t("evalForm.submit")}
+          </button>
+        </div>
+      </div>
     </div>
   );
 }

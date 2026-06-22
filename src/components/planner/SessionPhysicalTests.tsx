@@ -2,18 +2,22 @@
 
 import { useMemo, useState, useTransition } from "react";
 import { useTranslations } from "next-intl";
-import { Activity, Info, X } from "lucide-react";
+import { Activity, Check, HeartPulse, Info, X } from "lucide-react";
 import {
   attachTestToSessionAction,
   detachTestFromSessionAction,
   recordSessionMeasurementAction,
+  setTestAttendanceAction,
 } from "@/app/[locale]/(app)/contingent/[playerId]/physical/actions";
-import { declareUnavailabilityFromSessionAction } from "@/app/[locale]/(app)/contingent/[playerId]/medical/actions";
-import { KindBadge } from "@/components/contingent/MedicalSection";
-import {
-  UNAVAILABILITY_KINDS,
-  type PlayerAvailability,
-} from "@/lib/medical/unavailability";
+import type { PlayerAvailability } from "@/lib/availability/unavailability";
+
+type EvalStatus = "present" | "absent" | "injured";
+
+function statusFromAvailability(a: PlayerAvailability): EvalStatus {
+  if (a.status === "available") return "present";
+  if (a.status === "absent") return "absent";
+  return "injured";
+}
 
 export type SessionTestMetric = {
   id: string;
@@ -57,7 +61,6 @@ export function SessionPhysicalTests({
   attachedIds,
   results,
   availability = {},
-  evalDate,
   canRecord,
 }: {
   locale: string;
@@ -68,12 +71,22 @@ export function SessionPhysicalTests({
   attachedIds: string[];
   results: SessionTestResult[];
   availability?: Record<string, PlayerAvailability>;
-  evalDate: string;
   canRecord: boolean;
 }) {
   const t = useTranslations("attendance.physicalTests");
-  const tMed = useTranslations("medical");
+  const tMed = useTranslations("availability");
   const [pending, startTransition] = useTransition();
+  // Statut éditable par joueur (override de séance), initialisé depuis la dispo
+  // dérivée (période médicale / RSVP). Optimiste puis persistance serveur.
+  const [statusMap, setStatusMap] = useState<Map<string, EvalStatus>>(
+    () =>
+      new Map(
+        players.map((p) => [
+          p.playerId,
+          statusFromAvailability(availability[p.playerId] ?? { status: "available" }),
+        ]),
+      ),
+  );
   const [error, setError] = useState<string | null>(null);
   const [picker, setPicker] = useState("");
   const [openProtocol, setOpenProtocol] = useState<string | null>(null);
@@ -130,17 +143,16 @@ export function SessionPhysicalTests({
     });
   }
 
-  function declare(playerId: string, kind: string) {
-    if (!kind) return;
+  function setStatus(playerId: string, status: EvalStatus) {
     setError(null);
+    setStatusMap((prev) => new Map(prev).set(playerId, status));
     startTransition(async () => {
-      const res = await declareUnavailabilityFromSessionAction({
+      const res = await setTestAttendanceAction({
         locale,
         teamId,
         sessionId,
         playerId,
-        kind,
-        startDate: evalDate,
+        status,
       });
       if (res?.error) setError(res.error);
     });
@@ -231,6 +243,7 @@ export function SessionPhysicalTests({
               <thead className="bg-zinc-50 text-left text-[11px] uppercase tracking-widest text-zinc-500 dark:bg-zinc-900 dark:text-zinc-400">
                 <tr>
                   <th className="px-3 py-2">{t("colPlayer")}</th>
+                  <th className="px-3 py-2">{t("colStatus")}</th>
                   {attached.map((m) => (
                     <th key={m.id} className="px-3 py-2 text-center">
                       <div className="flex items-center justify-center gap-1">
@@ -253,13 +266,17 @@ export function SessionPhysicalTests({
                       </div>
                     </th>
                   ))}
-                  {canRecord ? <th className="px-2 py-2" /> : null}
                 </tr>
               </thead>
               <tbody className="divide-y divide-zinc-200 dark:divide-zinc-800">
                 {players.map((p) => {
                   const avail = availability[p.playerId] ?? { status: "available" };
-                  const unavailable = avail.status !== "available";
+                  const status = statusMap.get(p.playerId) ?? statusFromAvailability(avail);
+                  const present = status === "present";
+                  const periodKindLabel =
+                    status === "injured" && avail.status === "unavailable"
+                      ? tMed(`kind.${avail.kind}`)
+                      : null;
                   return (
                     <tr key={p.playerId} className="bg-white dark:bg-zinc-950">
                       <td className="px-3 py-2">
@@ -271,91 +288,76 @@ export function SessionPhysicalTests({
                           )}
                           <span
                             className={
-                              unavailable
-                                ? "font-medium text-zinc-400 line-through dark:text-zinc-500"
-                                : "font-medium text-zinc-900 dark:text-zinc-100"
+                              present
+                                ? "font-medium text-zinc-900 dark:text-zinc-100"
+                                : "font-medium text-zinc-400 line-through dark:text-zinc-500"
                             }
                           >
                             {p.fullName}
                           </span>
                         </div>
                       </td>
-                      {unavailable ? (
-                        <td
-                          colSpan={attached.length}
-                          className="px-3 py-2 text-left"
-                        >
-                          <div className="flex flex-wrap items-center gap-2">
-                            {avail.status === "unavailable" ? (
-                              <KindBadge
-                                kind={avail.kind}
-                                label={tMed(`kind.${avail.kind}`)}
+                      <td className="px-3 py-2">
+                        <StatusControl
+                          status={status}
+                          canRecord={canRecord}
+                          pending={pending}
+                          periodKindLabel={periodKindLabel}
+                          reason={avail.status !== "available" ? avail.reason : null}
+                          labels={{
+                            present: t("statusPresent"),
+                            absent: t("statusAbsent"),
+                            injured: t("statusInjured"),
+                          }}
+                          onChange={(s) => setStatus(p.playerId, s)}
+                        />
+                      </td>
+                      {attached.map((m) => {
+                        const key = `${p.playerId}|${m.id}`;
+                        const val = byKey.get(key) ?? null;
+                        return (
+                          <td key={m.id} className="px-2 py-1 text-center">
+                            {!present ? (
+                              <span className="text-zinc-300 dark:text-zinc-600">—</span>
+                            ) : canRecord ? (
+                              <input
+                                type="text"
+                                inputMode="decimal"
+                                key={key}
+                                defaultValue={fmt(val)}
+                                disabled={pending}
+                                onBlur={(e) => commit(p.playerId, m.id, e.target.value)}
+                                onKeyDown={(e) => {
+                                  // Entrée → valide (blur) et passe à la cellule suivante.
+                                  if (e.key === "Enter") {
+                                    e.preventDefault();
+                                    const table = e.currentTarget.closest("table");
+                                    const inputs = table
+                                      ? Array.from(
+                                          table.querySelectorAll<HTMLInputElement>("input.eval-input"),
+                                        )
+                                      : [];
+                                    const idx = inputs.indexOf(e.currentTarget);
+                                    inputs[idx + 1]?.focus();
+                                  }
+                                }}
+                                placeholder="—"
+                                className="eval-input w-16 rounded-md border border-transparent bg-zinc-50 px-2 py-1 text-center font-mono tabular-nums text-zinc-900 hover:border-zinc-300 focus:border-[var(--club-primary)] focus:bg-white focus:outline-none dark:bg-zinc-800/50 dark:text-zinc-100 dark:focus:bg-zinc-800"
                               />
                             ) : (
-                              <span className="inline-flex items-center gap-1 rounded-full bg-zinc-100 px-2 py-0.5 text-[11px] font-semibold text-zinc-600 dark:bg-zinc-800 dark:text-zinc-300">
-                                {t("absent")}
+                              <span className="font-mono tabular-nums text-zinc-700 dark:text-zinc-300">
+                                {fmt(val) || "—"}
                               </span>
                             )}
-                            {avail.reason ? (
-                              <span className="text-[12px] italic text-zinc-400">
-                                {avail.reason}
-                              </span>
-                            ) : null}
-                          </div>
-                        </td>
-                      ) : (
-                        attached.map((m) => {
-                          const key = `${p.playerId}|${m.id}`;
-                          const val = byKey.get(key) ?? null;
-                          return (
-                            <td key={m.id} className="px-2 py-1 text-center">
-                              {canRecord ? (
-                                <input
-                                  type="text"
-                                  inputMode="decimal"
-                                  key={key}
-                                  defaultValue={fmt(val)}
-                                  disabled={pending}
-                                  onBlur={(e) => commit(p.playerId, m.id, e.target.value)}
-                                  placeholder="—"
-                                  className="w-16 rounded-md border border-transparent bg-zinc-50 px-2 py-1 text-center font-mono tabular-nums text-zinc-900 hover:border-zinc-300 focus:border-[var(--club-primary)] focus:bg-white focus:outline-none dark:bg-zinc-800/50 dark:text-zinc-100 dark:focus:bg-zinc-800"
-                                />
-                              ) : (
-                                <span className="font-mono tabular-nums text-zinc-700 dark:text-zinc-300">
-                                  {fmt(val) || "—"}
-                                </span>
-                              )}
-                            </td>
-                          );
-                        })
-                      )}
-                      {canRecord ? (
-                        <td className="px-2 py-1 text-right">
-                          {unavailable ? null : (
-                            <select
-                              value=""
-                              disabled={pending}
-                              onChange={(e) => declare(p.playerId, e.target.value)}
-                              title={t("declareUnavailable")}
-                              aria-label={t("declareUnavailable")}
-                              className="rounded-md border border-zinc-200 bg-white px-1.5 py-1 text-[11px] text-zinc-500 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-400"
-                            >
-                              <option value="">{t("declareUnavailable")}</option>
-                              {UNAVAILABILITY_KINDS.map((k) => (
-                                <option key={k} value={k}>
-                                  {tMed(`kind.${k}`)}
-                                </option>
-                              ))}
-                            </select>
-                          )}
-                        </td>
-                      ) : null}
+                          </td>
+                        );
+                      })}
                     </tr>
                   );
                 })}
                 {players.length === 0 && (
                   <tr>
-                    <td colSpan={attached.length + (canRecord ? 2 : 1)} className="px-3 py-6 text-center text-zinc-500">
+                    <td colSpan={attached.length + 2} className="px-3 py-6 text-center text-zinc-500">
                       {t("emptyRoster")}
                     </td>
                   </tr>
@@ -365,6 +367,83 @@ export function SessionPhysicalTests({
           </div>
         </>
       )}
+    </div>
+  );
+}
+
+function StatusControl({
+  status,
+  canRecord,
+  pending,
+  periodKindLabel,
+  reason,
+  labels,
+  onChange,
+}: {
+  status: EvalStatus;
+  canRecord: boolean;
+  pending: boolean;
+  periodKindLabel: string | null;
+  reason: string | null;
+  labels: { present: string; absent: string; injured: string };
+  onChange: (status: EvalStatus) => void;
+}) {
+  const options: { value: EvalStatus; label: string; icon: typeof Check; tone: string }[] = [
+    { value: "present", label: labels.present, icon: Check, tone: "emerald" },
+    { value: "absent", label: labels.absent, icon: X, tone: "red" },
+    { value: "injured", label: labels.injured, icon: HeartPulse, tone: "amber" },
+  ];
+
+  if (!canRecord) {
+    const cur = options.find((o) => o.value === status) ?? options[0];
+    const Icon = cur.icon;
+    return (
+      <span className="inline-flex items-center gap-1.5 text-[12px] text-zinc-600 dark:text-zinc-300">
+        <Icon className="h-3.5 w-3.5" />
+        {periodKindLabel ?? cur.label}
+        {reason ? <span className="italic text-zinc-400">· {reason}</span> : null}
+      </span>
+    );
+  }
+
+  const toneActive: Record<string, string> = {
+    emerald: "bg-emerald-600 text-white border-emerald-600",
+    red: "bg-red-600 text-white border-red-600",
+    amber: "bg-amber-500 text-white border-amber-500",
+  };
+
+  return (
+    <div className="flex items-center gap-2">
+      <div className="inline-flex overflow-hidden rounded-md border border-zinc-200 dark:border-zinc-700">
+        {options.map((o, i) => {
+          const Icon = o.icon;
+          const active = status === o.value;
+          return (
+            <button
+              key={o.value}
+              type="button"
+              disabled={pending}
+              onClick={() => onChange(o.value)}
+              title={o.label}
+              aria-label={o.label}
+              aria-pressed={active}
+              className={`flex h-7 w-7 items-center justify-center transition-colors disabled:opacity-50 ${
+                i > 0 ? "border-l border-zinc-200 dark:border-zinc-700" : ""
+              } ${
+                active
+                  ? toneActive[o.tone]
+                  : "bg-white text-zinc-400 hover:bg-zinc-50 dark:bg-zinc-900 dark:hover:bg-zinc-800"
+              }`}
+            >
+              <Icon className="h-3.5 w-3.5" />
+            </button>
+          );
+        })}
+      </div>
+      {periodKindLabel && status === "injured" ? (
+        <span className="text-[11px] text-zinc-400">{periodKindLabel}</span>
+      ) : null}
+      {reason ? <span className="text-[11px] italic text-zinc-400">{reason}</span> : null}
     </div>
   );
 }

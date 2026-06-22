@@ -10,12 +10,12 @@ import {
   type Unavailability,
   type UnavailabilityKind,
   coversDate,
-} from "@/lib/medical/unavailability";
+} from "@/lib/availability/unavailability";
 import {
   createUnavailabilityAction,
   deleteUnavailabilityAction,
   updateUnavailabilityAction,
-} from "@/app/[locale]/(app)/contingent/[playerId]/medical/actions";
+} from "@/app/[locale]/(app)/contingent/[playerId]/availability/actions";
 
 type Draft = {
   id?: string;
@@ -39,7 +39,7 @@ function draftFrom(u: Unavailability): Draft {
   };
 }
 
-export function MedicalSection({
+export function AvailabilitySection({
   playerId,
   locale,
   unavailabilities,
@@ -50,7 +50,7 @@ export function MedicalSection({
   unavailabilities: Unavailability[];
   canManage: boolean;
 }) {
-  const t = useTranslations("medical");
+  const t = useTranslations("availability");
   const [pending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
   const [draft, setDraft] = useState<Draft | null>(null);

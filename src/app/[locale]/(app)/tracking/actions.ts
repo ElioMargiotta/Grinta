@@ -31,7 +31,7 @@ export async function createClubMetricAction({
   });
 
   if (error) return { error: error.message };
-  revalidatePath(`/${locale}/evaluation`);
+  revalidatePath(`/${locale}/tracking`);
   return { ok: true as const };
 }
 
@@ -56,7 +56,7 @@ export async function updateClubMetricAction({
     .eq("club_id", membership.club_id);
 
   if (error) return { error: error.message };
-  revalidatePath(`/${locale}/evaluation`);
+  revalidatePath(`/${locale}/tracking`);
   return { ok: true as const };
 }
 
@@ -81,7 +81,7 @@ export async function archiveClubMetricAction({
     .eq("club_id", membership.club_id);
 
   if (error) return { error: error.message };
-  revalidatePath(`/${locale}/evaluation`);
+  revalidatePath(`/${locale}/tracking`);
   return { ok: true as const };
 }
 
@@ -111,7 +111,7 @@ export async function deleteClubMetricAction({
     .is("default_key", null);
 
   if (error) return { error: error.message };
-  revalidatePath(`/${locale}/evaluation`);
+  revalidatePath(`/${locale}/tracking`);
   return { ok: true as const };
 }
 
@@ -120,7 +120,7 @@ export async function deleteClubMetricAction({
  * l'instance du planning et ses tests rattachés (FK ON DELETE CASCADE) ; les
  * résultats déjà saisis sont conservés (FK measurements.session_id en SET NULL).
  */
-export async function deletePhysicalEvalAction({
+export async function deletePhysicalTestAction({
   locale,
   sessionId,
 }: {
@@ -145,6 +145,6 @@ export async function deletePhysicalEvalAction({
   const { error } = await supabase.from("sessions").delete().eq("id", sessionId);
 
   if (error) return { error: error.message };
-  revalidatePath(`/${locale}/evaluation`);
+  revalidatePath(`/${locale}/tracking`);
   return { ok: true as const };
 }

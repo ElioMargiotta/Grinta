@@ -148,7 +148,7 @@ export async function createSessionForSlotAction({
  * à une date donnée, avec les tests choisis. Une seule éval par équipe/jour.
  * Redirige vers la page présences pour la saisie des résultats.
  */
-export async function createPhysicalEvalAction({
+export async function createPhysicalTestAction({
   teamId,
   date,
   metricIds,
@@ -215,7 +215,7 @@ export async function createPhysicalEvalAction({
   if (testsError) return { error: testsError.message };
 
   revalidatePath(`/${locale}/planner/${teamId}`);
-  redirect(`/${locale}/planner/${teamId}/sessions/${created.id}/eval`);
+  redirect(`/${locale}/planner/${teamId}/sessions/${created.id}/test`);
 }
 
 export async function cancelSessionAction({
