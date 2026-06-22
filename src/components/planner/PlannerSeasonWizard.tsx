@@ -22,7 +22,6 @@ import {
 } from "react";
 import {
   generateSeasonSkeletonAction,
-  saveSeasonDatesAction,
 } from "@/app/[locale]/(app)/planner/[teamId]/season-actions";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
@@ -30,11 +29,22 @@ import { Select } from "@/components/ui/Select";
 import { TeamCalendarSection } from "@/components/teams/TeamCalendarSection";
 import { PlannerDateField } from "./PlannerSeasonCalendar";
 import { THEME_COLORS, THEME_OPTIONS } from "./MicrocycleThemePicker";
-import { planSeason, type MatchKind, type MdScheme } from "@/lib/planner/season";
+import {
+  isStructuringKind,
+  planSeason,
+  type MatchKind,
+  type MdScheme,
+} from "@/lib/planner/season";
 import { segmentBounds } from "@/lib/planner/seasons";
-import type { SeasonMatch } from "./PlannerSeasonView";
+import type { SeasonMatch, SeasonMicrocycle } from "./PlannerSeasonView";
 
-type MesoDraft = { id: string; weeks: number; theme: string; name: string };
+type MesoDraft = {
+  id: string;
+  weeks: number;
+  weekThemes: string[];
+  name: string;
+  kind: "competition" | "transition";
+};
 type SectionStatus = "empty" | "partial" | "complete";
 type Segment = "first_round" | "second_round" | "full";
 type Mode = "replace" | "merge";
@@ -131,10 +141,18 @@ function ThemeSelect({
 type DraftStructure = {
   prepWeeks?: number;
   prepTheme?: string | null;
-  mesos?: { weeks?: number; theme?: string | null; name?: string | null }[];
+  prepWeekThemes?: (string | null)[];
+  mesos?: {
+    weeks?: number;
+    theme?: string | null;
+    weekThemes?: (string | null)[];
+    name?: string | null;
+    kind?: string | null;
+  }[];
 } | null;
 
 export type SeasonPlanRow = {
+  id: string;
   segment: Segment;
   start_date: string;
   championship_start_date: string | null;
@@ -149,7 +167,7 @@ export type SeasonPlanRow = {
 type SegmentDraft = {
   seasonStart: string;
   seasonEnd: string;
-  prepTheme: string;
+  prepWeekThemes: string[];
   slots: TrainingSlotDraft[];
   mesos: MesoDraft[];
 };
@@ -164,13 +182,6 @@ function defaultSlots(periodization: Periodization | null): TrainingSlotDraft[] 
     time: "19:00",
     durationMinutes: 90,
   }));
-}
-
-function defaultMesos(): MesoDraft[] {
-  return [
-    { id: "c1", weeks: 6, theme: "", name: "" },
-    { id: "c2", weeks: 4, theme: "", name: "" },
-  ];
 }
 
 /** État initial d'un tour : brouillon DB s'il existe, sinon défauts du segment. */
@@ -194,17 +205,27 @@ function draftFor(
       : defaultSlots(periodization);
   const mesos =
     structure?.mesos && structure.mesos.length > 0
-      ? structure.mesos.map((m, i) => ({
-          id: `c${i}`,
-          weeks: Math.max(1, Math.round(Number(m.weeks) || 1)),
-          theme: m.theme ?? "",
-          name: m.name ?? "",
-        }))
-      : defaultMesos();
+      ? structure.mesos.map((m, i) => {
+          const weeks = Math.max(1, Math.round(Number(m.weeks) || 1));
+          return {
+            id: `c${i}`,
+            weeks,
+            weekThemes: Array.from(
+              { length: weeks },
+              (_, weekIndex) => m.weekThemes?.[weekIndex] ?? m.theme ?? "",
+            ),
+            name: m.name ?? "",
+            kind: m.kind === "transition" ? ("transition" as const) : ("competition" as const),
+          };
+        })
+      : [];
   return {
     seasonStart: plan?.start_date || b.start,
     seasonEnd: plan?.end_date || b.end,
-    prepTheme: structure?.prepTheme ?? "",
+    prepWeekThemes: Array.from(
+      { length: Math.max(0, Math.round(Number(structure?.prepWeeks) || 0)) },
+      (_, index) => structure?.prepWeekThemes?.[index] ?? structure?.prepTheme ?? "",
+    ),
     slots,
     mesos,
   };
@@ -219,6 +240,7 @@ export function PlannerSeasonWizard({
   subscriptions,
   periodization,
   seasonPlans = [],
+  existingMicrocycles = [],
   generated,
   onClose,
 }: {
@@ -230,6 +252,7 @@ export function PlannerSeasonWizard({
   subscriptions: Subscription[];
   periodization: Periodization | null;
   seasonPlans?: SeasonPlanRow[];
+  existingMicrocycles?: SeasonMicrocycle[];
   generated: boolean;
   onClose?: () => void;
 }) {
@@ -243,6 +266,9 @@ export function PlannerSeasonWizard({
   const [stepKey, setStepKey] = useState(0);
   const [msg, setMsg] = useState<{ ok: boolean; text: string } | null>(null);
   const [segment, setSegment] = useState<Segment>(initialSegment);
+  const [lastPlanningSegment, setLastPlanningSegment] = useState<
+    "first_round" | "second_round"
+  >(initialSegment === "second_round" ? "second_round" : "first_round");
   const mode: Mode = generated ? "merge" : "replace";
   const [seasonLabel] = useState(
     initialSeasonLabel ||
@@ -266,7 +292,7 @@ export function PlannerSeasonWizard({
   const initial = initialDrafts[segment];
   const [seasonStart, setSeasonStart] = useState(initial.seasonStart);
   const [seasonEnd, setSeasonEnd] = useState(initial.seasonEnd);
-  const [prepTheme, setPrepTheme] = useState(initial.prepTheme);
+  const [prepWeekThemes, setPrepWeekThemes] = useState(initial.prepWeekThemes);
   const [slots, setSlots] = useState<TrainingSlotDraft[]>(initial.slots);
   const [mesos, setMesos] = useState<MesoDraft[]>(initial.mesos);
   const bounds = segmentBounds(seasonLabel, segment);
@@ -275,15 +301,19 @@ export function PlannerSeasonWizard({
     stepBodyRef.current?.scrollTo({ top: 0 });
   }, [stepKey]);
 
-  const anchors = matches.filter((m) => m.is_anchor);
-  function anchorsInBounds(start: string, end: string) {
-    return anchors.filter((m) => {
+  // La numérotation reste stable dans le temps : les matchs officiels déjà joués
+  // et archivés comptent autant que les matchs encore présents dans l'ICS actif.
+  const officialMatches = Array.from(
+    new Map([...matches, ...archivedMatches].map((m) => [m.id, m])).values(),
+  ).filter((m) => isStructuringKind(m.kind));
+  function officialMatchesInBounds(start: string, end: string) {
+    return officialMatches.filter((m) => {
       const d = localYmd(m.starts_at);
       return Boolean(d) && d >= start && d <= end;
     });
   }
   function prepWeeksFor(start: string, end: string) {
-    const first = anchorsInBounds(start, end)
+    const first = officialMatchesInBounds(start, end)
       .map((m) => localYmd(m.starts_at))
       .sort((a, b) => a.localeCompare(b))[0];
     if (!start || !first) return 0;
@@ -297,11 +327,17 @@ export function PlannerSeasonWizard({
   // Matchs officiels du tour sélectionné. On ne peut générer un tour que s'il a
   // ses matchs (sinon : calendrier pas à jour ou mauvais tour) — garde-fou non
   // destructif : bouton « Générer » désactivé + message, rien n'est supprimé.
-  const inFrameAnchors = anchorsInBounds(seasonStart, seasonEnd);
-  const noMatchesForTour = inFrameAnchors.length === 0;
+  const inFrameOfficialMatches = officialMatchesInBounds(seasonStart, seasonEnd);
+  const noMatchesForTour = inFrameOfficialMatches.length === 0;
 
   const totalWeeks = weeksInclusive(seasonStart, seasonEnd);
-  const definedWeeks = mesos.reduce((sum, m) => sum + (m.weeks || 0), 0) + prepWeeks;
+  const workWeeks = Math.max(0, totalWeeks - prepWeeks);
+  const assignedWeeks = mesos.reduce((sum, m) => sum + (m.weeks || 0), 0);
+  const definedWeeks = Math.min(
+    workWeeks,
+    assignedWeeks,
+  );
+  const remainingWeeks = Math.max(0, workWeeks - assignedWeeks);
 
   const statuses: SectionStatus[] = [
     segment ? "complete" : "partial",
@@ -319,6 +355,11 @@ export function PlannerSeasonWizard({
   ];
 
   function goTo(i: number) {
+    // « Saison complète » est une vue d'agrégation du résumé, jamais un plan à
+    // éditer. En revenant à Planification, on restaure le dernier tour utilisé.
+    if (i === 1 && segment === "full") {
+      switchFrame(lastPlanningSegment);
+    }
     setStep(i);
     setStepKey((k) => k + 1);
   }
@@ -326,12 +367,13 @@ export function PlannerSeasonWizard({
   function switchFrame(nextSegment: Segment) {
     if (nextSegment === segment) return;
     // Sauvegarde les saisies du tour courant avant de basculer.
-    draftsRef.current[segment] = { seasonStart, seasonEnd, prepTheme, slots, mesos };
+    draftsRef.current[segment] = { seasonStart, seasonEnd, prepWeekThemes, slots, mesos };
     const next = draftsRef.current[nextSegment];
     setSegment(nextSegment);
+    if (nextSegment !== "full" && step < 2) setLastPlanningSegment(nextSegment);
     setSeasonStart(next.seasonStart);
     setSeasonEnd(next.seasonEnd);
-    setPrepTheme(next.prepTheme);
+    setPrepWeekThemes(next.prepWeekThemes);
     setSlots(next.slots);
     setMesos(next.mesos);
   }
@@ -352,9 +394,17 @@ export function PlannerSeasonWizard({
   }
 
   function addMeso() {
+    const assigned = mesos.reduce((sum, meso) => sum + meso.weeks, 0);
+    const weeks = Math.max(1, Math.min(4, workWeeks - assigned || 1));
     setMesos((prev) => [
       ...prev,
-      { id: `c${Date.now()}`, weeks: 4, theme: "", name: "" },
+      {
+        id: `c${Date.now()}`,
+        weeks,
+        weekThemes: Array.from({ length: weeks }, () => ""),
+        name: "",
+        kind: "competition",
+      },
     ]);
   }
 
@@ -362,8 +412,48 @@ export function PlannerSeasonWizard({
     setMesos((prev) => prev.map((m) => (m.id === id ? { ...m, ...patch } : m)));
   }
 
+  function updateMesoWeeks(id: string, weeks: number) {
+    setMesos((prev) =>
+      prev.map((meso) =>
+        meso.id === id
+          ? {
+              ...meso,
+              weeks,
+              weekThemes: Array.from(
+                { length: weeks },
+                (_, index) => meso.weekThemes[index] ?? "",
+              ),
+            }
+          : meso,
+      ),
+    );
+  }
+
+  function updateWeekTheme(id: string, weekIndex: number, theme: string) {
+    setMesos((prev) =>
+      prev.map((meso) =>
+        meso.id === id
+          ? {
+              ...meso,
+              weekThemes: meso.weekThemes.map((value, index) =>
+                index === weekIndex ? theme : value,
+              ),
+            }
+          : meso,
+      ),
+    );
+  }
+
+  function updatePrepWeekTheme(weekIndex: number, theme: string) {
+    setPrepWeekThemes((current) =>
+      Array.from({ length: prepWeeks }, (_, index) =>
+        index === weekIndex ? theme : current[index] ?? "",
+      ),
+    );
+  }
+
   function removeMeso(id: string) {
-    setMesos((prev) => (prev.length <= 1 ? prev : prev.filter((m) => m.id !== id)));
+    setMesos((prev) => prev.filter((m) => m.id !== id));
   }
 
   function buildAndGenerate(seg: Segment, start: string, end: string) {
@@ -390,11 +480,15 @@ export function PlannerSeasonWizard({
       "structure",
       JSON.stringify({
         prepWeeks: prepWeeksFor(start, end),
-        prepTheme: prepTheme || null,
+        prepWeekThemes: Array.from(
+          { length: prepWeeksFor(start, end) },
+          (_, index) => prepWeekThemes[index] || null,
+        ),
         mesos: mesos.map((m) => ({
           weeks: m.weeks,
-          theme: m.theme || null,
+          weekThemes: m.weekThemes.map((theme) => theme || null),
           name: m.name.trim() || null,
+          kind: m.kind,
         })),
       }),
     );
@@ -416,52 +510,46 @@ export function PlannerSeasonWizard({
 
   function generate() {
     if (noMatchesForTour) return;
+    const savedPlan = seasonPlans.find((plan) => plan.segment === segment);
+    const savedStructure = savedPlan?.draft?.structure;
+    const savedSlots = savedPlan?.draft?.trainingSlots ?? [];
+    const structuralChange = Boolean(
+      savedPlan &&
+        (savedPlan.start_date !== seasonStart ||
+          savedPlan.end_date !== seasonEnd ||
+          Number(savedStructure?.prepWeeks ?? -1) !== prepWeeks ||
+          (savedStructure?.mesos?.length ?? 0) !== mesos.length ||
+          mesos.some((meso, index) => {
+            const saved = savedStructure?.mesos?.[index];
+            return (
+              Number(saved?.weeks ?? -1) !== meso.weeks ||
+              (saved?.kind === "transition" ? "transition" : "competition") !== meso.kind
+            );
+          }) ||
+          JSON.stringify(
+            savedSlots.map((slot) => ({
+              weekday: Number(slot.weekday),
+              time: slot.time ?? "19:00",
+              durationMinutes: Number(slot.durationMinutes) || 90,
+            })),
+          ) !==
+            JSON.stringify(
+              slots.map((slot) => ({
+                weekday: slot.weekday,
+                time: slot.time,
+                durationMinutes: slot.durationMinutes,
+              })),
+            ))
+    );
+    if (
+      structuralChange &&
+      !window.confirm(
+        t.has("structuralChangeConfirm")
+          ? t("structuralChangeConfirm")
+          : "Les dates, cycles ou créneaux ont fortement changé. Les semaines et séances vont être recalculées. Continuer ?",
+      )
+    ) return;
     buildAndGenerate(segment, seasonStart, seasonEnd);
-  }
-
-  // Enregistre dates + structure du tour SANS générer (brouillon persistant).
-  function saveDates() {
-    const fd = new FormData();
-    fd.set("teamId", teamId);
-    fd.set("locale", locale);
-    fd.set("segment", segment);
-    fd.set("seasonLabel", seasonLabel.trim());
-    fd.set("seasonStart", seasonStart);
-    fd.set("seasonEnd", seasonEnd);
-    fd.set(
-      "trainingSlots",
-      JSON.stringify(
-        slots.map((s) => ({
-          weekday: s.weekday,
-          time: s.time,
-          durationMinutes: s.durationMinutes,
-        })),
-      ),
-    );
-    fd.set(
-      "structure",
-      JSON.stringify({
-        prepWeeks,
-        prepTheme: prepTheme || null,
-        mesos: mesos.map((m) => ({
-          weeks: m.weeks,
-          theme: m.theme || null,
-          name: m.name.trim() || null,
-        })),
-      }),
-    );
-    // Garde aussi la saisie courante en mémoire (cohérent avec switchFrame).
-    draftsRef.current[segment] = { seasonStart, seasonEnd, prepTheme, slots, mesos };
-
-    startTransition(async () => {
-      setMsg(null);
-      const r = await saveSeasonDatesAction(fd);
-      if (r?.error) {
-        setMsg({ ok: false, text: t.has(`err.${r.error}`) ? t(`err.${r.error}`) : r.error });
-      } else {
-        setMsg({ ok: true, text: t("datesSaved") });
-      }
-    });
   }
 
   const body: ReactNode = (() => {
@@ -574,12 +662,6 @@ export function PlannerSeasonWizard({
                   readOnly
                   hint={t("prepWeeksHint")}
                 />
-                <ThemeSelect
-                  id="prep-theme"
-                  label={t("prepTheme")}
-                  value={prepTheme}
-                  onChange={setPrepTheme}
-                />
               </div>
             </section>
 
@@ -651,78 +733,180 @@ export function PlannerSeasonWizard({
                     {t("cyclesTitle")}
                   </div>
                   <div className="mt-1 text-xs text-zinc-500">
-                    {t("coverage", { defined: definedWeeks, total: totalWeeks })}
+                    {t("coverage", { defined: definedWeeks, total: workWeeks })}
                   </div>
+                  <div className="mt-1 text-xs text-zinc-500">{t("cyclesHint")}</div>
                 </div>
                 <Button type="button" variant="secondary" size="sm" onClick={addMeso}>
                   <Plus className="h-3.5 w-3.5" />
                   {t("addCycle")}
                 </Button>
               </div>
+              {prepWeeks > 0 ? (
+                <div className="mb-3 rounded-[12px] border border-sky-200 bg-sky-50/50 p-4">
+                  <div className="text-[10px] font-semibold uppercase tracking-[0.1em] text-sky-600">
+                    {t("prepCycleTitle")}
+                  </div>
+                  <div className="mt-0.5 text-xs text-zinc-500">
+                    {t("prepCycleRange", { start: -prepWeeks, end: -1 })}
+                  </div>
+                  <div className="mt-4 grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
+                    {Array.from({ length: prepWeeks }, (_, weekIndex) => {
+                      const theme = prepWeekThemes[weekIndex] ?? "";
+                      const dot = theme
+                        ? THEME_COLORS[theme as keyof typeof THEME_COLORS]?.dot
+                        : "#d4d4d8";
+                      return (
+                        <div
+                          key={`prep-week-${weekIndex}`}
+                          className="rounded-[8px] border border-sky-100 bg-white p-2"
+                        >
+                          <div className="mb-1.5 flex items-center gap-1.5 text-[11px] font-semibold text-zinc-700">
+                            <span className="h-2 w-2 rounded-full" style={{ background: dot }} />
+                            {t("weekBadge", { n: weekIndex - prepWeeks })}
+                          </div>
+                          <ThemeSelect
+                            id={`prep-week-theme-${weekIndex}`}
+                            label={t("theme")}
+                            value={theme}
+                            onChange={(value) => updatePrepWeekTheme(weekIndex, value)}
+                          />
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              ) : null}
               <ul className="flex flex-col gap-2">
                 {mesos.map((m, idx) => {
-                  const dot = m.theme ? THEME_COLORS[m.theme as keyof typeof THEME_COLORS]?.dot : null;
+                  const firstWeek =
+                    mesos.slice(0, idx).reduce((sum, cycle) => sum + cycle.weeks, 0) + 1;
                   return (
                     <li
                       key={m.id}
-                      className="grid gap-2 border-t border-zinc-200 py-3 lg:grid-cols-[18px_1.4fr_0.7fr_1fr_auto]"
+                      className="rounded-[12px] border border-zinc-200 bg-white p-4"
                     >
-                      <span
-                        className="mt-8 block h-3 w-3 rounded-full"
-                        style={{ background: dot ?? "#cbd5e1" }}
-                      />
-                      <Input
-                        id={`cycle-name-${m.id}`}
-                        label={t("cycleName")}
-                        value={m.name}
-                        placeholder={t("cyclePlaceholder", { n: idx + 1 })}
-                        onChange={(e) => updateMeso(m.id, { name: e.target.value })}
-                      />
-                      <Input
-                        id={`cycle-weeks-${m.id}`}
-                        type="number"
-                        min={1}
-                        max={24}
-                        label={t("weeks")}
-                        value={m.weeks}
-                        onChange={(e) =>
-                          updateMeso(m.id, {
-                            weeks: Math.max(1, Math.min(24, Number(e.target.value) || 1)),
-                          })
-                        }
-                      />
-                      <ThemeSelect
-                        id={`cycle-theme-${m.id}`}
-                        label={t("theme")}
-                        value={m.theme}
-                        onChange={(theme) => updateMeso(m.id, { theme })}
-                      />
-                      <button
-                        type="button"
-                        onClick={() => removeMeso(m.id)}
-                        className="self-end rounded-[8px] p-2 text-zinc-400 transition hover:bg-white hover:text-red-600"
-                        title={t("removeCycle")}
-                      >
-                        <Trash2 className="h-4 w-4" />
-                      </button>
+                      <div className="flex items-start justify-between gap-3">
+                        <div>
+                          <div className="text-[10px] font-semibold uppercase tracking-[0.1em] text-zinc-400">
+                            {t("cycleNumber", { n: idx + 1 })}
+                          </div>
+                          <div className="mt-0.5 text-xs text-zinc-500">
+                            {t("cycleRange", { start: firstWeek, end: firstWeek + m.weeks - 1 })}
+                          </div>
+                        </div>
+                        <button
+                          type="button"
+                          onClick={() => removeMeso(m.id)}
+                          className="rounded-[8px] p-2 text-zinc-400 transition hover:bg-zinc-50 hover:text-red-600"
+                          title={t("removeCycle")}
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </button>
+                      </div>
+
+                      <div className="mt-3 grid gap-3 sm:grid-cols-[1.4fr_1fr_0.6fr]">
+                        <Input
+                          id={`cycle-name-${m.id}`}
+                          label={t("cycleName")}
+                          value={m.name}
+                          placeholder={t("cyclePlaceholder", { n: idx + 1 })}
+                          onChange={(e) => updateMeso(m.id, { name: e.target.value })}
+                        />
+                        <Select
+                          id={`cycle-kind-${m.id}`}
+                          label={t("cycleType")}
+                          value={m.kind}
+                          onChange={(e) =>
+                            updateMeso(m.id, {
+                              kind: e.target.value === "transition" ? "transition" : "competition",
+                            })
+                          }
+                        >
+                          <option value="competition">{t("cycleTypeOption.competition")}</option>
+                          <option value="transition">{t("cycleTypeOption.transition")}</option>
+                        </Select>
+                        <Input
+                          id={`cycle-weeks-${m.id}`}
+                          type="number"
+                          min={1}
+                          max={Math.max(1, workWeeks)}
+                          label={t("weeks")}
+                          value={m.weeks}
+                          onChange={(e) =>
+                            updateMesoWeeks(
+                              m.id,
+                              Math.max(
+                                1,
+                                Math.min(Math.max(1, workWeeks), Number(e.target.value) || 1),
+                              ),
+                            )
+                          }
+                        />
+                      </div>
+
+                      <div className="mt-4 border-t border-zinc-100 pt-3">
+                        <div className="mb-2 text-[10px] font-semibold uppercase tracking-[0.1em] text-zinc-400">
+                          {t("weeklyThemes")}
+                        </div>
+                        <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
+                          {m.weekThemes.map((theme, weekIndex) => {
+                            const dot = theme
+                              ? THEME_COLORS[theme as keyof typeof THEME_COLORS]?.dot
+                              : "#d4d4d8";
+                            return (
+                              <div
+                                key={`${m.id}-week-${weekIndex}`}
+                                className="rounded-[8px] border border-zinc-100 bg-zinc-50 p-2"
+                              >
+                                <div className="mb-1.5 flex items-center gap-1.5 text-[11px] font-semibold text-zinc-700">
+                                  <span className="h-2 w-2 rounded-full" style={{ background: dot }} />
+                                  {t("weekBadge", { n: firstWeek + weekIndex })}
+                                </div>
+                                <ThemeSelect
+                                  id={`cycle-theme-${m.id}-${weekIndex}`}
+                                  label={t("theme")}
+                                  value={theme}
+                                  onChange={(value) => updateWeekTheme(m.id, weekIndex, value)}
+                                />
+                              </div>
+                            );
+                          })}
+                        </div>
+                      </div>
                     </li>
                   );
                 })}
               </ul>
+              {mesos.length === 0 ? (
+                <div className="rounded-[10px] border border-dashed border-zinc-300 px-4 py-5 text-center text-sm text-zinc-500">
+                  {t("cyclesEmpty", { n: workWeeks })}
+                </div>
+              ) : null}
+              <div className="mt-3 text-xs font-medium text-zinc-600">
+                {remainingWeeks > 0
+                  ? t("weeksRemaining", { n: remainingWeeks })
+                  : assignedWeeks > workWeeks
+                    ? t("weeksOverflow", { n: assignedWeeks - workWeeks })
+                    : t("weeksComplete")}
+              </div>
             </section>
           </div>
         );
       default: {
         // Aperçu = exactement ce que la génération produira : on reproduit la
-        // logique pure `planSeason` avec le même filtrage (ancres du cadre).
-        const matchById = new Map(matches.map((m) => [m.id, m] as const));
+        // logique pure `planSeason` avec les mêmes matchs officiels du cadre.
+        const matchById = new Map(
+          [...matches, ...archivedMatches].map((m) => [m.id, m] as const),
+        );
+        const planSegmentById = new Map(seasonPlans.map((plan) => [plan.id, plan.segment]));
+        const isFullAggregate = segment === "full";
         const previewPlan =
-          inFrameAnchors.length > 0
+          !isFullAggregate && inFrameOfficialMatches.length > 0
             ? planSeason(
-                inFrameAnchors.map((m) => ({
+                inFrameOfficialMatches.map((m) => ({
                   id: m.id,
                   startsAt: new Date(m.starts_at),
-                  isAnchor: true,
                   kind: (m.kind as MatchKind | null) ?? "league",
                 })),
                 {
@@ -736,11 +920,15 @@ export function PlannerSeasonWizard({
                   seasonEnd,
                   structure: {
                     prepWeeks,
-                    prepTheme: prepTheme || null,
+                    prepWeekThemes: Array.from(
+                      { length: prepWeeks },
+                      (_, index) => prepWeekThemes[index] || null,
+                    ),
                     mesos: mesos.map((m) => ({
                       weeks: m.weeks,
-                      theme: m.theme || null,
+                      weekThemes: m.weekThemes.map((theme) => theme || null),
                       name: m.name.trim() || null,
+                      kind: m.kind,
                     })),
                   },
                   trainingSlots: slots.map((s) => ({
@@ -751,7 +939,23 @@ export function PlannerSeasonWizard({
                 },
               )
             : null;
-        const weeks = previewPlan?.microcycles ?? [];
+        const weeks = isFullAggregate
+          ? existingMicrocycles
+              .filter((microcycle) => {
+                const planSegment = planSegmentById.get(microcycle.seasonPlanId);
+                return planSegment === "first_round" || planSegment === "second_round";
+              })
+              .map((microcycle) => ({
+                startDate: microcycle.startDate,
+                weekNumber: microcycle.weekNumber,
+                phase: microcycle.kind === "preparation" ? "preparation" as const :
+                  microcycle.kind === "transition" ? "transition" as const : "competition" as const,
+                theme: microcycle.theme,
+                targetMatchId: microcycle.targetMatchId,
+                sessions: microcycle.sessions,
+              }))
+              .sort((a, b) => a.startDate.localeCompare(b.startDate))
+          : previewPlan?.microcycles ?? [];
         const totalSessions = weeks.reduce((sum, w) => sum + w.sessions.length, 0);
         const prepCount = weeks.filter((w) => w.phase === "preparation").length;
         const compCount = weeks.filter((w) => w.phase === "competition").length;
@@ -788,7 +992,9 @@ export function PlannerSeasonWizard({
                 </div>
               </div>
               {weeks.length === 0 ? (
-                <p className="py-4 text-sm text-zinc-500">{t("gridEmpty")}</p>
+                <p className="py-4 text-sm text-zinc-500">
+                  {isFullAggregate ? t("fullAggregateEmpty") : t("gridEmpty")}
+                </p>
               ) : (
                 <div className="overflow-x-auto rounded-[10px] border border-zinc-200">
                   <table className="w-full border-collapse text-[12px]">
@@ -804,7 +1010,7 @@ export function PlannerSeasonWizard({
                     </thead>
                     <tbody>
                       {weeks.map((w, idx) => {
-                        const theme = previewPlan!.phases[w.phaseIndex]?.theme ?? null;
+                        const theme = w.theme;
                         const dot =
                           theme && THEME_COLORS[theme as keyof typeof THEME_COLORS]
                             ? THEME_COLORS[theme as keyof typeof THEME_COLORS].dot
@@ -829,13 +1035,13 @@ export function PlannerSeasonWizard({
                               </tr>
                             ) : null}
                             <WeekRow
-                              n={idx + 1}
+                              n={w.weekNumber}
                               startDate={w.startDate}
                               themeLabel={theme ? tTheme(`option.${theme}`) : t("noTheme")}
                               dot={dot}
                               phaseLabel={t(`phase.${w.phase}`)}
                               sessions={w.sessions}
-                              matchName={match ? match.opponent ?? match.summary ?? null : null}
+                              matchName={match ? match.summary ?? match.opponent ?? null : null}
                               locale={locale}
                               t={t}
                             />
@@ -911,13 +1117,13 @@ export function PlannerSeasonWizard({
             </div>
             <span className="text-[11px] font-semibold text-zinc-500">{pct}%</span>
           </div>
-          {/* Étape Planification : enregistrer les dates (sans générer).
-              Étape Résumé : générer. La génération n'est PLUS accessible avant. */}
+          {/* Les deux boutons enregistrent le plan réel : Saison et Hebdo lisent
+              ensuite les mêmes microcycles. */}
           {step === 1 ? (
             <button
               type="button"
-              onClick={saveDates}
-              disabled={isPending || !seasonStart || !seasonEnd}
+              onClick={generate}
+              disabled={isPending || noMatchesForTour || !seasonStart || !seasonEnd}
               className="inline-flex h-8 min-w-[112px] items-center justify-center gap-1.5 rounded-[8px] border border-zinc-200 bg-white px-3 text-[12px] font-medium text-zinc-900 shadow-[0_1px_2px_rgb(0_0_0/0.05)] transition hover:bg-zinc-50 active:scale-[0.98] disabled:opacity-60"
             >
               {isPending ? (
@@ -929,7 +1135,7 @@ export function PlannerSeasonWizard({
                 </>
               )}
             </button>
-          ) : step === steps.length - 1 ? (
+          ) : step === steps.length - 1 && segment !== "full" ? (
             <button
               type="button"
               onClick={generate}
@@ -937,11 +1143,11 @@ export function PlannerSeasonWizard({
               className="inline-flex h-8 min-w-[112px] items-center justify-center gap-1.5 rounded-[8px] border border-zinc-200 bg-white px-3 text-[12px] font-medium text-zinc-900 shadow-[0_1px_2px_rgb(0_0_0/0.05)] transition hover:bg-zinc-50 active:scale-[0.98] disabled:opacity-60"
             >
               {isPending ? (
-                t("generating")
+                t("savingDates")
               ) : (
                 <>
                   <Save className="h-3 w-3" />
-                  {generated ? t("regenerate") : t("generate")}
+                  {t("saveDates")}
                 </>
               )}
             </button>
@@ -1093,7 +1299,7 @@ function WeekRow({
   themeLabel: string;
   dot: string;
   phaseLabel: string;
-  sessions: { date: string; startTime: string | null }[];
+  sessions: { date: string; startTime: string | null; mdOffset: number | null }[];
   matchName: string | null;
   locale: string;
   t: ReturnType<typeof useTranslations>;
@@ -1127,7 +1333,6 @@ function WeekRow({
                 className="inline-flex items-center gap-1 rounded-[5px] bg-zinc-100 px-1.5 py-0.5 text-[10px] font-medium capitalize text-zinc-600"
               >
                 {new Date(`${s.date}T00:00:00`).toLocaleDateString(locale, { weekday: "short" })}
-                {s.startTime ? ` ${s.startTime}` : ""}
               </span>
             ))}
           </span>

@@ -4,7 +4,6 @@ import { useRef, useState, useTransition } from "react";
 import { useLocale, useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
 import {
-  Archive,
   CalendarDays,
   Check,
   ChevronDown,
@@ -13,20 +12,24 @@ import {
   Pencil,
   Plus,
   RefreshCw,
+  History,
   Trash2,
   Upload,
 } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
+import { Select } from "@/components/ui/Select";
 import { MatchEditor, type EditableMatch } from "@/components/teams/MatchEditor";
 import { PeriodizationSettingsForm } from "@/components/teams/PeriodizationSettingsForm";
 import {
   disconnectCalendarAction,
   saveCalendarUrlAction,
+  setCalendarTeamIdentityAction,
   syncCalendarNowAction,
   uploadCalendarFileAction,
 } from "@/app/[locale]/(app)/teams/[teamId]/calendar/actions";
 import { deleteMatchAction } from "@/app/[locale]/(app)/teams/[teamId]/calendar/match-actions";
+import { isStructuringKind } from "@/lib/planner/season";
 
 type Slot = "first_round" | "second_round" | "full";
 const SLOTS: Slot[] = ["first_round", "second_round", "full"];
@@ -44,6 +47,8 @@ type Subscription = {
 type Match = EditableMatch & {
   ends_at: string | null;
   match_url: string | null;
+  home_score?: number | null;
+  away_score?: number | null;
 };
 
 type Periodization = {
@@ -51,7 +56,13 @@ type Periodization = {
   md_scheme: string;
 };
 
-type Result = { ok?: true; error?: string; upserted?: number };
+type Result = {
+  ok?: true;
+  error?: string;
+  upserted?: number;
+  needsTeamSelection?: true;
+  teamCandidates?: string[];
+};
 type Segment = "first_round" | "second_round" | "full";
 
 export function TeamCalendarSection({
@@ -142,6 +153,12 @@ export function TeamCalendarSection({
       )}
 
       <CalendarImporter teamId={teamId} t={t} />
+
+      <CalendarIdentityPrompt
+        teamId={teamId}
+        matches={[...matches, ...archivedMatches]}
+        t={t}
+      />
 
       <IcsLinksPanel
         teamId={teamId}
@@ -248,7 +265,7 @@ export function TeamCalendarSection({
             onClick={() => setShowHistory((v) => !v)}
             className="flex items-center gap-1.5 text-sm font-semibold text-zinc-700 transition hover:text-zinc-950 dark:text-zinc-300"
           >
-            <Archive className="h-3.5 w-3.5" />
+            <History className="h-3.5 w-3.5" />
             {showHistory ? t("historyHide") : t("historyShow", { n: archivedMatches.length })}
           </button>
           {showHistory ? (
@@ -261,7 +278,7 @@ export function TeamCalendarSection({
                     match={m}
                     locale={locale}
                     t={t}
-                    onDelete={() => onDeleteMatch(m.id)}
+                    onOpen={() => router.push(`/planner/${teamId}/match/${m.id}`)}
                   />
                 ))}
               </ul>
@@ -281,6 +298,91 @@ export function TeamCalendarSection({
   );
 }
 
+function calendarTeamCandidates(matches: Match[]): string[] {
+  const counts = new Map<string, { label: string; count: number }>();
+  for (const match of matches) {
+    if (match.source === "manual") continue;
+    const sides = match.summary?.split(/\s+[-–—]\s+/).slice(0, 2) ?? [];
+    for (const side of sides) {
+      const label = side.trim();
+      if (!label) continue;
+      const key = label.toLocaleLowerCase().replace(/\s+/g, " ");
+      const current = counts.get(key);
+      counts.set(key, { label: current?.label ?? label, count: (current?.count ?? 0) + 1 });
+    }
+  }
+  return [...counts.values()]
+    .sort((a, b) => b.count - a.count || a.label.localeCompare(b.label))
+    .map((item) => item.label);
+}
+
+function CalendarIdentityPrompt({
+  teamId,
+  matches,
+  t,
+}: {
+  teamId: string;
+  matches: Match[];
+  t: ReturnType<typeof useTranslations>;
+}) {
+  const router = useRouter();
+  const importedMatches = matches.filter((match) => match.source !== "manual");
+  const candidates = calendarTeamCandidates(matches);
+  const currentIdentity = (() => {
+    for (const match of importedMatches) {
+      const sides = match.summary?.split(/\s+[-–—]\s+/).slice(0, 2) ?? [];
+      if (sides.length < 2) continue;
+      if (match.home_away === "home") return sides[0].trim();
+      if (match.home_away === "away") return sides[1].trim();
+    }
+    return null;
+  })();
+  const [selected, setSelected] = useState(currentIdentity ?? candidates[0] ?? "");
+  const [error, setError] = useState<string | null>(null);
+  const [isPending, startTransition] = useTransition();
+  if (importedMatches.length === 0 || candidates.length < 2) return null;
+
+  return (
+    <div className="mt-3 rounded-[10px] border border-zinc-200 bg-zinc-50 p-3 sm:max-w-xl">
+      <Select
+        id="existing-calendar-team-identity"
+        label={t("teamIdentityQuestion")}
+        value={selected}
+        onChange={(event) => setSelected(event.target.value)}
+      >
+        {candidates.map((candidate) => (
+          <option key={candidate} value={candidate}>{candidate}</option>
+        ))}
+      </Select>
+      <p className="mt-1 text-xs text-zinc-600">
+        {t("teamIdentityBulkHint", { n: importedMatches.length })}
+      </p>
+      <Button
+        type="button"
+        size="sm"
+        className="mt-2"
+        loading={isPending}
+        loadingLabel={t("savingTeamIdentity")}
+        disabled={!selected}
+        onClick={() => {
+          const fd = new FormData();
+          fd.set("teamId", teamId);
+          fd.set("calendarTeamName", selected);
+          startTransition(async () => {
+            setError(null);
+            const result = await setCalendarTeamIdentityAction(fd);
+            if (result.error) setError(result.error);
+            else router.refresh();
+          });
+        }}
+      >
+        {t("applyTeamIdentity")}
+      </Button>
+      {error ? <p className="mt-2 text-xs text-red-600">{error}</p> : null}
+    </div>
+  );
+}
+
 /** Ajout d'un calendrier ICS : un champ URL, rangé tout seul dans le bon tour. */
 function CalendarImporter({
   teamId,
@@ -294,6 +396,9 @@ function CalendarImporter({
   const [url, setUrl] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [done, setDone] = useState(false);
+  const [teamCandidates, setTeamCandidates] = useState<string[]>([]);
+  const [selectedTeam, setSelectedTeam] = useState("");
+  const [pendingFile, setPendingFile] = useState<File | null>(null);
   const [isPending, startTransition] = useTransition();
 
   const run = (fn: () => Promise<Result>, clearUrl: boolean) =>
@@ -301,30 +406,42 @@ function CalendarImporter({
       setError(null);
       setDone(false);
       const r = await fn();
+      if (r?.needsTeamSelection) {
+        const candidates = r.teamCandidates ?? [];
+        setTeamCandidates(candidates);
+        setSelectedTeam(candidates[0] ?? "");
+        return;
+      }
       if (r?.error) {
         setError(r.error);
         return;
       }
       if (r?.ok) {
         if (clearUrl) setUrl(""); // champ vidé : prêt pour un autre calendrier
+        setTeamCandidates([]);
+        setSelectedTeam("");
+        setPendingFile(null);
         setDone(true);
         router.refresh();
       }
     });
 
-  const onImport = () => {
+  const onImport = (calendarTeamName = "") => {
     const value = url.trim();
     if (!value) return;
     const fd = new FormData();
     fd.set("teamId", teamId);
     fd.set("url", value);
+    if (calendarTeamName) fd.set("calendarTeamName", calendarTeamName);
     run(() => saveCalendarUrlAction(fd), true);
   };
 
-  const onUpload = (file: File) => {
+  const onUpload = (file: File, calendarTeamName = "") => {
+    setPendingFile(file);
     const fd = new FormData();
     fd.set("teamId", teamId);
     fd.set("file", file);
+    if (calendarTeamName) fd.set("calendarTeamName", calendarTeamName);
     run(() => uploadCalendarFileAction(fd), false);
   };
 
@@ -344,13 +461,40 @@ function CalendarImporter({
           setUrl(e.target.value);
           setError(null);
           setDone(false);
+          setTeamCandidates([]);
+          setPendingFile(null);
         }}
       />
+      {teamCandidates.length > 0 ? (
+        <div className="mt-3 rounded-[8px] border border-amber-200 bg-amber-50 p-3">
+          <Select
+            id="calendar-team-identity"
+            label={t("teamIdentityQuestion")}
+            value={selectedTeam}
+            onChange={(event) => setSelectedTeam(event.target.value)}
+          >
+            {teamCandidates.map((candidate) => (
+              <option key={candidate} value={candidate}>{candidate}</option>
+            ))}
+          </Select>
+          <Button
+            type="button"
+            size="sm"
+            className="mt-2"
+            disabled={!selectedTeam || isPending}
+            onClick={() =>
+              pendingFile ? onUpload(pendingFile, selectedTeam) : onImport(selectedTeam)
+            }
+          >
+            {t("confirmTeamIdentity")}
+          </Button>
+        </div>
+      ) : null}
       <div className="mt-2 flex flex-wrap items-center gap-2">
         <Button
           type="button"
           size="sm"
-          onClick={onImport}
+          onClick={() => onImport()}
           loading={isPending}
           loadingLabel={t("syncing")}
           disabled={!url.trim()}
@@ -590,12 +734,12 @@ function ArchivedRow({
   match,
   locale,
   t,
-  onDelete,
+  onOpen,
 }: {
   match: Match;
   locale: string;
   t: ReturnType<typeof useTranslations>;
-  onDelete: () => void;
+  onOpen: () => void;
 }) {
   const start = new Date(match.starts_at);
   const dateStr = start.toLocaleDateString(locale, {
@@ -603,23 +747,41 @@ function ArchivedRow({
     month: "short",
     year: "numeric",
   });
-  const title = match.opponent ?? match.summary ?? "—";
+  const title = match.summary ?? match.opponent ?? "—";
   return (
     <li className="flex items-center justify-between gap-3 py-2.5 text-sm">
       <div className="flex min-w-0 items-center gap-3">
         <span className="w-28 shrink-0 text-xs font-medium uppercase tracking-wider text-zinc-400">
           {dateStr}
         </span>
-        <span className="truncate text-zinc-600 dark:text-zinc-300">{title}</span>
+        <div className="min-w-0">
+          <div className="flex items-center gap-2">
+            <span className="truncate font-medium text-zinc-700 dark:text-zinc-200">{title}</span>
+            <span className="rounded bg-zinc-100 px-1.5 py-0.5 text-[10px] text-zinc-500 dark:bg-zinc-800">
+              {t(`match.kindOption.${match.kind ?? "league"}`)}
+            </span>
+          </div>
+        </div>
       </div>
       <div className="flex shrink-0 items-center gap-2">
         {match.home_away ? (
           <span className="rounded bg-zinc-100 px-1.5 py-0.5 text-[10px] font-medium uppercase text-zinc-500 dark:bg-zinc-800">
             {t(`match.${match.home_away}`)}
           </span>
-        ) : null}
-        <Button type="button" variant="ghost" size="sm" onClick={onDelete} title={t("match.delete")}>
-          <Trash2 className="h-3.5 w-3.5" />
+        ) : (
+          <span className="rounded bg-amber-100 px-1.5 py-0.5 text-[10px] font-medium text-amber-700">
+            {t("match.homeAwayUnknown")}
+          </span>
+        )}
+        {match.home_score != null && match.away_score != null ? (
+          <span className="rounded bg-zinc-900 px-2 py-1 text-xs font-semibold tabular-nums text-white dark:bg-zinc-100 dark:text-zinc-900">
+            {match.home_score}–{match.away_score}
+          </span>
+        ) : (
+          <span className="text-xs text-amber-600">{t("historyResultMissing")}</span>
+        )}
+        <Button type="button" variant="ghost" size="sm" onClick={onOpen}>
+          {t("historyOpen")}
         </Button>
       </div>
     </li>
@@ -707,8 +869,7 @@ function MatchRow({
     minute: "2-digit",
   });
   const kind = match.kind ?? "league";
-  const title =
-    match.opponent ?? match.summary ?? "—";
+  const title = match.summary ?? match.opponent ?? "—";
 
   return (
     <li className="flex flex-col gap-2 py-3 md:flex-row md:items-center md:justify-between">
@@ -721,14 +882,14 @@ function MatchRow({
         </div>
         <div className="min-w-0">
           <div className="flex flex-wrap items-center gap-1.5">
-            {match.is_anchor ? (
+            {isStructuringKind(match.kind) ? (
               <span
-                title={t("match.isAnchor")}
+                title={t(`match.kindOption.${kind}`)}
                 className="inline-block h-2 w-2 shrink-0 rounded-full bg-[var(--club-primary)]"
               />
             ) : (
               <span
-                title={t("match.notAnchor")}
+                title={t(`match.kindOption.${kind}`)}
                 className="inline-block h-2 w-2 shrink-0 rounded-full border border-zinc-300"
               />
             )}
@@ -739,7 +900,11 @@ function MatchRow({
               <span className="rounded bg-zinc-100 px-1.5 py-0.5 text-[10px] font-medium uppercase text-zinc-500 dark:bg-zinc-800">
                 {t(`match.${match.home_away}`)}
               </span>
-            ) : null}
+            ) : (
+              <span className="rounded bg-amber-100 px-1.5 py-0.5 text-[10px] font-medium text-amber-700">
+                {t("match.homeAwayUnknown")}
+              </span>
+            )}
             <span className="rounded bg-[var(--club-primary-soft)] px-1.5 py-0.5 text-[10px] font-medium text-[var(--club-primary)]">
               {t(`match.kindOption.${kind}`)}
             </span>

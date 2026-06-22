@@ -135,7 +135,7 @@ export function PlannerCalendar({
           macrocycles={macrocycles}
           seasonStart={seasonWindow(season).start}
           seasonEnd={seasonWindow(season).end}
-          matches={matches.map((m) => ({
+          matches={[...matches, ...archivedMatches].map((m) => ({
             id: m.id,
             starts_at: m.starts_at,
             opponent: m.opponent,
@@ -143,6 +143,8 @@ export function PlannerCalendar({
             home_away: m.home_away,
             kind: m.kind,
             is_anchor: m.is_anchor,
+            home_score: m.home_score ?? null,
+            away_score: m.away_score ?? null,
           }))}
           evals={evals}
           evalMetrics={evalMetrics}

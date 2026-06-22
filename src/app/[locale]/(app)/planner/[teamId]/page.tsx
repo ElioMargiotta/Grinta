@@ -8,7 +8,7 @@ import { type Macrocycle } from "@/components/planner/PlannerTourView";
 import { FOCUS_FAMILIES, type FocusFamily } from "@/components/sheet/types";
 import { requireUser } from "@/lib/auth/getUser";
 import { resolveCurrentSeasonLabel } from "@/lib/club/season";
-import { archivePastMatches } from "@/lib/calendar/sync";
+import { movePastMatchesToHistory } from "@/lib/calendar/sync";
 import { seasonWindow } from "@/lib/planner/seasons";
 
 const VALID_VIEWS: PlannerView[] = ["season", "weekly"];
@@ -48,16 +48,15 @@ export default async function PlannerTeamPage({
   const winStartIso = `${window.start}T00:00:00.000Z`;
   const winEndIso = `${window.end}T23:59:59.999Z`;
 
-  // Modèle « calendrier vivant » : on archive d'abord les matchs joués (détachés
-  // de l'ICS), puis on ne charge que le calendrier ACTIF (archived = false).
-  await archivePastMatches(supabase, teamId);
+  // Les matchs passés rejoignent l'historique et sont protégés du flux ICS.
+  await movePastMatchesToHistory(supabase, teamId);
 
   // ---- Modèle piloté par les matchs (Lots 1-3) -----------------------------
   const [matchesRes, subscriptionRes, settingsRes] = await Promise.all([
     supabase
       .from("team_matches")
       .select(
-        "id, starts_at, ends_at, summary, location, match_url, kind, home_away, opponent, competition, is_anchor, source, microcycle_id",
+        "id, starts_at, ends_at, summary, location, match_url, kind, home_away, opponent, competition, is_anchor, source, microcycle_id, home_score, away_score",
       )
       .eq("team_id", teamId)
       .eq("archived", false)
@@ -83,7 +82,7 @@ export default async function PlannerTeamPage({
   const { data: archivedMatchesData } = await supabase
     .from("team_matches")
     .select(
-      "id, starts_at, ends_at, summary, location, match_url, kind, home_away, opponent, competition, is_anchor, source, microcycle_id",
+      "id, starts_at, ends_at, summary, location, match_url, kind, home_away, opponent, competition, is_anchor, source, microcycle_id, home_score, away_score",
     )
     .eq("team_id", teamId)
     .eq("archived", true)
@@ -242,16 +241,24 @@ export default async function PlannerTeamPage({
   // ---- Microcycles pilotés par les matchs (vue saison) ---------------------
   const { data: seasonMicroRows } = await supabase
     .from("microcycles")
-    .select("id, start_date, week_number, kind, theme, target_match_id")
+    .select("id, start_date, week_number, kind, theme, target_match_id, season_plan_id")
     .eq("team_id", teamId)
-    .not("target_match_id", "is", null)
+    // Même source que le résumé du wizard : toutes les semaines du plan, pas
+    // uniquement celles qui contiennent un match.
+    .not("season_plan_id", "is", null)
     .gte("start_date", window.start)
     .lte("start_date", window.end)
     .order("start_date", { ascending: true });
 
   const sessionsByMicro = new Map<
     string,
-    { id: string; date: string; theme: string | null; mdOffset: number | null }[]
+    {
+      id: string;
+      date: string;
+      startTime: string | null;
+      theme: string | null;
+      mdOffset: number | null;
+    }[]
   >();
   for (const s of sessions ?? []) {
     if (!s.microcycle_id) continue;
@@ -259,6 +266,7 @@ export default async function PlannerTeamPage({
     arr.push({
       id: s.id,
       date: s.date,
+      startTime: s.start_time ?? null,
       theme: s.theme,
       mdOffset: s.md_offset ?? null,
     });
@@ -269,10 +277,11 @@ export default async function PlannerTeamPage({
   // du wizard (dates + structure conservées sans génération).
   const { data: seasonPlanRows } = await supabase
     .from("season_plans")
-    .select("segment, start_date, championship_start_date, end_date, status, draft")
+    .select("id, segment, start_date, championship_start_date, end_date, status, draft")
     .eq("team_id", teamId)
     .eq("season_label", season);
   const seasonPlans = (seasonPlanRows ?? []).map((p) => ({
+    id: p.id as string,
     segment: p.segment as "first_round" | "second_round" | "full",
     start_date: p.start_date as string,
     championship_start_date: (p.championship_start_date as string | null) ?? null,
@@ -295,6 +304,7 @@ export default async function PlannerTeamPage({
     kind: mi.kind as string | null,
     theme: mi.theme as string | null,
     targetMatchId: mi.target_match_id as string | null,
+    seasonPlanId: mi.season_plan_id as string,
     sessions: (sessionsByMicro.get(mi.id) ?? []).sort((a, b) =>
       a.date.localeCompare(b.date),
     ),

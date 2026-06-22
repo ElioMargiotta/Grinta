@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 import { resolveCurrentSeasonLabel } from "@/lib/club/season";
+import { isStructuringKind } from "@/lib/planner/season";
 
 type ActionResult = {
   ok?: true;
@@ -124,6 +125,7 @@ export async function createManualMatchAction(
 
   const opponent = trimOrNull(formData.get("opponent"));
   const homeAway = asHomeAway(formData.get("home_away"));
+  const kind = asKind(formData.get("kind"));
   // Le summary affiché dérive de l'adversaire si non fourni.
   const summary =
     trimOrNull(formData.get("summary"), 500) ??
@@ -136,11 +138,12 @@ export async function createManualMatchAction(
     starts_at: startsAt.toISOString(),
     summary,
     location: trimOrNull(formData.get("location"), 500),
-    kind: asKind(formData.get("kind")),
+    kind,
     home_away: homeAway,
     opponent,
     competition: trimOrNull(formData.get("competition")),
-    is_anchor: formData.get("is_anchor") === "on",
+    // « Structurant » dérivé du type (compétition) — plus de saisie manuelle.
+    is_anchor: isStructuringKind(kind),
     source: "manual",
   });
   if (error) return { error: "db_error" };
@@ -151,8 +154,8 @@ export async function createManualMatchAction(
 
 /**
  * Met à jour un match. Les matchs ICS (source ≠ 'manual') restent la vérité du
- * flux : on n'autorise que les champs de périodisation `is_anchor` et `kind`
- * (préservés par la synchro). Les matchs manuels sont entièrement éditables.
+ * flux : seul le type reste modifiable ici (et détermine automatiquement si le
+ * match structure la saison). Les matchs manuels sont entièrement éditables.
  */
 export async function updateMatchAction(
   formData: FormData,
@@ -172,9 +175,12 @@ export async function updateMatchAction(
     .maybeSingle();
   if (!match) return { error: "match_not_found" };
 
+  const kind = asKind(formData.get("kind"));
   const patch: Record<string, unknown> = {
-    is_anchor: formData.get("is_anchor") === "on",
-    kind: asKind(formData.get("kind")),
+    kind,
+    home_away: asHomeAway(formData.get("home_away")),
+    // « Structurant » dérivé du type (compétition) — plus de saisie manuelle.
+    is_anchor: isStructuringKind(kind),
   };
 
   if (match.source === "manual") {
@@ -187,7 +193,6 @@ export async function updateMatchAction(
     }
     const opponent = trimOrNull(formData.get("opponent"));
     patch.opponent = opponent;
-    patch.home_away = asHomeAway(formData.get("home_away"));
     patch.competition = trimOrNull(formData.get("competition"));
     patch.location = trimOrNull(formData.get("location"), 500);
     patch.summary = trimOrNull(formData.get("summary"), 500) ?? opponent;
@@ -268,6 +273,62 @@ export async function deleteImportedMatchesAction(
 
   revalidatePath(`/[locale]/planner/${teamId}`, "page");
   return { ok: true, deleted: count ?? 0 };
+}
+
+/**
+ * Enregistre le résultat d'un match : score domicile/extérieur + note. Valable
+ * pour tout match (ICS ou manuel, actif ou archivé). Le score étant objectif
+ * (domicile/extérieur), le sens V/N/D se dérive de `home_away` à l'affichage.
+ */
+export async function setMatchResultAction(
+  formData: FormData,
+): Promise<ActionResult> {
+  const teamId = String(formData.get("teamId") ?? "");
+  const matchId = String(formData.get("matchId") ?? "");
+  if (!matchId) return { error: "invalid_input" };
+
+  const access = await loadTeamAccess(teamId);
+  if (!access.ok) return { error: access.error };
+
+  const { data: match } = await access.supabase
+    .from("team_matches")
+    .select("id")
+    .eq("id", matchId)
+    .eq("team_id", teamId)
+    .maybeSingle();
+  if (!match) return { error: "match_not_found" };
+
+  const parseScore = (v: FormDataEntryValue | null): number | null => {
+    const s = String(v ?? "").trim();
+    if (!s) return null;
+    const n = Number(s);
+    if (!Number.isInteger(n) || n < 0 || n > 99) return null;
+    return n;
+  };
+
+  const rawHome = String(formData.get("home_score") ?? "").trim();
+  const rawAway = String(formData.get("away_score") ?? "").trim();
+  const homeScore = parseScore(formData.get("home_score"));
+  const awayScore = parseScore(formData.get("away_score"));
+  // Un champ rempli mais invalide (non entier 0-99) = erreur explicite.
+  if ((rawHome && homeScore === null) || (rawAway && awayScore === null)) {
+    return { error: "invalid_input" };
+  }
+
+  const { error } = await access.supabase
+    .from("team_matches")
+    .update({
+      home_score: homeScore,
+      away_score: awayScore,
+      result_note: trimOrNull(formData.get("result_note"), 2000),
+    })
+    .eq("id", matchId)
+    .eq("team_id", teamId);
+  if (error) return { error: "db_error" };
+
+  revalidatePath(`/[locale]/planner/${teamId}`, "page");
+  revalidatePath(`/[locale]/planner/${teamId}/match/${matchId}`, "page");
+  return { ok: true };
 }
 
 /** Crée/MAJ la config de rythme de périodisation de l'équipe. */

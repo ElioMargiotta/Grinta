@@ -68,13 +68,14 @@ async function fetchIcs(url: string): Promise<string> {
 }
 
 /**
- * Archive (= détache de l'ICS) les matchs déjà commencés. Un match dont l'heure
- * de coup d'envoi est passée bascule `archived = true` : il sort du calendrier
- * actif (rangé en Historique) et la synchro l'ignore désormais, donc il reste en
+ * Place dans l'historique les matchs déjà commencés. Le booléen `archived` est
+ * uniquement le mécanisme interne qui les détache du flux ICS : côté produit,
+ * ils restent des matchs historiques avec leur résultat et leurs données.
+ * La synchro les ignore ensuite, donc ils restent en
  * base même si la fédé le retire du flux. Idempotent : ne retouche jamais un
  * match déjà archivé. À appeler avant chaque synchro et à l'ouverture du planner.
  */
-export async function archivePastMatches(
+export async function movePastMatchesToHistory(
   supabase: SupabaseClient,
   teamId: string,
 ): Promise<number> {
@@ -192,7 +193,33 @@ type SyncInput = {
   icsText?: string;
   /** URL à fetcher si pas de texte. */
   icsUrl?: string;
+  /** Identité exacte de notre équipe telle qu'elle apparaît dans ce calendrier. */
+  calendarTeamName?: string;
 };
+
+export function inspectCalendarTeam(icsText: string): {
+  candidates: string[];
+  automatic: string | null;
+} {
+  const events = parseIcs(icsText).events;
+  const counts = new Map<string, { label: string; count: number }>();
+  for (const event of events) {
+    const sides = event.summary?.split(/\s+[-–—]\s+/).slice(0, 2) ?? [];
+    for (const side of sides) {
+      const label = side.trim();
+      if (!label) continue;
+      const key = normalizeName(label);
+      const current = counts.get(key);
+      counts.set(key, { label: current?.label ?? label, count: (current?.count ?? 0) + 1 });
+    }
+  }
+  const ranked = [...counts.values()].sort((a, b) => b.count - a.count || a.label.localeCompare(b.label));
+  const automatic =
+    events.length >= 3 && ranked[0] && ranked[0].count > (ranked[1]?.count ?? 0)
+      ? ranked[0].label
+      : null;
+  return { candidates: ranked.map((item) => item.label), automatic };
+}
 
 /**
  * Synchronise les `team_matches` d'une équipe depuis un payload ICS. Quand
@@ -218,20 +245,22 @@ function normalizeName(s: string): string {
 export function deriveMatchSides(
   summary: string | null,
   teamName: string | null,
+  clubName: string | null = null,
 ): { opponent: string | null; homeAway: "home" | "away" | null } {
-  if (!summary || !teamName) return { opponent: null, homeAway: null };
+  if (!summary || (!teamName && !clubName)) return { opponent: null, homeAway: null };
   const parts = summary.split(/\s+-\s+/);
   if (parts.length < 2) return { opponent: null, homeAway: null };
 
   // On garde les 2 premiers segments (le reste = catégorie / compétition).
   const home = parts[0].trim();
   const away = parts[1].trim();
-  const team = normalizeName(teamName);
   const nHome = normalizeName(home);
   const nAway = normalizeName(away);
-
-  const matchesHome = nHome.includes(team) || team.includes(nHome);
-  const matchesAway = nAway.includes(team) || team.includes(nAway);
+  const aliases = [teamName, clubName]
+    .filter((value): value is string => Boolean(value?.trim()))
+    .map(normalizeName);
+  const matchesHome = aliases.some((alias) => nHome.includes(alias) || alias.includes(nHome));
+  const matchesAway = aliases.some((alias) => nAway.includes(alias) || alias.includes(nAway));
 
   if (matchesHome && !matchesAway) return { opponent: away, homeAway: "home" };
   if (matchesAway && !matchesHome) return { opponent: home, homeAway: "away" };
@@ -255,7 +284,7 @@ export async function syncTeamCalendar(input: SyncInput): Promise<SyncOutcome> {
 
   // Détache d'abord les matchs joués : ils ne doivent plus être touchés par le
   // flux (et restent en base / en Historique même si la fédé les a retirés).
-  await archivePastMatches(supabase, teamId);
+  await movePastMatchesToHistory(supabase, teamId);
 
   let text = input.icsText ?? "";
   if (!text && icsUrl) {
@@ -291,10 +320,20 @@ export async function syncTeamCalendar(input: SyncInput): Promise<SyncOutcome> {
   // Best-effort : si la lecture échoue, on enrichit juste sans les côtés.
   const { data: teamRow } = await supabase
     .from("teams")
-    .select("name")
+    .select("name, calendar_team_name")
     .eq("id", teamId)
     .maybeSingle();
-  const teamName = (teamRow?.name as string | null) ?? null;
+  const teamName =
+    input.calendarTeamName ??
+    (teamRow?.calendar_team_name as string | null) ??
+    (teamRow?.name as string | null) ??
+    null;
+  const { data: clubRow } = await supabase
+    .from("clubs")
+    .select("name")
+    .eq("id", clubId)
+    .maybeSingle();
+  const clubName = (clubRow?.name as string | null) ?? null;
 
   // Matchs déjà archivés (détachés) : on ne les réimporte/écrase jamais, même
   // s'ils sont encore présents dans le flux.
@@ -310,7 +349,7 @@ export async function syncTeamCalendar(input: SyncInput): Promise<SyncOutcome> {
   const rows = events
     .filter((e) => !archivedUids.has(e.uid))
     .map((e) => {
-    const { opponent, homeAway } = deriveMatchSides(e.summary, teamName);
+    const { opponent, homeAway } = deriveMatchSides(e.summary, teamName, clubName);
     return {
       team_id: teamId,
       club_id: clubId,

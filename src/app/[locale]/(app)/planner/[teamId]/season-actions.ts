@@ -88,15 +88,38 @@ function parseStructure(raw: string | null): SeasonStructure | undefined {
   try {
     const obj = JSON.parse(raw);
     if (typeof obj?.prepWeeks !== "number" || !Array.isArray(obj?.mesos)) return undefined;
+    const prepWeeks = Math.max(0, Math.round(obj.prepWeeks));
+    const legacyPrepTheme =
+      typeof obj.prepTheme === "string" && obj.prepTheme ? obj.prepTheme : null;
     return {
-      prepWeeks: Math.max(0, Math.round(obj.prepWeeks)),
-      prepTheme: typeof obj.prepTheme === "string" && obj.prepTheme ? obj.prepTheme : null,
+      prepWeeks,
+      prepTheme: legacyPrepTheme,
+      prepWeekThemes: Array.from({ length: prepWeeks }, (_, index) => {
+        const value = Array.isArray(obj.prepWeekThemes) ? obj.prepWeekThemes[index] : null;
+        return typeof value === "string" && value ? value : legacyPrepTheme;
+      }),
       mesos: obj.mesos
-        .map((m: { weeks?: unknown; theme?: unknown; name?: unknown }) => ({
-          weeks: Math.max(1, Math.round(Number(m?.weeks) || 1)),
-          theme: typeof m?.theme === "string" && m.theme ? m.theme : null,
-          name: typeof m?.name === "string" && m.name.trim() ? m.name.trim() : null,
-        }))
+        .map((m: {
+          weeks?: unknown;
+          theme?: unknown;
+          weekThemes?: unknown;
+          name?: unknown;
+          kind?: unknown;
+        }) => {
+          const weeks = Math.max(1, Math.round(Number(m?.weeks) || 1));
+          const legacyTheme = typeof m?.theme === "string" && m.theme ? m.theme : null;
+          const suppliedThemes = Array.isArray(m?.weekThemes) ? m.weekThemes : [];
+          return {
+            weeks,
+            theme: legacyTheme,
+            weekThemes: Array.from({ length: weeks }, (_, index) => {
+              const value = suppliedThemes[index];
+              return typeof value === "string" && value ? value : legacyTheme;
+            }),
+            name: typeof m?.name === "string" && m.name.trim() ? m.name.trim() : null,
+            kind: m?.kind === "transition" ? ("transition" as const) : ("competition" as const),
+          };
+        })
         .filter((m: { weeks: number }) => m.weeks > 0),
     };
   } catch {
@@ -130,7 +153,7 @@ async function loadTeamAccess(teamId: string): Promise<
 }
 
 /**
- * (Re)génère le squelette de saison d'une équipe à partir de ses matchs ancres.
+ * (Re)génère le squelette de saison d'une équipe à partir de ses matchs officiels.
  * Écrit dans macro/méso/micro (modèle lu par la vue Hebdo) :
  *   - 1 macrocycle source='generated' (la saison),
  *   - 1 mésocycle par phase (Préparation / Compétition…),
@@ -177,13 +200,16 @@ export async function generateSeasonSkeletonAction(
     mdScheme: (settingsRow?.md_scheme as MdScheme | null) ?? DEFAULT_SCHEME,
   };
 
-  // 2. Matchs ancres.
+  // 2. Matchs structurants (championnat + coupe). Les amicaux ne structurent pas
+  //    la saison (plus de notion d'« ancrage » manuel : tout vient du type).
   const { data: matchRows, error: matchErr } = await supabase
     .from("team_matches")
-    .select("id, starts_at, kind, is_anchor")
+    .select("id, starts_at, kind")
     .eq("team_id", teamId)
-    .eq("is_anchor", true)
-    .eq("archived", false)
+    .in("kind", ["league", "cup"])
+    // Les matchs joués sont archivés pour ne plus dépendre de l'ICS, mais ils
+    // restent structurants : sinon S-1/S1 se décaleraient à chaque régénération.
+    .or(`archived.eq.false,starts_at.lt.${new Date().toISOString()}`)
     .gte("starts_at", seasonStart ? `${seasonStart}T00:00:00.000Z` : "0001-01-01T00:00:00.000Z")
     .lte("starts_at", seasonEnd ? `${seasonEnd}T23:59:59.999Z` : "9999-12-31T23:59:59.999Z")
     .order("starts_at", { ascending: true });
@@ -193,7 +219,6 @@ export async function generateSeasonSkeletonAction(
   const matches: AnchorMatch[] = matchRows.map((m) => ({
     id: m.id as string,
     startsAt: new Date(m.starts_at as string),
-    isAnchor: true,
     kind: (m.kind as MatchKind | null) ?? "league",
   }));
 
@@ -232,11 +257,17 @@ export async function generateSeasonSkeletonAction(
         segment,
         mode,
         name: planName || null,
-        start_date: plan.macro.preseasonStart,
+        // Les bornes du plan sont les dates exactes saisies. Les microcycles
+        // restent alignés au lundi, sans réécrire le brouillon au dimanche.
+        start_date: seasonStart ?? plan.macro.preseasonStart,
         championship_start_date: plan.macro.firstMatch,
-        end_date: plan.macro.end,
+        end_date: seasonEnd ?? plan.macro.end,
         status: "generated",
         source: "generated",
+        draft: {
+          structure: structure ?? null,
+          trainingSlots: trainingSlots ?? null,
+        },
       },
       { onConflict: "team_id,season_label,segment" },
     )
@@ -442,7 +473,7 @@ export async function generateSeasonSkeletonAction(
   //    sinon on réutilise le thème déjà posé. Format/notes toujours préservés.
   const microRows = plan.microcycles.map((mc) => {
     const carried = themeByDate.get(mc.startDate);
-    const phaseTheme = plan.phases[mc.phaseIndex]?.theme ?? null;
+    const phaseTheme = mc.theme;
     return {
       mesocycle_id: mesoByIndex.get(mc.phaseIndex) ?? null,
       season_plan_id: seasonPlan.id,
