@@ -1271,8 +1271,29 @@
       "weekTitle": "Vorbereitungswoche",
       "weekEmpty": "Keine Einheit mit diesem Spiel verknüpft. Generiere den Plan in der Saisonansicht.",
       "sessionFallback": "Einheit",
-      "kitTitle": "Match-Kit",
-      "kitSoon": "Aufstellung, Spielbericht und Einsätze folgen bald."
+      "squad": {
+        "title": "Spielbericht",
+        "startersCount": "{count} Startelf",
+        "subsCount": "{count, plural, one {# Ersatzspieler} other {# Ersatzspieler}}",
+        "emptyRoster": "Keine Spieler dieser Mannschaft für die Saison zugewiesen. Füge Spieler zum Kader hinzu.",
+        "status": {
+          "none": "—",
+          "starter": "Startelf",
+          "substitute": "Einwechslung",
+          "unused": "Bank",
+          "unavailable": "Nicht verfügbar"
+        },
+        "min": "Min.",
+        "yellow": "Gelbe Karte",
+        "red": "Rote Karte",
+        "save": "Bericht speichern",
+        "saved": "Bericht gespeichert",
+        "err": {
+          "invalid_input": "Ungültige Eingabe",
+          "db_error": "Speichern fehlgeschlagen",
+          "match_not_found": "Spiel nicht gefunden"
+        }
+      }
     }
   },
   "common": {

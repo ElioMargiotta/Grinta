@@ -1271,8 +1271,29 @@
       "weekTitle": "Settimana di preparazione",
       "weekEmpty": "Nessuna seduta collegata a questa partita. Genera la pianificazione dalla vista Stagione.",
       "sessionFallback": "Seduta",
-      "kitTitle": "Kit partita",
-      "kitSoon": "Formazione, distinta e presenze in arrivo."
+      "squad": {
+        "title": "Distinta",
+        "startersCount": "{count, plural, one {# titolare} other {# titolari}}",
+        "subsCount": "{count, plural, one {# riserva} other {# riserve}}",
+        "emptyRoster": "Nessun giocatore assegnato a questa squadra per la stagione. Aggiungi giocatori alla rosa.",
+        "status": {
+          "none": "—",
+          "starter": "Titolare",
+          "substitute": "Subentrato",
+          "unused": "Panchina",
+          "unavailable": "Non disponibile"
+        },
+        "min": "min",
+        "yellow": "Cartellino giallo",
+        "red": "Cartellino rosso",
+        "save": "Salva distinta",
+        "saved": "Distinta salvata",
+        "err": {
+          "invalid_input": "Dati non validi",
+          "db_error": "Salvataggio non riuscito",
+          "match_not_found": "Partita non trovata"
+        }
+      }
     }
   },
   "common": {

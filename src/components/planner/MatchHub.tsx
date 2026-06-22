@@ -15,6 +15,11 @@ import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 import { MatchEditor, type EditableMatch } from "@/components/teams/MatchEditor";
 import {
+  MatchParticipations,
+  type ParticipationState,
+  type RosterPlayer,
+} from "@/components/planner/MatchParticipations";
+import {
   deleteMatchAction,
   setMatchResultAction,
 } from "@/app/[locale]/(app)/teams/[teamId]/calendar/match-actions";
@@ -59,10 +64,14 @@ export function MatchHub({
   teamId,
   match,
   weekSessions,
+  roster,
+  participations,
 }: {
   teamId: string;
   match: MatchHubMatch;
   weekSessions: WeekSession[];
+  roster: RosterPlayer[];
+  participations: Record<string, ParticipationState>;
 }) {
   const t = useTranslations("planner.match");
   const tCal = useTranslations("teams.calendar.match");
@@ -345,13 +354,13 @@ export function MatchHub({
         )}
       </section>
 
-      {/* Kit de match — fondation Lot 2 (compo, feuille, participations) */}
-      <section className="rounded-lg border border-dashed border-[var(--club-line)] bg-white/40 p-5 text-sm text-zinc-500 dark:bg-zinc-900/30">
-        <div className="font-semibold text-zinc-700 dark:text-zinc-300">
-          {t("kitTitle")}
-        </div>
-        <p className="mt-1">{t("kitSoon")}</p>
-      </section>
+      {/* Feuille de match — participations (Lot 2) */}
+      <MatchParticipations
+        teamId={teamId}
+        matchId={match.id}
+        roster={roster}
+        initial={participations}
+      />
     </div>
   );
 }

@@ -1,7 +1,32 @@
 import { notFound } from "next/navigation";
 import { setRequestLocale } from "next-intl/server";
 import { MatchHub, type WeekSession } from "@/components/planner/MatchHub";
+import type {
+  ParticipationState,
+  ParticipationStatus,
+  RosterPlayer,
+} from "@/components/planner/MatchParticipations";
 import { requireUser } from "@/lib/auth/getUser";
+import { currentSeasonLabel } from "@/lib/planner/seasons";
+
+type AssignmentRow = {
+  players: {
+    id: string;
+    first_name: string;
+    last_name: string;
+    jersey_number: number | null;
+  } | null;
+};
+
+type ParticipationRow = {
+  player_id: string;
+  status: ParticipationStatus;
+  minutes: number | null;
+  goals: number;
+  assists: number;
+  yellow_cards: number;
+  red_card: boolean;
+};
 
 export default async function MatchPage({
   params,
@@ -54,10 +79,59 @@ export default async function MatchPage({
     }));
   }
 
+  // Effectif de la saison du match + feuille de match déjà saisie.
+  const matchSeason = currentSeasonLabel(new Date(match.starts_at as string));
+  const [{ data: assignmentsRaw }, { data: participationsRaw }] =
+    await Promise.all([
+      supabase
+        .from("player_team_assignments")
+        .select("players (id, first_name, last_name, jersey_number)")
+        .eq("team_id", teamId)
+        .eq("season", matchSeason),
+      supabase
+        .from("match_participations")
+        .select(
+          "player_id, status, minutes, goals, assists, yellow_cards, red_card",
+        )
+        .eq("match_id", matchId),
+    ]);
+
+  const assignments = (assignmentsRaw ?? []) as unknown as AssignmentRow[];
+  const roster: RosterPlayer[] = assignments
+    .map((a) => a.players)
+    .filter((p): p is NonNullable<AssignmentRow["players"]> => p !== null)
+    .map((p) => ({
+      playerId: p.id,
+      fullName: `${p.first_name} ${p.last_name}`.trim(),
+      jerseyNumber: p.jersey_number,
+    }))
+    .sort((a, b) => {
+      if (a.jerseyNumber !== null && b.jerseyNumber !== null) {
+        return a.jerseyNumber - b.jerseyNumber;
+      }
+      if (a.jerseyNumber !== null) return -1;
+      if (b.jerseyNumber !== null) return 1;
+      return a.fullName.localeCompare(b.fullName);
+    });
+
+  const participations: Record<string, ParticipationState> = {};
+  for (const row of (participationsRaw ?? []) as ParticipationRow[]) {
+    participations[row.player_id] = {
+      status: row.status,
+      minutes: row.minutes,
+      goals: row.goals,
+      assists: row.assists,
+      yellowCards: row.yellow_cards,
+      redCard: row.red_card,
+    };
+  }
+
   return (
     <div className="mx-auto flex w-full max-w-4xl flex-col gap-6">
       <MatchHub
         teamId={teamId}
+        roster={roster}
+        participations={participations}
         match={{
           id: match.id as string,
           starts_at: match.starts_at as string,

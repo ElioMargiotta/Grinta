@@ -1277,8 +1277,29 @@
       "weekTitle": "Preparation week",
       "weekEmpty": "No session linked to this match. Generate the plan from the Season view.",
       "sessionFallback": "Session",
-      "kitTitle": "Match kit",
-      "kitSoon": "Lineup, team sheet and participations are coming soon."
+      "squad": {
+        "title": "Match sheet",
+        "startersCount": "{count, plural, one {# starter} other {# starters}}",
+        "subsCount": "{count, plural, one {# sub} other {# subs}}",
+        "emptyRoster": "No players assigned to this team for the season. Add players to the squad.",
+        "status": {
+          "none": "—",
+          "starter": "Starter",
+          "substitute": "Sub",
+          "unused": "Bench",
+          "unavailable": "Unavailable"
+        },
+        "min": "min",
+        "yellow": "Yellow card",
+        "red": "Red card",
+        "save": "Save sheet",
+        "saved": "Sheet saved",
+        "err": {
+          "invalid_input": "Invalid input",
+          "db_error": "Could not save",
+          "match_not_found": "Match not found"
+        }
+      }
     }
   },
   "common": {

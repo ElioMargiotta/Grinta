@@ -331,6 +331,130 @@ export async function setMatchResultAction(
   return { ok: true };
 }
 
+const PARTICIPATION_STATUS = [
+  "starter",
+  "substitute",
+  "unused",
+  "unavailable",
+] as const;
+type ParticipationStatus = (typeof PARTICIPATION_STATUS)[number];
+
+type ParticipationInput = {
+  playerId: string;
+  status: ParticipationStatus;
+  minutes: number | null;
+  goals: number;
+  assists: number;
+  yellowCards: number;
+  redCard: boolean;
+};
+
+/** Borne un entier optionnel dans [min,max] ; null si vide/invalide. */
+function clampIntOrNull(v: unknown, min: number, max: number): number | null {
+  const n = Number(v);
+  if (!Number.isInteger(n) || n < min || n > max) return null;
+  return n;
+}
+
+/**
+ * Enregistre la feuille de match : la liste complète des participations
+ * (titulaire / remplaçant / non utilisé / indisponible) + stats par joueur.
+ * Remplace l'état existant — les joueurs absents de la liste sont retirés.
+ */
+export async function setMatchParticipationsAction(
+  formData: FormData,
+): Promise<ActionResult> {
+  const teamId = String(formData.get("teamId") ?? "");
+  const matchId = String(formData.get("matchId") ?? "");
+  if (!matchId) return { error: "invalid_input" };
+
+  const access = await loadTeamAccess(teamId);
+  if (!access.ok) return { error: access.error };
+
+  const { data: match } = await access.supabase
+    .from("team_matches")
+    .select("id")
+    .eq("id", matchId)
+    .eq("team_id", teamId)
+    .maybeSingle();
+  if (!match) return { error: "match_not_found" };
+
+  // Effectif autorisé : joueurs réellement affectés à l'équipe (toutes saisons
+  // confondues — la feuille porte sur un match précis). Garde-fou anti-injection
+  // de player_id arbitraires.
+  const { data: assignmentRows } = await access.supabase
+    .from("player_team_assignments")
+    .select("player_id")
+    .eq("team_id", teamId);
+  const allowed = new Set(
+    (assignmentRows ?? []).map((r) => r.player_id as string),
+  );
+
+  let parsed: unknown;
+  try {
+    parsed = JSON.parse(String(formData.get("participations") ?? "[]"));
+  } catch {
+    return { error: "invalid_input" };
+  }
+  if (!Array.isArray(parsed)) return { error: "invalid_input" };
+
+  const seen = new Set<string>();
+  const rows: ParticipationInput[] = [];
+  for (const raw of parsed) {
+    if (!raw || typeof raw !== "object") continue;
+    const r = raw as Record<string, unknown>;
+    const playerId = String(r.playerId ?? "");
+    if (!allowed.has(playerId) || seen.has(playerId)) continue;
+    const status = String(r.status ?? "");
+    if (!(PARTICIPATION_STATUS as readonly string[]).includes(status)) continue;
+    seen.add(playerId);
+    rows.push({
+      playerId,
+      status: status as ParticipationStatus,
+      minutes: clampIntOrNull(r.minutes, 0, 200),
+      goals: clampIntOrNull(r.goals, 0, 50) ?? 0,
+      assists: clampIntOrNull(r.assists, 0, 50) ?? 0,
+      yellowCards: clampIntOrNull(r.yellowCards, 0, 2) ?? 0,
+      redCard: Boolean(r.redCard),
+    });
+  }
+
+  // Retire les participations désélectionnées (joueurs hors de la liste).
+  const keepIds = [...seen];
+  let del = access.supabase
+    .from("match_participations")
+    .delete()
+    .eq("match_id", matchId);
+  if (keepIds.length > 0) {
+    del = del.not("player_id", "in", `(${keepIds.join(",")})`);
+  }
+  const { error: delError } = await del;
+  if (delError) return { error: "db_error" };
+
+  if (rows.length > 0) {
+    const { error: upError } = await access.supabase
+      .from("match_participations")
+      .upsert(
+        rows.map((r) => ({
+          match_id: matchId,
+          player_id: r.playerId,
+          club_id: access.clubId,
+          status: r.status,
+          minutes: r.minutes,
+          goals: r.goals,
+          assists: r.assists,
+          yellow_cards: r.yellowCards,
+          red_card: r.redCard,
+        })),
+        { onConflict: "match_id,player_id" },
+      );
+    if (upError) return { error: "db_error" };
+  }
+
+  revalidatePath(`/[locale]/planner/${teamId}/match/${matchId}`, "page");
+  return { ok: true };
+}
+
 /** Crée/MAJ la config de rythme de périodisation de l'équipe. */
 export async function setPeriodizationSettingsAction(
   formData: FormData,

@@ -1276,8 +1276,29 @@
       "weekTitle": "Semaine de préparation",
       "weekEmpty": "Aucune séance rattachée à ce match. Génère la planification depuis la vue Saison.",
       "sessionFallback": "Séance",
-      "kitTitle": "Kit de match",
-      "kitSoon": "Composition, feuille de match et participations arrivent bientôt."
+      "squad": {
+        "title": "Feuille de match",
+        "startersCount": "{count, plural, one {# titulaire} other {# titulaires}}",
+        "subsCount": "{count, plural, one {# remplaçant} other {# remplaçants}}",
+        "emptyRoster": "Aucun joueur affecté à cette équipe pour la saison. Ajoute des joueurs au contingent.",
+        "status": {
+          "none": "—",
+          "starter": "Titulaire",
+          "substitute": "Remplaçant",
+          "unused": "Banc",
+          "unavailable": "Indisponible"
+        },
+        "min": "min",
+        "yellow": "Carton jaune",
+        "red": "Carton rouge",
+        "save": "Enregistrer la feuille",
+        "saved": "Feuille enregistrée",
+        "err": {
+          "invalid_input": "Saisie invalide",
+          "db_error": "Erreur d'enregistrement",
+          "match_not_found": "Match introuvable"
+        }
+      }
     }
   },
   "common": {
