@@ -25,7 +25,7 @@ export type EditableMatch = {
   source: string;
 };
 
-const KINDS = ["league", "cup", "friendly", "tournament", "break"] as const;
+const KINDS = ["league", "cup", "friendly"] as const;
 
 /** ISO UTC → {date:'YYYY-MM-DD', time:'HH:MM'} en Europe/Zurich. */
 function splitLocal(iso: string | null): { date: string; time: string } {
@@ -77,7 +77,6 @@ export function MatchEditor({
   const [competition, setCompetition] = useState(match?.competition ?? "");
   const [location, setLocation] = useState(match?.location ?? "");
   const [kind, setKind] = useState(match?.kind ?? "league");
-  const [isAnchor, setIsAnchor] = useState(match?.is_anchor ?? true);
   const [error, setError] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
 
@@ -90,12 +89,11 @@ export function MatchEditor({
     const fd = new FormData();
     fd.set("teamId", teamId);
     fd.set("kind", kind);
-    fd.set("is_anchor", isAnchor ? "on" : "");
+    fd.set("home_away", homeAway);
     if (isManual) {
       fd.set("date", date);
       fd.set("time", time);
       fd.set("opponent", opponent);
-      fd.set("home_away", homeAway);
       fd.set("competition", competition);
       fd.set("location", location);
     }
@@ -140,16 +138,6 @@ export function MatchEditor({
             onChange={(e) => setOpponent(e.target.value)}
             placeholder={t("opponentPlaceholder")}
           />
-          <Select
-            id="match-homeaway"
-            label={t("homeAway")}
-            value={homeAway}
-            onChange={(e) => setHomeAway(e.target.value)}
-          >
-            <option value="">{t("homeAwayUnset")}</option>
-            <option value="home">{t("home")}</option>
-            <option value="away">{t("away")}</option>
-          </Select>
           <Input
             id="match-competition"
             label={t("competition")}
@@ -178,18 +166,16 @@ export function MatchEditor({
             </option>
           ))}
         </Select>
-        <label className="flex items-end gap-2 pb-2 text-sm text-zinc-700 dark:text-zinc-300">
-          <input
-            type="checkbox"
-            checked={isAnchor}
-            onChange={(e) => setIsAnchor(e.target.checked)}
-            className="h-4 w-4 rounded border-zinc-300"
-          />
-          <span>
-            {t("isAnchor")}
-            <span className="block text-xs text-zinc-400">{t("isAnchorHint")}</span>
-          </span>
-        </label>
+        <Select
+          id="match-homeaway"
+          label={t("homeAway")}
+          value={homeAway}
+          onChange={(e) => setHomeAway(e.target.value)}
+        >
+          <option value="">{t("homeAwayUnset")}</option>
+          <option value="home">{t("home")}</option>
+          <option value="away">{t("away")}</option>
+        </Select>
       </div>
 
       {error ? (

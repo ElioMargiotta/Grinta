@@ -4,7 +4,7 @@
  * Modèle « tactical periodization / MD± » unifié avec la périodisation classique :
  * la saison est découpée en SEMAINES calendaires (microcycles, début lundi),
  * groupées en PHASES (mésocycles : Préparation / Compétition / Transition).
- * Chaque semaine qui contient un match d'ancrage « cible » ce match et ses jours
+ * Chaque semaine qui contient un match officiel « cible » ce match et ses jours
  * d'entraînement sont étiquetés par leur écart au jour J (`mdOffset`).
  *
  * Le générateur (server action) écrit ce plan dans macro/méso/micro — le même
@@ -18,10 +18,23 @@
 
 export type MatchKind = "league" | "cup" | "friendly" | "tournament" | "break";
 
+/**
+ * Types de match qui STRUCTURENT la saison (compétition) : championnat + coupe.
+ * Le 1er de ces matchs termine la préparation ; chacun « cible » sa semaine
+ * (MD-). Les amicaux ne structurent rien (pas de bascule prépa→compétition, pas
+ * de découpe de microcycle). Remplace l'ancien concept d'« ancrage » manuel.
+ */
+export const COMPETITION_KINDS: MatchKind[] = ["league", "cup"];
+
+export function isStructuringKind(kind?: string | null): boolean {
+  return kind === "league" || kind === "cup";
+}
+
 export type AnchorMatch = {
   id: string;
   startsAt: Date;
-  isAnchor: boolean;
+  /** @deprecated conservé pour compat ; la structure vient désormais de `kind`. */
+  isAnchor?: boolean;
   kind?: MatchKind;
 };
 
@@ -48,8 +61,18 @@ export type SeasonStructure = {
   prepWeeks: number;
   /** Thème (phase de jeu) appliqué par défaut aux semaines de prépa. */
   prepTheme?: string | null;
+  /** Thèmes individuels des semaines S-N à S-1. */
+  prepWeekThemes?: (string | null)[];
   /** Mésocycles de compétition, dans l'ordre. */
-  mesos: { weeks: number; theme?: string | null; name?: string | null }[];
+  mesos: {
+    weeks: number;
+    /** Ancien thème global, conservé pour relire les brouillons existants. */
+    theme?: string | null;
+    /** Un thème par semaine du cycle. */
+    weekThemes?: (string | null)[];
+    name?: string | null;
+    kind?: PhaseKind;
+  }[];
 };
 
 export type PlanOptions = {
@@ -89,6 +112,8 @@ export type PlannedMicrocycle = {
   phase: PhaseKind;
   /** Index dans `phases` (un mésocycle = une phase). */
   phaseIndex: number;
+  /** Thème propre à cette semaine. */
+  theme: string | null;
   targetMatchId: string | null;
   sessions: PlannedSession[];
 };
@@ -183,18 +208,20 @@ export function planSeason(
     settings.trainingWeekdays.filter((w) => w >= 1 && w <= 7),
   );
 
-  const anchors = matches
-    .filter((m) => m.isAnchor)
+  // Les matchs structurants (championnat/coupe) découpent la saison. Les amicaux
+  // sont ignorés ici (ils n'ancrent pas de microcycle).
+  const officialMatches = matches
+    .filter((m) => isStructuringKind(m.kind))
     .map((m) => ({ ...m, civil: civilFromInstant(m.startsAt, timeZone) }))
     .sort((a, b) => a.civil.getTime() - b.civil.getTime());
 
-  if (anchors.length === 0) {
+  if (officialMatches.length === 0) {
     return { macro: null, phases: [], microcycles: [] };
   }
 
-  const firstMatchCivil = anchors[0].civil;
+  const firstMatchCivil = officialMatches[0].civil;
   const explicitEnd = opts.seasonEnd ? civilFromYmd(opts.seasonEnd) : null;
-  const lastMatchCivil = explicitEnd ?? anchors[anchors.length - 1].civil;
+  const lastMatchCivil = explicitEnd ?? officialMatches[officialMatches.length - 1].civil;
   const firstMatchMonday = startOfIsoWeek(firstMatchCivil);
   const lastMatchMonday = startOfIsoWeek(lastMatchCivil);
 
@@ -218,10 +245,14 @@ export function planSeason(
 
   const firstMatchIdx = diffWeeks(repriseMonday, firstMatchMonday);
 
-  // Nombre total de semaines.
-  let weeksCount = structure
-    ? structPrep! + structure.mesos.reduce((s, m) => s + Math.max(0, Math.round(m.weeks)), 0)
-    : diffWeeks(repriseMonday, lastMatchMonday) + 1;
+  // La durée vient des dates, jamais du découpage thématique. Le wizard peut
+  // ainsi laisser des semaines sans thème ou définir ses blocs progressivement.
+  // Sans date de fin explicite, l'ancienne somme reste un fallback compatible.
+  let weeksCount = opts.seasonEnd
+    ? diffWeeks(repriseMonday, lastMatchMonday) + 1
+    : structure
+      ? structPrep! + structure.mesos.reduce((s, m) => s + Math.max(0, Math.round(m.weeks)), 0)
+      : diffWeeks(repriseMonday, lastMatchMonday) + 1;
 
   // Bornage sur la fin de saison/tour : les semaines générées ne doivent JAMAIS
   // déborder de `seasonEnd` (sinon elles tombent dans le tour suivant — bug des
@@ -238,19 +269,32 @@ export function planSeason(
   const perWeekPhase: WeekPhase[] = [];
   if (structure) {
     for (let i = 0; i < structPrep!; i++) {
-      perWeekPhase.push({ kind: "preparation", name: null, theme: structure.prepTheme ?? null, key: "prep" });
+      perWeekPhase.push({
+        kind: "preparation",
+        name: null,
+        theme: structure.prepWeekThemes?.[i] ?? structure.prepTheme ?? null,
+        key: "prep",
+      });
     }
     structure.mesos.forEach((meso, mi) => {
       const w = Math.max(0, Math.round(meso.weeks));
       for (let k = 0; k < w; k++) {
         perWeekPhase.push({
-          kind: "competition",
+          kind: meso.kind === "transition" ? "transition" : "competition",
           name: meso.name?.trim() || null,
-          theme: meso.theme ?? null,
+          theme: meso.weekThemes?.[k] ?? meso.theme ?? null,
           key: `meso-${mi}`,
         });
       }
     });
+    while (perWeekPhase.length < weeksCount) {
+      perWeekPhase.push({
+        kind: "competition",
+        name: null,
+        theme: null,
+        key: "work-unassigned",
+      });
+    }
   } else {
     for (let i = 0; i < weeksCount; i++) {
       const isPrep = i < firstMatchIdx;
@@ -263,9 +307,9 @@ export function planSeason(
     }
   }
 
-  // Index de semaine → premier match d'ancrage qui y tombe.
+  // Index de semaine → premier match officiel qui y tombe.
   const matchByWeek = new Map<number, { id: string; civil: Date }>();
-  for (const a of anchors) {
+  for (const a of officialMatches) {
     const idx = diffWeeks(repriseMonday, startOfIsoWeek(a.civil));
     if (idx >= 0 && idx < weeksCount && !matchByWeek.has(idx)) {
       matchByWeek.set(idx, { id: a.id, civil: a.civil });
@@ -296,6 +340,8 @@ export function planSeason(
     if (trainingSlots.length > 0) {
       for (let d = 0; d < 7; d++) {
         const day = addDays(weekMonday, d);
+        if (explicitEnd && day.getTime() > explicitEnd.getTime()) continue;
+        if (match && diffDays(day, match.civil) === 0) continue;
         const weekday = isoWeekday(day);
         for (const slot of trainingSlots) {
           if (slot.weekday !== weekday) continue;
@@ -310,6 +356,8 @@ export function planSeason(
     } else if (weekdays.size > 0) {
       for (let d = 0; d < 7; d++) {
         const day = addDays(weekMonday, d);
+        if (explicitEnd && day.getTime() > explicitEnd.getTime()) continue;
+        if (match && diffDays(day, match.civil) === 0) continue;
         if (!weekdays.has(isoWeekday(day))) continue;
         sessions.push({
           date: ymd(day),
@@ -330,6 +378,7 @@ export function planSeason(
       weekNumber,
       phase,
       phaseIndex,
+      theme: perWeekPhase[i]?.theme ?? null,
       targetMatchId: match?.id ?? null,
       sessions,
     });
@@ -341,7 +390,9 @@ export function planSeason(
     macro: {
       preseasonStart: ymd(repriseMonday),
       firstMatch: ymd(firstMatchCivil),
-      end: ymd(endSunday),
+      // La dernière semaine peut être partielle. La borne métier saisie dans le
+      // wizard reste exacte (ex. 30 juin), elle ne devient pas le dimanche 5 juillet.
+      end: ymd(explicitEnd ?? endSunday),
     },
     phases,
     microcycles,

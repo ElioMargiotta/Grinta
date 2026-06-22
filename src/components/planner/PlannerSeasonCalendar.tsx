@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useLocale, useTranslations } from "next-intl";
 import { CalendarDays, ChevronLeft, ChevronRight, MapPin } from "lucide-react";
+import { isStructuringKind } from "@/lib/planner/season";
 import type { SeasonMatch } from "./PlannerSeasonView";
 
 type CalendarMatch = SeasonMatch & {
@@ -75,7 +76,7 @@ export function PlannerSeasonCalendar({
   }, [value, frameStart]);
   const [cursor, setCursor] = useState(initialMonth);
 
-  // Index des matchs par jour (ymd) — anchor prioritaire pour la pastille.
+  // Index des matchs par jour (ymd) — les matchs officiels sont mis en avant.
   const byDay = useMemo(() => {
     const map = new Map<string, CalendarMatch[]>();
     for (const m of matches) {
@@ -188,9 +189,9 @@ export function PlannerSeasonCalendar({
             const isReprise = ymd === value;
             const isToday = ymd === todayYmd;
             const dayMatches = byDay.get(ymd) ?? [];
-            const hasAnchor = dayMatches.some((m) => m.is_anchor);
+            const hasAnchor = dayMatches.some((m) => isStructuringKind(m.kind));
             const hasMatch = dayMatches.length > 0;
-            const label = dayMatches[0]?.opponent ?? dayMatches[0]?.summary ?? null;
+            const label = dayMatches[0]?.summary ?? dayMatches[0]?.opponent ?? null;
 
             return (
               <button
@@ -198,7 +199,7 @@ export function PlannerSeasonCalendar({
                 type="button"
                 disabled={outOfRange}
                 onClick={() => onPick(ymd)}
-                title={dayMatches.map((m) => m.opponent ?? m.summary ?? "—").join(" · ") || undefined}
+                title={dayMatches.map((m) => m.summary ?? m.opponent ?? "—").join(" · ") || undefined}
                 className={[
                   "relative flex min-h-[44px] min-w-0 flex-col items-center gap-0.5 overflow-hidden rounded-[7px] px-0.5 py-1 transition",
                   inMonth ? "" : "opacity-30",
@@ -274,14 +275,14 @@ export function PlannerSeasonCalendar({
                   >
                     <span
                       className={`h-2 w-2 shrink-0 rounded-full ${
-                        m.is_anchor ? "bg-red-500" : "border border-zinc-300"
+                        isStructuringKind(m.kind) ? "bg-red-500" : "border border-zinc-300"
                       }`}
                     />
                     <span className="w-24 shrink-0 text-[11px] font-medium text-zinc-500">
                       {dateStr} · {timeStr}
                     </span>
                     <span className="min-w-0 flex-1 truncate text-[12px] text-zinc-900">
-                      {m.opponent ?? m.summary ?? "—"}
+                      {m.summary ?? m.opponent ?? "—"}
                     </span>
                     {m.location ? (
                       <span className="hidden items-center gap-1 truncate text-[11px] text-zinc-400 sm:flex">

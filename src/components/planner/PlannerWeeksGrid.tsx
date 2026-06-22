@@ -21,6 +21,7 @@ import {
 } from "@/app/[locale]/(app)/planner/actions";
 import { clearSeasonAction } from "@/app/[locale]/(app)/planner/[teamId]/season-actions";
 import type { FocusFamily } from "@/components/sheet/types";
+import { isStructuringKind } from "@/lib/planner/season";
 
 const KNOWN_THEMES: ThemeKey[] = [
   "possede_ballon",
@@ -261,6 +262,8 @@ export type WeekMatch = {
   home_away: string | null;
   kind: string | null;
   is_anchor: boolean;
+  home_score?: number | null;
+  away_score?: number | null;
 };
 
 /** Date locale (Europe/Zurich) `YYYY-MM-DD` d'un instant ISO. */
@@ -801,7 +804,7 @@ export function PlannerWeeksGrid({
 	                    setDraggingSessionId(session.id);
 	                  }}
 	                  onDragEnd={() => setDraggingSessionId(null)}
-                  className={`group/session relative flex w-full overflow-hidden rounded-lg border bg-zinc-50/70 text-left text-zinc-800 shadow-sm transition-all duration-150 hover:-translate-y-px hover:border-zinc-300 hover:bg-white hover:shadow-md active:scale-[0.99] dark:bg-zinc-800/70 dark:text-zinc-100 dark:hover:border-zinc-600 dark:hover:bg-zinc-800 ${
+                  className={`group/session relative flex w-full flex-col overflow-hidden rounded-lg border bg-zinc-50/70 text-left text-zinc-800 shadow-sm transition-all duration-150 hover:-translate-y-px hover:border-zinc-300 hover:bg-white hover:shadow-md active:scale-[0.99] dark:bg-zinc-800/70 dark:text-zinc-100 dark:hover:border-zinc-600 dark:hover:bg-zinc-800 ${
 	                      isCopied
 	                        ? "border-zinc-900 ring-2 ring-zinc-900/10 dark:border-zinc-100 dark:ring-zinc-100/10"
 	                        : "border-zinc-200 dark:border-zinc-700/80"
@@ -821,7 +824,7 @@ export function PlannerWeeksGrid({
 	                      );
 	                    }}
 	                      title={session.title}
-	                      className="flex min-w-0 flex-1 flex-col gap-0.5 py-1.5 pl-3 pr-8 text-left"
+                      className="flex min-w-0 flex-1 flex-col gap-0.5 py-1.5 pl-3 pr-2 text-left"
 	                  >
 	                    <span className="flex items-center justify-between gap-2">
 	                      <span className="text-[10px] font-semibold tabular-nums text-zinc-500 dark:text-zinc-400">
@@ -838,7 +841,7 @@ export function PlannerWeeksGrid({
 	                      {session.title}
 	                    </span>
 	                  </button>
-                  <div className="absolute right-1 top-1 flex items-center gap-1 rounded-lg bg-white/90 p-0.5 opacity-0 shadow-sm ring-1 ring-zinc-200 transition-opacity group-hover/session:opacity-100 dark:bg-zinc-900/90 dark:ring-zinc-700">
+                  <div className="flex w-full items-center border-t border-zinc-200 pl-2 dark:border-zinc-700">
                     <button
                       type="button"
                       title={tAtt("openLink")}
@@ -849,9 +852,9 @@ export function PlannerWeeksGrid({
                           `/planner/${teamId}/sessions/${session.id}/attendance`,
                         );
                       }}
-                      className="inline-flex h-6 w-6 items-center justify-center rounded-lg text-zinc-500 transition-all duration-150 hover:bg-zinc-100 hover:text-zinc-900 active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-zinc-300 dark:text-zinc-400 dark:hover:bg-zinc-800 dark:hover:text-zinc-100"
+                      className="inline-flex h-6 min-w-0 flex-1 items-center justify-center rounded-md text-zinc-600 transition hover:bg-zinc-100 hover:text-zinc-950 dark:text-zinc-300 dark:hover:bg-zinc-700"
                     >
-                      <Users size={12} strokeWidth={2.2} />
+                      <Users size={13} strokeWidth={2.2} />
                     </button>
                     <button
 	                      type="button"
@@ -864,7 +867,7 @@ export function PlannerWeeksGrid({
 	                            current === session.id ? null : session.id,
 	                          );
 	                        }}
-                      className={`inline-flex h-6 w-6 items-center justify-center rounded-lg transition-all duration-150 active:scale-[0.98] disabled:pointer-events-none disabled:opacity-40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-zinc-300 ${
+                      className={`inline-flex h-6 w-6 items-center justify-center rounded-md transition-all duration-150 active:scale-[0.98] disabled:pointer-events-none disabled:opacity-40 ${
                         isCopied
                           ? "bg-zinc-900 text-white shadow-sm dark:bg-zinc-100 dark:text-zinc-900"
                           : "text-zinc-500 hover:bg-zinc-100 hover:text-zinc-900 dark:text-zinc-400 dark:hover:bg-zinc-800 dark:hover:text-zinc-100"
@@ -888,7 +891,7 @@ export function PlannerWeeksGrid({
 	                          }),
 	                        );
 	                      }}
-                      className="inline-flex h-6 w-6 items-center justify-center rounded-lg text-zinc-500 transition-all duration-150 hover:bg-red-50 hover:text-red-600 active:scale-[0.98] disabled:pointer-events-none disabled:opacity-40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-200 dark:text-zinc-400 dark:hover:bg-red-950/40 dark:hover:text-red-300"
+                      className="inline-flex h-6 w-6 items-center justify-center rounded-md text-red-500 transition hover:bg-red-50 hover:text-red-700 disabled:pointer-events-none disabled:opacity-40 dark:text-red-400 dark:hover:bg-red-950/40"
 	                    >
 	                      <Trash2 size={12} strokeWidth={2.2} />
 	                    </button>
@@ -942,7 +945,7 @@ export function PlannerWeeksGrid({
             <div
               key={dateStr}
               onClick={canPlaceEval ? () => setWizardDate(dateStr) : undefined}
-              className={`group relative flex min-h-[110px] flex-col gap-1 border-b border-r border-zinc-200 p-1.5 text-left transition-colors dark:border-zinc-800 ${baseBg} ${pastWeekClass} ${
+              className={`group relative flex min-h-[112px] flex-col gap-1 border-b border-r border-zinc-200 p-1.5 text-left transition-colors dark:border-zinc-800 ${baseBg} ${pastWeekClass} ${
                 canPlaceEval
                   ? "cursor-pointer ring-1 ring-inset ring-transparent hover:ring-[var(--club-primary)] hover:bg-[var(--club-primary-soft)]/40"
                   : ""
@@ -974,33 +977,49 @@ export function PlannerWeeksGrid({
                     );
                   }}
                   title={t("physicalTest.open")}
-                  className="flex items-center gap-1 truncate rounded-md bg-[#c94a4a] px-1.5 py-0.5 text-[10px] font-semibold text-white"
+                  className="flex min-h-[38px] w-full items-center justify-between gap-1 rounded-md border border-red-200 bg-red-50 px-2 py-1.5 text-left text-red-800 transition hover:bg-red-100 dark:border-red-900 dark:bg-red-950/40 dark:text-red-200"
                 >
-                  <Activity className="h-3 w-3 shrink-0" />
-                  <span className="truncate">
+                  <span className="flex items-center gap-1 text-[10px] font-bold uppercase tracking-wide">
+                    <Activity className="h-3.5 w-3.5 shrink-0" />
                     {t("physicalTest.badge")}
-                    {cellEval.testCount > 0 ? ` · ${cellEval.testCount}` : ""}
+                  </span>
+                  <span className="text-[9px] font-medium">
+                    {cellEval.testCount > 0
+                      ? t("physicalTest.testsCount", { n: cellEval.testCount })
+                      : t("physicalTest.open")}
                   </span>
                 </button>
               ) : null}
               {cellMatch ? (
-                <div
-                  title={cellMatch.opponent ?? cellMatch.summary ?? "Match"}
-                  className={`flex items-center gap-1 truncate rounded-md px-1.5 py-0.5 text-[10px] font-semibold ${
-                    cellMatch.is_anchor
-                      ? "bg-[var(--club-primary)] text-[var(--club-primary-foreground)]"
-                      : "bg-[var(--club-primary-soft)] text-[var(--club-primary)]"
+                <button
+                  type="button"
+                  title={cellMatch.summary ?? cellMatch.opponent ?? "Match"}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    router.push(`/planner/${teamId}/match/${cellMatch.id}`);
+                  }}
+                  className={`flex min-h-[56px] w-full flex-col items-start justify-between gap-1 rounded-md border px-2 py-1.5 text-left transition hover:brightness-105 ${
+                    isStructuringKind(cellMatch.kind)
+                      ? "border-[var(--club-primary)] bg-[var(--club-primary)] text-[var(--club-primary-foreground)]"
+                      : "border-[var(--club-primary)]/30 bg-[var(--club-primary-soft)] text-[var(--club-primary)]"
                   }`}
                 >
-                  <span aria-hidden="true">⚽</span>
-                  {cellMatch.home_away === "away" ? "@" : ""}
-                  <span className="truncate">
-                    {cellMatch.opponent ?? cellMatch.summary ?? "Match"}
+                  <span className="flex items-center gap-1 text-[10px] font-bold uppercase tracking-wide opacity-80">
+                    <span aria-hidden="true">⚽</span>
+                    {t("matchLabel")}
                   </span>
-                </div>
+                  <span className="line-clamp-2 text-[11px] font-semibold leading-tight">
+                    {cellMatch.summary ?? cellMatch.opponent ?? "Match"}
+                  </span>
+                  {cellMatch.home_score != null && cellMatch.away_score != null ? (
+                    <span className="rounded bg-black/15 px-1.5 py-0.5 text-xs font-bold tabular-nums">
+                      {cellMatch.home_score}–{cellMatch.away_score}
+                    </span>
+                  ) : null}
+                </button>
               ) : null}
-              {renderSlot("morning", morning, t("slot.morning"))}
-              {renderSlot("afternoon", afternoon, t("slot.afternoon"))}
+              {cellMatch ? null : renderSlot("morning", morning, t("slot.morning"))}
+              {cellMatch ? null : renderSlot("afternoon", afternoon, t("slot.afternoon"))}
             </div>
           );
         })}
