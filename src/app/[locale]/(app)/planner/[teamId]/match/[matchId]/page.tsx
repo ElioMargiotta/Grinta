@@ -2,7 +2,10 @@ import { notFound } from "next/navigation";
 import { setRequestLocale } from "next-intl/server";
 import { MatchHub, type WeekSession } from "@/components/planner/MatchHub";
 import type { RosterPlayer } from "@/components/planner/MatchParticipations";
-import type { LineupValue, BenchRole } from "@/components/planner/LineupBoard";
+import type {
+  LineupValue,
+  UnavailableMap,
+} from "@/components/planner/LineupBoard";
 import type { TacticsValue } from "@/components/planner/MatchTactics";
 import type { CallupInfo } from "@/components/planner/MatchCallup";
 import type { MatchEvent, MatchEventType } from "@/components/planner/MatchEventsTimeline";
@@ -10,7 +13,24 @@ import type {
   DerivedStat,
   SquadRecapRow,
 } from "@/components/planner/MatchSquadRecap";
-import { DEFAULT_FORMATION } from "@/components/planner/match/formations";
+import {
+  FORMATIONS,
+  normalizeFormation,
+} from "@/components/planner/match/formations";
+import {
+  activeUnavailability,
+  type Unavailability,
+  type UnavailabilityKind,
+} from "@/lib/availability/unavailability";
+import {
+  PHASE_KINDS,
+  parseBoard,
+  parseLineup,
+  parseTactics,
+  type PhaseKind,
+  type TacticalPhase,
+  type TacticalSystem,
+} from "@/lib/planner/tacticalSystems";
 import { requireUser } from "@/lib/auth/getUser";
 import { currentSeasonLabel } from "@/lib/planner/seasons";
 
@@ -33,6 +53,14 @@ type ParticipationRow = {
   pitch_x: number | null;
   pitch_y: number | null;
   slot_role: string | null;
+};
+
+type UnavailDbRow = {
+  player_id: string;
+  kind: UnavailabilityKind;
+  reason: string | null;
+  start_date: string;
+  end_date: string | null;
 };
 
 type EventRow = {
@@ -74,7 +102,7 @@ export default async function MatchPage({
   const { data: match } = await supabase
     .from("team_matches")
     .select(
-      "id, starts_at, ends_at, summary, location, match_url, kind, home_away, opponent, competition, is_anchor, source, archived, home_score, away_score, result_note, formation, tactics",
+      "id, starts_at, ends_at, summary, location, match_url, kind, home_away, opponent, competition, is_anchor, source, archived, home_score, away_score, result_note, formation, tactics, selected_phase_ids, convocation_sent_at",
     )
     .eq("id", matchId)
     .eq("team_id", teamId)
@@ -148,15 +176,44 @@ export default async function MatchPage({
   const rosterById = new Map(roster.map((p) => [p.playerId, p]));
 
   const participations = (participationsRaw ?? []) as ParticipationRow[];
-  const partByPlayer = new Map(participations.map((p) => [p.player_id, p]));
 
-  // Convoqués (called_up), dans l'ordre du roster.
-  const convened = roster.filter(
-    (p) => partByPlayer.get(p.playerId)?.called_up,
-  );
+  // Indisponibilités médicales actives à la date du match (blessé/suspendu/malade/…).
+  const matchDate = (match.starts_at as string).slice(0, 10);
+  const unavailable: UnavailableMap = {};
+  if (roster.length > 0) {
+    const { data: unavailRows } = await supabase
+      .from("player_unavailability")
+      .select("player_id, kind, reason, start_date, end_date")
+      .in(
+        "player_id",
+        roster.map((p) => p.playerId),
+      )
+      .lte("start_date", matchDate)
+      .or(`end_date.is.null,end_date.gte.${matchDate}`);
+    const byPlayer = new Map<string, Unavailability[]>();
+    for (const r of (unavailRows ?? []) as UnavailDbRow[]) {
+      const list = byPlayer.get(r.player_id) ?? [];
+      list.push({
+        id: "",
+        playerId: r.player_id,
+        kind: r.kind,
+        reason: r.reason,
+        startDate: r.start_date,
+        endDate: r.end_date,
+      });
+      byPlayer.set(r.player_id, list);
+    }
+    for (const [playerId, list] of byPlayer) {
+      const active = activeUnavailability(list, matchDate);
+      if (active) unavailable[playerId] = { kind: active.kind, reason: active.reason };
+    }
+  }
 
-  // Compo initiale : titulaires placés + bancs.
-  const starters = participations
+  // Compo initiale : reconstruction du modèle « par poste » depuis les
+  // participations sauvegardées (titulaires placés + remplaçants convoqués).
+  const formation = normalizeFormation(match.formation as string | null);
+  const formationSlots = FORMATIONS[formation] ?? [];
+  const savedStarters = participations
     .filter(
       (p) =>
         p.status === "starter" && p.pitch_x !== null && p.pitch_y !== null,
@@ -167,17 +224,36 @@ export default async function MatchPage({
       y: p.pitch_y as number,
       role: p.slot_role ?? "",
     }));
-  const starterSet = new Set(starters.map((s) => s.playerId));
-  const bench: Record<string, BenchRole> = {};
-  for (const p of participations) {
-    if (!p.called_up || starterSet.has(p.player_id)) continue;
-    bench[p.player_id] = p.status === "unused" ? "unused" : "substitute";
+  const slots: (string | null)[] = Array(formationSlots.length).fill(null);
+  const coords: Record<number, { x: number; y: number }> = {};
+  for (const st of savedStarters) {
+    let best = -1;
+    let bestCost = Infinity;
+    for (let i = 0; i < formationSlots.length; i++) {
+      if (slots[i]) continue;
+      const sl = formationSlots[i];
+      const dist = Math.hypot(sl.x - st.x, sl.y - st.y);
+      const cost = (sl.role === st.role ? 0 : 1000) + dist;
+      if (cost < bestCost) {
+        bestCost = cost;
+        best = i;
+      }
+    }
+    if (best === -1) continue; // plus de titulaires que de postes (formation changée)
+    slots[best] = st.playerId;
+    const sl = formationSlots[best];
+    if (Math.round(sl.x) !== Math.round(st.x) || Math.round(sl.y) !== Math.round(st.y)) {
+      coords[best] = { x: st.x, y: st.y };
+    }
   }
-  const lineupInitial: LineupValue = {
-    formation: (match.formation as string | null) ?? DEFAULT_FORMATION,
-    starters,
-    bench,
-  };
+  const starterSet = new Set(slots.filter((s): s is string => Boolean(s)));
+  const subs = roster
+    .filter((p) => {
+      const part = participations.find((x) => x.player_id === p.playerId);
+      return part?.called_up && !starterSet.has(p.playerId);
+    })
+    .map((p) => p.playerId);
+  const lineupInitial: LineupValue = { formation, slots, coords, subs };
 
   const tacticsInitial = tacticsFrom(match.tactics);
 
@@ -236,12 +312,55 @@ export default async function MatchPage({
       };
     });
 
+  // Systèmes de jeu de l'équipe (pour l'import dans la compo + sélection de phases).
+  const { data: systemRows } = await supabase
+    .from("team_tactical_systems")
+    .select("id, name, formation, lineup, tactics")
+    .eq("team_id", teamId)
+    .order("updated_at", { ascending: false });
+  const sysList = systemRows ?? [];
+  const sysIds = sysList.map((s) => s.id as string);
+  const phasesBySystem = new Map<string, TacticalPhase[]>();
+  if (sysIds.length > 0) {
+    const { data: phaseRows } = await supabase
+      .from("team_tactical_phases")
+      .select("id, system_id, kind, name, board, sort_order")
+      .in("system_id", sysIds)
+      .order("sort_order", { ascending: true });
+    for (const p of phaseRows ?? []) {
+      if (!(PHASE_KINDS as readonly string[]).includes(p.kind as string)) continue;
+      const arr = phasesBySystem.get(p.system_id as string) ?? [];
+      arr.push({
+        id: p.id as string,
+        kind: p.kind as PhaseKind,
+        name: (p.name as string | null) ?? null,
+        board: parseBoard(p.board),
+      });
+      phasesBySystem.set(p.system_id as string, arr);
+    }
+  }
+  const systems: TacticalSystem[] = sysList.map((s) => ({
+    id: s.id as string,
+    name: s.name as string,
+    formation: normalizeFormation(s.formation as string | null),
+    lineup: parseLineup(s.lineup),
+    tactics: parseTactics(s.tactics),
+    phases: phasesBySystem.get(s.id as string) ?? [],
+  }));
+  const selectedPhaseIds = Array.isArray(match.selected_phase_ids)
+    ? (match.selected_phase_ids as unknown[]).filter(
+        (x): x is string => typeof x === "string",
+      )
+    : [];
+
   return (
     <div className="mx-auto flex w-full max-w-4xl flex-col gap-6">
       <MatchHub
         teamId={teamId}
         roster={roster}
-        convened={convened}
+        unavailable={unavailable}
+        systems={systems}
+        selectedPhaseIds={selectedPhaseIds}
         lineupInitial={lineupInitial}
         tacticsInitial={tacticsInitial}
         callupInitial={callupInitial}
@@ -265,6 +384,8 @@ export default async function MatchPage({
           home_score: (match.home_score as number | null) ?? null,
           away_score: (match.away_score as number | null) ?? null,
           result_note: (match.result_note as string | null) ?? null,
+          convocation_sent_at:
+            (match.convocation_sent_at as string | null) ?? null,
         }}
         weekSessions={weekSessions}
       />

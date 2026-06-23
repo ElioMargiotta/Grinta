@@ -560,6 +560,28 @@ export async function setMatchFormationAction(
     if (upError) return { error: "db_error" };
   }
 
+  // Convocation = compo : tout joueur hors squad repasse non convoqué (et sa
+  // réponse/position sont effacées). C'est ce qui matérialise les « non convoqués ».
+  const keepIds = [...seen];
+  let reset = access.supabase
+    .from("match_participations")
+    .update({
+      called_up: false,
+      availability: null,
+      availability_reason: null,
+      availability_at: null,
+      status: "unused",
+      pitch_x: null,
+      pitch_y: null,
+      slot_role: null,
+    })
+    .eq("match_id", matchId);
+  if (keepIds.length > 0) {
+    reset = reset.not("player_id", "in", `(${keepIds.join(",")})`);
+  }
+  const { error: resetError } = await reset;
+  if (resetError) return { error: "db_error" };
+
   revalidatePath(`/[locale]/planner/${teamId}/match/${matchId}`, "page");
   return { ok: true };
 }
@@ -637,6 +659,44 @@ export async function setMatchCallupAction(
   }
   const { error: resetError } = await reset;
   if (resetError) return { error: "db_error" };
+
+  revalidatePath(`/[locale]/planner/${teamId}/match/${matchId}`, "page");
+  return { ok: true };
+}
+
+/**
+ * Envoie (ou annule l'envoi de) la convocation aux joueurs. Tant que
+ * `convocation_sent_at` est NULL, les joueurs ne voient pas le match dans leur
+ * agenda (player_match_callups filtre dessus) et ne peuvent pas y répondre.
+ * C'est ce qui rend l'envoi explicite plutôt qu'automatique à l'enregistrement
+ * de la compo : le coach construit la compo librement, puis décide d'envoyer.
+ */
+export async function setMatchConvocationSentAction(
+  formData: FormData,
+): Promise<ActionResult> {
+  const teamId = String(formData.get("teamId") ?? "");
+  const matchId = String(formData.get("matchId") ?? "");
+  if (!matchId) return { error: "invalid_input" };
+
+  const access = await loadTeamAccess(teamId);
+  if (!access.ok) return { error: access.error };
+
+  const { data: match } = await access.supabase
+    .from("team_matches")
+    .select("id")
+    .eq("id", matchId)
+    .eq("team_id", teamId)
+    .maybeSingle();
+  if (!match) return { error: "match_not_found" };
+
+  const send = String(formData.get("send") ?? "") === "true";
+
+  const { error } = await access.supabase
+    .from("team_matches")
+    .update({ convocation_sent_at: send ? new Date().toISOString() : null })
+    .eq("id", matchId)
+    .eq("team_id", teamId);
+  if (error) return { error: "db_error" };
 
   revalidatePath(`/[locale]/planner/${teamId}/match/${matchId}`, "page");
   return { ok: true };
@@ -723,6 +783,64 @@ export async function setMatchEventsAction(
       .insert(rows);
     if (insError) return { error: "db_error" };
   }
+
+  revalidatePath(`/[locale]/planner/${teamId}/match/${matchId}`, "page");
+  return { ok: true };
+}
+
+/**
+ * Enregistre les phases arrêtées retenues pour un match. Les ids sont bornés aux
+ * phases des systèmes de l'équipe (garde-fou anti-injection).
+ */
+export async function setMatchPhasesAction(
+  formData: FormData,
+): Promise<ActionResult> {
+  const teamId = String(formData.get("teamId") ?? "");
+  const matchId = String(formData.get("matchId") ?? "");
+  if (!matchId) return { error: "invalid_input" };
+
+  const access = await loadTeamAccess(teamId);
+  if (!access.ok) return { error: access.error };
+
+  const { data: match } = await access.supabase
+    .from("team_matches")
+    .select("id")
+    .eq("id", matchId)
+    .eq("team_id", teamId)
+    .maybeSingle();
+  if (!match) return { error: "match_not_found" };
+
+  let parsed: unknown;
+  try {
+    parsed = JSON.parse(String(formData.get("phaseIds") ?? "[]"));
+  } catch {
+    return { error: "invalid_input" };
+  }
+  if (!Array.isArray(parsed)) return { error: "invalid_input" };
+
+  const { data: systems } = await access.supabase
+    .from("team_tactical_systems")
+    .select("id")
+    .eq("team_id", teamId);
+  const sysIds = (systems ?? []).map((s) => s.id as string);
+  let allowed = new Set<string>();
+  if (sysIds.length > 0) {
+    const { data: phases } = await access.supabase
+      .from("team_tactical_phases")
+      .select("id")
+      .in("system_id", sysIds);
+    allowed = new Set((phases ?? []).map((p) => p.id as string));
+  }
+  const selected = [
+    ...new Set(parsed.map((v) => String(v)).filter((id) => allowed.has(id))),
+  ];
+
+  const { error } = await access.supabase
+    .from("team_matches")
+    .update({ selected_phase_ids: selected })
+    .eq("id", matchId)
+    .eq("team_id", teamId);
+  if (error) return { error: "db_error" };
 
   revalidatePath(`/[locale]/planner/${teamId}/match/${matchId}`, "page");
   return { ok: true };

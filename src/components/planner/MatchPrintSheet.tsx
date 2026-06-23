@@ -10,25 +10,17 @@ export type PrintStarter = {
   x: number;
   y: number;
 };
-export type PrintBench = { jerseyNumber: number | null; name: string; role: string };
-export type PrintCallup = {
-  jerseyNumber: number | null;
-  name: string;
-  availability: "available" | "unavailable" | null;
-};
+export type PrintMember = { jerseyNumber: number | null; name: string };
+export type PrintGroup = { label: string; players: PrintMember[] };
 
 export type PrintLabels = {
   formation: string;
-  bench: string;
   tactics: string;
   general: string;
   possession: string;
   defense: string;
   transition: string;
-  convocation: string;
-  present: string;
-  absent: string;
-  pending: string;
+  squad: string;
 };
 
 /**
@@ -40,18 +32,16 @@ export function MatchPrintSheet({
   subtitle,
   formation,
   starters,
-  bench,
+  groups,
   tactics,
-  callups,
   labels,
 }: {
   title: string;
   subtitle: string;
   formation: string;
   starters: PrintStarter[];
-  bench: PrintBench[];
+  groups: PrintGroup[];
   tactics: { general: string; possession: string; defense: string; transition: string };
-  callups: PrintCallup[];
   labels: PrintLabels;
 }) {
   const tacticEntries = (
@@ -102,24 +92,8 @@ export function MatchPrintSheet({
           </div>
         </div>
 
-        {/* Banc + tactique */}
+        {/* Consignes tactiques */}
         <div className="flex w-1/2 flex-col gap-3 text-sm">
-          {bench.length > 0 ? (
-            <div>
-              <div className="font-semibold">{labels.bench}</div>
-              <ul className="mt-1 space-y-0.5">
-                {bench.map((b, i) => (
-                  <li key={i} className="flex gap-2">
-                    <span className="w-6 text-right tabular-nums text-zinc-500">
-                      {b.jerseyNumber ?? "—"}
-                    </span>
-                    <span>{b.name}</span>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          ) : null}
-
           {tacticEntries.length > 0 ? (
             <div>
               <div className="font-semibold">{labels.tactics}</div>
@@ -138,29 +112,29 @@ export function MatchPrintSheet({
         </div>
       </div>
 
-      {/* Convocation */}
-      {callups.length > 0 ? (
+      {/* Convocation — groupes (remplaçants, non convoqués, indispos) */}
+      {groups.length > 0 ? (
         <div className="mt-4">
-          <div className="text-sm font-semibold">{labels.convocation}</div>
-          <table className="mt-1 w-full border-collapse text-xs">
-            <tbody>
-              {callups.map((c, i) => (
-                <tr key={i} className="border-b border-zinc-200">
-                  <td className="w-8 py-0.5 text-right tabular-nums text-zinc-500">
-                    {c.jerseyNumber ?? "—"}
-                  </td>
-                  <td className="py-0.5 pl-2">{c.name}</td>
-                  <td className="py-0.5 text-right text-zinc-500">
-                    {c.availability === "available"
-                      ? labels.present
-                      : c.availability === "unavailable"
-                        ? labels.absent
-                        : labels.pending}
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+          <div className="text-sm font-semibold">{labels.squad}</div>
+          <div className="mt-1 grid grid-cols-2 gap-x-6 gap-y-2">
+            {groups.map((g) => (
+              <div key={g.label} className="break-inside-avoid">
+                <div className="text-xs font-semibold text-zinc-600">
+                  {g.label}
+                </div>
+                <ul className="mt-0.5 space-y-0.5 text-xs">
+                  {g.players.map((p, i) => (
+                    <li key={i} className="flex gap-2">
+                      <span className="w-6 text-right tabular-nums text-zinc-500">
+                        {p.jerseyNumber ?? "—"}
+                      </span>
+                      <span>{p.name}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ))}
+          </div>
         </div>
       ) : null}
     </div>

@@ -10,8 +10,10 @@ import {
   Pencil,
   Printer,
   Save,
+  Send,
   Trash2,
   Trophy,
+  Undo2,
 } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
@@ -20,9 +22,17 @@ import type { RosterPlayer } from "@/components/planner/MatchParticipations";
 import {
   LineupBoard,
   type LineupValue,
+  type UnavailableMap,
 } from "@/components/planner/LineupBoard";
 import { MatchTactics, type TacticsValue } from "@/components/planner/MatchTactics";
-import { MatchCallup, type CallupInfo } from "@/components/planner/MatchCallup";
+import { type CallupInfo } from "@/components/planner/MatchCallup";
+import { MatchSquadSummary } from "@/components/planner/MatchSquadSummary";
+import { MatchPhases, type MatchPhase } from "@/components/planner/MatchPhases";
+import {
+  FORMATIONS,
+  normalizeFormation,
+} from "@/components/planner/match/formations";
+import type { TacticalSystem } from "@/lib/planner/tacticalSystems";
 import {
   MatchEventsTimeline,
   type MatchEvent,
@@ -35,6 +45,7 @@ import {
 import { MatchPrintSheet } from "@/components/planner/MatchPrintSheet";
 import {
   deleteMatchAction,
+  setMatchConvocationSentAction,
   setMatchFormationAction,
   setMatchResultAction,
 } from "@/app/[locale]/(app)/teams/[teamId]/calendar/match-actions";
@@ -46,6 +57,7 @@ export type MatchHubMatch = EditableMatch & {
   home_score: number | null;
   away_score: number | null;
   result_note: string | null;
+  convocation_sent_at: string | null;
 };
 
 export type WeekSession = {
@@ -86,19 +98,23 @@ export function MatchHub({
   match,
   weekSessions,
   roster,
-  convened,
+  unavailable,
   lineupInitial,
   tacticsInitial,
   callupInitial,
   eventsInitial,
   squadRecap,
   derived,
+  systems,
+  selectedPhaseIds,
 }: {
   teamId: string;
   match: MatchHubMatch;
   weekSessions: WeekSession[];
   roster: RosterPlayer[];
-  convened: RosterPlayer[];
+  unavailable: UnavailableMap;
+  systems: TacticalSystem[];
+  selectedPhaseIds: string[];
   lineupInitial: LineupValue;
   tacticsInitial: TacticsValue;
   callupInitial: Record<string, CallupInfo>;
@@ -147,6 +163,14 @@ export function MatchHub({
   const [isSavingLineup, startSaveLineup] = useTransition();
   const [lineupMsg, setLineupMsg] = useState<string | null>(null);
 
+  // Envoi de la convocation : porte explicite. Tant que `convocationSentAt` est
+  // null, le joueur ne voit pas le match dans son agenda.
+  const [convocationSentAt, setConvocationSentAt] = useState<string | null>(
+    match.convocation_sent_at,
+  );
+  const [isSendingConvocation, startSendConvocation] = useTransition();
+  const [convocationMsg, setConvocationMsg] = useState<string | null>(null);
+
   const dateStr = start.toLocaleDateString(locale, {
     weekday: "long",
     day: "2-digit",
@@ -184,22 +208,26 @@ export function MatchHub({
 
   function saveLineup() {
     setLineupMsg(null);
-    const starterSet = new Set(lineup.starters.map((s) => s.playerId));
+    const fSlots = FORMATIONS[lineup.formation] ?? [];
     const squad = [
-      ...lineup.starters.map((s) => ({
-        playerId: s.playerId,
-        status: "starter" as const,
-        pitchX: Math.round(s.x),
-        pitchY: Math.round(s.y),
-        slotRole: s.role,
+      ...lineup.slots
+        .map((playerId, i) => {
+          if (!playerId) return null;
+          const base = fSlots[i] ?? { x: 50, y: 50, role: "" };
+          const pos = lineup.coords[i] ?? { x: base.x, y: base.y };
+          return {
+            playerId,
+            status: "starter" as const,
+            pitchX: Math.round(pos.x),
+            pitchY: Math.round(pos.y),
+            slotRole: base.role,
+          };
+        })
+        .filter((r): r is NonNullable<typeof r> => r !== null),
+      ...lineup.subs.map((playerId) => ({
+        playerId,
+        status: "substitute" as const,
       })),
-      // Tous les convoqués non titulaires reçoivent un statut de banc.
-      ...convened
-        .filter((p) => !starterSet.has(p.playerId))
-        .map((p) => ({
-          playerId: p.playerId,
-          status: lineup.bench[p.playerId] ?? "substitute",
-        })),
     ];
     const fd = new FormData();
     fd.set("teamId", teamId);
@@ -216,6 +244,60 @@ export function MatchHub({
       }
     });
   }
+
+  function sendConvocation(send: boolean) {
+    if (send && !window.confirm(t("prematch.convocation.sendConfirm"))) return;
+    if (!send && !window.confirm(t("prematch.convocation.cancelConfirm"))) return;
+    setConvocationMsg(null);
+    const fd = new FormData();
+    fd.set("teamId", teamId);
+    fd.set("matchId", match.id);
+    fd.set("send", String(send));
+    startSendConvocation(async () => {
+      const r = await setMatchConvocationSentAction(fd);
+      if (r?.error) setConvocationMsg(r.error);
+      else {
+        setConvocationSentAt(send ? new Date().toISOString() : null);
+        setConvocationMsg(
+          send
+            ? t("prematch.convocation.sent")
+            : t("prematch.convocation.cancelled"),
+        );
+        router.refresh();
+      }
+    });
+  }
+
+  function importSystem(systemId: string) {
+    const sys = systems.find((s) => s.id === systemId);
+    if (!sys) return;
+    const formation = normalizeFormation(sys.formation);
+    const slotCount = (FORMATIONS[formation] ?? []).length || 11;
+    const rosterIds = new Set(roster.map((p) => p.playerId));
+    const slots = Array.from({ length: slotCount }, (_, i) => {
+      const id = sys.lineup.slots[i] ?? null;
+      return id && rosterIds.has(id) ? id : null;
+    });
+    setLineup({
+      formation,
+      slots,
+      coords: sys.lineup.coords,
+      subs: sys.lineup.subs.filter((id) => rosterIds.has(id)),
+    });
+    setTactics(sys.tactics);
+    setLineupMsg(t("prematch.systemImported", { name: sys.name }));
+  }
+
+  // Phases arrêtées de tous les systèmes de l'équipe (sélection par match).
+  const matchPhases: MatchPhase[] = systems.flatMap((s) =>
+    s.phases.map((p) => ({
+      id: p.id,
+      systemName: s.name,
+      kind: p.kind,
+      name: p.name,
+      board: p.board,
+    })),
+  );
 
   function onDelete() {
     if (!window.confirm(tCal("deleteConfirm"))) return;
@@ -241,29 +323,60 @@ export function MatchHub({
 
   // Données pour la feuille imprimable.
   const byId = new Map(roster.map((p) => [p.playerId, p]));
-  const starterIds = new Set(lineup.starters.map((s) => s.playerId));
-  const printStarters = lineup.starters.map((s) => {
-    const p = byId.get(s.playerId);
-    return {
-      jerseyNumber: p?.jerseyNumber ?? null,
-      name: p ? lastName(p.fullName) : "?",
-      role: s.role,
-      x: s.x,
-      y: s.y,
-    };
-  });
-  const printBench = convened
-    .filter((p) => !starterIds.has(p.playerId))
-    .map((p) => ({
-      jerseyNumber: p.jerseyNumber,
-      name: p.fullName,
-      role: lineup.bench[p.playerId] ?? "substitute",
-    }));
-  const printCallups = convened.map((p) => ({
+  const fSlots = FORMATIONS[lineup.formation] ?? [];
+  const starterIds = lineup.slots.filter((s): s is string => Boolean(s));
+  const printStarters = lineup.slots
+    .map((playerId, i) => {
+      if (!playerId) return null;
+      const p = byId.get(playerId);
+      const base = fSlots[i] ?? { x: 50, y: 50, role: "" };
+      const pos = lineup.coords[i] ?? { x: base.x, y: base.y };
+      return {
+        jerseyNumber: p?.jerseyNumber ?? null,
+        name: p ? lastName(p.fullName) : "?",
+        role: base.role,
+        x: pos.x,
+        y: pos.y,
+      };
+    })
+    .filter((s): s is NonNullable<typeof s> => s !== null);
+
+  // Groupes convocation (remplaçants + non convoqués + indispos) pour le print.
+  const usedIds = new Set<string>([...starterIds, ...lineup.subs]);
+  const notUsed = roster.filter((p) => !usedIds.has(p.playerId));
+  const notCalled: RosterPlayer[] = [];
+  const byKind: Record<string, RosterPlayer[]> = {
+    injury: [],
+    illness: [],
+    suspension: [],
+    other: [],
+  };
+  for (const p of notUsed) {
+    const u = unavailable[p.playerId];
+    if (u) byKind[u.kind].push(p);
+    else notCalled.push(p);
+  }
+  const member = (p: RosterPlayer) => ({
     jerseyNumber: p.jerseyNumber,
     name: p.fullName,
-    availability: callupInitial[p.playerId]?.availability ?? null,
-  }));
+  });
+  const printGroups = [
+    {
+      label: t("prematch.subsTitle"),
+      players: lineup.subs
+        .map((id) => byId.get(id))
+        .filter((p): p is RosterPlayer => Boolean(p))
+        .map(member),
+    },
+    { label: t("prematch.summary.notCalled"), players: notCalled.map(member) },
+    { label: t("prematch.summary.injury"), players: byKind.injury.map(member) },
+    {
+      label: t("prematch.summary.suspension"),
+      players: byKind.suspension.map(member),
+    },
+    { label: t("prematch.summary.illness"), players: byKind.illness.map(member) },
+    { label: t("prematch.summary.other"), players: byKind.other.map(member) },
+  ].filter((g) => g.players.length > 0);
 
   return (
     <div className="flex flex-col gap-6">
@@ -375,13 +488,6 @@ export function MatchHub({
 
       {tab === "prematch" ? (
         <div className="prep-no-print flex flex-col gap-8">
-          <MatchCallup
-            teamId={teamId}
-            matchId={match.id}
-            roster={roster}
-            initial={callupInitial}
-          />
-
           <section className="flex flex-col gap-4">
             <div className="flex flex-wrap items-center justify-between gap-2">
               <div className="flex items-center gap-2 text-base font-semibold text-zinc-900 dark:text-zinc-100">
@@ -389,6 +495,25 @@ export function MatchHub({
                 {t("prematch.lineupTitle")}
               </div>
               <div className="flex items-center gap-2">
+                {systems.length > 0 ? (
+                  <select
+                    defaultValue=""
+                    onChange={(e) => {
+                      if (e.target.value) importSystem(e.target.value);
+                      e.target.value = "";
+                    }}
+                    className="rounded-md border border-zinc-200 bg-white px-2 py-1.5 text-sm text-zinc-700 focus:border-zinc-400 focus:outline-none dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-300"
+                  >
+                    <option value="" disabled>
+                      {t("prematch.importSystem")}
+                    </option>
+                    {systems.map((s) => (
+                      <option key={s.id} value={s.id}>
+                        {s.name}
+                      </option>
+                    ))}
+                  </select>
+                ) : null}
                 <Button
                   type="button"
                   variant="secondary"
@@ -410,24 +535,18 @@ export function MatchHub({
               </div>
             </div>
 
-            {convened.length === 0 ? (
+            {roster.length === 0 ? (
               <p className="rounded-lg border border-dashed border-[var(--club-line)] bg-white/40 p-4 text-sm text-zinc-500 dark:bg-zinc-900/30">
-                {t("prematch.noConvened")}
+                {t("prematch.emptyRoster")}
               </p>
             ) : (
               <LineupBoard
                 value={lineup}
                 onChange={setLineup}
-                convened={convened}
+                roster={roster}
+                unavailable={unavailable}
               />
             )}
-
-            <div className="flex flex-col gap-2">
-              <div className="text-base font-semibold text-zinc-900 dark:text-zinc-100">
-                {t("prematch.tacticsTitle")}
-              </div>
-              <MatchTactics value={tactics} onChange={setTactics} />
-            </div>
 
             {lineupMsg ? (
               <span className="text-sm text-emerald-700 dark:text-emerald-400">
@@ -435,6 +554,95 @@ export function MatchHub({
               </span>
             ) : null}
           </section>
+
+          {roster.length > 0 ? (
+            <div className="flex flex-col gap-4">
+              <div className="flex flex-col gap-3 rounded-lg border border-[var(--club-line)] bg-white/60 p-4 dark:bg-zinc-900/40 sm:flex-row sm:items-center sm:justify-between">
+                <div className="flex items-start gap-2.5">
+                  <Send
+                    className={`mt-0.5 h-4 w-4 shrink-0 ${
+                      convocationSentAt
+                        ? "text-emerald-600 dark:text-emerald-400"
+                        : "text-zinc-400"
+                    }`}
+                  />
+                  <div className="flex flex-col">
+                    <span className="text-sm font-semibold text-zinc-900 dark:text-zinc-100">
+                      {convocationSentAt
+                        ? t("prematch.convocation.statusSent", {
+                            date: new Date(convocationSentAt).toLocaleString(
+                              locale,
+                              {
+                                day: "2-digit",
+                                month: "short",
+                                hour: "2-digit",
+                                minute: "2-digit",
+                              },
+                            ),
+                          })
+                        : t("prematch.convocation.statusNotSent")}
+                    </span>
+                    <span className="text-xs text-zinc-500 dark:text-zinc-400">
+                      {convocationSentAt
+                        ? t("prematch.convocation.hintSent")
+                        : t("prematch.convocation.hintNotSent")}
+                    </span>
+                  </div>
+                </div>
+                <div className="flex items-center gap-3">
+                  {convocationMsg ? (
+                    <span className="text-xs text-emerald-700 dark:text-emerald-400">
+                      {convocationMsg}
+                    </span>
+                  ) : null}
+                  {convocationSentAt ? (
+                    <Button
+                      type="button"
+                      variant="secondary"
+                      size="sm"
+                      onClick={() => sendConvocation(false)}
+                      loading={isSendingConvocation}
+                    >
+                      <Undo2 className="h-3.5 w-3.5" />
+                      {t("prematch.convocation.cancel")}
+                    </Button>
+                  ) : (
+                    <Button
+                      type="button"
+                      size="sm"
+                      onClick={() => sendConvocation(true)}
+                      loading={isSendingConvocation}
+                    >
+                      <Send className="h-3.5 w-3.5" />
+                      {t("prematch.convocation.send")}
+                    </Button>
+                  )}
+                </div>
+              </div>
+
+              <MatchSquadSummary
+                roster={roster}
+                starters={lineup.slots.filter((s): s is string => Boolean(s))}
+                subs={lineup.subs}
+                unavailable={unavailable}
+                callup={callupInitial}
+              />
+            </div>
+          ) : null}
+
+          <section className="flex flex-col gap-2 border-t border-[var(--club-line)] pt-5">
+            <div className="text-base font-semibold text-zinc-900 dark:text-zinc-100">
+              {t("prematch.tacticsTitle")}
+            </div>
+            <MatchTactics value={tactics} onChange={setTactics} />
+          </section>
+
+          <MatchPhases
+            teamId={teamId}
+            matchId={match.id}
+            phases={matchPhases}
+            initialSelected={selectedPhaseIds}
+          />
 
           <WeekSessionsSection
             teamId={teamId}
@@ -534,21 +742,16 @@ export function MatchHub({
         subtitle={`${dateStr} · ${timeStr}`}
         formation={lineup.formation}
         starters={printStarters}
-        bench={printBench}
+        groups={printGroups}
         tactics={tactics}
-        callups={printCallups}
         labels={{
           formation: t("prematch.formation"),
-          bench: t("prematch.bench"),
           tactics: t("prematch.tacticsTitle"),
           general: t("prematch.tactics.general"),
           possession: t("prematch.tactics.possession"),
           defense: t("prematch.tactics.defense"),
           transition: t("prematch.tactics.transition"),
-          convocation: t("prematch.callup.title"),
-          present: t("prematch.callup.present"),
-          absent: t("prematch.callup.absent"),
-          pending: t("prematch.callup.pending"),
+          squad: t("prematch.summary.title"),
         }}
       />
     </div>
