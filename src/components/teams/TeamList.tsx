@@ -17,11 +17,14 @@ export type TeamRow = {
 export async function TeamList({
   teams,
   basePath,
+  hrefSuffix = "",
   playersByTeam,
   plannedTeams,
 }: {
   teams: TeamRow[];
-  basePath: "/teams" | "/planner";
+  basePath: "/teams" | "/planner" | "/systems";
+  /** Segment ajouté après l'id (ex. "/systems"). Défaut : aucun. */
+  hrefSuffix?: string;
   playersByTeam: Map<string, number>;
   plannedTeams: Set<string>;
 }) {
@@ -32,7 +35,7 @@ export async function TeamList({
       {teams.map((team) => (
         <Link
           key={team.id}
-          href={`${basePath}/${team.id}`}
+          href={`${basePath}/${team.id}${hrefSuffix}`}
           className="group grid gap-3 border-b border-zinc-100 px-4 py-4 transition last:border-b-0 hover:bg-[var(--club-primary-soft)] md:grid-cols-[1fr_180px_44px] md:items-center"
         >
           <div className="flex min-w-0 items-center gap-3">

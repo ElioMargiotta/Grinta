@@ -1,7 +1,35 @@
 import { getLocale, getTranslations, setRequestLocale } from "next-intl/server";
 import { Card } from "@/components/ui/Card";
 import { AttendanceRSVP } from "@/components/player/AttendanceRSVP";
+import { MatchRSVP } from "@/components/player/MatchRSVP";
 import { requirePersona } from "@/lib/auth/getUser";
+
+type MatchCallupRow = {
+  match_id: string;
+  starts_at: string;
+  team_name: string | null;
+  summary: string | null;
+  opponent: string | null;
+  location: string | null;
+  kind: string | null;
+  home_away: string | null;
+  availability: "available" | "unavailable" | null;
+  availability_reason: string | null;
+};
+
+function formatDateTime(iso: string, locale: string) {
+  try {
+    return new Intl.DateTimeFormat(locale, {
+      weekday: "short",
+      day: "2-digit",
+      month: "short",
+      hour: "2-digit",
+      minute: "2-digit",
+    }).format(new Date(iso));
+  } catch {
+    return iso;
+  }
+}
 
 type SessionRow = {
   id: string;
@@ -113,11 +141,59 @@ export default async function PlayerSchedulePage({
     (attendanceData ?? []).map((a) => [a.session_id, a]),
   );
 
+  // Convocations match à venir (RPC SECURITY DEFINER scopée au joueur courant).
+  const { data: matchData } = await supabase.rpc("player_match_callups");
+  const matches = (matchData ?? []) as MatchCallupRow[];
+
   return (
     <div className="mx-auto flex w-full max-w-3xl flex-col gap-6">
       <h1 className="text-2xl font-semibold text-zinc-900 dark:text-zinc-100">
         {t("title")}
       </h1>
+
+      {matches.length > 0 ? (
+        <div className="flex flex-col gap-3">
+          <h2 className="text-sm font-semibold uppercase tracking-wide text-zinc-500 dark:text-zinc-400">
+            {t("matchesTitle")}
+          </h2>
+          {matches.map((m) => {
+            const label =
+              m.summary ?? m.opponent ?? t("matchUntitled");
+            return (
+              <Card key={m.match_id}>
+                <div className="flex flex-col gap-3">
+                  <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+                    <div>
+                      <div className="flex items-center gap-2">
+                        <span className="rounded bg-[var(--club-primary-soft)] px-1.5 py-0.5 text-[10px] font-semibold uppercase text-[var(--club-primary)]">
+                          {t("matchBadge")}
+                        </span>
+                        <span className="text-base font-semibold text-zinc-900 dark:text-zinc-100">
+                          {label}
+                        </span>
+                      </div>
+                      <div className="text-sm text-zinc-500 dark:text-zinc-400">
+                        {m.team_name ?? "—"}
+                        {m.location ? ` · ${m.location}` : ""}
+                      </div>
+                    </div>
+                    <div className="text-sm text-zinc-600 dark:text-zinc-300">
+                      {formatDateTime(m.starts_at, currentLocale)}
+                    </div>
+                  </div>
+                  <div className="border-t border-zinc-200 pt-3 dark:border-zinc-800">
+                    <MatchRSVP
+                      matchId={m.match_id}
+                      initialStatus={m.availability}
+                      initialReason={m.availability_reason}
+                    />
+                  </div>
+                </div>
+              </Card>
+            );
+          })}
+        </div>
+      ) : null}
 
       {sessions.length === 0 ? (
         <Card>

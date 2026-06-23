@@ -408,6 +408,7 @@
     "teams": "Squadre",
     "exercises": "Esercizi",
     "planner": "Pianificazione",
+    "systems": "Sistemi di gioco",
     "settings": "Impostazioni",
     "logout": "Esci",
     "account": "Account",
@@ -836,6 +837,56 @@
     }
   },
   "planner": {
+    "systems": {
+      "title": "Sistemi di gioco",
+      "subtitle": "Formazioni e palle inattive riutilizzabili",
+      "intro": "I tuoi sistemi riutilizzabili: formazione, giocatori e indicazioni, da importare in una partita.",
+      "new": "Nuovo sistema",
+      "empty": "Nessun sistema salvato. Crea la tua prima formazione riutilizzabile.",
+      "playerCount": "{count, plural, one {# giocatore} other {# giocatori}}",
+      "phaseCount": "{count, plural, =0 {0 fasi} one {# fase} other {# fasi}}",
+      "duplicate": "Duplica",
+      "delete": "Elimina",
+      "deleteConfirm": "Eliminare questo sistema?",
+      "backToList": "Torna ai sistemi",
+      "nameLabel": "Nome del sistema",
+      "namePlaceholder": "Es. Blocco basso contropiede",
+      "save": "Salva",
+      "compoTitle": "Formazione",
+      "emptyRoster": "Nessun giocatore assegnato a questa squadra per la stagione.",
+      "tacticsTitle": "Indicazioni tattiche",
+      "phasesTitle": "Palle inattive",
+      "addPhase": "Aggiungi una fase",
+      "phasesEmpty": "Nessuna fase. Aggiungi un corner, una punizione, una costruzione…",
+      "phaseNamePlaceholder": "Nome della fase (opzionale)",
+      "removePhase": "Rimuovi fase",
+      "matchPhasesTitle": "Palle inattive",
+      "phasesSaved": "Fasi salvate",
+      "phaseKind": {
+        "build_up": "Costruzione",
+        "press": "Pressing",
+        "attack_corner": "Corner offensivo",
+        "defense_corner": "Corner difensivo",
+        "attack_freekick": "Punizione offensiva",
+        "defense_freekick": "Punizione difensiva"
+      },
+      "phaseBoard": {
+        "addUs": "Giocatore",
+        "addThem": "Avversario",
+        "addBall": "Palla",
+        "arrow": "Freccia",
+        "removeToken": "Rimuovi",
+        "arrowKind": { "run": "Corsa", "pass": "Passaggio" }
+      },
+      "err": {
+        "nameRequired": "Dai un nome al sistema.",
+        "invalid_input": "Input non valido",
+        "db_error": "Errore di salvataggio",
+        "system_not_found": "Sistema non trovato",
+        "team_not_found": "Squadra non trovata",
+        "unauthenticated": "Non autenticato"
+      }
+    },
     "title": "Pianificazione della stagione",
     "pickTeam": "Scegli una squadra da pianificare",
     "noTeams": "Crea prima una squadra.",
@@ -1271,8 +1322,143 @@
       "weekTitle": "Settimana di preparazione",
       "weekEmpty": "Nessuna seduta collegata a questa partita. Genera la pianificazione dalla vista Stagione.",
       "sessionFallback": "Seduta",
-      "kitTitle": "Kit partita",
-      "kitSoon": "Formazione, distinta e presenze in arrivo."
+      "squad": {
+        "title": "Distinta",
+        "startersCount": "{count, plural, one {# titolare} other {# titolari}}",
+        "subsCount": "{count, plural, one {# riserva} other {# riserve}}",
+        "emptyRoster": "Nessun giocatore assegnato a questa squadra per la stagione. Aggiungi giocatori alla rosa.",
+        "status": {
+          "none": "—",
+          "starter": "Titolare",
+          "substitute": "Subentrato",
+          "unused": "Panchina",
+          "unavailable": "Non disponibile"
+        },
+        "min": "min",
+        "yellow": "Cartellino giallo",
+        "red": "Cartellino rosso",
+        "save": "Salva distinta",
+        "saved": "Distinta salvata",
+        "err": {
+          "invalid_input": "Dati non validi",
+          "db_error": "Salvataggio non riuscito",
+          "match_not_found": "Partita non trovata"
+        }
+      },
+      "tab": {
+        "prematch": "Pre-partita",
+        "result": "Risultato"
+      },
+      "prematch": {
+        "lineupTitle": "Formazione",
+        "tacticsTitle": "Indicazioni tattiche",
+        "formation": "Modulo",
+        "startersOf": "{count}/11 titolari",
+        "pickPlayer": "Scegli un giocatore",
+        "pickerEmpty": "Nessun giocatore disponibile.",
+        "removeFromSlot": "Rimuovi dal ruolo",
+        "subsTitle": "Riserve",
+        "subsEmpty": "Nessuna riserva.",
+        "addSub": "Aggiungi riserva",
+        "removeSub": "Rimuovi",
+        "emptyRoster": "Nessun giocatore assegnato a questa squadra per la stagione. Aggiungi giocatori alla rosa.",
+        "print": "Stampa",
+        "save": "Salva formazione",
+        "saved": "Formazione salvata",
+        "reset": "Reimposta",
+        "resetConfirm": "Reimpostare la formazione? Titolari e riserve saranno rimossi.",
+        "defenders": "{count} difensori",
+        "importSystem": "Importa un sistema",
+        "systemImported": "Sistema « {name} » importato — verifica poi salva.",
+        "convocation": {
+          "send": "Invia la convocazione",
+          "cancel": "Annulla l'invio",
+          "sent": "Convocazione inviata",
+          "cancelled": "Invio annullato",
+          "statusSent": "Convocazione inviata il {date}",
+          "statusNotSent": "Convocazione non inviata",
+          "hintSent": "I giocatori convocati la vedono nella loro agenda e possono rispondere.",
+          "hintNotSent": "I giocatori non sono ancora avvisati. Invia la convocazione quando sei pronto.",
+          "sendConfirm": "Inviare la convocazione ai giocatori convocati? La vedranno nella loro agenda e potranno rispondere.",
+          "cancelConfirm": "Annullare l'invio? I giocatori non vedranno più la convocazione nella loro agenda."
+        },
+        "kind": {
+          "injury": "Infortunato",
+          "illness": "Malato",
+          "suspension": "Squalificato",
+          "other": "Indisponibile"
+        },
+        "summary": {
+          "title": "Convocazione",
+          "starters": "Titolari",
+          "subs": "Riserve",
+          "notCalled": "Non convocati",
+          "injury": "Infortunati",
+          "illness": "Malati",
+          "suspension": "Squalificati",
+          "other": "Indisponibili",
+          "present": "Disponibile",
+          "absent": "Assente",
+          "pending": "In attesa"
+        },
+        "tactics": {
+          "general": "Generale",
+          "generalPlaceholder": "Piano di gioco, mentalità…",
+          "possession": "Con la palla",
+          "possessionPlaceholder": "Costruzione, ampiezza, finalizzazione…",
+          "defense": "Senza palla",
+          "defensePlaceholder": "Blocco, pressing, marcature…",
+          "transition": "Transizioni",
+          "transitionPlaceholder": "Reazioni a perdita/recupero…"
+        },
+        "callup": {
+          "title": "Convocazione",
+          "convenedCount": "{count} convocati",
+          "emptyRoster": "Nessun giocatore assegnato a questa squadra per la stagione.",
+          "present": "Disponibile",
+          "absent": "Non disponibile",
+          "pending": "In attesa",
+          "save": "Salva convocazione",
+          "saved": "Convocazione salvata"
+        }
+      },
+      "result": {
+        "events": {
+          "title": "Eventi della partita",
+          "empty": "Nessun evento. Aggiungi gol, cambi, cartellini…",
+          "add": "Aggiungi evento",
+          "save": "Salva eventi",
+          "saved": "Eventi salvati",
+          "remove": "Rimuovi",
+          "minuteShort": "min",
+          "selectPlayer": "Giocatore…",
+          "scorer": "Marcatore",
+          "player": "Giocatore",
+          "playerIn": "Entra",
+          "playerOut": "Esce",
+          "assist": "Assist",
+          "noAssist": "Senza assist",
+          "penalty": "Rig.",
+          "notePlaceholder": "Evento…",
+          "type": {
+            "goal": "Gol",
+            "own_goal": "Autogol",
+            "yellow": "Cartellino giallo",
+            "red": "Cartellino rosso",
+            "substitution": "Cambio",
+            "note": "Evento"
+          }
+        },
+        "recap": {
+          "title": "Distinta",
+          "empty": "Nessuna distinta. Convoca e schiera la squadra nella scheda Pre-partita.",
+          "group": {
+            "starter": "Titolari",
+            "substitute": "Riserve",
+            "unused": "Panchina"
+          }
+        }
+      }
     }
   },
   "common": {
@@ -2216,7 +2402,10 @@
     "title": "Il mio calendario",
     "empty": "Nessuna squadra — niente da mostrare.",
     "emptyUpcoming": "Nessuna sessione in arrivo.",
-    "untitled": "Sessione"
+    "untitled": "Sessione",
+    "matchesTitle": "Le mie partite",
+    "matchUntitled": "Partita",
+    "matchBadge": "Partita"
   },
   "attendance": {
     "present": "Presente",
@@ -2627,6 +2816,27 @@
       "announced": "Annunciato",
       "injured": "Indisponibile",
       "none": "Non impostato"
+    }
+  },
+  "matchRsvp": {
+    "present": "Disponibile",
+    "absent": "Non disponibile",
+    "answeredPresent": "Hai confermato la disponibilità",
+    "answeredAbsent": "Hai indicato di non essere disponibile",
+    "reasonLabel": "Motivo dell'assenza",
+    "confirmAbsent": "Conferma assenza",
+    "cancel": "Annulla",
+    "errors": {
+      "unauthenticated": "Non autenticato",
+      "invalid_status": "Stato non valido",
+      "reason_required_when_unavailable": "È richiesto un motivo se non disponibile",
+      "match_not_found": "Partita non trovata",
+      "club_inactive": "Club inattivo",
+      "match_finished": "La partita si è già svolta",
+      "not_assigned_to_team": "Non sei assegnato a questa squadra",
+      "not_called_up": "Non sei convocato per questa partita",
+      "missing_match": "Partita mancante",
+      "unknown": "Si è verificato un errore"
     }
   }
 }

@@ -331,6 +331,521 @@ export async function setMatchResultAction(
   return { ok: true };
 }
 
+const PARTICIPATION_STATUS = [
+  "starter",
+  "substitute",
+  "unused",
+  "unavailable",
+] as const;
+type ParticipationStatus = (typeof PARTICIPATION_STATUS)[number];
+
+type ParticipationInput = {
+  playerId: string;
+  status: ParticipationStatus;
+  minutes: number | null;
+  goals: number;
+  assists: number;
+  yellowCards: number;
+  redCard: boolean;
+};
+
+/** Borne un entier optionnel dans [min,max] ; null si vide/invalide. */
+function clampIntOrNull(v: unknown, min: number, max: number): number | null {
+  const n = Number(v);
+  if (!Number.isInteger(n) || n < min || n > max) return null;
+  return n;
+}
+
+/**
+ * Enregistre la feuille de match : la liste complète des participations
+ * (titulaire / remplaçant / non utilisé / indisponible) + stats par joueur.
+ * Remplace l'état existant — les joueurs absents de la liste sont retirés.
+ */
+export async function setMatchParticipationsAction(
+  formData: FormData,
+): Promise<ActionResult> {
+  const teamId = String(formData.get("teamId") ?? "");
+  const matchId = String(formData.get("matchId") ?? "");
+  if (!matchId) return { error: "invalid_input" };
+
+  const access = await loadTeamAccess(teamId);
+  if (!access.ok) return { error: access.error };
+
+  const { data: match } = await access.supabase
+    .from("team_matches")
+    .select("id")
+    .eq("id", matchId)
+    .eq("team_id", teamId)
+    .maybeSingle();
+  if (!match) return { error: "match_not_found" };
+
+  // Effectif autorisé : joueurs réellement affectés à l'équipe (toutes saisons
+  // confondues — la feuille porte sur un match précis). Garde-fou anti-injection
+  // de player_id arbitraires.
+  const { data: assignmentRows } = await access.supabase
+    .from("player_team_assignments")
+    .select("player_id")
+    .eq("team_id", teamId);
+  const allowed = new Set(
+    (assignmentRows ?? []).map((r) => r.player_id as string),
+  );
+
+  let parsed: unknown;
+  try {
+    parsed = JSON.parse(String(formData.get("participations") ?? "[]"));
+  } catch {
+    return { error: "invalid_input" };
+  }
+  if (!Array.isArray(parsed)) return { error: "invalid_input" };
+
+  const seen = new Set<string>();
+  const rows: ParticipationInput[] = [];
+  for (const raw of parsed) {
+    if (!raw || typeof raw !== "object") continue;
+    const r = raw as Record<string, unknown>;
+    const playerId = String(r.playerId ?? "");
+    if (!allowed.has(playerId) || seen.has(playerId)) continue;
+    const status = String(r.status ?? "");
+    if (!(PARTICIPATION_STATUS as readonly string[]).includes(status)) continue;
+    seen.add(playerId);
+    rows.push({
+      playerId,
+      status: status as ParticipationStatus,
+      minutes: clampIntOrNull(r.minutes, 0, 200),
+      goals: clampIntOrNull(r.goals, 0, 50) ?? 0,
+      assists: clampIntOrNull(r.assists, 0, 50) ?? 0,
+      yellowCards: clampIntOrNull(r.yellowCards, 0, 2) ?? 0,
+      redCard: Boolean(r.redCard),
+    });
+  }
+
+  // Retire les participations désélectionnées (joueurs hors de la liste).
+  const keepIds = [...seen];
+  let del = access.supabase
+    .from("match_participations")
+    .delete()
+    .eq("match_id", matchId);
+  if (keepIds.length > 0) {
+    del = del.not("player_id", "in", `(${keepIds.join(",")})`);
+  }
+  const { error: delError } = await del;
+  if (delError) return { error: "db_error" };
+
+  if (rows.length > 0) {
+    const { error: upError } = await access.supabase
+      .from("match_participations")
+      .upsert(
+        rows.map((r) => ({
+          match_id: matchId,
+          player_id: r.playerId,
+          club_id: access.clubId,
+          status: r.status,
+          minutes: r.minutes,
+          goals: r.goals,
+          assists: r.assists,
+          yellow_cards: r.yellowCards,
+          red_card: r.redCard,
+        })),
+        { onConflict: "match_id,player_id" },
+      );
+    if (upError) return { error: "db_error" };
+  }
+
+  revalidatePath(`/[locale]/planner/${teamId}/match/${matchId}`, "page");
+  return { ok: true };
+}
+
+/** Charge l'ensemble des player_id réellement affectés à l'équipe (garde-fou). */
+async function loadAllowedPlayers(
+  supabase: Awaited<ReturnType<typeof createClient>>,
+  teamId: string,
+): Promise<Set<string>> {
+  const { data } = await supabase
+    .from("player_team_assignments")
+    .select("player_id")
+    .eq("team_id", teamId);
+  return new Set((data ?? []).map((r) => r.player_id as string));
+}
+
+const SQUAD_STATUS = ["starter", "substitute", "unused", "unavailable"] as const;
+
+/**
+ * Enregistre l'onglet « Avant-match » : formation + consignes tactiques + la
+ * compo visuelle (statut + position terrain par joueur convoqué). Le placement
+ * sur le terrain implique la convocation (called_up = true).
+ */
+export async function setMatchFormationAction(
+  formData: FormData,
+): Promise<ActionResult> {
+  const teamId = String(formData.get("teamId") ?? "");
+  const matchId = String(formData.get("matchId") ?? "");
+  if (!matchId) return { error: "invalid_input" };
+
+  const access = await loadTeamAccess(teamId);
+  if (!access.ok) return { error: access.error };
+
+  const { data: match } = await access.supabase
+    .from("team_matches")
+    .select("id")
+    .eq("id", matchId)
+    .eq("team_id", teamId)
+    .maybeSingle();
+  if (!match) return { error: "match_not_found" };
+
+  const formation = trimOrNull(formData.get("formation"), 20);
+
+  // Consignes tactiques : 4 champs texte libres bornés.
+  const tactics: Record<string, string> = {};
+  try {
+    const parsed = JSON.parse(String(formData.get("tactics") ?? "{}"));
+    if (parsed && typeof parsed === "object") {
+      for (const key of ["general", "possession", "defense", "transition"]) {
+        const v = (parsed as Record<string, unknown>)[key];
+        if (typeof v === "string" && v.trim()) {
+          tactics[key] = v.slice(0, 2000);
+        }
+      }
+    }
+  } catch {
+    return { error: "invalid_input" };
+  }
+
+  const { error: matchError } = await access.supabase
+    .from("team_matches")
+    .update({ formation, tactics })
+    .eq("id", matchId)
+    .eq("team_id", teamId);
+  if (matchError) return { error: "db_error" };
+
+  // Compo : statut + position par joueur convoqué.
+  const allowed = await loadAllowedPlayers(access.supabase, teamId);
+  let squad: unknown;
+  try {
+    squad = JSON.parse(String(formData.get("squad") ?? "[]"));
+  } catch {
+    return { error: "invalid_input" };
+  }
+  if (!Array.isArray(squad)) return { error: "invalid_input" };
+
+  const seen = new Set<string>();
+  const rows = [];
+  for (const raw of squad) {
+    if (!raw || typeof raw !== "object") continue;
+    const r = raw as Record<string, unknown>;
+    const playerId = String(r.playerId ?? "");
+    if (!allowed.has(playerId) || seen.has(playerId)) continue;
+    const status = String(r.status ?? "");
+    if (!(SQUAD_STATUS as readonly string[]).includes(status)) continue;
+    seen.add(playerId);
+    const isStarter = status === "starter";
+    rows.push({
+      match_id: matchId,
+      player_id: playerId,
+      club_id: access.clubId,
+      status,
+      called_up: true,
+      pitch_x: isStarter ? clampIntOrNull(r.pitchX, 0, 100) : null,
+      pitch_y: isStarter ? clampIntOrNull(r.pitchY, 0, 100) : null,
+      slot_role:
+        isStarter && typeof r.slotRole === "string"
+          ? r.slotRole.slice(0, 20)
+          : null,
+    });
+  }
+
+  if (rows.length > 0) {
+    const { error: upError } = await access.supabase
+      .from("match_participations")
+      .upsert(rows, { onConflict: "match_id,player_id" });
+    if (upError) return { error: "db_error" };
+  }
+
+  // Convocation = compo : tout joueur hors squad repasse non convoqué (et sa
+  // réponse/position sont effacées). C'est ce qui matérialise les « non convoqués ».
+  const keepIds = [...seen];
+  let reset = access.supabase
+    .from("match_participations")
+    .update({
+      called_up: false,
+      availability: null,
+      availability_reason: null,
+      availability_at: null,
+      status: "unused",
+      pitch_x: null,
+      pitch_y: null,
+      slot_role: null,
+    })
+    .eq("match_id", matchId);
+  if (keepIds.length > 0) {
+    reset = reset.not("player_id", "in", `(${keepIds.join(",")})`);
+  }
+  const { error: resetError } = await reset;
+  if (resetError) return { error: "db_error" };
+
+  revalidatePath(`/[locale]/planner/${teamId}/match/${matchId}`, "page");
+  return { ok: true };
+}
+
+/**
+ * Convocation : la liste des joueurs convoqués par le coach. Les joueurs retirés
+ * de la liste repassent `called_up=false` (et leur réponse/position sont effacées).
+ */
+export async function setMatchCallupAction(
+  formData: FormData,
+): Promise<ActionResult> {
+  const teamId = String(formData.get("teamId") ?? "");
+  const matchId = String(formData.get("matchId") ?? "");
+  if (!matchId) return { error: "invalid_input" };
+
+  const access = await loadTeamAccess(teamId);
+  if (!access.ok) return { error: access.error };
+
+  const { data: match } = await access.supabase
+    .from("team_matches")
+    .select("id")
+    .eq("id", matchId)
+    .eq("team_id", teamId)
+    .maybeSingle();
+  if (!match) return { error: "match_not_found" };
+
+  const allowed = await loadAllowedPlayers(access.supabase, teamId);
+  let parsed: unknown;
+  try {
+    parsed = JSON.parse(String(formData.get("callups") ?? "[]"));
+  } catch {
+    return { error: "invalid_input" };
+  }
+  if (!Array.isArray(parsed)) return { error: "invalid_input" };
+
+  const callups = [
+    ...new Set(
+      parsed
+        .map((v) => String(v))
+        .filter((id) => allowed.has(id)),
+    ),
+  ];
+
+  // Convoqués → upsert called_up=true.
+  if (callups.length > 0) {
+    const { error: upError } = await access.supabase
+      .from("match_participations")
+      .upsert(
+        callups.map((playerId) => ({
+          match_id: matchId,
+          player_id: playerId,
+          club_id: access.clubId,
+          called_up: true,
+        })),
+        { onConflict: "match_id,player_id" },
+      );
+    if (upError) return { error: "db_error" };
+  }
+
+  // Non-convoqués (anciennement convoqués) → called_up=false + reset réponse/position.
+  let reset = access.supabase
+    .from("match_participations")
+    .update({
+      called_up: false,
+      availability: null,
+      availability_reason: null,
+      availability_at: null,
+      pitch_x: null,
+      pitch_y: null,
+      slot_role: null,
+    })
+    .eq("match_id", matchId);
+  if (callups.length > 0) {
+    reset = reset.not("player_id", "in", `(${callups.join(",")})`);
+  }
+  const { error: resetError } = await reset;
+  if (resetError) return { error: "db_error" };
+
+  revalidatePath(`/[locale]/planner/${teamId}/match/${matchId}`, "page");
+  return { ok: true };
+}
+
+/**
+ * Envoie (ou annule l'envoi de) la convocation aux joueurs. Tant que
+ * `convocation_sent_at` est NULL, les joueurs ne voient pas le match dans leur
+ * agenda (player_match_callups filtre dessus) et ne peuvent pas y répondre.
+ * C'est ce qui rend l'envoi explicite plutôt qu'automatique à l'enregistrement
+ * de la compo : le coach construit la compo librement, puis décide d'envoyer.
+ */
+export async function setMatchConvocationSentAction(
+  formData: FormData,
+): Promise<ActionResult> {
+  const teamId = String(formData.get("teamId") ?? "");
+  const matchId = String(formData.get("matchId") ?? "");
+  if (!matchId) return { error: "invalid_input" };
+
+  const access = await loadTeamAccess(teamId);
+  if (!access.ok) return { error: access.error };
+
+  const { data: match } = await access.supabase
+    .from("team_matches")
+    .select("id")
+    .eq("id", matchId)
+    .eq("team_id", teamId)
+    .maybeSingle();
+  if (!match) return { error: "match_not_found" };
+
+  const send = String(formData.get("send") ?? "") === "true";
+
+  const { error } = await access.supabase
+    .from("team_matches")
+    .update({ convocation_sent_at: send ? new Date().toISOString() : null })
+    .eq("id", matchId)
+    .eq("team_id", teamId);
+  if (error) return { error: "db_error" };
+
+  revalidatePath(`/[locale]/planner/${teamId}/match/${matchId}`, "page");
+  return { ok: true };
+}
+
+const EVENT_TYPES = [
+  "goal",
+  "own_goal",
+  "yellow",
+  "red",
+  "substitution",
+  "note",
+] as const;
+
+/**
+ * Enregistre la timeline « Résultat » : remplace l'ensemble des événements du
+ * match. Buteurs / passeurs / changements s'en dérivent à l'affichage.
+ */
+export async function setMatchEventsAction(
+  formData: FormData,
+): Promise<ActionResult> {
+  const teamId = String(formData.get("teamId") ?? "");
+  const matchId = String(formData.get("matchId") ?? "");
+  if (!matchId) return { error: "invalid_input" };
+
+  const access = await loadTeamAccess(teamId);
+  if (!access.ok) return { error: access.error };
+
+  const { data: match } = await access.supabase
+    .from("team_matches")
+    .select("id")
+    .eq("id", matchId)
+    .eq("team_id", teamId)
+    .maybeSingle();
+  if (!match) return { error: "match_not_found" };
+
+  const allowed = await loadAllowedPlayers(access.supabase, teamId);
+  const asPlayer = (v: unknown): string | null => {
+    const s = String(v ?? "");
+    return allowed.has(s) ? s : null;
+  };
+
+  let parsed: unknown;
+  try {
+    parsed = JSON.parse(String(formData.get("events") ?? "[]"));
+  } catch {
+    return { error: "invalid_input" };
+  }
+  if (!Array.isArray(parsed)) return { error: "invalid_input" };
+
+  const rows = [];
+  let order = 0;
+  for (const raw of parsed) {
+    if (!raw || typeof raw !== "object") continue;
+    const r = raw as Record<string, unknown>;
+    const type = String(r.type ?? "");
+    if (!(EVENT_TYPES as readonly string[]).includes(type)) continue;
+    rows.push({
+      match_id: matchId,
+      club_id: access.clubId,
+      type,
+      minute: clampIntOrNull(r.minute, 0, 130),
+      player_id: asPlayer(r.playerId),
+      related_player_id: asPlayer(r.relatedPlayerId),
+      is_penalty: Boolean(r.isPenalty),
+      note:
+        typeof r.note === "string" && r.note.trim()
+          ? r.note.slice(0, 500)
+          : null,
+      sort_order: order++,
+    });
+  }
+
+  // Remplacement complet : on efface puis on réinsère.
+  const { error: delError } = await access.supabase
+    .from("match_events")
+    .delete()
+    .eq("match_id", matchId);
+  if (delError) return { error: "db_error" };
+
+  if (rows.length > 0) {
+    const { error: insError } = await access.supabase
+      .from("match_events")
+      .insert(rows);
+    if (insError) return { error: "db_error" };
+  }
+
+  revalidatePath(`/[locale]/planner/${teamId}/match/${matchId}`, "page");
+  return { ok: true };
+}
+
+/**
+ * Enregistre les phases arrêtées retenues pour un match. Les ids sont bornés aux
+ * phases des systèmes de l'équipe (garde-fou anti-injection).
+ */
+export async function setMatchPhasesAction(
+  formData: FormData,
+): Promise<ActionResult> {
+  const teamId = String(formData.get("teamId") ?? "");
+  const matchId = String(formData.get("matchId") ?? "");
+  if (!matchId) return { error: "invalid_input" };
+
+  const access = await loadTeamAccess(teamId);
+  if (!access.ok) return { error: access.error };
+
+  const { data: match } = await access.supabase
+    .from("team_matches")
+    .select("id")
+    .eq("id", matchId)
+    .eq("team_id", teamId)
+    .maybeSingle();
+  if (!match) return { error: "match_not_found" };
+
+  let parsed: unknown;
+  try {
+    parsed = JSON.parse(String(formData.get("phaseIds") ?? "[]"));
+  } catch {
+    return { error: "invalid_input" };
+  }
+  if (!Array.isArray(parsed)) return { error: "invalid_input" };
+
+  const { data: systems } = await access.supabase
+    .from("team_tactical_systems")
+    .select("id")
+    .eq("team_id", teamId);
+  const sysIds = (systems ?? []).map((s) => s.id as string);
+  let allowed = new Set<string>();
+  if (sysIds.length > 0) {
+    const { data: phases } = await access.supabase
+      .from("team_tactical_phases")
+      .select("id")
+      .in("system_id", sysIds);
+    allowed = new Set((phases ?? []).map((p) => p.id as string));
+  }
+  const selected = [
+    ...new Set(parsed.map((v) => String(v)).filter((id) => allowed.has(id))),
+  ];
+
+  const { error } = await access.supabase
+    .from("team_matches")
+    .update({ selected_phase_ids: selected })
+    .eq("id", matchId)
+    .eq("team_id", teamId);
+  if (error) return { error: "db_error" };
+
+  revalidatePath(`/[locale]/planner/${teamId}/match/${matchId}`, "page");
+  return { ok: true };
+}
+
 /** Crée/MAJ la config de rythme de périodisation de l'équipe. */
 export async function setPeriodizationSettingsAction(
   formData: FormData,

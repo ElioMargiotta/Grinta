@@ -408,6 +408,7 @@
     "teams": "Teams",
     "exercises": "Exercises",
     "planner": "Planner",
+    "systems": "Tactical systems",
     "settings": "Settings",
     "logout": "Log out",
     "account": "Account",
@@ -842,6 +843,56 @@
     }
   },
   "planner": {
+    "systems": {
+      "title": "Tactical systems",
+      "subtitle": "Reusable line-ups and set pieces",
+      "intro": "Your reusable systems: line-up, players and instructions, to import into a match.",
+      "new": "New system",
+      "empty": "No system saved yet. Create your first reusable line-up.",
+      "playerCount": "{count, plural, one {# player} other {# players}}",
+      "phaseCount": "{count, plural, =0 {0 phases} one {# phase} other {# phases}}",
+      "duplicate": "Duplicate",
+      "delete": "Delete",
+      "deleteConfirm": "Delete this system?",
+      "backToList": "Back to systems",
+      "nameLabel": "System name",
+      "namePlaceholder": "e.g. Low block counter-attack",
+      "save": "Save",
+      "compoTitle": "Line-up",
+      "emptyRoster": "No player assigned to this team for the season.",
+      "tacticsTitle": "Tactical instructions",
+      "phasesTitle": "Set pieces",
+      "addPhase": "Add a phase",
+      "phasesEmpty": "No phase yet. Add a corner, a free kick, a build-up…",
+      "phaseNamePlaceholder": "Phase name (optional)",
+      "removePhase": "Remove phase",
+      "matchPhasesTitle": "Set pieces",
+      "phasesSaved": "Phases saved",
+      "phaseKind": {
+        "build_up": "Build-up",
+        "press": "Pressing",
+        "attack_corner": "Attacking corner",
+        "defense_corner": "Defensive corner",
+        "attack_freekick": "Attacking free kick",
+        "defense_freekick": "Defensive free kick"
+      },
+      "phaseBoard": {
+        "addUs": "Player",
+        "addThem": "Opponent",
+        "addBall": "Ball",
+        "arrow": "Arrow",
+        "removeToken": "Remove",
+        "arrowKind": { "run": "Run", "pass": "Pass" }
+      },
+      "err": {
+        "nameRequired": "Give the system a name.",
+        "invalid_input": "Invalid input",
+        "db_error": "Save error",
+        "system_not_found": "System not found",
+        "team_not_found": "Team not found",
+        "unauthenticated": "Not authenticated"
+      }
+    },
     "title": "Season planner",
     "pickTeam": "Pick a team to plan",
     "noTeams": "Create a team first.",
@@ -1277,8 +1328,143 @@
       "weekTitle": "Preparation week",
       "weekEmpty": "No session linked to this match. Generate the plan from the Season view.",
       "sessionFallback": "Session",
-      "kitTitle": "Match kit",
-      "kitSoon": "Lineup, team sheet and participations are coming soon."
+      "squad": {
+        "title": "Match sheet",
+        "startersCount": "{count, plural, one {# starter} other {# starters}}",
+        "subsCount": "{count, plural, one {# sub} other {# subs}}",
+        "emptyRoster": "No players assigned to this team for the season. Add players to the squad.",
+        "status": {
+          "none": "—",
+          "starter": "Starter",
+          "substitute": "Sub",
+          "unused": "Bench",
+          "unavailable": "Unavailable"
+        },
+        "min": "min",
+        "yellow": "Yellow card",
+        "red": "Red card",
+        "save": "Save sheet",
+        "saved": "Sheet saved",
+        "err": {
+          "invalid_input": "Invalid input",
+          "db_error": "Could not save",
+          "match_not_found": "Match not found"
+        }
+      },
+      "tab": {
+        "prematch": "Pre-match",
+        "result": "Result"
+      },
+      "prematch": {
+        "lineupTitle": "Line-up",
+        "tacticsTitle": "Tactical instructions",
+        "formation": "Formation",
+        "startersOf": "{count}/11 starters",
+        "pickPlayer": "Pick a player",
+        "pickerEmpty": "No player available.",
+        "removeFromSlot": "Remove from position",
+        "subsTitle": "Substitutes",
+        "subsEmpty": "No substitutes.",
+        "addSub": "Add substitute",
+        "removeSub": "Remove",
+        "emptyRoster": "No player assigned to this team for the season. Add players to the squad.",
+        "print": "Print",
+        "save": "Save line-up",
+        "saved": "Line-up saved",
+        "reset": "Reset",
+        "resetConfirm": "Reset the line-up? Starters and substitutes will be removed.",
+        "defenders": "{count} defenders",
+        "importSystem": "Import a system",
+        "systemImported": "System \"{name}\" imported — review then save.",
+        "convocation": {
+          "send": "Send call-up",
+          "cancel": "Unsend",
+          "sent": "Call-up sent",
+          "cancelled": "Call-up unsent",
+          "statusSent": "Call-up sent on {date}",
+          "statusNotSent": "Call-up not sent",
+          "hintSent": "Called-up players see it in their schedule and can respond.",
+          "hintNotSent": "Players are not notified yet. Send the call-up when you're ready.",
+          "sendConfirm": "Send the call-up to the selected players? They will see it in their schedule and can respond.",
+          "cancelConfirm": "Unsend the call-up? Players will no longer see it in their schedule."
+        },
+        "kind": {
+          "injury": "Injured",
+          "illness": "Ill",
+          "suspension": "Suspended",
+          "other": "Unavailable"
+        },
+        "summary": {
+          "title": "Call-up",
+          "starters": "Starters",
+          "subs": "Substitutes",
+          "notCalled": "Not called up",
+          "injury": "Injured",
+          "illness": "Ill",
+          "suspension": "Suspended",
+          "other": "Unavailable",
+          "present": "Available",
+          "absent": "Absent",
+          "pending": "Pending"
+        },
+        "tactics": {
+          "general": "General",
+          "generalPlaceholder": "Game plan, mindset…",
+          "possession": "In possession",
+          "possessionPlaceholder": "Build-up, width, finishing…",
+          "defense": "Out of possession",
+          "defensePlaceholder": "Block, pressing, marking…",
+          "transition": "Transitions",
+          "transitionPlaceholder": "Reactions on loss/recovery…"
+        },
+        "callup": {
+          "title": "Call-up",
+          "convenedCount": "{count} called up",
+          "emptyRoster": "No players assigned to this team for the season.",
+          "present": "Available",
+          "absent": "Unavailable",
+          "pending": "Pending",
+          "save": "Save call-up",
+          "saved": "Call-up saved"
+        }
+      },
+      "result": {
+        "events": {
+          "title": "Match facts",
+          "empty": "No events yet. Add goals, subs, cards…",
+          "add": "Add event",
+          "save": "Save facts",
+          "saved": "Facts saved",
+          "remove": "Remove",
+          "minuteShort": "min",
+          "selectPlayer": "Player…",
+          "scorer": "Scorer",
+          "player": "Player",
+          "playerIn": "In",
+          "playerOut": "Out",
+          "assist": "Assist",
+          "noAssist": "No assist",
+          "penalty": "Pen.",
+          "notePlaceholder": "Match fact…",
+          "type": {
+            "goal": "Goal",
+            "own_goal": "Own goal",
+            "yellow": "Yellow card",
+            "red": "Red card",
+            "substitution": "Substitution",
+            "note": "Match fact"
+          }
+        },
+        "recap": {
+          "title": "Match sheet",
+          "empty": "No sheet yet. Call up and pick the team in the Pre-match tab.",
+          "group": {
+            "starter": "Starters",
+            "substitute": "Substitutes",
+            "unused": "Bench"
+          }
+        }
+      }
     }
   },
   "common": {
@@ -2222,7 +2408,10 @@
     "title": "My schedule",
     "empty": "No team — nothing to display.",
     "emptyUpcoming": "No upcoming session.",
-    "untitled": "Session"
+    "untitled": "Session",
+    "matchesTitle": "My matches",
+    "matchUntitled": "Match",
+    "matchBadge": "Match"
   },
   "attendance": {
     "present": "Going",
@@ -2633,6 +2822,27 @@
       "announced": "Announced",
       "injured": "Unavailable",
       "none": "Not set"
+    }
+  },
+  "matchRsvp": {
+    "present": "Available",
+    "absent": "Unavailable",
+    "answeredPresent": "You confirmed you're available",
+    "answeredAbsent": "You marked yourself unavailable",
+    "reasonLabel": "Reason for absence",
+    "confirmAbsent": "Confirm unavailable",
+    "cancel": "Cancel",
+    "errors": {
+      "unauthenticated": "Not authenticated",
+      "invalid_status": "Invalid status",
+      "reason_required_when_unavailable": "A reason is required if unavailable",
+      "match_not_found": "Match not found",
+      "club_inactive": "Club inactive",
+      "match_finished": "The match has already taken place",
+      "not_assigned_to_team": "You're not assigned to this team",
+      "not_called_up": "You're not called up for this match",
+      "missing_match": "Missing match",
+      "unknown": "Something went wrong"
     }
   }
 }
