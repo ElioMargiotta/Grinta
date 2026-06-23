@@ -1,13 +1,5 @@
 export type AccessLevel = "full" | "extended" | "team" | "team_readonly";
 
-export type SubscriptionStatus =
-  | "trialing"
-  | "active"
-  | "past_due"
-  | "canceled"
-  | "incomplete"
-  | "paused";
-
 export type ClubThemeMode = "day" | "night";
 
 export type ClubIdentity = {
@@ -25,8 +17,6 @@ export type ClubMembership = {
   role_id: string;
   role_name: string;
   access_level: AccessLevel;
-  subscription_status: SubscriptionStatus;
-  trial_ends_at: string | null;
 } & ClubIdentity;
 
 export const ACCESS_LEVELS: AccessLevel[] = [

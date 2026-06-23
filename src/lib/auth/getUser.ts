@@ -1,4 +1,5 @@
 import { redirect } from "next/navigation";
+import { cache } from "react";
 import { createClient } from "@/lib/supabase/server";
 import { resolveCurrentMembership } from "@/lib/club/context";
 import { resolvePersona, type Persona } from "@/lib/club/persona";
@@ -38,4 +39,27 @@ export async function requirePersona(locale: string, expected: Persona) {
     redirect(`/${locale}/${persona.active === "staff" ? "dashboard" : "me"}`);
   }
   return { supabase, user, persona };
+}
+
+/**
+ * True when the current user is a Grinta platform operator (super-admin).
+ * Cached per request; safe to call from layouts and nav components.
+ */
+export const isPlatformAdmin = cache(async (): Promise<boolean> => {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) return false;
+  const { data } = await supabase.rpc("is_platform_admin");
+  return data === true;
+});
+
+/** Gate the admin area: only platform operators may enter. */
+export async function requirePlatformAdmin(locale: string) {
+  const { supabase, user } = await requireUser(locale);
+  if (!(await isPlatformAdmin())) {
+    redirect(`/${locale}/dashboard`);
+  }
+  return { supabase, user };
 }

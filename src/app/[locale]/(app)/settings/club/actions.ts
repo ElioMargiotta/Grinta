@@ -127,6 +127,12 @@ export async function inviteMemberAction(formData: FormData): Promise<InviteResu
     if (error?.message?.includes("rate_limited")) {
       return { error: "Trop d'invitations récentes pour cet email. Réessaie plus tard." };
     }
+    if (error?.message?.includes("staff_quota_reached")) {
+      return {
+        error:
+          "Quota de membres du staff atteint pour la licence de ce club. Contacte l'administrateur pour l'étendre.",
+      };
+    }
     return { error: error?.message ?? "Échec de la création de l'invitation." };
   }
 

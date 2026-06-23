@@ -1,13 +1,15 @@
 import { setRequestLocale } from "next-intl/server";
 import { Sidebar } from "@/components/layout/Sidebar";
 import { Topbar } from "@/components/layout/Topbar";
-import { requireUser } from "@/lib/auth/getUser";
+import { requireUser, isPlatformAdmin } from "@/lib/auth/getUser";
 import { resolveCurrentMembership } from "@/lib/club/context";
 import { listClubSeasons, resolveCurrentSeasonLabel } from "@/lib/club/season";
 import { getMyMemberships } from "@/lib/club/queries";
 import { resolvePersona } from "@/lib/club/persona";
 import { redirect } from "next/navigation";
 import { clubThemeStyle } from "@/lib/club/theme";
+import { getClubLicenseUsage } from "@/lib/license/queries";
+import type { LicenseUsage } from "@/lib/license/types";
 
 export default async function AppLayout({
   children,
@@ -27,33 +29,35 @@ export default async function AppLayout({
     redirect(`/${locale}/me`);
   }
 
-  const [{ data: profile }, membership, memberships] = await Promise.all([
+  const [{ data: profile }, membership, memberships, admin] = await Promise.all([
     supabase.from("profiles").select("full_name").eq("id", user.id).single(),
     resolveCurrentMembership(),
     getMyMemberships(),
+    isPlatformAdmin(),
   ]);
 
   const displayName = profile?.full_name?.trim() || user.email || "";
   const hasMembership = memberships.length > 0;
 
-  // Per-team billing summary: count non-archived teams of the current club
-  // and surface the trial state. Free-tier (no membership) shows nothing.
-  let teamCount = 0;
+  // Licence gating + usage. A `locked` licence (suspended / expired past its
+  // grace window) hides the club behind an info screen; `grace` keeps the data
+  // visible but read-only (writes are also blocked at the DB level).
+  let licenseUsage: LicenseUsage | null = null;
   let currentSeason: string | null = null;
   let seasons: string[] = [];
   if (membership) {
-    const [{ count }, season, seasonList] = await Promise.all([
-      supabase
-        .from("teams")
-        .select("id", { head: true, count: "exact" })
-        .eq("club_id", membership.club_id)
-        .is("archived_at", null),
+    const [usage, season, seasonList] = await Promise.all([
+      getClubLicenseUsage(membership.club_id),
       resolveCurrentSeasonLabel(),
       listClubSeasons(supabase, membership.club_id),
     ]);
-    teamCount = count ?? 0;
+    licenseUsage = usage;
     currentSeason = season;
     seasons = seasonList;
+
+    if (usage?.state === "locked") {
+      redirect(`/${locale}/licence-inactive`);
+    }
   }
 
   return (
@@ -62,7 +66,7 @@ export default async function AppLayout({
       style={clubThemeStyle(membership)}
     >
       <div className="print:hidden">
-        <Sidebar hasMembership={hasMembership} currentMembership={membership} />
+        <Sidebar hasMembership={hasMembership} currentMembership={membership} isAdmin={admin} />
       </div>
       <div className="flex flex-1 flex-col">
         <div className="print:hidden">
@@ -70,7 +74,7 @@ export default async function AppLayout({
             userName={displayName}
             currentMembership={membership}
             memberships={memberships}
-            teamCount={teamCount}
+            licenseUsage={licenseUsage}
             persona={persona}
             currentSeason={currentSeason}
             seasons={seasons}

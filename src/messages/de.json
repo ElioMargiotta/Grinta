@@ -416,7 +416,8 @@
     "physical": "Spieler-Tracking",
     "playerMe": "Mein Profil",
     "playerTeam": "Meine Mannschaften",
-    "playerSchedule": "Mein Plan"
+    "playerSchedule": "Mein Plan",
+    "admin": "Admin"
   },
   "physicalHub": {
     "title": "Spieler-Tracking",
@@ -1825,7 +1826,10 @@
     "clubPage": {
       "title": "Neuer Club",
       "description": "Ein Club fasst deine Teams, Trainer und Abrechnung zusammen. Du kannst Mitglieder einladen, sobald er erstellt ist. Du kannst mehreren Clubs angehören.",
-      "pricing": "14 Tage kostenlos testen · danach 25CHF/Team/Monat · Keine Karte zum Start erforderlich."
+      "pricing": "14 Tage kostenlos testen · danach 25CHF/Team/Monat · Keine Karte zum Start erforderlich.",
+      "noAccessTitle": "Noch kein Club",
+      "noAccessBody": "Grinta-Clubs werden von unserem Team unter Lizenz erstellt und verwaltet. Wenn du eine Einladung erwartest, prüfe dein Postfach. Andernfalls kontaktiere uns, um den Zugang für deinen Club freizuschalten.",
+      "contactSales": "Grinta kontaktieren"
     },
     "invitations": {
       "invitedTo": "Du wurdest zu {club} eingeladen",
@@ -2068,6 +2072,9 @@
     "trialDays": "Testphase · {days}T verbleibend",
     "planPerTeam": "{count} {teams} · {amount} CHF/Monat",
     "planStatus": "{status} · {count} {teams}",
+    "noLicense": "Keine aktive Lizenz",
+    "teamsOfMax": "{count}/{max} {teams}",
+    "readOnly": "Nur Lesen",
     "fallbackName": "Coach",
     "personaCoach": "Trainer",
     "personaPlayer": "Spieler",
@@ -2077,6 +2084,95 @@
     "fallbackClubName": "Club",
     "fallbackOrgName": "Grinta",
     "footerText": "Trainings-Workspace"
+  },
+  "license": {
+    "inactiveTitle": "Lizenz inaktiv",
+    "inactiveBody": "Die Lizenz dieses Clubs ist nicht mehr aktiv. Die Daten sind nicht mehr zugänglich. Kontaktiere den Grinta-Administrator, um den Zugang wiederherzustellen.",
+    "contactAdmin": "Administrator kontaktieren"
+  },
+  "admin": {
+    "nav": {
+      "dashboard": "Dashboard",
+      "clubs": "Clubs",
+      "admins": "Administratoren",
+      "subtitle": "Lizenzverwaltung",
+      "backToApp": "Zurück zur App"
+    },
+    "common": {
+      "save": "Speichern",
+      "saving": "Speichern…",
+      "saved": "Gespeichert."
+    },
+    "state": {
+      "active": "Aktiv",
+      "grace": "Nur Lesen",
+      "locked": "Gesperrt"
+    },
+    "dashboard": {
+      "title": "Dashboard",
+      "subtitle": "Übersicht der lizenzierten Clubs.",
+      "totalClubs": "Clubs",
+      "active": "Aktive Lizenzen",
+      "grace": "Nur Lesen",
+      "locked": "Gesperrt",
+      "expiringSoon": "Läuft in 30T ab",
+      "totalTeams": "Teams",
+      "totalPlayers": "Spieler",
+      "totalStaff": "Staff",
+      "recentClubs": "Neueste Clubs"
+    },
+    "clubs": {
+      "title": "Clubs",
+      "new": "Neuer Club",
+      "newSubtitle": "Erstelle einen Club, lege seine Lizenz fest und lade den Inhaber ein.",
+      "name": "Name",
+      "state": "Status",
+      "usage": "Nutzung (Tm · Sp · Staff)",
+      "created": "Erstellt am",
+      "empty": "Noch keine Clubs.",
+      "ownerEmail": "E-Mail des Inhabers",
+      "ownerEmailHint": "Eine Einladung zum Beitritt wird versendet.",
+      "create": "Club erstellen",
+      "members": "Mitglieder",
+      "noMembers": "Noch keine Mitglieder.",
+      "teams": "Teams",
+      "players": "Spieler",
+      "staff": "Staff"
+    },
+    "license": {
+      "title": "Lizenz",
+      "none": "Keine Lizenz für diesen Club.",
+      "maxTeams": "Max. Teams",
+      "maxPlayers": "Max. Spieler",
+      "maxStaff": "Max. Staff",
+      "unlimitedHint": "Leer = unbegrenzt",
+      "endsAt": "Ablauf",
+      "endsAtHint": "Leer = unbefristet",
+      "autoRenew": "Automatische Verlängerung",
+      "autoRenewShort": "Auto",
+      "quoteReference": "Angebotsreferenz",
+      "notes": "Notizen",
+      "status": "Status",
+      "statusSuspended": "Ausgesetzt",
+      "statusExpired": "Abgelaufen",
+      "history": "Verlauf",
+      "noHistory": "Keine Ereignisse.",
+      "event": {
+        "created": "Erstellt",
+        "updated": "Aktualisiert",
+        "suspended": "Ausgesetzt",
+        "reactivated": "Reaktiviert",
+        "status_changed": "Status geändert"
+      }
+    },
+    "admins": {
+      "title": "Administratoren",
+      "subtitle": "Betreiber der Grinta-Plattform.",
+      "addLabel": "Administrator hinzufügen (E-Mail)",
+      "add": "Hinzufügen",
+      "remove": "Entfernen",
+      "you": "Du"
+    }
   },
   "pitch": {
     "halfPitch": "Halbfeld",
