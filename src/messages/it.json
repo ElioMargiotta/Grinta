@@ -399,7 +399,8 @@
       "submitting": "Invio…",
       "error": "Invio non riuscito. Riprova o scrivici direttamente via e-mail.",
       "successTitle": "Messaggio inviato",
-      "successBody": "Grazie! Ti risponderemo a breve."
+      "successBody": "Grazie! Ti risponderemo a breve.",
+      "devisMessage": "Salve, vorrei un preventivo Grinta per il mio club.\n\nClub: \nNumero di squadre: \nNumero di giocatori (circa): \nIl tuo ruolo: "
     }
   },
   "nav": {
@@ -556,20 +557,37 @@
     "resetRequestAgain": "Richiedi un nuovo link"
   },
   "dashboard": {
-    "title": "Cruscotto",
-    "welcome": "Bentornato, {name}.",
-    "teamsCard": "Squadre",
-    "exercisesCard": "Esercizi",
-    "nextSession": "Prossima seduta",
-    "noNextSession": "Nessuna seduta in arrivo.",
+    "title": "Dashboard",
+    "greeting": "Ciao",
+    "premiumBadge": "Su preventivo",
+    "premiumTitle": "Attrezza il tuo club con Grinta",
+    "premiumDesc": "Pianifica le stagioni, gestisci squadre e staff, monitora i progressi dei giocatori. Grinta si attiva per il tuo club su preventivo — raccontaci il tuo progetto.",
+    "premiumCta": "Richiedi un preventivo",
+    "freeActionsTitle": "Nel frattempo, esplora Grinta",
     "ctaJoinClubTitle": "Unisciti a un club",
-    "ctaJoinClubDesc": "Incolla un link d'invito per unirti a un club esistente.",
-    "ctaCreateClubTitle": "Crea un club",
-    "ctaCreateClubDesc": "Pianifica le stagioni, gestisci le squadre, invita lo staff. Offerta a pagamento.",
-    "ctaCreateSessionTitle": "Crea il mio allenamento",
+    "ctaJoinClubDesc": "Incolla un link di invito per unirti a un club esistente.",
+    "ctaCreateSessionTitle": "Il mio allenamento",
     "ctaCreateSessionDesc": "Una scheda di allenamento pronta in due minuti.",
-    "ctaLibraryTitle": "Libreria di esercizi",
-    "ctaLibraryDesc": "Sfoglia oltre 170 esercizi collaudati."
+    "ctaLibraryTitle": "Libreria",
+    "ctaLibraryDesc": "Sfoglia oltre 170 esercizi collaudati.",
+    "week": {
+      "title": "Questa settimana",
+      "openPlanner": "Apri il planner",
+      "nextMatch": "Prossima partita",
+      "vsHome": "Ospita {opponent}",
+      "vsAway": "In trasferta a {opponent}",
+      "matchGeneric": "Partita",
+      "sessionGeneric": "Allenamento",
+      "today": "Oggi",
+      "tomorrow": "Domani",
+      "inDays": "MD-{count}",
+      "todayTag": "Oggi",
+      "empty": "Nessuna partita o allenamento in programma questa settimana.",
+      "weekRange": "Settimana dal {start} al {end}",
+      "allTeams": "Tutte le squadre",
+      "evalGeneric": "Valutazione fisica",
+      "evalTag": "Valut."
+    }
   },
   "teams": {
     "title": "Squadre",
@@ -877,7 +895,10 @@
         "addBall": "Palla",
         "arrow": "Freccia",
         "removeToken": "Rimuovi",
-        "arrowKind": { "run": "Corsa", "pass": "Passaggio" }
+        "arrowKind": {
+          "run": "Corsa",
+          "pass": "Passaggio"
+        }
       },
       "err": {
         "nameRequired": "Dai un nome al sistema.",

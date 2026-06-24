@@ -399,7 +399,8 @@
       "submitting": "Sending…",
       "error": "Sending failed. Try again or email us directly.",
       "successTitle": "Message sent",
-      "successBody": "Thanks! We'll get back to you shortly."
+      "successBody": "Thanks! We'll get back to you shortly.",
+      "devisMessage": "Hello, I would like a Grinta quote for my club.\n\nClub: \nNumber of teams: \nNumber of players (approx.): \nYour role: "
     }
   },
   "nav": {
@@ -563,19 +564,36 @@
   },
   "dashboard": {
     "title": "Dashboard",
-    "welcome": "Welcome back, {name}.",
-    "teamsCard": "Teams",
-    "exercisesCard": "Exercises",
-    "nextSession": "Next session",
-    "noNextSession": "No upcoming session.",
+    "greeting": "Hello",
+    "premiumBadge": "On quote",
+    "premiumTitle": "Equip your club with Grinta",
+    "premiumDesc": "Plan your seasons, manage your teams and staff, track your players' progress. Grinta is activated for your club on a quote basis — tell us about your project.",
+    "premiumCta": "Request a quote",
+    "freeActionsTitle": "In the meantime, explore Grinta",
     "ctaJoinClubTitle": "Join a club",
     "ctaJoinClubDesc": "Paste an invitation link to join an existing club.",
-    "ctaCreateClubTitle": "Create a club",
-    "ctaCreateClubDesc": "Plan seasons, manage teams, invite staff. Paid plan.",
-    "ctaCreateSessionTitle": "Create my session",
-    "ctaCreateSessionDesc": "One training sheet, ready in two minutes.",
-    "ctaLibraryTitle": "Exercise library",
-    "ctaLibraryDesc": "Browse 170+ proven drills."
+    "ctaCreateSessionTitle": "My training",
+    "ctaCreateSessionDesc": "A training sheet ready in two minutes.",
+    "ctaLibraryTitle": "Library",
+    "ctaLibraryDesc": "Browse 170+ proven drills.",
+    "week": {
+      "title": "This week",
+      "openPlanner": "Open planner",
+      "nextMatch": "Next match",
+      "vsHome": "Hosting {opponent}",
+      "vsAway": "Away at {opponent}",
+      "matchGeneric": "Match",
+      "sessionGeneric": "Training",
+      "today": "Today",
+      "tomorrow": "Tomorrow",
+      "inDays": "MD-{count}",
+      "todayTag": "Today",
+      "empty": "No match or training scheduled this week.",
+      "weekRange": "Week of {start} to {end}",
+      "allTeams": "All teams",
+      "evalGeneric": "Physical assessment",
+      "evalTag": "Eval"
+    }
   },
   "teams": {
     "title": "Teams",
@@ -883,7 +901,10 @@
         "addBall": "Ball",
         "arrow": "Arrow",
         "removeToken": "Remove",
-        "arrowKind": { "run": "Run", "pass": "Pass" }
+        "arrowKind": {
+          "run": "Run",
+          "pass": "Pass"
+        }
       },
       "err": {
         "nameRequired": "Give the system a name.",

@@ -399,7 +399,8 @@
       "submitting": "Wird gesendet…",
       "error": "Senden fehlgeschlagen. Versuchen Sie es erneut oder schreiben Sie uns direkt per E-Mail.",
       "successTitle": "Nachricht gesendet",
-      "successBody": "Danke! Wir melden uns in Kürze."
+      "successBody": "Danke! Wir melden uns in Kürze.",
+      "devisMessage": "Hallo, ich möchte ein Grinta-Angebot für meinen Verein.\n\nVerein: \nAnzahl Teams: \nAnzahl Spieler (ca.): \nIhre Rolle: "
     }
   },
   "nav": {
@@ -556,20 +557,37 @@
     "resetRequestAgain": "Neuen Link anfordern"
   },
   "dashboard": {
-    "title": "Übersicht",
-    "welcome": "Willkommen zurück, {name}.",
-    "teamsCard": "Mannschaften",
-    "exercisesCard": "Übungen",
-    "nextSession": "Nächste Einheit",
-    "noNextSession": "Keine bevorstehende Einheit.",
+    "title": "Dashboard",
+    "greeting": "Hallo",
+    "premiumBadge": "Auf Anfrage",
+    "premiumTitle": "Rüsten Sie Ihren Verein mit Grinta aus",
+    "premiumDesc": "Planen Sie Ihre Saisons, verwalten Sie Teams und Staff, verfolgen Sie die Entwicklung Ihrer Spieler. Grinta wird für Ihren Verein auf Angebotsbasis aktiviert — erzählen Sie uns von Ihrem Projekt.",
+    "premiumCta": "Angebot anfordern",
+    "freeActionsTitle": "Entdecken Sie Grinta in der Zwischenzeit",
     "ctaJoinClubTitle": "Verein beitreten",
-    "ctaJoinClubDesc": "Füge einen Einladungslink ein, um einem bestehenden Verein beizutreten.",
-    "ctaCreateClubTitle": "Verein erstellen",
-    "ctaCreateClubDesc": "Plane deine Saisons, verwalte Mannschaften, lade Staff ein. Kostenpflichtig.",
-    "ctaCreateSessionTitle": "Mein Training erstellen",
-    "ctaCreateSessionDesc": "Eine Trainingskarte in zwei Minuten bereit.",
-    "ctaLibraryTitle": "Übungsbibliothek",
-    "ctaLibraryDesc": "Durchstöbere 170+ erprobte Übungen."
+    "ctaJoinClubDesc": "Fügen Sie einen Einladungslink ein, um einem bestehenden Verein beizutreten.",
+    "ctaCreateSessionTitle": "Mein Training",
+    "ctaCreateSessionDesc": "Ein Trainingsplan in zwei Minuten.",
+    "ctaLibraryTitle": "Bibliothek",
+    "ctaLibraryDesc": "Über 170 bewährte Übungen durchsuchen.",
+    "week": {
+      "title": "Diese Woche",
+      "openPlanner": "Planer öffnen",
+      "nextMatch": "Nächstes Spiel",
+      "vsHome": "Empfängt {opponent}",
+      "vsAway": "Auswärts bei {opponent}",
+      "matchGeneric": "Spiel",
+      "sessionGeneric": "Training",
+      "today": "Heute",
+      "tomorrow": "Morgen",
+      "inDays": "MD-{count}",
+      "todayTag": "Heute",
+      "empty": "Diese Woche kein Spiel oder Training geplant.",
+      "weekRange": "Woche vom {start} bis {end}",
+      "allTeams": "Alle Teams",
+      "evalGeneric": "Leistungstest",
+      "evalTag": "Test"
+    }
   },
   "teams": {
     "title": "Mannschaften",
@@ -877,7 +895,10 @@
         "addBall": "Ball",
         "arrow": "Pfeil",
         "removeToken": "Entfernen",
-        "arrowKind": { "run": "Lauf", "pass": "Pass" }
+        "arrowKind": {
+          "run": "Lauf",
+          "pass": "Pass"
+        }
       },
       "err": {
         "nameRequired": "Gib dem System einen Namen.",
