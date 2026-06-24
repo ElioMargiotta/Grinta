@@ -1,6 +1,6 @@
 "use client";
 
-import { useActionState, useState } from "react";
+import { useActionState } from "react";
 import { useTranslations } from "next-intl";
 import { createClubAction } from "@/app/[locale]/(admin)/admin/actions";
 import { LicensePriceEstimate } from "@/components/admin/LicensePriceEstimate";
@@ -9,7 +9,6 @@ type State = { error?: string } | null;
 
 export function CreateClubForm({ locale }: { locale: string }) {
   const t = useTranslations("admin");
-  const [maxTeams, setMaxTeams] = useState("");
   const [state, formAction, pending] = useActionState<State, FormData>(
     async (_prev, formData) => createClubAction(formData),
     null,
@@ -29,14 +28,7 @@ export function CreateClubForm({ locale }: { locale: string }) {
 
       <fieldset className="grid grid-cols-3 gap-3">
         <Field label={t("license.maxTeams")} hint={t("license.unlimitedHint")}>
-          <input
-            name="maxTeams"
-            type="number"
-            min={0}
-            value={maxTeams}
-            onChange={(e) => setMaxTeams(e.target.value)}
-            className={inputCls}
-          />
+          <input name="maxTeams" type="number" min={0} className={inputCls} />
         </Field>
         <Field label={t("license.maxPlayers")}>
           <input name="maxPlayers" type="number" min={0} className={inputCls} />
@@ -46,7 +38,7 @@ export function CreateClubForm({ locale }: { locale: string }) {
         </Field>
       </fieldset>
 
-      <LicensePriceEstimate teams={maxTeams ? Number(maxTeams) : null} />
+      <LicensePriceEstimate />
 
       <div className="grid grid-cols-2 gap-3">
         <Field label={t("license.endsAt")} hint={t("license.endsAtHint")}>

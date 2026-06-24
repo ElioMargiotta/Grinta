@@ -126,7 +126,7 @@
       "eyebrow": "Tarifs",
       "title": "Gratuit pour un coach. Sur devis pour un club.",
       "recommended": "recommandé",
-      "jsNote": "En Suisse, Jeunesse+Sport reverse 1,04 CHF par heure et par joueur. Une seule séance junior subventionnée rembourse le mois entier de Grinta pour l’équipe — et ce au tarif le plus élevé.",
+      "jsNote": "En Suisse, Jeunesse+Sport reverse 1,04 CHF par heure et par joueur. Une seule séance junior subventionnée rembourse le mois entier de Grinta pour l’équipe.",
       "tiers": [
         {
           "name": "Coach",
@@ -144,11 +144,11 @@
         {
           "name": "Club",
           "discountLabel": "Sur devis",
-          "price": "dès 30 CHF",
+          "price": "40 CHF",
           "priceSuffix": "/ équipe / mois",
-          "sub": "Tarif dégressif (40 → 30 CHF) selon le nombre d’équipes.",
+          "sub": "Facturé sur les seules équipes de formation (D et plus).",
           "features": [
-            "Équipes illimitées",
+            "Toutes les catégories de formation (D à A + actifs)",
             "Périodisation saison & microcycles (MD±)",
             "Kit de match : compo, tactique, convocation",
             "Suivi physique & évaluations",
@@ -157,11 +157,12 @@
           ],
           "notes": [
             "−5 % en paiement annuel",
-            "Licence calibrée à votre club (équipes, effectif, staff)",
+            "Licence calibrée à votre club",
             "Créée et activée par Grinta sur devis"
           ],
           "cta": "Demander un devis",
-          "href": "/contact?topic=devis"
+          "href": "/contact?topic=devis",
+          "highlight": "Football des enfants (G/F/E) inclus gratuitement"
         }
       ]
     },
@@ -407,14 +408,15 @@
     "devis": {
       "title": "Ce que comprend une licence club",
       "points": [
-        "Équipes illimitées, toutes catégories",
+        "Football des enfants (G, F, E) inclus gratuitement",
+        "Toutes les catégories de formation (D à A + actifs)",
         "Périodisation saison & microcycles (MD±)",
         "Kit de match : compo, tactique, convocation",
         "Suivi physique & évaluations joueurs",
         "Données conservées d’année en année",
         "Export CDP J+S"
       ],
-      "pricing": "Tarif dégressif de 40 à 30 CHF / équipe / mois selon le nombre d’équipes. −5 % en paiement annuel.",
+      "pricing": "40 CHF / équipe de formation (D et plus). Football des enfants (G/F/E) inclus. −5 % en paiement annuel.",
       "js": "En Suisse, Jeunesse+Sport reverse 1,04 CHF/h/joueur : une seule séance junior subventionnée rembourse le mois de Grinta pour l’équipe."
     }
   },
@@ -2213,12 +2215,13 @@
     },
     "price": {
       "title": "Devis estimé",
+      "billableLabel": "Équipes facturables",
+      "billableHint": "Formation : D, C, B, A + actifs. Football des enfants (G/F/E) inclus gratuitement.",
+      "enterBillable": "Saisis le nombre d’équipes facturables pour estimer le devis.",
       "monthly": "/ mois",
       "annual": "/ an",
-      "annualNote": "−5 % à l'année",
-      "perTeamSuffix": "/ équipe / mois",
-      "unlimited": "Équipes illimitées — montant sur devis (non calculé automatiquement).",
-      "hint": "estimation sur le nombre d'équipes, ajustable manuellement"
+      "annualNote": "−5 % à l’année",
+      "perTeamSuffix": "/ équipe / mois"
     }
   },
   "pitch": {
