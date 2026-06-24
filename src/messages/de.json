@@ -1105,6 +1105,7 @@
       "startTime": "Startzeit",
       "duration": "Dauer (Minuten)",
       "theme": "Thema",
+      "location": "Ort",
       "notes": "Notizen",
       "rsvpDeadlineHours": "Rückmeldefrist (Std)",
       "rsvpDeadlineHoursHint": "Stunden vor Beginn, in denen Spieler noch antworten können",
@@ -1244,6 +1245,7 @@
       },
       "slotTime": "Zeit",
       "duration": "Dauer (Min.)",
+      "slotLocation": "Ort",
       "addSlot": "Zeit hinzufügen",
       "removeSlot": "Zeit entfernen",
       "cyclesTitle": "Verteilung der Arbeitswochen",
@@ -1342,6 +1344,7 @@
       "outOfSeasonRange": "Bleibt im Rahmen der Runde"
     },
     "seasonScope": "Saison {season}",
+    "bdnsExport": "BDNS-Export",
     "match": {
       "backToPlanning": "Zurück zur Planung",
       "fallback": "Spiel",
@@ -1632,6 +1635,7 @@
         },
         "sessionTitlePlaceholder": "Titel der Einheit",
         "durationPlaceholder": "90 Min.",
+        "locationPlaceholder": "Ort",
         "teamPlaceholder": "Mannschaft",
         "coachPlaceholder": "Trainer"
       },
@@ -2616,6 +2620,44 @@
       "bulkLabel": "Schnellerfassung:",
       "markAllPresent": "Alle anwesend",
       "markAllAbsent": "Alle abwesend"
+    },
+    "staff": {
+      "title": "Betreuer (Leitende)",
+      "hint": "Erfasse anwesende Leiter und trage ihre J+S-Nummer für den BDNS-Export ein.",
+      "colName": "Leiter",
+      "colJsNumber": "J+S-Nr.",
+      "colPresence": "Anwesenheit",
+      "jsNumberPlaceholder": "J+S-Nr.",
+      "jsNumberMissing": "J+S-Nummer fehlt",
+      "empty": "Keine Betreuer dieser Mannschaft zugeordnet.",
+      "unnamed": "Ohne Name"
+    }
+  },
+  "bdns": {
+    "title": "BDNS-Export",
+    "subtitle": "Erzeuge die Importdatei für die Präsenzkontrolle (PK) für Jugend+Sport für den gewählten Zeitraum.",
+    "backToPlanner": "Zurück zur Planung",
+    "startDate": "Von",
+    "endDate": "Bis",
+    "activities": "Einzubeziehende Aktivitäten",
+    "includeTrainings": "Trainings",
+    "includeMatches": "Wettkämpfe (Spiele)",
+    "fallbackLocation": "Standardort (Trainings ohne Ort)",
+    "fallbackLocationHint": "Wird nur für Einheiten ohne eigenen Ort verwendet. Optional.",
+    "generate": "CSV erzeugen",
+    "done": "{n, plural, =0 {Keine Zeilen erzeugt} one {# Zeile erzeugt — Datei heruntergeladen} other {# Zeilen erzeugt — Datei heruntergeladen}}",
+    "missingTitle": "{n, plural, one {# Person ausgeschlossen (J+S-Nummer fehlt)} other {# Personen ausgeschlossen (J+S-Nummer fehlt)}}",
+    "durationWarning": "Dauern ausserhalb der J+S-Werte: {list} Min. Bitte diese Einheiten prüfen.",
+    "unnamed": "Ohne Name",
+    "fonction": {
+      "participant": "Teilnehmer/in",
+      "moniteur": "Leiter/in"
+    },
+    "err": {
+      "missing_team": "Mannschaft fehlt",
+      "team_not_found": "Mannschaft nicht gefunden",
+      "invalid_range": "Ungültiger Datumsbereich",
+      "no_activity": "Wähle mindestens eine Aktivitätsart"
     }
   },
   "email": {

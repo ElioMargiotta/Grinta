@@ -21,7 +21,7 @@ export default async function SoloWizardPage({
   // Find or pre-create the user's solo session.
   const { data: existing } = await supabase
     .from("sessions")
-    .select("id, date, theme, start_time, duration_minutes")
+    .select("id, date, theme, start_time, duration_minutes, location")
     .is("team_id", null)
     .eq("trainer_id", user.id)
     .order("created_at", { ascending: false })
@@ -35,6 +35,7 @@ export default async function SoloWizardPage({
     theme: string | null;
     start_time: string | null;
     duration_minutes: number | null;
+    location: string | null;
   };
 
   if (existing) {
@@ -53,7 +54,7 @@ export default async function SoloWizardPage({
         theme: null,
         notes: null,
       })
-      .select("id, date, theme, start_time, duration_minutes")
+      .select("id, date, theme, start_time, duration_minutes, location")
       .single();
     if (error || !inserted) {
       throw new Error(error?.message ?? t("cannotCreate"));
@@ -94,6 +95,7 @@ export default async function SoloWizardPage({
         title: sessionRow.theme ?? "",
         startTime: (sessionRow.start_time ?? "")?.slice(0, 5) ?? "",
         durationMinutes: sessionRow.duration_minutes ?? null,
+        location: sessionRow.location ?? "",
       }}
       weekTheme={null}
     />

@@ -22,7 +22,7 @@ export default async function PreparationPage({
       supabase
         .from("sessions")
         .select(
-          "id, date, theme, start_time, duration_minutes, team_id, microcycle_id, teams(name), microcycles(theme)",
+          "id, date, theme, start_time, duration_minutes, location, team_id, microcycle_id, teams(name), microcycles(theme)",
         )
         .eq("id", sessionId)
         .single(),
@@ -105,6 +105,7 @@ export default async function PreparationPage({
           title: session.theme ?? "",
           startTime: (session.start_time as string | null)?.slice(0, 5) ?? "",
           durationMinutes: session.duration_minutes ?? null,
+          location: (session.location as string | null) ?? "",
         }}
         weekTheme={weekTheme}
       />

@@ -100,6 +100,92 @@ export async function markAllActualAttendanceAction({
   return { ok: true };
 }
 
+export async function markStaffAttendanceAction({
+  sessionId,
+  membershipId,
+  status,
+  teamId,
+  locale,
+}: {
+  sessionId: string;
+  membershipId: string;
+  status: "present" | "absent" | null;
+  teamId: string;
+  locale: string;
+}) {
+  if (!sessionId || !membershipId) return { error: "missing_fields" };
+  if (status !== null && status !== "present" && status !== "absent") {
+    return { error: "invalid_status" };
+  }
+
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) redirect(`/${locale}/login`);
+
+  if (status === null) {
+    const { error } = await supabase
+      .from("session_staff_attendances")
+      .update({
+        actual_status: null,
+        actual_marked_at: null,
+        actual_marked_by: null,
+      })
+      .eq("session_id", sessionId)
+      .eq("membership_id", membershipId);
+    if (error) return { error: error.message };
+  } else {
+    const { error } = await supabase
+      .from("session_staff_attendances")
+      .upsert(
+        {
+          session_id: sessionId,
+          membership_id: membershipId,
+          actual_status: status,
+          actual_marked_at: new Date().toISOString(),
+          actual_marked_by: user.id,
+        },
+        { onConflict: "session_id,membership_id" },
+      );
+    if (error) return { error: error.message };
+  }
+
+  revalidatePath(`/${locale}/planner/${teamId}/sessions/${sessionId}/attendance`);
+  return { ok: true };
+}
+
+export async function setMembershipJsNumberAction({
+  membershipId,
+  jsNumber,
+  teamId,
+  sessionId,
+  locale,
+}: {
+  membershipId: string;
+  jsNumber: string;
+  teamId: string;
+  sessionId: string;
+  locale: string;
+}) {
+  if (!membershipId) return { error: "missing_fields" };
+
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) redirect(`/${locale}/login`);
+
+  const { error } = await supabase.rpc("set_membership_js_number", {
+    p_membership_id: membershipId,
+    p_js_number: jsNumber,
+  });
+  if (error) return { error: error.message };
+
+  revalidatePath(`/${locale}/planner/${teamId}/sessions/${sessionId}/attendance`);
+  return { ok: true };
+}
+
 export async function setSessionDeadlineAction({
   sessionId,
   teamId,

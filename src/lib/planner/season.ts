@@ -53,6 +53,8 @@ export type TrainingSlot = {
   time: string;
   /** Durée en minutes. */
   durationMinutes: number;
+  /** Lieu d'entraînement par défaut de ce créneau (colonne LIEU export BDNS). */
+  location?: string | null;
 };
 
 /** Structure saisie au wizard : phase prépa + une liste de mésocycles (cycles). */
@@ -98,6 +100,8 @@ export type PlannedSession = {
   startTime: string | null;
   /** Durée en minutes. */
   durationMinutes: number | null;
+  /** Lieu hérité du créneau hebdo (null si aucun). */
+  location: string | null;
   /** Écart en jours au match de la semaine (négatif = avant). null = semaine sans match. */
   mdOffset: number | null;
 };
@@ -202,6 +206,7 @@ export function planSeason(
         weekday: Math.round(slot.weekday),
         time: /^([01]\d|2[0-3]):[0-5]\d$/.test(slot.time) ? slot.time : "19:00",
         durationMinutes: Math.max(15, Math.min(240, Math.round(slot.durationMinutes || 90))),
+        location: typeof slot.location === "string" && slot.location.trim() ? slot.location.trim() : null,
       }))
       .filter((slot) => slot.weekday >= 1 && slot.weekday <= 7) ?? [];
   const weekdays = new Set(
@@ -349,6 +354,7 @@ export function planSeason(
             date: ymd(day),
             startTime: slot.time,
             durationMinutes: slot.durationMinutes,
+            location: slot.location ?? null,
             mdOffset: match ? diffDays(day, match.civil) : null,
           });
         }
@@ -363,6 +369,7 @@ export function planSeason(
           date: ymd(day),
           startTime: null,
           durationMinutes: null,
+          location: null,
           mdOffset: match ? diffDays(day, match.civil) : null,
         });
       }

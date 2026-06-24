@@ -21,6 +21,7 @@ export async function savePreparationAction({
     title: string;
     startTime: string | null;
     durationMinutes: number;
+    location: string | null;
   };
 }) {
   if (!sessionId) return { error: "Missing fields" };
@@ -57,6 +58,7 @@ export async function savePreparationAction({
       update.theme = sessionMeta.title || null;
       update.start_time = sessionMeta.startTime;
       update.duration_minutes = sessionMeta.durationMinutes;
+      update.location = sessionMeta.location;
     }
     if (microcycleId !== session.microcycle_id) {
       update.microcycle_id = microcycleId;

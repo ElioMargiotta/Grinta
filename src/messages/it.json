@@ -1105,6 +1105,7 @@
       "startTime": "Ora di inizio",
       "duration": "Durata (minuti)",
       "theme": "Tema",
+      "location": "Luogo",
       "notes": "Note",
       "rsvpDeadlineHours": "Scadenza risposta (h)",
       "rsvpDeadlineHoursHint": "Ore prima dell'inizio in cui i giocatori possono ancora rispondere",
@@ -1244,6 +1245,7 @@
       },
       "slotTime": "Ora",
       "duration": "Durata (min)",
+      "slotLocation": "Luogo",
       "addSlot": "Aggiungi slot",
       "removeSlot": "Rimuovi slot",
       "cyclesTitle": "Distribuzione delle settimane di lavoro",
@@ -1342,6 +1344,7 @@
       "outOfSeasonRange": "Resta nei limiti del turno"
     },
     "seasonScope": "Stagione {season}",
+    "bdnsExport": "Export BDNS",
     "match": {
       "backToPlanning": "Torna alla pianificazione",
       "fallback": "Partita",
@@ -1632,6 +1635,7 @@
         },
         "sessionTitlePlaceholder": "Titolo della seduta",
         "durationPlaceholder": "90min",
+        "locationPlaceholder": "Luogo",
         "teamPlaceholder": "Squadra",
         "coachPlaceholder": "Allenatore"
       },
@@ -2616,6 +2620,44 @@
       "bulkLabel": "Marcatura rapida:",
       "markAllPresent": "Tutti presenti",
       "markAllAbsent": "Tutti assenti"
+    },
+    "staff": {
+      "title": "Staff tecnico (monitori)",
+      "hint": "Segna i monitori presenti e inserisci il loro numero G+S per l'export BDNS.",
+      "colName": "Monitore",
+      "colJsNumber": "N° G+S",
+      "colPresence": "Presenza",
+      "jsNumberPlaceholder": "N° G+S",
+      "jsNumberMissing": "Numero G+S mancante",
+      "empty": "Nessun monitore collegato a questa squadra.",
+      "unnamed": "Senza nome"
+    }
+  },
+  "bdns": {
+    "title": "Export BDNS",
+    "subtitle": "Genera il file di importazione del controllo delle presenze (CdP) per Gioventù+Sport nel periodo scelto.",
+    "backToPlanner": "Torna alla pianificazione",
+    "startDate": "Dal",
+    "endDate": "Al",
+    "activities": "Attività da includere",
+    "includeTrainings": "Allenamenti",
+    "includeMatches": "Competizioni (partite)",
+    "fallbackLocation": "Luogo predefinito (allenamenti senza luogo)",
+    "fallbackLocationHint": "Usato solo per le sedute prive di un luogo proprio. Facoltativo.",
+    "generate": "Genera CSV",
+    "done": "{n, plural, =0 {Nessuna riga generata} one {# riga generata — file scaricato} other {# righe generate — file scaricato}}",
+    "missingTitle": "{n, plural, one {# persona esclusa (numero G+S mancante)} other {# persone escluse (numero G+S mancante)}}",
+    "durationWarning": "Durate fuori dai valori G+S ammessi: {list} min. Verifica queste sedute.",
+    "unnamed": "Senza nome",
+    "fonction": {
+      "participant": "Partecipante",
+      "moniteur": "Monitore"
+    },
+    "err": {
+      "missing_team": "Squadra mancante",
+      "team_not_found": "Squadra non trovata",
+      "invalid_range": "Intervallo di date non valido",
+      "no_activity": "Seleziona almeno un tipo di attività"
     }
   },
   "email": {

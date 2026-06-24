@@ -9,6 +9,7 @@ import {
   Clock,
   FileText,
   Loader2,
+  MapPin,
   Printer,
   Save,
   Timer,
@@ -832,6 +833,7 @@ export type SessionMeta = {
   title: string;
   startTime: string;
   durationMinutes: number | null;
+  location: string;
 };
 
 const SESSION_TITLE_MAX = 20;
@@ -1041,6 +1043,17 @@ function Step1({
                 />
               </label>
             </div>
+            <label className="flex min-w-0 items-center gap-2">
+              <MapPin className="h-3.5 w-3.5 text-zinc-400" />
+              <input
+                className={inpUlClass}
+                placeholder={t("step1.locationPlaceholder")}
+                value={meta.location}
+                onChange={(e) =>
+                  patchMeta((m) => ({ ...m, location: e.target.value }))
+                }
+              />
+            </label>
             <label className="flex min-w-0 items-center gap-2">
               <Users className="h-3.5 w-3.5 text-zinc-400" />
               <input
@@ -2477,6 +2490,7 @@ export function PreparationSheet({
               title: meta.title.trim().slice(0, SESSION_TITLE_MAX),
               startTime: meta.startTime || null,
               durationMinutes,
+              location: meta.location.trim() || null,
             },
           }),
         { label: t("saving"), message: tCommon("pleaseWait") },
