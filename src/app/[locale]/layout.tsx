@@ -37,9 +37,17 @@ export default async function LocaleLayout({
   return (
     <html
       lang={locale}
+      suppressHydrationWarning
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col font-sans">
+      <head>
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `try{document.documentElement.classList.toggle('dark',localStorage.getItem('grinta-theme')==='dark')}catch(e){}`,
+          }}
+        />
+      </head>
+      <body className="flex min-h-full flex-col font-sans">
         <NextIntlClientProvider locale={locale} messages={messages}>
           <LoadingProvider defaultLabel={loadingLabel}>
             {children}

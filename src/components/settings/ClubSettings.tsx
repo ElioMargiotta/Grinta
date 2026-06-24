@@ -54,7 +54,7 @@ type Data = {
 type Tab = "general" | "staff" | "roles";
 
 const inputClass =
-  "h-10 w-full rounded-md border border-zinc-300 bg-white px-3 text-sm text-zinc-900 placeholder:text-zinc-400 focus:border-zinc-900 focus:outline-none focus:ring-2 focus:ring-zinc-900/10";
+  "h-10 w-full rounded-md border border-zinc-300 bg-white px-3 text-sm text-zinc-900 placeholder:text-zinc-400 focus:border-zinc-900 focus:outline-none focus:ring-2 focus:ring-zinc-900/10 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100 dark:focus:border-zinc-500";
 
 // Pastille colorée par niveau d'accès — reprend la sémantique du reste de l'app
 // (rouge = plein accès, dégradé jusqu'au gris = lecture seule).
@@ -130,7 +130,7 @@ export function ClubSettings({ data }: { data: Data }) {
   return (
     <div className="flex flex-col gap-6">
       {/* Sous-onglets façon sélecteur de tour du wizard (soulignés) */}
-      <div className="flex gap-1 overflow-x-auto border-b border-zinc-200">
+      <div className="flex gap-1 overflow-x-auto border-b border-zinc-200 dark:border-zinc-800">
         {tabs.map(({ key, label }) => {
           const isActive = tab === key;
           return (
@@ -141,8 +141,8 @@ export function ClubSettings({ data }: { data: Data }) {
               aria-current={isActive ? "page" : undefined}
               className={`-mb-px shrink-0 border-b-2 px-3 pb-2.5 text-[13px] font-semibold transition ${
                 isActive
-                  ? "border-[var(--club-primary)] text-zinc-950"
-                  : "border-transparent text-zinc-500 hover:text-zinc-900"
+                  ? "border-[var(--club-primary)] text-zinc-950 dark:text-zinc-100"
+                  : "border-transparent text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100"
               }`}
             >
               {label}
@@ -224,7 +224,7 @@ export function ClubSettings({ data }: { data: Data }) {
             </div>
 
             <label className="flex max-w-md flex-col gap-1 text-sm">
-              <span className="font-medium text-zinc-700">
+              <span className="font-medium text-zinc-700 dark:text-zinc-300">
                 {t("identity.clubName")}
               </span>
               <input
@@ -241,65 +241,23 @@ export function ClubSettings({ data }: { data: Data }) {
           {/* Couleurs */}
           <section className="flex flex-col gap-5 border-t border-[var(--club-line)] pt-8">
             <div className="max-w-xl">
-              <h2 className="text-lg font-semibold text-zinc-900">
+              <h2 className="text-lg font-semibold text-zinc-900 dark:text-zinc-100">
                 {t("identity.title")}
               </h2>
-              <p className="mt-1 text-sm text-zinc-600">
+              <p className="mt-1 text-sm text-zinc-600 dark:text-zinc-300">
                 {t("identity.description")}
               </p>
             </div>
 
-            <div className="grid gap-x-10 gap-y-6 sm:grid-cols-2">
-              <div className="flex flex-col gap-3">
-                <div className="text-xs font-semibold uppercase tracking-wide text-zinc-400">
-                  {t("identity.dayMode")}
-                </div>
-                <ColorField
-                  label={t("identity.primaryColor")}
-                  name="primaryColor"
-                  defaultValue={data.clubIdentity.theme_primary_color}
-                />
-                <ColorField
-                  label={t("identity.secondaryColor")}
-                  name="secondaryColor"
-                  defaultValue={data.clubIdentity.theme_secondary_color}
-                />
-              </div>
-              <div className="flex flex-col gap-3">
-                <div className="text-xs font-semibold uppercase tracking-wide text-zinc-400">
-                  {t("identity.nightMode")}
-                </div>
-                <ColorField
-                  label={t("identity.primaryColor")}
-                  name="nightPrimaryColor"
-                  defaultValue={data.clubIdentity.theme_night_primary_color}
-                />
-                <ColorField
-                  label={t("identity.secondaryColor")}
-                  name="nightSecondaryColor"
-                  defaultValue={data.clubIdentity.theme_night_secondary_color}
-                />
-              </div>
+            <div className="max-w-sm">
+              <ColorField
+                label={t("identity.clubColor")}
+                name="primaryColor"
+                defaultValue={data.clubIdentity.theme_primary_color}
+              />
             </div>
 
-            <div className="flex flex-wrap items-center justify-between gap-3 pt-2">
-              <fieldset className="inline-flex rounded-lg border border-zinc-200 bg-white p-1">
-                {(["day", "night"] as const).map((mode) => (
-                  <label
-                    key={mode}
-                    className="has-[:checked]:bg-[var(--club-primary)] has-[:checked]:text-[var(--club-primary-foreground)] rounded-md px-3 py-1.5 text-sm font-medium text-zinc-600"
-                  >
-                    <input
-                      type="radio"
-                      name="themeMode"
-                      value={mode}
-                      defaultChecked={data.clubIdentity.theme_mode === mode}
-                      className="sr-only"
-                    />
-                    {mode === "day" ? t("identity.dayMode") : t("identity.nightMode")}
-                  </label>
-                ))}
-              </fieldset>
+            <div className="flex justify-end pt-2">
               <Button type="submit" loading={isPending}>
                 {t("identity.saveIdentity")}
               </Button>
@@ -702,7 +660,7 @@ function ColorField({
       >
         {label}
       </span>
-      <span className="flex h-10 overflow-hidden rounded-md border border-zinc-300 bg-white">
+      <span className="flex h-10 overflow-hidden rounded-md border border-zinc-300 bg-white dark:border-zinc-700 dark:bg-zinc-900">
         <input
           type="color"
           name={name}

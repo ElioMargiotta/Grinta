@@ -28,12 +28,49 @@
 html,
 body {
   height: 100%;
+  background-color: #ffffff;
 }
 
 body {
-  background: var(--color-background);
   color: var(--color-foreground);
 }
+
+html.dark,
+html.dark body {
+  background-color: #000000;
+  color-scheme: dark;
+}
+
+/* Fallback for application surfaces that do not yet declare an explicit
+   `dark:` utility. Explicit component-level dark styles always take priority. */
+.dark .bg-white:not([class*="dark:bg-"]) { background-color: #18181b; }
+.dark .bg-zinc-50:not([class*="dark:bg-"]),
+.dark .bg-zinc-100:not([class*="dark:bg-"]) { background-color: #27272a; }
+.dark .text-zinc-950:not([class*="dark:text-"]),
+.dark .text-zinc-900:not([class*="dark:text-"]) { color: #f4f4f5; }
+.dark .text-zinc-800:not([class*="dark:text-"]),
+.dark .text-zinc-700:not([class*="dark:text-"]) { color: #e4e4e7; }
+.dark .text-zinc-600:not([class*="dark:text-"]) { color: #d4d4d8; }
+.dark .border-zinc-100:not([class*="dark:border-"]),
+.dark .border-zinc-200:not([class*="dark:border-"]),
+.dark .border-zinc-300:not([class*="dark:border-"]) { border-color: #3f3f46; }
+.dark .hover\:bg-zinc-50:hover:not([class*="dark:hover:bg-"]),
+.dark .hover\:bg-zinc-100:hover:not([class*="dark:hover:bg-"]) { background-color: #27272a; }
+.dark .hover\:text-zinc-900:hover:not([class*="dark:hover:text-"]),
+.dark .hover\:text-zinc-950:hover:not([class*="dark:hover:text-"]) { color: #f4f4f5; }
+
+/* The printable training sheet remains a white document in both themes. */
+.dark .prep-page,
+.dark .prep-page .bg-white { background-color: #ffffff; }
+.dark .prep-page .bg-zinc-50 { background-color: #fafafa; }
+.dark .prep-page .bg-zinc-100 { background-color: #f4f4f5; }
+.dark .prep-page .text-zinc-950,
+.dark .prep-page .text-zinc-900 { color: #18181b; }
+.dark .prep-page .text-zinc-800,
+.dark .prep-page .text-zinc-700 { color: #3f3f46; }
+.dark .prep-page .text-zinc-600 { color: #52525b; }
+.dark .prep-page .border-zinc-100 { border-color: #f4f4f5; }
+.dark .prep-page .border-zinc-200 { border-color: #e4e4e7; }
 
 .grinta-grid {
   background-image:

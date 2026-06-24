@@ -435,7 +435,10 @@
     "playerMe": "Mein Profil",
     "playerTeam": "Meine Mannschaften",
     "playerSchedule": "Mein Plan",
-    "admin": "Admin"
+    "admin": "Admin",
+    "more": "Mehr",
+    "closeMenu": "Menü schließen",
+    "mobileNavigation": "Hauptnavigation"
   },
   "physicalHub": {
     "title": "Spieler-Tracking",
@@ -1884,14 +1887,17 @@
     "club": {
       "identity": {
         "title": "Vereinsidentität",
-        "description": "Diese Farben steuern das Menü, die Buttons, aktive Zustände und die Vereinsbildschirme. Der Nachtmodus erlaubt es, eine dunklere Identität zu testen, ohne die Tagesfarben zu ändern.",
+        "description": "Die Vereinsfarbe wird für Buttons, aktive Links und visuelle Akzente verwendet.",
         "workspacePreview": "Workspace-Vorschau",
         "clubName": "Vereinsname",
         "logoUrl": "Logo-URL",
         "logoUrlPlaceholder": "https://...",
         "dayMode": "Tag",
         "nightMode": "Nacht",
-        "primaryColor": "Primär",
+        "primaryColor": "Vereinsfarbe",
+        "clubColor": "Vereinsfarbe",
+        "lightBackground": "Heller Hintergrund",
+        "darkBackground": "Dunkler Hintergrund",
         "secondaryColor": "Sekundär",
         "saveIdentity": "Identität speichern",
         "uploadLogo": "Logo hochladen",
@@ -2116,7 +2122,9 @@
     "fallbackName": "Coach",
     "personaCoach": "Trainer",
     "personaPlayer": "Spieler",
-    "personaSwitchAria": "Ansicht wechseln"
+    "personaSwitchAria": "Ansicht wechseln",
+    "useDarkTheme": "Dunkelmodus aktivieren",
+    "useLightTheme": "Hellmodus aktivieren"
   },
   "sidebar": {
     "fallbackClubName": "Club",

@@ -29,23 +29,15 @@ function foregroundFor(hex: string): string {
 
 export function clubThemeStyle(identity: Partial<ClubIdentity> | null): ClubThemeStyle {
   const theme = { ...FALLBACK, ...identity };
-  const primary =
-    theme.theme_mode === "night"
-      ? theme.theme_night_primary_color
-      : theme.theme_primary_color;
-  const secondary =
-    theme.theme_mode === "night"
-      ? theme.theme_night_secondary_color
-      : theme.theme_secondary_color;
+  const primary = theme.theme_primary_color;
 
   return {
     "--club-primary": primary,
     "--club-primary-foreground": foregroundFor(primary),
-    "--club-secondary": secondary,
-    "--club-secondary-foreground": foregroundFor(secondary),
     "--club-primary-soft": `color-mix(in oklch, ${primary} 11%, white)`,
     "--club-primary-muted": `color-mix(in oklch, ${primary} 68%, #71717a)`,
     "--club-line": `color-mix(in oklch, ${primary} 22%, #e4e4e7)`,
-    "--club-page-bg": `color-mix(in oklch, ${secondary} 18%, #fafafa)`,
+    "--club-page-bg-light": "#ffffff",
+    "--club-page-bg-dark": "#000000",
   };
 }

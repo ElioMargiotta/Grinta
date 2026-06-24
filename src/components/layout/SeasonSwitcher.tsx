@@ -48,7 +48,7 @@ export function SeasonSwitcher({
         disabled={isPending}
         onClick={() => setOpen((v) => !v)}
         title={t("label")}
-        className="flex items-center gap-2 rounded-md border border-[var(--club-line)] bg-white px-3 py-1.5 text-sm text-zinc-900 hover:bg-[var(--club-primary-soft)] dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-100 dark:hover:bg-zinc-800"
+        className="flex items-center gap-1.5 rounded-md border border-[var(--club-line)] bg-white px-2 py-1.5 text-xs text-zinc-900 hover:bg-[var(--club-primary-soft)] lg:gap-2 lg:px-3 lg:text-sm dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-100 dark:hover:bg-zinc-800"
       >
         <CalendarRange className="h-4 w-4 shrink-0 text-[var(--club-primary)]" />
         <span className="font-medium tabular-nums">{current}</span>

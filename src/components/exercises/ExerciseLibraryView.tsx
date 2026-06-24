@@ -50,17 +50,17 @@ export function ExerciseLibraryView({ ex }: { ex: ExerciseLibrary }) {
             {ex.theme}
           </div>
         )}
-        <h1 className="mt-1 text-2xl font-semibold tracking-tight text-zinc-900">
+        <h1 className="mt-1 text-2xl font-semibold tracking-tight text-zinc-900 dark:text-zinc-100">
           {titre}
         </h1>
         <div className="mt-2 flex flex-wrap items-center gap-2 text-[12px]">
           {ex.niveau && (
-            <span className="rounded-md bg-zinc-100 px-2 py-0.5 font-medium text-zinc-700">
+            <span className="rounded-md bg-zinc-100 px-2 py-0.5 font-medium text-zinc-700 dark:bg-zinc-800 dark:text-zinc-300">
               {ex.niveau}
             </span>
           )}
           {ex.duree && (
-            <span className="rounded-md bg-zinc-100 px-2 py-0.5 font-medium text-zinc-700">
+            <span className="rounded-md bg-zinc-100 px-2 py-0.5 font-medium text-zinc-700 dark:bg-zinc-800 dark:text-zinc-300">
               {ex.duree}
             </span>
           )}
@@ -73,7 +73,7 @@ export function ExerciseLibraryView({ ex }: { ex: ExerciseLibrary }) {
       {/* Two-column layout: image + organisation */}
       <div className="grid gap-5 lg:grid-cols-[3fr_2fr]">
         {ex.main_image ? (
-          <div className="relative aspect-[4/3] w-full overflow-hidden rounded-xl border border-zinc-200 bg-zinc-100 shadow-sm">
+          <div className="relative aspect-[4/3] w-full overflow-hidden rounded-xl border border-zinc-200 bg-zinc-100 shadow-sm dark:border-zinc-800 dark:bg-zinc-900">
             <Image
               src={ex.main_image}
               alt={titre}
@@ -84,7 +84,7 @@ export function ExerciseLibraryView({ ex }: { ex: ExerciseLibrary }) {
             />
           </div>
         ) : (
-          <div className="flex aspect-[4/3] w-full items-center justify-center rounded-xl border border-zinc-200 bg-zinc-50 text-sm text-zinc-400 shadow-sm">
+          <div className="flex aspect-[4/3] w-full items-center justify-center rounded-xl border border-zinc-200 bg-zinc-50 text-sm text-zinc-400 shadow-sm dark:border-zinc-800 dark:bg-zinc-900">
             {t("noDiagram")}
           </div>
         )}
@@ -92,14 +92,14 @@ export function ExerciseLibraryView({ ex }: { ex: ExerciseLibrary }) {
         <div className="flex flex-col gap-4">
           {ex.description && (
             <Section title={t("description")}>
-              <p className="whitespace-pre-line text-[13px] leading-relaxed text-zinc-700">
+              <p className="whitespace-pre-line text-[13px] leading-relaxed text-zinc-700 dark:text-zinc-300">
                 {ex.description}
               </p>
             </Section>
           )}
           {ex.organisation && (
             <Section title={t("organisation")}>
-              <p className="whitespace-pre-line text-[13px] leading-relaxed text-zinc-700">
+              <p className="whitespace-pre-line text-[13px] leading-relaxed text-zinc-700 dark:text-zinc-300">
                 {ex.organisation}
               </p>
             </Section>
@@ -109,7 +109,7 @@ export function ExerciseLibraryView({ ex }: { ex: ExerciseLibrary }) {
 
       {/* Coaching tabs */}
       <Section title={t("coachingPoints")}>
-        <div className="flex flex-wrap gap-1 rounded-[10px] bg-zinc-100 p-1">
+        <div className="flex flex-wrap gap-1 rounded-[10px] bg-zinc-100 p-1 dark:bg-zinc-900">
           {FAMILY_IDS.map((f) => {
             const count = (ex[f.column] ?? []).length;
             const isActive = activeFamily === f.id;
@@ -120,8 +120,8 @@ export function ExerciseLibraryView({ ex }: { ex: ExerciseLibrary }) {
                 onClick={() => setActiveFamily(f.id)}
                 className={`flex flex-1 items-center justify-center gap-2 rounded-[8px] px-3 py-2 text-[12px] font-medium transition ${
                   isActive
-                    ? "bg-white text-zinc-900 shadow-[0_1px_3px_rgb(0_0_0/0.1)]"
-                    : "text-zinc-500 hover:text-zinc-800"
+                    ? "bg-white text-zinc-900 shadow-[0_1px_3px_rgb(0_0_0/0.1)] dark:bg-zinc-700 dark:text-white"
+                    : "text-zinc-500 hover:text-zinc-800 dark:text-zinc-400 dark:hover:text-zinc-100"
                 }`}
               >
                 <span className="font-mono text-[10px] tabular-nums opacity-70">
@@ -149,7 +149,7 @@ export function ExerciseLibraryView({ ex }: { ex: ExerciseLibrary }) {
             activeTags.map((t, i) => (
               <li
                 key={`${t}-${i}`}
-                className="flex items-start gap-2 rounded-md border border-zinc-100 bg-white px-3 py-1.5 text-[13px] text-zinc-800 shadow-sm"
+                className="flex items-start gap-2 rounded-md border border-zinc-100 bg-white px-3 py-1.5 text-[13px] text-zinc-800 shadow-sm dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-200"
               >
                 <span className="mt-1 h-1.5 w-1.5 shrink-0 rounded-full bg-zinc-400" />
                 {t}
@@ -207,7 +207,7 @@ function VariationCard({
   text: string | null;
 }) {
   return (
-    <div className="rounded-xl border border-zinc-200 bg-white p-4 shadow-sm">
+    <div className="rounded-xl border border-zinc-200 bg-white p-4 shadow-sm dark:border-zinc-800 dark:bg-zinc-900">
       <div className="mb-2 flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.08em] text-zinc-400">
         <span
           className={`flex h-5 w-5 items-center justify-center rounded-full text-[12px] font-bold ${
@@ -218,7 +218,7 @@ function VariationCard({
         </span>
         {label}
       </div>
-      <p className="whitespace-pre-line text-[13px] leading-relaxed text-zinc-700">
+      <p className="whitespace-pre-line text-[13px] leading-relaxed text-zinc-700 dark:text-zinc-300">
         {text || <span className="italic text-zinc-400">—</span>}
       </p>
     </div>

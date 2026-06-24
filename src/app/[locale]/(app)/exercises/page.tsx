@@ -79,8 +79,8 @@ type SearchParams = {
 function chipStyle(active: boolean) {
   return `inline-flex items-center rounded-full border px-3 py-1 text-xs font-medium transition ${
     active
-      ? "border-zinc-900 bg-zinc-900 text-white shadow-sm"
-      : "border-zinc-200 bg-white text-zinc-700 hover:border-zinc-300 hover:bg-zinc-50"
+      ? "border-zinc-900 bg-zinc-900 text-white shadow-sm dark:border-zinc-100 dark:bg-zinc-100 dark:text-zinc-950"
+      : "border-zinc-200 bg-white text-zinc-700 hover:border-zinc-300 hover:bg-zinc-50 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-300 dark:hover:border-zinc-600 dark:hover:bg-zinc-800"
   }`;
 }
 
@@ -177,7 +177,7 @@ export default async function ExercisesPage({
     <div className="flex flex-col gap-6">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
-          <h1 className="text-2xl font-semibold tracking-tight text-zinc-900">
+          <h1 className="text-2xl font-semibold tracking-tight text-zinc-900 dark:text-zinc-100">
             {t("title")}
           </h1>
           <p className="mt-1 text-sm text-zinc-500">{activeTab.hint}.</p>
@@ -191,7 +191,7 @@ export default async function ExercisesPage({
       </div>
 
       {/* Family tabs — switch between the two seeded libraries. */}
-      <div className="flex w-fit gap-1 rounded-[10px] bg-zinc-100 p-1">
+      <div className="flex w-fit gap-1 rounded-[10px] bg-zinc-100 p-1 dark:bg-zinc-900">
         {libraryTabs.map((tab) => {
           const isActive = activeTab.id === tab.id;
           return (
@@ -200,8 +200,8 @@ export default async function ExercisesPage({
               href={familyHref(sp, tab.id)}
               className={`rounded-[8px] px-4 py-1.5 text-[13px] font-medium transition ${
                 isActive
-                  ? "bg-white text-zinc-900 shadow-[0_1px_3px_rgb(0_0_0/0.1)]"
-                  : "text-zinc-500 hover:text-zinc-800"
+                  ? "bg-white text-zinc-900 shadow-[0_1px_3px_rgb(0_0_0/0.1)] dark:bg-zinc-700 dark:text-white"
+                  : "text-zinc-500 hover:text-zinc-800 dark:text-zinc-400 dark:hover:text-zinc-100"
               }`}
             >
               {tab.label}
@@ -211,7 +211,7 @@ export default async function ExercisesPage({
       </div>
 
       {/* Filter bar */}
-      <div className="flex flex-col gap-3 rounded-xl border border-zinc-200 bg-white p-4 shadow-sm">
+      <div className="flex flex-col gap-3 rounded-xl border border-zinc-200 bg-white p-4 shadow-sm dark:border-zinc-800 dark:bg-zinc-900">
         <FilterRow label={activeTab.id === "phases" ? t("filters.phaseOfPlay") : t("filters.theme")}>
           <Link href={chipHref(sp, "theme", null)} className={chipStyle(!sp.theme)}>
             {t("filters.all")}
@@ -265,7 +265,7 @@ export default async function ExercisesPage({
       </div>
 
       {exercises.length === 0 ? (
-        <div className="rounded-xl border border-zinc-200 bg-white p-8 text-center text-sm text-zinc-500 shadow-sm">
+        <div className="rounded-xl border border-zinc-200 bg-white p-8 text-center text-sm text-zinc-500 shadow-sm dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-400">
           {t("filters.noMatch")}
         </div>
       ) : (
@@ -313,7 +313,7 @@ function ExerciseCard({
   return (
     <Link
       href={`/exercises/${ex.id}`}
-      className="group flex h-full flex-col overflow-hidden rounded-xl border border-zinc-200 bg-white shadow-sm transition hover:-translate-y-0.5 hover:shadow-md"
+      className="group flex h-full flex-col overflow-hidden rounded-xl border border-zinc-200 bg-white shadow-sm transition hover:-translate-y-0.5 hover:shadow-md dark:border-zinc-800 dark:bg-zinc-900"
     >
       {ex.main_image ? (
         <div className="relative aspect-[4/3] w-full bg-zinc-100">
@@ -339,12 +339,12 @@ function ExerciseCard({
                 {ex.theme}
               </div>
             )}
-            <div className="mt-0.5 text-sm font-semibold leading-snug text-zinc-900">
+            <div className="mt-0.5 text-sm font-semibold leading-snug text-zinc-900 dark:text-zinc-100">
               {titre}
             </div>
           </div>
           {ex.duree && (
-            <span className="shrink-0 rounded-md bg-zinc-100 px-2 py-0.5 text-[11px] font-medium text-zinc-700">
+            <span className="shrink-0 rounded-md bg-zinc-100 px-2 py-0.5 text-[11px] font-medium text-zinc-700 dark:bg-zinc-800 dark:text-zinc-300">
               {ex.duree}
             </span>
           )}
@@ -355,7 +355,7 @@ function ExerciseCard({
         )}
 
         {ex.description && (
-          <p className="line-clamp-2 text-[12px] leading-snug text-zinc-600">
+          <p className="line-clamp-2 text-[12px] leading-snug text-zinc-600 dark:text-zinc-300">
             {ex.description}
           </p>
         )}
@@ -365,7 +365,7 @@ function ExerciseCard({
             {previewTags.slice(0, focusFamily ? 5 : 4).map((t, i) => (
               <span
                 key={`${t}-${i}`}
-                className="inline-flex max-w-[180px] items-center rounded bg-zinc-100 px-1.5 py-0.5 text-[10px] text-zinc-600"
+                className="inline-flex max-w-[180px] items-center rounded bg-zinc-100 px-1.5 py-0.5 text-[10px] text-zinc-600 dark:bg-zinc-800 dark:text-zinc-300"
                 title={t}
               >
                 <span className="truncate">{t}</span>

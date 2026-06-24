@@ -78,18 +78,6 @@ export async function updateClubIdentityAction(formData: FormData) {
         formData.get("primaryColor"),
         membership.theme_primary_color,
       ),
-      theme_secondary_color: cleanColor(
-        formData.get("secondaryColor"),
-        membership.theme_secondary_color,
-      ),
-      theme_night_primary_color: cleanColor(
-        formData.get("nightPrimaryColor"),
-        membership.theme_night_primary_color,
-      ),
-      theme_night_secondary_color: cleanColor(
-        formData.get("nightSecondaryColor"),
-        membership.theme_night_secondary_color,
-      ),
     })
     .eq("id", membership.club_id);
 

@@ -2578,21 +2578,21 @@ export function PreparationSheet({
   return (
     <>
       <div
-        className="prep-no-print fixed inset-0 z-50 flex flex-col overflow-hidden bg-[#f8f8f9] text-zinc-900"
+        className="prep-no-print fixed inset-0 z-50 flex flex-col overflow-hidden bg-white text-zinc-900 dark:bg-black dark:text-zinc-100"
         style={{ ["--g-green" as string]: GRINTA_GREEN }}
       >
         {/* Topbar */}
-        <header className="relative z-10 flex h-[52px] flex-shrink-0 items-center justify-between border-b border-zinc-200 bg-white/95 px-5 backdrop-blur-md">
+        <header className="relative z-10 flex h-[52px] flex-shrink-0 items-center justify-between border-b border-zinc-200 bg-white/95 px-5 backdrop-blur-md dark:border-zinc-800 dark:bg-black/95">
           <div className="flex min-w-0 items-center gap-2.5">
             <button
               type="button"
               onClick={() => router.back()}
-              className="flex items-center gap-1 border-0 bg-transparent text-[12px] font-medium text-zinc-500 transition hover:text-zinc-950"
+              className="flex items-center gap-1 border-0 bg-transparent text-[12px] font-medium text-zinc-500 transition hover:text-zinc-950 dark:text-zinc-400 dark:hover:text-white"
             >
               <ChevronLeft className="h-3.5 w-3.5" strokeWidth={2} />
               {t("back")}
             </button>
-            <span className="mx-3 h-[18px] w-px bg-zinc-200" />
+            <span className="mx-3 h-[18px] w-px bg-zinc-200 dark:bg-zinc-800" />
             <Image
               src="/documents/svg/grinta-icon.svg"
               alt=""
@@ -2602,7 +2602,7 @@ export function PreparationSheet({
               className="h-7 w-7 shrink-0"
             />
             <div className="min-w-0 leading-none">
-              <div className="text-[13px] font-semibold text-zinc-950">
+              <div className="text-[13px] font-semibold text-zinc-950 dark:text-white">
                 {t("header")}
               </div>
               <div className="mt-0.5 truncate text-[10px] text-zinc-500">
@@ -2611,10 +2611,10 @@ export function PreparationSheet({
             </div>
           </div>
           <div className="flex items-center gap-2">
-            <div className="mr-1 flex items-center gap-2 rounded-lg bg-zinc-100 px-3 py-[5px]">
-              <div className="h-[3px] w-20 overflow-hidden rounded-full bg-zinc-200">
+            <div className="mr-1 flex items-center gap-2 rounded-lg bg-zinc-100 px-3 py-[5px] dark:bg-zinc-900">
+              <div className="h-[3px] w-20 overflow-hidden rounded-full bg-zinc-200 dark:bg-zinc-700">
                 <div
-                  className="h-full rounded-full bg-zinc-950 transition-all duration-500 ease-[cubic-bezier(0.4,0,0.2,1)]"
+                  className="h-full rounded-full bg-zinc-950 transition-all duration-500 ease-[cubic-bezier(0.4,0,0.2,1)] dark:bg-zinc-100"
                   style={{ width: `${pct}%` }}
                 />
               </div>
@@ -2635,7 +2635,7 @@ export function PreparationSheet({
               type="button"
               onClick={save}
               disabled={isPending}
-              className="inline-flex h-8 min-w-[88px] items-center justify-center gap-1.5 rounded-[8px] border border-zinc-200 bg-white px-3 text-[12px] font-medium text-zinc-900 shadow-[0_1px_2px_rgb(0_0_0/0.05)] transition hover:bg-zinc-50 active:scale-[0.98] disabled:opacity-60"
+              className="inline-flex h-8 min-w-[88px] items-center justify-center gap-1.5 rounded-[8px] border border-zinc-200 bg-white px-3 text-[12px] font-medium text-zinc-900 shadow-[0_1px_2px_rgb(0_0_0/0.05)] transition hover:bg-zinc-50 active:scale-[0.98] disabled:opacity-60 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100 dark:hover:bg-zinc-800"
             >
               {isPending ? (
                 <>
@@ -2666,7 +2666,7 @@ export function PreparationSheet({
         {/* Shell */}
         <div className="flex min-h-0 flex-1 overflow-hidden">
           {/* Sidebar */}
-          <aside className="hidden w-[232px] shrink-0 flex-col overflow-hidden border-r border-zinc-200 bg-white md:flex">
+          <aside className="hidden w-[232px] shrink-0 flex-col overflow-hidden border-r border-zinc-200 bg-white md:flex dark:border-zinc-800 dark:bg-black">
             <div className="flex items-center gap-2 px-4 pb-3 pt-4">
               <Image
                 src="/documents/svg/grinta-icon.svg"
@@ -2691,12 +2691,12 @@ export function PreparationSheet({
                 const st: SectionStatus | null = i < 5 ? statuses[i] : null;
                 const isActive = step === i;
                 const numCls = isActive
-                  ? "bg-zinc-950 text-white"
+                  ? "bg-zinc-950 text-white dark:bg-zinc-100 dark:text-black"
                   : st === "complete"
                     ? "bg-emerald-50 text-emerald-600"
                     : st === "partial"
                       ? "bg-amber-50 text-amber-600"
-                      : "bg-zinc-100 text-zinc-400";
+                      : "bg-zinc-100 text-zinc-400 dark:bg-zinc-800 dark:text-zinc-400";
                 return (
                   <button
                     key={i}
@@ -2705,8 +2705,8 @@ export function PreparationSheet({
                     aria-current={isActive ? "step" : undefined}
                     className={`group relative flex w-full items-center gap-2.5 rounded-[9px] px-2.5 py-2 text-left transition ${
                       isActive
-                        ? "bg-zinc-50"
-                        : "hover:bg-zinc-50"
+                        ? "bg-zinc-50 dark:bg-zinc-900"
+                        : "hover:bg-zinc-50 dark:hover:bg-zinc-900"
                     }`}
                   >
                     {isActive && (
@@ -2725,8 +2725,8 @@ export function PreparationSheet({
                       <span
                         className={`block text-[12px] font-medium leading-tight transition ${
                           isActive
-                            ? "text-zinc-950"
-                            : "text-zinc-500 group-hover:text-zinc-900"
+                            ? "text-zinc-950 dark:text-white"
+                            : "text-zinc-500 group-hover:text-zinc-900 dark:text-zinc-400 dark:group-hover:text-white"
                         }`}
                       >
                         {s.label}
@@ -2737,16 +2737,16 @@ export function PreparationSheet({
                 );
               })}
             </nav>
-            <div className="border-t border-zinc-200 px-4 py-3.5">
+            <div className="border-t border-zinc-200 px-4 py-3.5 dark:border-zinc-800">
               <div className="mb-1.5 flex justify-between">
                 <span className="text-[10px] text-zinc-400">{t("progress")}</span>
                 <span className="text-[10px] font-semibold text-zinc-600">
                   {pct}%
                 </span>
               </div>
-              <div className="h-[3px] overflow-hidden rounded-full bg-zinc-200">
+              <div className="h-[3px] overflow-hidden rounded-full bg-zinc-200 dark:bg-zinc-700">
                 <div
-                  className="h-full rounded-full bg-zinc-950 transition-all duration-500 ease-[cubic-bezier(0.4,0,0.2,1)]"
+                  className="h-full rounded-full bg-zinc-950 transition-all duration-500 ease-[cubic-bezier(0.4,0,0.2,1)] dark:bg-zinc-100"
                   style={{ width: `${pct}%` }}
                 />
               </div>
@@ -2754,9 +2754,9 @@ export function PreparationSheet({
           </aside>
 
           {/* Content panel */}
-          <section className="flex min-w-0 flex-1 flex-col overflow-hidden bg-[#f8f8f9]">
+          <section className="flex min-w-0 flex-1 flex-col overflow-hidden bg-[#f8f8f9] dark:bg-zinc-950">
             {/* Mobile step pills */}
-            <div className="flex shrink-0 gap-1.5 overflow-x-auto border-b border-zinc-200 bg-white px-4 py-2.5 md:hidden">
+            <div className="flex shrink-0 gap-1.5 overflow-x-auto border-b border-zinc-200 bg-white px-4 py-2.5 md:hidden dark:border-zinc-800 dark:bg-black">
               {STEPS.map((s, i) => {
                 const isActive = step === i;
                 const st: SectionStatus | null = i < 5 ? statuses[i] : null;
@@ -2767,8 +2767,8 @@ export function PreparationSheet({
                     onClick={() => goTo(i)}
                     className={`flex shrink-0 items-center gap-1.5 rounded-full border px-3 py-1 text-[11px] font-medium transition ${
                       isActive
-                        ? "border-zinc-900 bg-zinc-900 text-white"
-                        : "border-zinc-200 bg-white text-zinc-700"
+                        ? "border-zinc-900 bg-zinc-900 text-white dark:border-zinc-100 dark:bg-zinc-100 dark:text-black"
+                        : "border-zinc-200 bg-white text-zinc-700 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-300"
                     }`}
                   >
                     <span
@@ -2806,7 +2806,7 @@ export function PreparationSheet({
                   type="button"
                   onClick={goPrev}
                   disabled={step === 0}
-                  className="inline-flex h-8 items-center gap-1.5 rounded-[9px] border border-zinc-200 bg-white px-3 text-[12px] font-medium text-zinc-900 shadow-[0_1px_2px_rgb(0_0_0/0.05)] transition hover:bg-zinc-50 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-40"
+                  className="inline-flex h-8 items-center gap-1.5 rounded-[9px] border border-zinc-200 bg-white px-3 text-[12px] font-medium text-zinc-900 shadow-[0_1px_2px_rgb(0_0_0/0.05)] transition hover:bg-zinc-50 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-40 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100 dark:hover:bg-zinc-800"
                 >
                   <ChevronLeft className="h-3.5 w-3.5" strokeWidth={2} />
                   {t("back")}
@@ -2815,7 +2815,7 @@ export function PreparationSheet({
                   type="button"
                   onClick={goNext}
                   disabled={step === STEPS.length - 1}
-                  className="inline-flex h-8 items-center gap-1.5 rounded-[9px] bg-[#0c0c0d] px-3 text-[12px] font-medium text-white shadow-[0_1px_3px_rgb(0_0_0/0.15)] transition hover:bg-[#1a1a1d] active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-40"
+                  className="inline-flex h-8 items-center gap-1.5 rounded-[9px] bg-[#0c0c0d] px-3 text-[12px] font-medium text-white shadow-[0_1px_3px_rgb(0_0_0/0.15)] transition hover:bg-[#1a1a1d] active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-40 dark:bg-white dark:text-black dark:hover:bg-zinc-200"
                 >
                   {t("next")}
                   <ChevronRight className="h-3.5 w-3.5" strokeWidth={2} />

@@ -10,6 +10,7 @@ import { redirect } from "next/navigation";
 import { clubThemeStyle } from "@/lib/club/theme";
 import { getClubLicenseUsage } from "@/lib/license/queries";
 import type { LicenseUsage } from "@/lib/license/types";
+import { MobileNavigation } from "@/components/layout/MobileNavigation";
 
 export default async function AppLayout({
   children,
@@ -62,13 +63,13 @@ export default async function AppLayout({
 
   return (
     <div
-      className="flex min-h-screen flex-1 bg-[var(--club-page-bg)] dark:bg-zinc-950 print:bg-white"
+      className="flex min-h-screen min-h-dvh flex-1 bg-[var(--club-page-bg-light)] dark:bg-[var(--club-page-bg-dark)] print:bg-white"
       style={clubThemeStyle(membership)}
     >
       <div className="print:hidden">
         <Sidebar hasMembership={hasMembership} currentMembership={membership} isAdmin={admin} />
       </div>
-      <div className="flex flex-1 flex-col">
+      <div className="flex min-w-0 flex-1 flex-col">
         <div className="print:hidden">
           <Topbar
             userName={displayName}
@@ -80,7 +81,10 @@ export default async function AppLayout({
             seasons={seasons}
           />
         </div>
-        <main className="flex-1 p-4 md:p-6 print:p-0">{children}</main>
+        <main className="flex-1 p-4 pb-24 md:p-5 lg:p-6 print:p-0">{children}</main>
+      </div>
+      <div className="print:hidden">
+        <MobileNavigation mode="staff" hasMembership={hasMembership} isAdmin={admin} />
       </div>
     </div>
   );

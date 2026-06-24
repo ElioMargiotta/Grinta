@@ -435,7 +435,10 @@
     "playerMe": "Ma fiche",
     "playerTeam": "Mes équipes",
     "playerSchedule": "Mon planning",
-    "admin": "Admin"
+    "admin": "Admin",
+    "more": "Plus",
+    "closeMenu": "Fermer le menu",
+    "mobileNavigation": "Navigation principale"
   },
   "physicalHub": {
     "title": "Suivi joueurs",
@@ -1890,14 +1893,17 @@
     "club": {
       "identity": {
         "title": "Identité du club",
-        "description": "Ces couleurs pilotent le menu, les boutons, les états actifs et les écrans club. Le mode nuit permet de tester une identité plus sombre sans changer les couleurs jour.",
+        "description": "La couleur du club est utilisée pour les boutons, les liens actifs et les accents visuels.",
         "workspacePreview": "Aperçu workspace",
         "clubName": "Nom du club",
         "logoUrl": "Logo URL",
         "logoUrlPlaceholder": "https://...",
         "dayMode": "Jour",
         "nightMode": "Nuit",
-        "primaryColor": "Principale",
+        "primaryColor": "Couleur du club",
+        "clubColor": "Couleur du club",
+        "lightBackground": "Fond clair",
+        "darkBackground": "Fond sombre",
         "secondaryColor": "Secondaire",
         "saveIdentity": "Enregistrer l'identité",
         "uploadLogo": "Importer un logo",
@@ -2118,7 +2124,9 @@
     "fallbackName": "Coach",
     "personaCoach": "Entraîneur",
     "personaPlayer": "Joueur",
-    "personaSwitchAria": "Changer de vue"
+    "personaSwitchAria": "Changer de vue",
+    "useDarkTheme": "Activer le mode sombre",
+    "useLightTheme": "Activer le mode clair"
   },
   "sidebar": {
     "fallbackClubName": "Club",

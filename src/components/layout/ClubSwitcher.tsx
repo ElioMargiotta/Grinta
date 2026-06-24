@@ -52,10 +52,10 @@ export function ClubSwitcher({
 
   if (memberships.length <= 1) {
     return (
-      <div className="flex items-center gap-2 rounded-md border border-[var(--club-line)] bg-white px-3 py-1.5 text-sm text-zinc-900 dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-100">
+      <div className="flex max-w-52 items-center gap-1.5 rounded-md border border-[var(--club-line)] bg-white px-2 py-1.5 text-xs text-zinc-900 lg:max-w-64 lg:gap-2 lg:px-3 lg:text-sm dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-100">
         <ClubMark membership={current} />
-        <span className="font-medium">{current.club_name}</span>
-        <span className="text-xs text-zinc-500">· {current.role_name}</span>
+        <span className="truncate font-medium">{current.club_name}</span>
+        <span className="hidden shrink-0 text-xs text-zinc-500 xl:inline">· {current.role_name}</span>
       </div>
     );
   }
@@ -66,11 +66,11 @@ export function ClubSwitcher({
         type="button"
         disabled={isPending}
         onClick={() => setOpen((v) => !v)}
-        className="flex items-center gap-2 rounded-md border border-[var(--club-line)] bg-white px-3 py-1.5 text-sm text-zinc-900 hover:bg-[var(--club-primary-soft)] dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-100 dark:hover:bg-zinc-800"
+        className="flex max-w-52 items-center gap-1.5 rounded-md border border-[var(--club-line)] bg-white px-2 py-1.5 text-xs text-zinc-900 hover:bg-[var(--club-primary-soft)] lg:max-w-64 lg:gap-2 lg:px-3 lg:text-sm dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-100 dark:hover:bg-zinc-800"
       >
         <ClubMark membership={current} />
-        <span className="font-medium">{current.club_name}</span>
-        <span className="text-xs text-zinc-500">· {current.role_name}</span>
+        <span className="truncate font-medium">{current.club_name}</span>
+        <span className="hidden shrink-0 text-xs text-zinc-500 xl:inline">· {current.role_name}</span>
         <ChevronDown className="h-4 w-4 text-zinc-400" />
       </button>
 

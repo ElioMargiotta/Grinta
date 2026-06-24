@@ -435,7 +435,10 @@
     "playerMe": "My profile",
     "playerTeam": "My teams",
     "playerSchedule": "My schedule",
-    "admin": "Admin"
+    "admin": "Admin",
+    "more": "More",
+    "closeMenu": "Close menu",
+    "mobileNavigation": "Main navigation"
   },
   "physicalHub": {
     "title": "Player tracking",
@@ -1890,14 +1893,17 @@
     "club": {
       "identity": {
         "title": "Club identity",
-        "description": "These colors drive the menu, buttons, active states, and club screens. Night mode lets you test a darker identity without changing the day colors.",
+        "description": "The club color is used for buttons, active links, and visual accents.",
         "workspacePreview": "Workspace preview",
         "clubName": "Club name",
         "logoUrl": "Logo URL",
         "logoUrlPlaceholder": "https://...",
         "dayMode": "Day",
         "nightMode": "Night",
-        "primaryColor": "Primary",
+        "primaryColor": "Club color",
+        "clubColor": "Club color",
+        "lightBackground": "Light background",
+        "darkBackground": "Dark background",
         "secondaryColor": "Secondary",
         "saveIdentity": "Save identity",
         "uploadLogo": "Upload a logo",
@@ -2122,7 +2128,9 @@
     "fallbackName": "Coach",
     "personaCoach": "Coach",
     "personaPlayer": "Player",
-    "personaSwitchAria": "Switch view"
+    "personaSwitchAria": "Switch view",
+    "useDarkTheme": "Enable dark mode",
+    "useLightTheme": "Enable light mode"
   },
   "sidebar": {
     "fallbackClubName": "Club",

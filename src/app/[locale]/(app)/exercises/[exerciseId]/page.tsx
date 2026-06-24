@@ -34,7 +34,7 @@ export default async function ExerciseDetailPage({
       <div className="flex items-center justify-between">
         <Link
           href="/exercises"
-          className="inline-flex items-center gap-1 text-[12px] font-medium text-zinc-500 transition hover:text-zinc-900"
+          className="inline-flex items-center gap-1 text-[12px] font-medium text-zinc-500 transition hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100"
         >
           <ChevronLeft className="h-3.5 w-3.5" />
           {t("backToLibrary")}

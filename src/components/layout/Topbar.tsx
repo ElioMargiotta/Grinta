@@ -13,6 +13,7 @@ import { LocaleSwitcher } from "./LocaleSwitcher";
 import type { ClubMembership } from "@/lib/club/types";
 import type { PersonaState } from "@/lib/club/persona";
 import type { LicenseUsage } from "@/lib/license/types";
+import { ThemeToggle } from "./ThemeToggle";
 
 function initials(name: string) {
   const trimmed = name.trim();
@@ -61,12 +62,12 @@ export function Topbar({
   }
 
   return (
-    <header className="sticky top-0 z-30 flex h-14 items-center justify-between border-b border-[var(--club-line)] bg-white/[0.82] px-4 backdrop-blur md:px-6 dark:border-zinc-800 dark:bg-zinc-950/80">
-      <div className="flex items-center gap-3">
+    <header className="sticky top-0 z-30 flex h-14 min-w-0 items-center justify-between gap-2 border-b border-[var(--club-line)] bg-white/95 px-3 backdrop-blur sm:px-4 lg:px-6 dark:border-zinc-800 dark:bg-zinc-950/95">
+      <div className="flex min-w-0 items-center gap-2 lg:gap-3">
         <span className="flex h-8 w-8 items-center justify-center rounded-full bg-[var(--club-primary)] text-xs font-semibold text-[var(--club-primary-foreground)]">
           {initials(userName)}
         </span>
-        <div className="leading-tight">
+        <div className="hidden min-w-0 leading-tight xl:block">
           <div className="text-sm font-medium text-zinc-900 dark:text-zinc-100">
             {userName || tp("fallbackName")}
           </div>
@@ -75,29 +76,30 @@ export function Topbar({
           </div>
         </div>
         {currentMembership && persona?.active !== "player" && (
-          <div className="ml-2">
+          <div className="hidden min-w-0 md:block lg:ml-1">
             <ClubSwitcher current={currentMembership} memberships={memberships} />
           </div>
         )}
         {currentMembership && persona?.active !== "player" && currentSeason && (
-          <div className="ml-2">
+          <div className="hidden md:block lg:ml-1">
             <SeasonSwitcher current={currentSeason} seasons={seasons ?? []} />
           </div>
         )}
         {persona?.available === "dual" && (
-          <div className="ml-2">
+          <div className="hidden lg:ml-1 lg:block">
             <PersonaSwitcher active={persona.active} />
           </div>
         )}
       </div>
-      <div className="flex items-center gap-1">
+      <div className="flex shrink-0 items-center gap-0.5 sm:gap-1">
+        <ThemeToggle />
         <LocaleSwitcher variant="subtle" />
         <Link
           href="/account"
-          className="inline-flex h-8 items-center gap-1.5 rounded-md px-2 text-xs font-medium text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 dark:text-zinc-400 dark:hover:bg-zinc-800 dark:hover:text-zinc-100"
+          className="inline-flex h-8 w-8 items-center justify-center rounded-md text-xs font-medium text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 sm:w-auto sm:gap-1.5 sm:px-2 dark:text-zinc-400 dark:hover:bg-zinc-800 dark:hover:text-zinc-100"
         >
           <UserCog className="h-4 w-4" />
-          <span className="hidden sm:inline">{t("account")}</span>
+          <span className="hidden lg:inline">{t("account")}</span>
         </Link>
         <Button
           variant="ghost"
@@ -110,7 +112,7 @@ export function Topbar({
           loading={isPending}
         >
           <LogOut className="h-4 w-4" />
-          {t("logout")}
+          <span className="hidden lg:inline">{t("logout")}</span>
         </Button>
       </div>
     </header>
