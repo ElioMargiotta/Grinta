@@ -7,6 +7,10 @@ import {
   AttendanceRoster,
   type RosterEntry,
 } from "@/components/planner/AttendanceRoster";
+import {
+  StaffAttendanceRoster,
+  type StaffEntry,
+} from "@/components/planner/StaffAttendanceRoster";
 import { requireMembership } from "@/lib/auth/getUser";
 import { currentSeasonLabel } from "@/lib/planner/seasons";
 import {
@@ -98,6 +102,33 @@ export default async function SessionAttendancePage({
   const attendances = (attendancesRaw ?? []) as AttendanceRow[];
   const attByPlayer = new Map(attendances.map((a) => [a.player_id, a]));
 
+  // Encadrement (moniteurs/staff) de l'équipe + leur pointage de la séance.
+  // `list_team_staff` (SECURITY DEFINER) contourne la RLS de club_memberships
+  // pour qu'un coach d'équipe voie aussi ses moniteurs (export BDNS #59).
+  const [{ data: staffRaw }, { data: staffAttRaw }] = await Promise.all([
+    supabase.rpc("list_team_staff", { p_team_id: teamId }),
+    supabase
+      .from("session_staff_attendances")
+      .select("membership_id, actual_status")
+      .eq("session_id", sessionId)
+      .returns<{ membership_id: string; actual_status: "present" | "absent" | null }[]>(),
+  ]);
+  const staffAttByMember = new Map(
+    (staffAttRaw ?? []).map((a) => [a.membership_id, a.actual_status]),
+  );
+  const staffList = (staffRaw ?? []) as {
+    membership_id: string;
+    user_id: string;
+    full_name: string | null;
+    js_number: string | null;
+  }[];
+  const staff: StaffEntry[] = staffList.map((s) => ({
+    membershipId: s.membership_id,
+    fullName: (s.full_name ?? "").trim(),
+    jsNumber: s.js_number,
+    actualStatus: staffAttByMember.get(s.membership_id) ?? null,
+  }));
+
   // Indisponibilités (médical/discipline) couvrant la date de la séance.
   const sessionDate = session.date as string;
   const rosterPlayerIds = assignments
@@ -182,6 +213,14 @@ export default async function SessionAttendancePage({
           teamId={teamId}
           deadlineHours={(session.rsvp_deadline_hours as number | null) ?? 24}
           roster={roster}
+        />
+      </Card>
+
+      <Card>
+        <StaffAttendanceRoster
+          sessionId={sessionId}
+          teamId={teamId}
+          staff={staff}
         />
       </Card>
     </div>

@@ -1,4 +1,6 @@
 import { notFound } from "next/navigation";
+import Link from "next/link";
+import { FileSpreadsheet } from "lucide-react";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import {
   PlannerCalendar,
@@ -293,7 +295,7 @@ export default async function PlannerTeamPage({
         prepTheme?: string | null;
         mesos?: { weeks?: number; theme?: string | null; name?: string | null }[];
       } | null;
-      trainingSlots: { weekday?: number; time?: string; durationMinutes?: number }[] | null;
+      trainingSlots: { weekday?: number; time?: string; durationMinutes?: number; location?: string | null }[] | null;
     } | null) ?? null,
   }));
 
@@ -312,13 +314,22 @@ export default async function PlannerTeamPage({
 
   return (
     <div className="flex flex-col gap-6">
-      <div>
-        <h1 className="text-2xl font-semibold text-zinc-900 dark:text-zinc-100">
-          {team.name} — {t("title")}
-        </h1>
-        <p className="mt-1 text-sm text-zinc-500 dark:text-zinc-400">
-          {t("seasonScope", { season })}
-        </p>
+      <div className="flex flex-wrap items-start justify-between gap-3">
+        <div>
+          <h1 className="text-2xl font-semibold text-zinc-900 dark:text-zinc-100">
+            {team.name} — {t("title")}
+          </h1>
+          <p className="mt-1 text-sm text-zinc-500 dark:text-zinc-400">
+            {t("seasonScope", { season })}
+          </p>
+        </div>
+        <Link
+          href={`/${locale}/planner/${teamId}/bdns-export`}
+          className="inline-flex items-center gap-1.5 rounded-md border border-zinc-200 bg-white px-3 py-1.5 text-[12px] font-medium text-zinc-700 shadow-sm transition-colors hover:bg-zinc-50 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-300 dark:hover:bg-zinc-800"
+        >
+          <FileSpreadsheet className="h-3.5 w-3.5" />
+          {t("bdnsExport")}
+        </Link>
       </div>
 
       <PlannerCalendar

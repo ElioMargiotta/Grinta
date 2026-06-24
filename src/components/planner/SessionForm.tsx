@@ -16,6 +16,7 @@ type Initial = {
   start_time: string | null;
   duration_minutes: number | null;
   theme: string | null;
+  location: string | null;
   notes: string | null;
   rsvp_deadline_hours: number | null;
 };
@@ -83,6 +84,12 @@ export function SessionForm({
           name="theme"
           label={t("theme")}
           defaultValue={initial?.theme ?? ""}
+        />
+        <Input
+          id="location"
+          name="location"
+          label={t("location")}
+          defaultValue={initial?.location ?? ""}
         />
         <Input
           id="rsvpDeadlineHours"

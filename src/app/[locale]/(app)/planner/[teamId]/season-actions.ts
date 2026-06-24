@@ -63,10 +63,11 @@ function parseTrainingSlots(raw: string | null): TrainingSlot[] | undefined {
     const arr = JSON.parse(raw);
     if (!Array.isArray(arr)) return undefined;
     const slots = arr
-      .map((s: { weekday?: unknown; time?: unknown; durationMinutes?: unknown }) => ({
+      .map((s: { weekday?: unknown; time?: unknown; durationMinutes?: unknown; location?: unknown }) => ({
         weekday: Number(s.weekday),
         time: typeof s.time === "string" ? s.time : "19:00",
         durationMinutes: Number(s.durationMinutes) || 90,
+        location: typeof s.location === "string" && s.location.trim() ? s.location.trim() : null,
       }))
       .filter((s) => Number.isInteger(s.weekday) && s.weekday >= 1 && s.weekday <= 7);
     return slots.length ? slots : undefined;
@@ -521,6 +522,7 @@ export async function generateSeasonSkeletonAction(
       date: s.date,
       start_time: s.startTime,
       duration_minutes: s.durationMinutes,
+      location: s.location,
       md_offset: s.mdOffset,
       source: "generated" as const,
     }));

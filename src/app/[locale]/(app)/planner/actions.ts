@@ -51,6 +51,7 @@ type SessionPayload = {
   startTime: string | null;
   duration: number | null;
   theme: string | null;
+  location: string | null;
   notes: string | null;
   rsvpDeadlineHours: number;
 };
@@ -66,6 +67,7 @@ function readSessionFields(formData: FormData): SessionPayload {
     startTime: String(formData.get("startTime") ?? "") || null,
     duration: formData.get("duration") ? Number(formData.get("duration")) : null,
     theme: String(formData.get("theme") ?? "").trim() || null,
+    location: String(formData.get("location") ?? "").trim() || null,
     notes: String(formData.get("notes") ?? "").trim() || null,
     rsvpDeadlineHours: Number.isFinite(deadline) ? deadline : 24,
   };
@@ -468,6 +470,7 @@ export async function createSessionAction(formData: FormData) {
       start_time: fields.startTime,
       duration_minutes: fields.duration,
       theme: fields.theme,
+      location: fields.location,
       notes: fields.notes,
       rsvp_deadline_hours: fields.rsvpDeadlineHours,
     })
@@ -516,6 +519,7 @@ export async function updateSessionAction(formData: FormData) {
       start_time: fields.startTime,
       duration_minutes: fields.duration,
       theme: fields.theme,
+      location: fields.location,
       notes: fields.notes,
       rsvp_deadline_hours: fields.rsvpDeadlineHours,
     })

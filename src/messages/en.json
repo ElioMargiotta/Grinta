@@ -1111,6 +1111,7 @@
       "startTime": "Start time",
       "duration": "Duration (minutes)",
       "theme": "Theme",
+      "location": "Location",
       "notes": "Notes",
       "rsvpDeadlineHours": "RSVP deadline (h)",
       "rsvpDeadlineHoursHint": "Hours before the start when players can still respond",
@@ -1250,6 +1251,7 @@
       },
       "slotTime": "Time",
       "duration": "Duration (min)",
+      "slotLocation": "Location",
       "addSlot": "Add slot",
       "removeSlot": "Remove slot",
       "cyclesTitle": "Work-week allocation",
@@ -1348,6 +1350,7 @@
       "outOfSeasonRange": "Stays within the round"
     },
     "seasonScope": "Season {season}",
+    "bdnsExport": "BDNS export",
     "match": {
       "backToPlanning": "Back to planning",
       "fallback": "Match",
@@ -1638,6 +1641,7 @@
         },
         "sessionTitlePlaceholder": "Session title",
         "durationPlaceholder": "90min",
+        "locationPlaceholder": "Location",
         "teamPlaceholder": "Team",
         "coachPlaceholder": "Coach"
       },
@@ -2622,6 +2626,44 @@
       "bulkLabel": "Quick mark:",
       "markAllPresent": "All present",
       "markAllAbsent": "All absent"
+    },
+    "staff": {
+      "title": "Coaching staff (leaders)",
+      "hint": "Mark present staff and fill in their J+S number for the BDNS export.",
+      "colName": "Leader",
+      "colJsNumber": "J+S no.",
+      "colPresence": "Attendance",
+      "jsNumberPlaceholder": "J+S no.",
+      "jsNumberMissing": "J+S number missing",
+      "empty": "No staff linked to this team.",
+      "unnamed": "Unnamed"
+    }
+  },
+  "bdns": {
+    "title": "BDNS export",
+    "subtitle": "Generate the attendance control (CdP) import file for Youth+Sport over the selected period.",
+    "backToPlanner": "Back to planner",
+    "startDate": "From",
+    "endDate": "To",
+    "activities": "Activities to include",
+    "includeTrainings": "Trainings",
+    "includeMatches": "Competitions (matches)",
+    "fallbackLocation": "Default location (trainings without a location)",
+    "fallbackLocationHint": "Used only for sessions that have no location of their own. Optional.",
+    "generate": "Generate CSV",
+    "done": "{n, plural, =0 {No rows generated} one {# row generated — file downloaded} other {# rows generated — file downloaded}}",
+    "missingTitle": "{n, plural, one {# person excluded (missing J+S number)} other {# people excluded (missing J+S number)}}",
+    "durationWarning": "Durations outside J+S allowed values: {list} min. Please review these sessions.",
+    "unnamed": "Unnamed",
+    "fonction": {
+      "participant": "Participant",
+      "moniteur": "Leader"
+    },
+    "err": {
+      "missing_team": "Missing team",
+      "team_not_found": "Team not found",
+      "invalid_range": "Invalid date range",
+      "no_activity": "Select at least one activity type"
     }
   },
   "email": {

@@ -53,6 +53,7 @@ type TrainingSlotDraft = {
   weekday: number;
   time: string;
   durationMinutes: number;
+  location: string;
 };
 
 type Subscription = {
@@ -160,7 +161,7 @@ export type SeasonPlanRow = {
   status: string;
   draft: {
     structure: DraftStructure;
-    trainingSlots: { weekday?: number; time?: string; durationMinutes?: number }[] | null;
+    trainingSlots: { weekday?: number; time?: string; durationMinutes?: number; location?: string | null }[] | null;
   } | null;
 };
 
@@ -181,6 +182,7 @@ function defaultSlots(periodization: Periodization | null): TrainingSlotDraft[] 
     weekday,
     time: "19:00",
     durationMinutes: 90,
+    location: "",
   }));
 }
 
@@ -201,6 +203,7 @@ function draftFor(
           weekday: Number(s.weekday) || 1,
           time: typeof s.time === "string" ? s.time : "19:00",
           durationMinutes: Number(s.durationMinutes) || 90,
+          location: typeof s.location === "string" ? s.location : "",
         }))
       : defaultSlots(periodization);
   const mesos =
@@ -381,7 +384,7 @@ export function PlannerSeasonWizard({
   function addSlot() {
     setSlots((prev) => [
       ...prev,
-      { id: `slot-${Date.now()}`, weekday: 1, time: "19:00", durationMinutes: 90 },
+      { id: `slot-${Date.now()}`, weekday: 1, time: "19:00", durationMinutes: 90, location: "" },
     ]);
   }
 
@@ -473,6 +476,7 @@ export function PlannerSeasonWizard({
           weekday: s.weekday,
           time: s.time,
           durationMinutes: s.durationMinutes,
+          location: s.location.trim() || null,
         })),
       ),
     );
@@ -531,6 +535,7 @@ export function PlannerSeasonWizard({
               weekday: Number(slot.weekday),
               time: slot.time ?? "19:00",
               durationMinutes: Number(slot.durationMinutes) || 90,
+              location: (slot.location ?? "").trim() || null,
             })),
           ) !==
             JSON.stringify(
@@ -538,6 +543,7 @@ export function PlannerSeasonWizard({
                 weekday: slot.weekday,
                 time: slot.time,
                 durationMinutes: slot.durationMinutes,
+                location: slot.location.trim() || null,
               })),
             ))
     );
@@ -679,7 +685,7 @@ export function PlannerSeasonWizard({
                 {slots.map((slot) => (
                   <li
                     key={slot.id}
-                    className="grid gap-2 border-t border-zinc-200 py-3 sm:grid-cols-[1fr_1fr_1fr_auto]"
+                    className="grid gap-2 border-t border-zinc-200 py-3 sm:grid-cols-[1fr_1fr_1fr_1.4fr_auto]"
                   >
                     <Select
                       id={`slot-day-${slot.id}`}
@@ -712,6 +718,12 @@ export function PlannerSeasonWizard({
                           durationMinutes: Math.max(15, Math.min(240, Number(e.target.value) || 90)),
                         })
                       }
+                    />
+                    <Input
+                      id={`slot-location-${slot.id}`}
+                      label={t("slotLocation")}
+                      value={slot.location}
+                      onChange={(e) => updateSlot(slot.id, { location: e.target.value })}
                     />
                     <button
                       type="button"
@@ -935,6 +947,7 @@ export function PlannerSeasonWizard({
                     weekday: s.weekday,
                     time: s.time,
                     durationMinutes: s.durationMinutes,
+                    location: s.location.trim() || null,
                   })),
                 },
               )
