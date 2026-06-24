@@ -20,13 +20,17 @@ export async function generateMetadata({
 
 export default async function ContactPage({
   params,
+  searchParams,
 }: {
   params: Promise<{ locale: string }>;
+  searchParams: Promise<{ topic?: string }>;
 }) {
   const { locale } = await params;
+  const { topic } = await searchParams;
   setRequestLocale(locale);
 
   const t = await getTranslations("contact");
+  const defaultMessage = topic === "devis" ? t("form.devisMessage") : undefined;
 
   return (
     <div
@@ -64,7 +68,7 @@ export default async function ContactPage({
         </a>
 
         <div className="mt-12">
-          <ContactForm />
+          <ContactForm defaultMessage={defaultMessage} />
         </div>
       </main>
     </div>

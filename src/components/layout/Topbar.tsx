@@ -12,8 +12,7 @@ import { PersonaSwitcher } from "./PersonaSwitcher";
 import { LocaleSwitcher } from "./LocaleSwitcher";
 import type { ClubMembership } from "@/lib/club/types";
 import type { PersonaState } from "@/lib/club/persona";
-
-const PRICE_PER_TEAM_CHF = 12;
+import type { LicenseUsage } from "@/lib/license/types";
 
 function initials(name: string) {
   const trimmed = name.trim();
@@ -23,17 +22,11 @@ function initials(name: string) {
   return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
 }
 
-function daysUntil(iso: string | null): number | null {
-  if (!iso) return null;
-  const diff = new Date(iso).getTime() - Date.now();
-  return Math.max(0, Math.ceil(diff / (1000 * 60 * 60 * 24)));
-}
-
 export function Topbar({
   userName,
   currentMembership,
   memberships,
-  teamCount,
+  licenseUsage,
   persona,
   currentSeason,
   seasons,
@@ -41,7 +34,7 @@ export function Topbar({
   userName: string;
   currentMembership: ClubMembership | null;
   memberships: ClubMembership[];
-  teamCount: number;
+  licenseUsage?: LicenseUsage | null;
   persona?: PersonaState | null;
   currentSeason?: string | null;
   seasons?: string[];
@@ -50,21 +43,20 @@ export function Topbar({
   const tp = useTranslations("topbar");
   const [isPending, startTransition] = useTransition();
 
+  // Subtitle = licence usage. Shows the team count against its cap (or just the
+  // count when unlimited), plus a read-only marker while in the grace window.
   let subtitle: string;
-  if (!currentMembership) {
-    subtitle = tp("freePlan");
+  if (!currentMembership || !licenseUsage) {
+    subtitle = tp("noLicense");
   } else {
-    const teamWord = teamCount === 1 ? tp("teamSingular") : tp("teamPlural");
-    const status = currentMembership.subscription_status;
-    if (status === "trialing") {
-      const days = daysUntil(currentMembership.trial_ends_at);
-      subtitle = days === null ? tp("trial") : tp("trialDays", { days });
-      subtitle += ` · ${teamCount} ${teamWord}`;
-    } else if (status === "active") {
-      const monthly = teamCount * PRICE_PER_TEAM_CHF;
-      subtitle = tp("planPerTeam", { count: teamCount, teams: teamWord, amount: monthly });
-    } else {
-      subtitle = tp("planStatus", { status, count: teamCount, teams: teamWord });
+    const teams = licenseUsage.teams;
+    const teamWord = teams === 1 ? tp("teamSingular") : tp("teamPlural");
+    subtitle =
+      licenseUsage.max_teams === null
+        ? `${teams} ${teamWord}`
+        : tp("teamsOfMax", { count: teams, max: licenseUsage.max_teams, teams: teamWord });
+    if (licenseUsage.state === "grace") {
+      subtitle = `${tp("readOnly")} · ${subtitle}`;
     }
   }
 

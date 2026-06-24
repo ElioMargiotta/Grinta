@@ -1,6 +1,6 @@
 "use client";
 
-import { Activity, CalendarDays, ContactRound, Dumbbell, LayoutDashboard, PenSquare, Settings, Shapes, Users } from "lucide-react";
+import { Activity, CalendarDays, ContactRound, Dumbbell, LayoutDashboard, PenSquare, Settings, Shapes, ShieldCheck, Users } from "lucide-react";
 import { useTranslations } from "next-intl";
 import Image from "next/image";
 import { Link, usePathname } from "@/i18n/navigation";
@@ -29,9 +29,11 @@ const CLUB_ITEMS = [
 export function Sidebar({
   hasMembership,
   currentMembership,
+  isAdmin = false,
 }: {
   hasMembership: boolean;
   currentMembership: ClubMembership | null;
+  isAdmin?: boolean;
 }) {
   const t = useTranslations("nav");
   const ts = useTranslations("sidebar");
@@ -100,6 +102,15 @@ export function Sidebar({
             </Link>
           );
         })}
+        {isAdmin && (
+          <Link
+            href="/admin"
+            className="group relative mt-1 flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium text-zinc-600 transition-colors hover:bg-zinc-100 hover:text-zinc-900 dark:text-zinc-400 dark:hover:bg-zinc-900 dark:hover:text-zinc-100"
+          >
+            <ShieldCheck className="h-4 w-4 shrink-0 text-zinc-400 group-hover:text-zinc-600 dark:group-hover:text-zinc-200" />
+            <span>{t("admin")}</span>
+          </Link>
+        )}
       </nav>
       <div className="mt-auto border-t border-[var(--club-line)] px-5 py-5 text-[11px] leading-relaxed text-zinc-500 dark:text-zinc-500">
         <span className="font-medium text-[var(--club-primary)]">{ts("fallbackOrgName")}</span>{" "}

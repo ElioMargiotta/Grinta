@@ -398,7 +398,8 @@
       "submitting": "Envoi…",
       "error": "L'envoi a échoué. Réessayez ou écrivez-nous directement par e-mail.",
       "successTitle": "Message envoyé",
-      "successBody": "Merci ! Nous vous répondrons dans les meilleurs délais."
+      "successBody": "Merci ! Nous vous répondrons dans les meilleurs délais.",
+      "devisMessage": "Bonjour, je souhaite un devis Grinta pour mon club.\n\nClub : \nNombre d'équipes : \nNombre de joueurs (environ) : \nVotre rôle : "
     }
   },
   "nav": {
@@ -415,7 +416,8 @@
     "physical": "Suivi joueurs",
     "playerMe": "Ma fiche",
     "playerTeam": "Mes équipes",
-    "playerSchedule": "Mon planning"
+    "playerSchedule": "Mon planning",
+    "admin": "Admin"
   },
   "physicalHub": {
     "title": "Suivi joueurs",
@@ -561,19 +563,36 @@
   },
   "dashboard": {
     "title": "Tableau de bord",
-    "welcome": "Bienvenue, {name}.",
-    "teamsCard": "Équipes",
-    "exercisesCard": "Exercices",
-    "nextSession": "Prochaine séance",
-    "noNextSession": "Aucune séance à venir.",
+    "greeting": "Bonjour",
+    "premiumBadge": "Sur devis",
+    "premiumTitle": "Équipez votre club avec Grinta",
+    "premiumDesc": "Planifiez vos saisons, gérez vos équipes et votre staff, suivez la progression de vos joueurs. Grinta s'active pour votre club sur devis — parlez-nous de votre projet.",
+    "premiumCta": "Demander un devis",
+    "freeActionsTitle": "En attendant, explorez Grinta",
     "ctaJoinClubTitle": "Rejoindre un club",
     "ctaJoinClubDesc": "Collez un lien d'invitation pour rejoindre un club existant.",
-    "ctaCreateClubTitle": "Créer un club",
-    "ctaCreateClubDesc": "Planifiez vos saisons, gérez vos équipes, invitez le staff. Offre payante.",
-    "ctaCreateSessionTitle": "Créer mon entraînement",
+    "ctaCreateSessionTitle": "Mon entraînement",
     "ctaCreateSessionDesc": "Une fiche d'entraînement prête en deux minutes.",
-    "ctaLibraryTitle": "Bibliothèque d'exercices",
-    "ctaLibraryDesc": "Parcourez 170+ exercices éprouvés."
+    "ctaLibraryTitle": "Bibliothèque",
+    "ctaLibraryDesc": "Parcourez 170+ exercices éprouvés.",
+    "week": {
+      "title": "Cette semaine",
+      "openPlanner": "Ouvrir le planning",
+      "nextMatch": "Prochain match",
+      "vsHome": "Reçoit {opponent}",
+      "vsAway": "Déplacement à {opponent}",
+      "matchGeneric": "Match",
+      "sessionGeneric": "Entraînement",
+      "today": "Aujourd'hui",
+      "tomorrow": "Demain",
+      "inDays": "J-{count}",
+      "todayTag": "Auj.",
+      "empty": "Aucun match ni entraînement programmé cette semaine.",
+      "weekRange": "Semaine du {start} au {end}",
+      "allTeams": "Toutes les équipes",
+      "evalGeneric": "Évaluation physique",
+      "evalTag": "Éval"
+    }
   },
   "teams": {
     "title": "Équipes",
@@ -881,7 +900,10 @@
         "addBall": "Ballon",
         "arrow": "Flèche",
         "removeToken": "Supprimer",
-        "arrowKind": { "run": "Course", "pass": "Passe" }
+        "arrowKind": {
+          "run": "Course",
+          "pass": "Passe"
+        }
       },
       "err": {
         "nameRequired": "Donne un nom au système.",
@@ -1830,7 +1852,10 @@
     "clubPage": {
       "title": "Nouveau club",
       "description": "Un club regroupe tes équipes, tes coachs et ta facturation. Tu peux inviter des membres dès qu'il est créé. Tu peux appartenir à plusieurs clubs.",
-      "pricing": "14 jours d'essai gratuit · 25 CHF/équipe/mois ensuite · Aucune carte requise pour démarrer."
+      "pricing": "14 jours d'essai gratuit · 25 CHF/équipe/mois ensuite · Aucune carte requise pour démarrer.",
+      "noAccessTitle": "Aucun club pour l'instant",
+      "noAccessBody": "Les clubs Grinta sont créés et gérés sous licence par notre équipe. Si tu attends une invitation, vérifie ta boîte mail. Sinon, contacte-nous pour ouvrir l'accès de ton club.",
+      "contactSales": "Contacter Grinta"
     },
     "invitations": {
       "invitedTo": "Tu as été invité à <strong>{club}</strong>",
@@ -2069,10 +2094,9 @@
     "freePlan": "Plan gratuit",
     "teamSingular": "équipe",
     "teamPlural": "équipes",
-    "trial": "Essai",
-    "trialDays": "Essai · {days}j restants",
-    "planPerTeam": "{count} {teams} · {amount} CHF/mois",
-    "planStatus": "{status} · {count} {teams}",
+    "noLicense": "Aucune licence active",
+    "teamsOfMax": "{count}/{max} {teams}",
+    "readOnly": "Lecture seule",
     "fallbackName": "Coach",
     "personaCoach": "Entraîneur",
     "personaPlayer": "Joueur",
@@ -2082,6 +2106,95 @@
     "fallbackClubName": "Club",
     "fallbackOrgName": "Grinta",
     "footerText": "workspace d'entraînement"
+  },
+  "license": {
+    "inactiveTitle": "Licence inactive",
+    "inactiveBody": "La licence de ce club n'est plus active. Les données ne sont plus accessibles. Contacte l'administrateur Grinta pour réactiver l'accès.",
+    "contactAdmin": "Contacter l'administrateur"
+  },
+  "admin": {
+    "nav": {
+      "dashboard": "Tableau de bord",
+      "clubs": "Clubs",
+      "admins": "Administrateurs",
+      "subtitle": "Gestion des licences",
+      "backToApp": "Retour à l'app"
+    },
+    "common": {
+      "save": "Enregistrer",
+      "saving": "Enregistrement…",
+      "saved": "Enregistré."
+    },
+    "state": {
+      "active": "Active",
+      "grace": "Lecture seule",
+      "locked": "Verrouillée"
+    },
+    "dashboard": {
+      "title": "Tableau de bord",
+      "subtitle": "Vue d'ensemble des clubs sous licence.",
+      "totalClubs": "Clubs",
+      "active": "Licences actives",
+      "grace": "En lecture seule",
+      "locked": "Verrouillées",
+      "expiringSoon": "Expirent sous 30 j",
+      "totalTeams": "Équipes",
+      "totalPlayers": "Joueurs",
+      "totalStaff": "Staff",
+      "recentClubs": "Clubs récents"
+    },
+    "clubs": {
+      "title": "Clubs",
+      "new": "Nouveau club",
+      "newSubtitle": "Crée un club, définis sa licence et invite son propriétaire.",
+      "name": "Nom",
+      "state": "État",
+      "usage": "Usage (éq · jr · staff)",
+      "created": "Créé le",
+      "empty": "Aucun club pour l'instant.",
+      "ownerEmail": "Email du propriétaire",
+      "ownerEmailHint": "Une invitation lui sera envoyée pour rejoindre le club.",
+      "create": "Créer le club",
+      "members": "Membres",
+      "noMembers": "Aucun membre pour l'instant.",
+      "teams": "Équipes",
+      "players": "Joueurs",
+      "staff": "Staff"
+    },
+    "license": {
+      "title": "Licence",
+      "none": "Aucune licence pour ce club.",
+      "maxTeams": "Max équipes",
+      "maxPlayers": "Max joueurs",
+      "maxStaff": "Max staff",
+      "unlimitedHint": "Vide = illimité",
+      "endsAt": "Échéance",
+      "endsAtHint": "Vide = ouverte",
+      "autoRenew": "Renouvellement automatique",
+      "autoRenewShort": "Auto",
+      "quoteReference": "Référence devis",
+      "notes": "Notes",
+      "status": "Statut",
+      "statusSuspended": "Suspendue",
+      "statusExpired": "Expirée",
+      "history": "Historique",
+      "noHistory": "Aucun événement.",
+      "event": {
+        "created": "Création",
+        "updated": "Mise à jour",
+        "suspended": "Suspension",
+        "reactivated": "Réactivation",
+        "status_changed": "Changement de statut"
+      }
+    },
+    "admins": {
+      "title": "Administrateurs",
+      "subtitle": "Les opérateurs de la plateforme Grinta.",
+      "addLabel": "Ajouter un administrateur (email)",
+      "add": "Ajouter",
+      "remove": "Retirer",
+      "you": "Toi"
+    }
   },
   "pitch": {
     "halfPitch": "Demi-terrain",

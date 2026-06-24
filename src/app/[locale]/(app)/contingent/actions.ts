@@ -5,6 +5,7 @@ import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 import { resolveCurrentMembership } from "@/lib/club/context";
 import { resolveCurrentSeasonLabel } from "@/lib/club/season";
+import { licenseErrorMessage } from "@/lib/license/types";
 import {
   parseClubCornerCsv,
   type ClubCornerPlayer,
@@ -134,7 +135,7 @@ export async function createClubPlayerAction(formData: FormData) {
     .select("id")
     .single();
 
-  if (error) return { error: error.message };
+  if (error) return { error: licenseErrorMessage(error.message) };
 
   const teamIds = readTeamIds(formData);
   if (created && teamIds.length > 0) {

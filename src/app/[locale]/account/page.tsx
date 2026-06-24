@@ -6,6 +6,7 @@ import { resolvePersona } from "@/lib/club/persona";
 import { resolveCurrentMembership } from "@/lib/club/context";
 import { getMyMemberships } from "@/lib/club/queries";
 import { clubThemeStyle } from "@/lib/club/theme";
+import { getClubLicenseUsage } from "@/lib/license/queries";
 import { Topbar } from "@/components/layout/Topbar";
 import { AccountPersonaForm } from "@/components/account/AccountPersonaForm";
 
@@ -38,15 +39,7 @@ export default async function AccountPage({
   const displayName = profile?.full_name?.trim() || user.email || "";
   const backHref = persona?.active === "player" ? "/me" : "/dashboard";
 
-  let teamCount = 0;
-  if (membership) {
-    const { count } = await supabase
-      .from("teams")
-      .select("id", { head: true, count: "exact" })
-      .eq("club_id", membership.club_id)
-      .is("archived_at", null);
-    teamCount = count ?? 0;
-  }
+  const licenseUsage = membership ? await getClubLicenseUsage(membership.club_id) : null;
 
   return (
     <div
@@ -57,7 +50,7 @@ export default async function AccountPage({
         userName={displayName}
         currentMembership={membership}
         memberships={memberships}
-        teamCount={teamCount}
+        licenseUsage={licenseUsage}
         persona={persona}
       />
       <main className="flex-1 px-4 py-8 sm:py-12">

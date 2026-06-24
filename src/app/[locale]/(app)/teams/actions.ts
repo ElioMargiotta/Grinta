@@ -5,6 +5,7 @@ import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 import { resolveCurrentMembership } from "@/lib/club/context";
 import { resolveCurrentSeasonLabel } from "@/lib/club/season";
+import { licenseErrorMessage } from "@/lib/license/types";
 
 export async function createTeamAction(formData: FormData) {
   const name = String(formData.get("name") ?? "").trim();
@@ -39,7 +40,7 @@ export async function createTeamAction(formData: FormData) {
     p_age_group: ageGroup,
   });
 
-  if (error) return { error: error.message };
+  if (error) return { error: licenseErrorMessage(error.message) };
 
   // Rend l'équipe visible dans la saison active (table d'appartenance). Sans
   // cette ligne, la nouvelle équipe n'apparaîtrait dans aucune saison.

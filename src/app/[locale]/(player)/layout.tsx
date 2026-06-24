@@ -5,6 +5,7 @@ import { requirePersona } from "@/lib/auth/getUser";
 import { resolveCurrentMembership } from "@/lib/club/context";
 import { getMyMemberships } from "@/lib/club/queries";
 import { clubThemeStyle } from "@/lib/club/theme";
+import { getClubLicenseUsage } from "@/lib/license/queries";
 
 export default async function PlayerLayout({
   children,
@@ -24,6 +25,7 @@ export default async function PlayerLayout({
   ]);
 
   const displayName = profile?.full_name?.trim() || user.email || "";
+  const licenseUsage = membership ? await getClubLicenseUsage(membership.club_id) : null;
 
   return (
     <div
@@ -39,7 +41,7 @@ export default async function PlayerLayout({
             userName={displayName}
             currentMembership={membership}
             memberships={memberships}
-            teamCount={0}
+            licenseUsage={licenseUsage}
             persona={persona}
           />
         </div>

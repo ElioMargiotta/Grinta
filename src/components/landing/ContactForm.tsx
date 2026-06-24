@@ -11,7 +11,7 @@ const fieldClass =
 const labelClass =
   "text-[11px] font-mono uppercase tracking-widest text-[var(--ink-3)]";
 
-export function ContactForm() {
+export function ContactForm({ defaultMessage }: { defaultMessage?: string }) {
   const t = useTranslations("contact.form");
   const locale = useLocale();
   const formRef = useRef<HTMLFormElement>(null);
@@ -109,6 +109,7 @@ export function ContactForm() {
           name="message"
           required
           rows={5}
+          defaultValue={defaultMessage}
           placeholder={t("messagePlaceholder")}
           className={`${fieldClass} resize-y`}
           style={{ border: "1px solid var(--line)" }}
