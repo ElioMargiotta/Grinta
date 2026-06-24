@@ -124,42 +124,44 @@
     },
     "pricing": {
       "eyebrow": "Preise",
-      "title": "Gratis für einen Trainer. Fair für einen Verein.",
+      "title": "Gratis für einen Coach. Auf Anfrage für einen Verein.",
       "recommended": "empfohlen",
+      "jsNote": "In der Schweiz zahlt Jugend+Sport 1,04 CHF pro Stunde und Spieler zurück. Ein einziges subventioniertes Junioren-Training deckt einen ganzen Monat Grinta fürs Team — zum höchsten Tarif.",
       "tiers": [
         {
           "name": "Coach",
           "price": "Gratis",
           "priceSuffix": "",
-          "sub": "Für einen Trainer, eine Mannschaft.",
+          "sub": "Für einen unabhängigen Trainer, ein Team.",
           "features": [
-            "1 Mannschaft",
-            "Unbegrenzte Bibliothek",
-            "Saisonplaner",
-            "PDF-Export"
+            "Verein beitreten",
+            "Meine Trainings",
+            "Übungsbibliothek"
           ],
-          "cta": "Konto erstellen"
+          "cta": "Konto erstellen",
+          "href": "/signup"
         },
         {
-          "name": "Verein",
-          "originalPrice": "50 CHF",
-          "discountLabel": "Early-Bakers-Rabatt",
-          "price": "25 CHF",
-          "priceSuffix": "/ team / month",
-          "sub": "Alle Kategorien, eine Methode.",
+          "name": "Club",
+          "discountLabel": "Auf Anfrage",
+          "price": "ab 30 CHF",
+          "priceSuffix": "/ Team / Monat",
+          "sub": "Degressiver Tarif (40 → 30 CHF) je nach Teamanzahl.",
           "features": [
-            "Unbegrenzte Mannschaften",
-            "Vereinsweite Sicht",
-            "Geteilte Spielprinzipien",
-            "Staff- & DTN-Rollen",
-            "Priorisierter Support"
+            "Unbegrenzte Teams",
+            "Saison- & Mikrozyklus-Periodisierung (MD±)",
+            "Match-Kit: Aufstellung, Taktik, Aufgebot",
+            "Leistungs-Tracking & Bewertungen",
+            "Mehrjährige Daten",
+            "J+S-Export"
           ],
           "notes": [
-            "Preise in CHF, inkl. MwSt.",
-            "14 Tage kostenlos testen, ohne Karte",
-            "Monatliche Abrechnung pro Team — jederzeit kündbar"
+            "−5 % bei jährlicher Zahlung",
+            "Lizenz auf Ihren Verein zugeschnitten (Teams, Kader, Staff)",
+            "Von Grinta auf Anfrage erstellt & aktiviert"
           ],
-          "cta": "Saison starten"
+          "cta": "Angebot anfordern",
+          "href": "/contact?topic=devis"
         }
       ]
     },
@@ -401,6 +403,19 @@
       "successTitle": "Nachricht gesendet",
       "successBody": "Danke! Wir melden uns in Kürze.",
       "devisMessage": "Hallo, ich möchte ein Grinta-Angebot für meinen Verein.\n\nVerein: \nAnzahl Teams: \nAnzahl Spieler (ca.): \nIhre Rolle: "
+    },
+    "devis": {
+      "title": "Was eine Vereinslizenz umfasst",
+      "points": [
+        "Unbegrenzte Teams, alle Altersklassen",
+        "Saison- & Mikrozyklus-Periodisierung (MD±)",
+        "Match-Kit: Aufstellung, Taktik, Aufgebot",
+        "Leistungs-Tracking & Spielerbewertungen",
+        "Daten Jahr für Jahr erhalten",
+        "J+S-Export"
+      ],
+      "pricing": "Degressiver Tarif von 40 bis 30 CHF / Team / Monat je nach Teamanzahl. −5 % bei jährlicher Zahlung.",
+      "js": "In der Schweiz zahlt J+S 1,04 CHF/h pro Spieler zurück: ein subventioniertes Junioren-Training deckt einen Monat Grinta fürs Team."
     }
   },
   "nav": {
@@ -2193,6 +2208,15 @@
       "add": "Hinzufügen",
       "remove": "Entfernen",
       "you": "Du"
+    },
+    "price": {
+      "title": "Geschätztes Angebot",
+      "monthly": "/ Monat",
+      "annual": "/ Jahr",
+      "annualNote": "−5% jährlich",
+      "perTeamSuffix": "/ Team / Monat",
+      "unlimited": "Unbegrenzte Teams — Betrag auf Anfrage (nicht automatisch berechnet).",
+      "hint": "Schätzung nach Teamanzahl, manuell anpassbar"
     }
   },
   "pitch": {
