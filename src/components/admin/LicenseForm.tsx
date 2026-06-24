@@ -1,8 +1,9 @@
 "use client";
 
-import { useActionState } from "react";
+import { useActionState, useState } from "react";
 import { useTranslations } from "next-intl";
 import { updateLicenseAction } from "@/app/[locale]/(admin)/admin/actions";
+import { LicensePriceEstimate } from "@/components/admin/LicensePriceEstimate";
 import type { LicenseStatus } from "@/lib/license/types";
 
 type State = { ok?: true; error?: string } | null;
@@ -36,6 +37,7 @@ export function LicenseForm({
   values: LicenseFormValues;
 }) {
   const t = useTranslations("admin");
+  const [maxTeams, setMaxTeams] = useState(values.max_teams != null ? String(values.max_teams) : "");
   const [state, formAction, pending] = useActionState<State, FormData>(
     async (_prev, formData) => updateLicenseAction(formData),
     null,
@@ -48,7 +50,14 @@ export function LicenseForm({
 
       <fieldset className="grid grid-cols-3 gap-3">
         <Field label={t("license.maxTeams")} hint={t("license.unlimitedHint")}>
-          <input name="maxTeams" type="number" min={0} defaultValue={values.max_teams ?? ""} className={inputCls} />
+          <input
+            name="maxTeams"
+            type="number"
+            min={0}
+            value={maxTeams}
+            onChange={(e) => setMaxTeams(e.target.value)}
+            className={inputCls}
+          />
         </Field>
         <Field label={t("license.maxPlayers")}>
           <input name="maxPlayers" type="number" min={0} defaultValue={values.max_players ?? ""} className={inputCls} />
@@ -57,6 +66,8 @@ export function LicenseForm({
           <input name="maxStaff" type="number" min={0} defaultValue={values.max_staff ?? ""} className={inputCls} />
         </Field>
       </fieldset>
+
+      <LicensePriceEstimate teams={maxTeams ? Number(maxTeams) : null} />
 
       <div className="grid grid-cols-2 gap-3">
         <Field label={t("license.status")}>

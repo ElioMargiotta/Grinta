@@ -28,6 +28,7 @@ type Tier = {
   features: string[];
   notes?: string[];
   cta: string;
+  href?: string;
 };
 type FooterLink = { label: string; href: string };
 type FooterCol = { title: string; links: FooterLink[] };
@@ -404,7 +405,7 @@ async function PricingSection({ tiers }: { tiers: Tier[] }) {
                     </ul>
                   )}
                   <Link
-                    href="/signup"
+                    href={tier.href ?? "/signup"}
                     className={
                       "mt-auto inline-flex justify-center items-center gap-1.5 text-[13px] font-medium px-4 py-2.5 rounded-lg " +
                       (featured ? "btn-accent" : "btn-ink")
@@ -417,6 +418,14 @@ async function PricingSection({ tiers }: { tiers: Tier[] }) {
             );
           })}
         </div>
+        <Reveal>
+          <p
+            className="mx-auto mt-10 max-w-2xl text-center text-[13px] leading-relaxed"
+            style={{ color: "var(--ink-2)" }}
+          >
+            {t("jsNote")}
+          </p>
+        </Reveal>
       </div>
     </section>
   );
