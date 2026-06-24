@@ -3,7 +3,7 @@ import { createClient } from "@/lib/supabase/server";
 import { resolvePersona } from "@/lib/club/persona";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { getMessages } from "next-intl/server";
-import { ArrowRight, Check } from "lucide-react";
+import { ArrowRight, Check, Gift } from "lucide-react";
 import { NavBar } from "@/components/landing/NavBar";
 import { Reveal } from "@/components/landing/Reveal";
 import {
@@ -24,6 +24,7 @@ type Tier = {
   discountLabel?: string;
   price: string;
   priceSuffix: string;
+  highlight?: string;
   sub: string;
   features: string[];
   notes?: string[];
@@ -374,6 +375,15 @@ async function PricingSection({ tiers }: { tiers: Tier[] }) {
                       )}
                     </div>
                   </div>
+                  {tier.highlight && (
+                    <div
+                      className="flex items-center gap-2 rounded-xl px-3.5 py-3 text-[14px] font-semibold"
+                      style={{ background: "var(--accent-soft)", color: "var(--accent-ink)" }}
+                    >
+                      <Gift className="h-[18px] w-[18px] shrink-0" />
+                      {tier.highlight}
+                    </div>
+                  )}
                   <p className="text-[13px]" style={{ color: "var(--ink-3)" }}>
                     {tier.sub}
                   </p>

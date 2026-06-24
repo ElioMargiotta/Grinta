@@ -148,8 +148,7 @@
           "priceSuffix": "/ squadra / mese",
           "sub": "Fatturato solo sulle squadre di formazione (D e oltre).",
           "features": [
-            "Calcio dei bambini (G, F, E) incluso",
-            "Squadre illimitate, tutte le categorie",
+            "Tutte le categorie di formazione (da D ad A + attivi)",
             "Periodizzazione stagione & microcicli (MD±)",
             "Kit partita: formazione, tattica, convocazione",
             "Monitoraggio fisico & valutazioni",
@@ -162,7 +161,8 @@
             "Creata e attivata da Grinta su preventivo"
           ],
           "cta": "Richiedi un preventivo",
-          "href": "/contact?topic=devis"
+          "href": "/contact?topic=devis",
+          "highlight": "Calcio dei bambini (G·F·E) incluso gratuitamente"
         }
       ]
     },
@@ -409,7 +409,7 @@
       "title": "Cosa include una licenza club",
       "points": [
         "Calcio dei bambini (G, F, E) incluso gratuitamente",
-        "Squadre di formazione illimitate (D e oltre)",
+        "Tutte le categorie di formazione (da D ad A + attivi)",
         "Periodizzazione stagione & microcicli (MD±)",
         "Kit partita: formazione, tattica, convocazione",
         "Monitoraggio fisico & valutazioni giocatori",

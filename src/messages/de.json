@@ -148,8 +148,7 @@
           "priceSuffix": "/ Team / Monat",
           "sub": "Nur Ausbildungsteams (D und höher) werden verrechnet.",
           "features": [
-            "Kinderfussball (G, F, E) inbegriffen",
-            "Unbegrenzte Teams, alle Kategorien",
+            "Alle Ausbildungskategorien (D bis A + Aktive)",
             "Saison- & Mikrozyklus-Periodisierung (MD±)",
             "Match-Kit: Aufstellung, Taktik, Aufgebot",
             "Leistungs-Tracking & Bewertungen",
@@ -162,7 +161,8 @@
             "Von Grinta auf Anfrage erstellt & aktiviert"
           ],
           "cta": "Angebot anfordern",
-          "href": "/contact?topic=devis"
+          "href": "/contact?topic=devis",
+          "highlight": "Kinderfussball (G·F·E) gratis inbegriffen"
         }
       ]
     },
@@ -409,7 +409,7 @@
       "title": "Was eine Vereinslizenz umfasst",
       "points": [
         "Kinderfussball (G, F, E) gratis inbegriffen",
-        "Unbegrenzte Ausbildungsteams (D und höher)",
+        "Alle Ausbildungskategorien (D bis A + Aktive)",
         "Saison- & Mikrozyklus-Periodisierung (MD±)",
         "Match-Kit: Aufstellung, Taktik, Aufgebot",
         "Leistungs-Tracking & Spielerbewertungen",

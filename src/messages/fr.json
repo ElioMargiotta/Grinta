@@ -148,8 +148,7 @@
           "priceSuffix": "/ équipe / mois",
           "sub": "Facturé sur les seules équipes de formation (D et plus).",
           "features": [
-            "Football des enfants (G, F, E) inclus",
-            "Équipes illimitées, toutes catégories",
+            "Toutes les catégories de formation (D à A + actifs)",
             "Périodisation saison & microcycles (MD±)",
             "Kit de match : compo, tactique, convocation",
             "Suivi physique & évaluations",
@@ -162,7 +161,8 @@
             "Créée et activée par Grinta sur devis"
           ],
           "cta": "Demander un devis",
-          "href": "/contact?topic=devis"
+          "href": "/contact?topic=devis",
+          "highlight": "Football des enfants (G·F·E) inclus gratuitement"
         }
       ]
     },
@@ -409,7 +409,7 @@
       "title": "Ce que comprend une licence club",
       "points": [
         "Football des enfants (G, F, E) inclus gratuitement",
-        "Équipes de formation illimitées (D et plus)",
+        "Toutes les catégories de formation (D à A + actifs)",
         "Périodisation saison & microcycles (MD±)",
         "Kit de match : compo, tactique, convocation",
         "Suivi physique & évaluations joueurs",

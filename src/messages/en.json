@@ -148,8 +148,7 @@
           "priceSuffix": "/ team / month",
           "sub": "Billed only on development teams (D and up).",
           "features": [
-            "Children’s football (G, F, E) included",
-            "Unlimited teams, all age groups",
+            "All development categories (D to A + seniors)",
             "Season & microcycle periodization (MD±)",
             "Match kit: lineup, tactics, call-ups",
             "Physical tracking & assessments",
@@ -162,7 +161,8 @@
             "Created and activated by Grinta on quote"
           ],
           "cta": "Request a quote",
-          "href": "/contact?topic=devis"
+          "href": "/contact?topic=devis",
+          "highlight": "Children’s football (G·F·E) included for free"
         }
       ]
     },
@@ -409,7 +409,7 @@
       "title": "What a club licence includes",
       "points": [
         "Children’s football (G, F, E) included for free",
-        "Unlimited development teams (D and up)",
+        "All development categories (D to A + seniors)",
         "Season & microcycle periodization (MD±)",
         "Match kit: lineup, tactics, call-ups",
         "Physical tracking & player assessments",
