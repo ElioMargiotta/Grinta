@@ -124,41 +124,44 @@
     },
     "pricing": {
       "eyebrow": "Tarifs",
-      "title": "Gratuit pour un coach. Juste pour un club.",
+      "title": "Gratuit pour un coach. Sur devis pour un club.",
       "recommended": "recommandé",
+      "jsNote": "En Suisse, Jeunesse+Sport reverse 1,04 CHF par heure et par joueur. Une seule séance junior subventionnée rembourse le mois entier de Grinta pour l’équipe — et ce au tarif le plus élevé.",
       "tiers": [
         {
           "name": "Coach",
           "price": "Gratuit",
           "priceSuffix": "",
-          "sub": "Pour un entraîneur, une équipe.",
+          "sub": "Pour un entraîneur indépendant, une équipe.",
           "features": [
-            "1 équipe",
-            "Bibliothèque illimitée",
-            "Export PDF"
+            "Rejoindre un club",
+            "Mes séances",
+            "Bibliothèque d’exercices"
           ],
-          "cta": "Créer mon compte"
+          "cta": "Créer mon compte",
+          "href": "/signup"
         },
         {
           "name": "Club",
-          "originalPrice": "50 CHF",
-          "discountLabel": "Offre de lancement",
-          "price": "25 CHF",
+          "discountLabel": "Sur devis",
+          "price": "dès 30 CHF",
           "priceSuffix": "/ équipe / mois",
-          "sub": "Toutes les catégories, une seule méthode.",
+          "sub": "Tarif dégressif (40 → 30 CHF) selon le nombre d’équipes.",
           "features": [
             "Équipes illimitées",
-            "Planification saison & microcycles",
-            "Création de séances illimitée",
-            "Suivi des joueurs",
-            "Automatisation export CDP J+S"
+            "Périodisation saison & microcycles (MD±)",
+            "Kit de match : compo, tactique, convocation",
+            "Suivi physique & évaluations",
+            "Données pluriannuelles",
+            "Export CDP J+S"
           ],
           "notes": [
-            "Prix en CHF, TVA incluse",
-            "14 jours d'essai gratuit, sans carte",
-            "Facturation mensuelle, par équipe — résiliable à tout moment"
+            "−5 % en paiement annuel",
+            "Licence calibrée à votre club (équipes, effectif, staff)",
+            "Créée et activée par Grinta sur devis"
           ],
-          "cta": "Démarrer la saison"
+          "cta": "Demander un devis",
+          "href": "/contact?topic=devis"
         }
       ]
     },
@@ -400,6 +403,19 @@
       "successTitle": "Message envoyé",
       "successBody": "Merci ! Nous vous répondrons dans les meilleurs délais.",
       "devisMessage": "Bonjour, je souhaite un devis Grinta pour mon club.\n\nClub : \nNombre d'équipes : \nNombre de joueurs (environ) : \nVotre rôle : "
+    },
+    "devis": {
+      "title": "Ce que comprend une licence club",
+      "points": [
+        "Équipes illimitées, toutes catégories",
+        "Périodisation saison & microcycles (MD±)",
+        "Kit de match : compo, tactique, convocation",
+        "Suivi physique & évaluations joueurs",
+        "Données conservées d’année en année",
+        "Export CDP J+S"
+      ],
+      "pricing": "Tarif dégressif de 40 à 30 CHF / équipe / mois selon le nombre d’équipes. −5 % en paiement annuel.",
+      "js": "En Suisse, Jeunesse+Sport reverse 1,04 CHF/h/joueur : une seule séance junior subventionnée rembourse le mois de Grinta pour l’équipe."
     }
   },
   "nav": {
@@ -2194,6 +2210,15 @@
       "add": "Ajouter",
       "remove": "Retirer",
       "you": "Toi"
+    },
+    "price": {
+      "title": "Devis estimé",
+      "monthly": "/ mois",
+      "annual": "/ an",
+      "annualNote": "−5 % à l'année",
+      "perTeamSuffix": "/ équipe / mois",
+      "unlimited": "Équipes illimitées — montant sur devis (non calculé automatiquement).",
+      "hint": "estimation sur le nombre d'équipes, ajustable manuellement"
     }
   },
   "pitch": {

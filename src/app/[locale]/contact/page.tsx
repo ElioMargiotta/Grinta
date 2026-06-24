@@ -1,6 +1,6 @@
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import type { Metadata } from "next";
-import { ArrowLeft, Mail } from "lucide-react";
+import { ArrowLeft, Check, Mail } from "lucide-react";
 import { Link } from "@/i18n/navigation";
 import { NavBar } from "@/components/landing/NavBar";
 import { ContactForm } from "@/components/landing/ContactForm";
@@ -30,7 +30,9 @@ export default async function ContactPage({
   setRequestLocale(locale);
 
   const t = await getTranslations("contact");
-  const defaultMessage = topic === "devis" ? t("form.devisMessage") : undefined;
+  const isDevis = topic === "devis";
+  const defaultMessage = isDevis ? t("form.devisMessage") : undefined;
+  const devisPoints = isDevis ? (t.raw("devis.points") as string[]) : [];
 
   return (
     <div
@@ -66,6 +68,42 @@ export default async function ContactPage({
           <Mail className="h-4 w-4" />
           {CONTACT_EMAIL}
         </a>
+
+        {isDevis && (
+          <div
+            className="mt-10 rounded-2xl p-6"
+            style={{ border: "1px solid var(--line)", background: "var(--paper)" }}
+          >
+            <div className="text-[13px] font-medium">{t("devis.title")}</div>
+            <ul className="mt-4 grid gap-2.5 sm:grid-cols-2">
+              {devisPoints.map((point) => (
+                <li
+                  key={point}
+                  className="flex items-start gap-2 text-[13px]"
+                  style={{ color: "var(--ink-2)" }}
+                >
+                  <Check
+                    className="mt-0.5 h-3.5 w-3.5 shrink-0"
+                    style={{ color: "var(--accent-ink)" }}
+                  />
+                  {point}
+                </li>
+              ))}
+            </ul>
+            <p
+              className="mt-5 text-[13px] leading-relaxed"
+              style={{ color: "var(--ink-2)" }}
+            >
+              {t("devis.pricing")}
+            </p>
+            <p
+              className="mt-3 rounded-lg px-3.5 py-2.5 text-[13px] leading-relaxed"
+              style={{ background: "var(--accent-soft)", color: "var(--accent-ink)" }}
+            >
+              {t("devis.js")}
+            </p>
+          </div>
+        )}
 
         <div className="mt-12">
           <ContactForm defaultMessage={defaultMessage} />
