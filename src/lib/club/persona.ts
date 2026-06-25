@@ -2,6 +2,7 @@ import "server-only";
 import { cache } from "react";
 import { cookies } from "next/headers";
 import { createClient } from "@/lib/supabase/server";
+import { getAuthUser, getProfile } from "@/lib/auth/user";
 import { resolveCurrentMembership } from "./context";
 
 export type Persona = "staff" | "player";
@@ -70,15 +71,14 @@ function normalizePreference(value: unknown): PersonaPreference {
  *                           the active side, defaulting to "staff".
  */
 export const resolvePersona = cache(async (): Promise<PersonaState | null> => {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const user = await getAuthUser();
   if (!user) return null;
 
+  const supabase = await createClient();
   // resolveCurrentMembership is awaited for its side-effect of pinning the
-  // current club cookie when one isn't set yet.
-  const [, { data: playerRow }, { data: profileRow }] = await Promise.all([
+  // current club cookie when one isn't set yet. getProfile is request-cached
+  // and shared with the layout, so it costs no extra round trip here.
+  const [, { data: playerRow }, profile] = await Promise.all([
     resolveCurrentMembership(),
     supabase
       .from("players")
@@ -86,14 +86,10 @@ export const resolvePersona = cache(async (): Promise<PersonaState | null> => {
       .eq("user_id", user.id)
       .limit(1)
       .maybeSingle(),
-    supabase
-      .from("profiles")
-      .select("persona_preference")
-      .eq("id", user.id)
-      .maybeSingle(),
+    getProfile(),
   ]);
 
-  const preference = normalizePreference(profileRow?.persona_preference);
+  const preference = normalizePreference(profile?.persona_preference);
   const cookiePersona = await getCurrentPersona();
 
   let available: PersonaAvailability;

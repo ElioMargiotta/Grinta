@@ -2,6 +2,7 @@ import { setRequestLocale } from "next-intl/server";
 import { Sidebar } from "@/components/layout/Sidebar";
 import { Topbar } from "@/components/layout/Topbar";
 import { requireUser, isPlatformAdmin } from "@/lib/auth/getUser";
+import { getProfile } from "@/lib/auth/user";
 import { resolveCurrentMembership } from "@/lib/club/context";
 import { listClubSeasons, resolveCurrentSeasonLabel } from "@/lib/club/season";
 import { getMyMemberships } from "@/lib/club/queries";
@@ -31,8 +32,8 @@ export default async function AppLayout({
     redirect(`/${locale}/me`);
   }
 
-  const [{ data: profile }, membership, memberships, admin] = await Promise.all([
-    supabase.from("profiles").select("full_name").eq("id", user.id).single(),
+  const [profile, membership, memberships, admin] = await Promise.all([
+    getProfile(),
     resolveCurrentMembership(),
     getMyMemberships(),
     isPlatformAdmin(),
