@@ -47,6 +47,39 @@ type EvaluationDbRow = {
   shared_with_player?: boolean | null;
 };
 
+type SupabaseServerClient = Awaited<ReturnType<typeof requireMembership>>["supabase"];
+
+/**
+ * Loads a player's evaluations. The `shared_with_player` column may be absent
+ * on older databases; on error we retry without it and signal that the
+ * share-with-player feature is unavailable. Returned as a single unit so the
+ * whole thing can run inside the page's parallel fetch wave.
+ */
+async function loadEvaluations(
+  supabase: SupabaseServerClient,
+  playerId: string,
+): Promise<{ rows: EvaluationDbRow[] | null; shareAvailable: boolean }> {
+  const { data, error } = await supabase
+    .from("player_evaluations")
+    .select("id, season, evaluation_date, data, created_at, shared_with_player")
+    .eq("player_id", playerId)
+    .order("evaluation_date", { ascending: false, nullsFirst: false })
+    .order("created_at", { ascending: false })
+    .returns<EvaluationDbRow[]>();
+
+  if (!error) return { rows: data, shareAvailable: true };
+
+  const fallback = await supabase
+    .from("player_evaluations")
+    .select("id, season, evaluation_date, data, created_at")
+    .eq("player_id", playerId)
+    .order("evaluation_date", { ascending: false, nullsFirst: false })
+    .order("created_at", { ascending: false })
+    .returns<EvaluationDbRow[]>();
+
+  return { rows: fallback.data, shareAvailable: false };
+}
+
 export default async function ContingentPlayerPage({
   params,
 }: {
@@ -54,9 +87,11 @@ export default async function ContingentPlayerPage({
 }) {
   const { locale, playerId } = await params;
   setRequestLocale(locale);
-  const { supabase, membership } = await requireMembership(locale);
-  const t = await getTranslations("contingent");
-  const season = await resolveCurrentSeasonLabel();
+  const [{ supabase, membership }, t, season] = await Promise.all([
+    requireMembership(locale),
+    getTranslations("contingent"),
+    resolveCurrentSeasonLabel(),
+  ]);
 
   const { data: player } = await supabase
     .from("players")
@@ -73,12 +108,18 @@ export default async function ContingentPlayerPage({
 
   if (!player) notFound();
 
-  // Affectations actuelles (saison NULL = "courante"), pour pré-cocher le
-  // picker du bloc dédié (#39).
+  // Tout ce qui ne dépend que de { playerId, club_id, season } part en une
+  // seule vague parallèle (affectations, équipes, invitations, évaluations,
+  // suivi physique, KPIs). La prochaine séance dépend des affectations et suit.
   const [
     { data: assignments },
     teams,
     { data: inviteRows },
+    { rows: evalRows, shareAvailable: evaluationsShareAvailable },
+    { data: metricRows },
+    { data: measurementRows },
+    { data: unavailRows },
+    overviewMap,
   ] = await Promise.all([
     supabase
       .from("player_team_assignments")
@@ -92,54 +133,28 @@ export default async function ContingentPlayerPage({
       .eq("player_id", playerId)
       .eq("status", "pending")
       .order("created_at", { ascending: false }),
-  ]);
-
-  let evaluationsShareAvailable = true;
-  let evalRows: EvaluationDbRow[] | null = null;
-  const { data: fullEvalRows, error: evalError } = await supabase
-    .from("player_evaluations")
-    .select("id, season, evaluation_date, data, created_at, shared_with_player")
-    .eq("player_id", playerId)
-    .order("evaluation_date", { ascending: false, nullsFirst: false })
-    .order("created_at", { ascending: false })
-    .returns<EvaluationDbRow[]>();
-  evalRows = fullEvalRows;
-
-  if (evalError) {
-    evaluationsShareAvailable = false;
-    const fallback = await supabase
-      .from("player_evaluations")
-      .select("id, season, evaluation_date, data, created_at")
+    loadEvaluations(supabase, playerId),
+    supabase
+      .from("physical_metrics")
+      .select("id, name, unit, category, description, protocol, higher_is_better, sort_order, archived")
+      .eq("club_id", membership.club_id)
+      .order("sort_order", { ascending: true })
+      .order("name", { ascending: true })
+      .returns<PhysicalMetric[]>(),
+    supabase
+      .from("physical_measurements")
+      .select("metric_id, measured_on, value, note")
       .eq("player_id", playerId)
-      .order("evaluation_date", { ascending: false, nullsFirst: false })
-      .order("created_at", { ascending: false })
-      .returns<EvaluationDbRow[]>();
-    evalRows = fallback.data;
-  }
-
-  // Suivi physique — indicateurs du club + mesures du joueur + indisponibilités.
-  const [{ data: metricRows }, { data: measurementRows }, { data: unavailRows }] =
-    await Promise.all([
-      supabase
-        .from("physical_metrics")
-        .select("id, name, unit, category, description, protocol, higher_is_better, sort_order, archived")
-        .eq("club_id", membership.club_id)
-        .order("sort_order", { ascending: true })
-        .order("name", { ascending: true })
-        .returns<PhysicalMetric[]>(),
-      supabase
-        .from("physical_measurements")
-        .select("metric_id, measured_on, value, note")
-        .eq("player_id", playerId)
-        .order("measured_on", { ascending: true })
-        .returns<PhysicalMeasurement[]>(),
-      supabase
-        .from("player_unavailability")
-        .select("id, kind, reason, start_date, end_date")
-        .eq("player_id", playerId)
-        .order("start_date", { ascending: false })
-        .returns<UnavailabilityDbRow[]>(),
-    ]);
+      .order("measured_on", { ascending: true })
+      .returns<PhysicalMeasurement[]>(),
+    supabase
+      .from("player_unavailability")
+      .select("id, kind, reason, start_date, end_date")
+      .eq("player_id", playerId)
+      .order("start_date", { ascending: false })
+      .returns<UnavailabilityDbRow[]>(),
+    getPlayersOverview(supabase, { season, playerIds: [playerId] }),
+  ]);
 
   const physicalMetrics = metricRows ?? [];
   const physicalMeasurements = measurementRows ?? [];
@@ -154,9 +169,7 @@ export default async function ContingentPlayerPage({
 
   // KPIs de la fiche (présence + disponibilité). Présence/séances depuis
   // l'agrégateur serveur ; disponibilité = jours sans indispo sur la saison.
-  const overview = (await getPlayersOverview(supabase, { season, playerIds: [playerId] })).get(
-    playerId,
-  );
+  const overview = overviewMap.get(playerId);
   const todayKpi = new Date().toISOString().slice(0, 10);
   const seasonStartKpi = `${Number(season.slice(0, 4)) || 1970}-07-01`;
   const unavailableDays = new Set<string>();
