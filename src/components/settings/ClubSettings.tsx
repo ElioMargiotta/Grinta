@@ -2,7 +2,7 @@
 
 import { useRef, useState, useTransition } from "react";
 import { useLocale, useTranslations } from "next-intl";
-import { ImageUp, Shield, Trash2, UserMinus, Users } from "lucide-react";
+import { ImageUp, Pencil, Shield, Trash2, UserMinus, Users } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import type { AccessLevel } from "@/lib/club/types";
 import {
@@ -12,6 +12,7 @@ import {
   removeMemberAction,
   revokeInvitationAction,
   updateClubIdentityAction,
+  updateMemberAction,
 } from "@/app/[locale]/(app)/settings/club/actions";
 import type { ClubIdentity } from "@/lib/club/types";
 
@@ -81,6 +82,7 @@ export function ClubSettings({ data }: { data: Data }) {
   const [tab, setTab] = useState<Tab>("general");
   const [filterRoleId, setFilterRoleId] = useState<string>("");
   const [filterTeamId, setFilterTeamId] = useState<string>("");
+  const [editingMemberId, setEditingMemberId] = useState<string | null>(null);
   const logoInputRef = useRef<HTMLInputElement>(null);
   const [logoPreview, setLogoPreview] = useState<string | null>(null);
   const [logoRemoved, setLogoRemoved] = useState(false);
@@ -339,40 +341,76 @@ export function ClubSettings({ data }: { data: Data }) {
                     </p>
                   ) : (
                     <div className="overflow-hidden border-y border-[var(--club-line)] bg-white/[0.72]">
-                      {members.map((m) => (
-                        <div
-                          key={m.id}
-                          className="grid gap-3 border-b border-zinc-100 px-4 py-3 last:border-b-0 md:grid-cols-[1fr_auto] md:items-center"
-                        >
-                          <div className="flex min-w-0 items-center gap-3">
-                            <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[var(--club-primary-soft)] text-xs font-semibold text-[var(--club-primary)]">
-                              {initials(m.profiles?.full_name ?? null)}
-                            </span>
-                            <div className="min-w-0">
-                              <div className="truncate text-sm font-medium text-zinc-900">
-                                {m.profiles?.full_name?.trim() || t("members.unnamed")}
+                      {members.map((m) => {
+                        const teamScoped =
+                          role.access_level === "team" ||
+                          role.access_level === "team_readonly";
+                        const teamNames = m.team_ids
+                          .map((id) => data.teams.find((t) => t.id === id)?.name)
+                          .filter(Boolean)
+                          .join(", ");
+                        return (
+                          <div
+                            key={m.id}
+                            className="border-b border-zinc-100 px-4 py-3 last:border-b-0"
+                          >
+                            <div className="grid gap-3 md:grid-cols-[1fr_auto] md:items-center">
+                              <div className="flex min-w-0 items-center gap-3">
+                                <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[var(--club-primary-soft)] text-xs font-semibold text-[var(--club-primary)]">
+                                  {initials(m.profiles?.full_name ?? null)}
+                                </span>
+                                <div className="min-w-0">
+                                  <div className="truncate text-sm font-medium text-zinc-900">
+                                    {m.profiles?.full_name?.trim() || t("members.unnamed")}
+                                  </div>
+                                  <div className="truncate text-xs text-zinc-500">
+                                    {role.name}
+                                    {teamScoped && teamNames && (
+                                      <span className="text-zinc-400"> · {teamNames}</span>
+                                    )}
+                                  </div>
+                                </div>
                               </div>
-                              <div className="text-xs text-zinc-500">
-                                {role.name}
+                              <div className="flex items-center gap-1 md:justify-self-end">
+                                <Button
+                                  type="button"
+                                  variant="ghost"
+                                  size="sm"
+                                  onClick={() =>
+                                    setEditingMemberId(
+                                      editingMemberId === m.id ? null : m.id,
+                                    )
+                                  }
+                                >
+                                  <Pencil className="h-4 w-4" />
+                                  {t("members.edit")}
+                                </Button>
+                                <form
+                                  action={(formData) =>
+                                    startTransition(async () => {
+                                      await removeMemberAction(formData);
+                                    })
+                                  }
+                                >
+                                  <input type="hidden" name="userId" value={m.user_id} />
+                                  <Button type="submit" variant="ghost" size="sm">
+                                    <UserMinus className="h-4 w-4" />
+                                    {t("members.remove")}
+                                  </Button>
+                                </form>
                               </div>
                             </div>
+                            {editingMemberId === m.id && (
+                              <MemberEditor
+                                member={m}
+                                roles={data.roles}
+                                teams={data.teams}
+                                onDone={() => setEditingMemberId(null)}
+                              />
+                            )}
                           </div>
-                          <form
-                            className="md:justify-self-end"
-                            action={(formData) =>
-                              startTransition(async () => {
-                                await removeMemberAction(formData);
-                              })
-                            }
-                          >
-                            <input type="hidden" name="userId" value={m.user_id} />
-                            <Button type="submit" variant="ghost" size="sm">
-                              <UserMinus className="h-4 w-4" />
-                              {t("members.remove")}
-                            </Button>
-                          </form>
-                        </div>
-                      ))}
+                        );
+                      })}
                     </div>
                   )}
                 </div>
@@ -637,6 +675,105 @@ export function ClubSettings({ data }: { data: Data }) {
         </div>
       )}
     </div>
+  );
+}
+
+// Inline editor for an existing member: change role and (for team-scoped roles)
+// the set of assigned teams. Submits to updateMemberAction.
+function MemberEditor({
+  member,
+  roles,
+  teams,
+  onDone,
+}: {
+  member: Member;
+  roles: Role[];
+  teams: Team[];
+  onDone: () => void;
+}) {
+  const t = useTranslations("settings.club");
+  const [isPending, startTransition] = useTransition();
+  const [roleId, setRoleId] = useState(member.club_roles?.id ?? roles[0]?.id ?? "");
+  const [error, setError] = useState<string | null>(null);
+  const role = roles.find((r) => r.id === roleId);
+  const needsTeams =
+    role?.access_level === "team" || role?.access_level === "team_readonly";
+
+  return (
+    <form
+      className="mt-3 flex flex-col gap-3 rounded-md border border-zinc-200 bg-white/70 p-3 dark:border-zinc-700 dark:bg-zinc-900/40"
+      action={(formData) => {
+        setError(null);
+        formData.set("membershipId", member.id);
+        startTransition(async () => {
+          const res = await updateMemberAction(formData);
+          if (res && "error" in res) setError(res.error);
+          else onDone();
+        });
+      }}
+    >
+      <label className="flex flex-col gap-1 text-sm">
+        <span className="font-medium text-zinc-700">{t("members.editRole")}</span>
+        <select
+          name="roleId"
+          value={roleId}
+          onChange={(e) => setRoleId(e.target.value)}
+          className={inputClass}
+        >
+          {roles.map((r) => (
+            <option key={r.id} value={r.id}>
+              {r.name} · {t(`access.${r.access_level}`)}
+            </option>
+          ))}
+        </select>
+      </label>
+
+      {needsTeams && (
+        <div className="flex flex-col gap-1 text-sm">
+          <span className="font-medium text-zinc-700">{t("members.editTeams")}</span>
+          {teams.length === 0 ? (
+            <p className="text-xs text-amber-700">{t("invite.noTeamsInClub")}</p>
+          ) : (
+            <div className="flex flex-wrap gap-2">
+              {teams.map((team) => (
+                <label
+                  key={team.id}
+                  className="flex items-center gap-2 rounded-md border border-zinc-200 px-2 py-1 text-xs"
+                >
+                  <input
+                    type="checkbox"
+                    name="teamIds"
+                    value={team.id}
+                    defaultChecked={member.team_ids.includes(team.id)}
+                  />
+                  <span>{team.name}</span>
+                </label>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
+
+      {error && (
+        <p className="rounded-md border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700">
+          {error}
+        </p>
+      )}
+
+      <div className="flex items-center gap-2">
+        <Button
+          type="submit"
+          size="sm"
+          loading={isPending}
+          loadingLabel={t("members.saving")}
+        >
+          {t("members.save")}
+        </Button>
+        <Button type="button" variant="ghost" size="sm" onClick={onDone}>
+          {t("members.cancel")}
+        </Button>
+      </div>
+    </form>
   );
 }
 

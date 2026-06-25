@@ -237,6 +237,45 @@ export async function removeMemberAction(formData: FormData) {
   return { ok: true as const };
 }
 
+/**
+ * Update an existing member's role and/or team assignments (e.g. add U16 to a
+ * coach already on U15). Atomic + self-guarded server-side via the RPC.
+ */
+export async function updateMemberAction(
+  formData: FormData,
+): Promise<{ ok: true } | { error: string }> {
+  const membershipId = String(formData.get("membershipId") ?? "");
+  const roleId = String(formData.get("roleId") ?? "");
+  const teamIds = formData.getAll("teamIds").map(String).filter(Boolean);
+  if (!membershipId) return { error: "Membre manquant." };
+  if (!roleId) return { error: "Rôle requis." };
+
+  const membership = await resolveCurrentMembership();
+  if (!membership || !canManageClub(membership.access_level)) {
+    return { error: "Action interdite." };
+  }
+
+  const supabase = await createClient();
+  const { error } = await supabase.rpc("update_membership_assignment", {
+    p_membership_id: membershipId,
+    p_role_id: roleId,
+    p_team_ids: teamIds,
+  });
+
+  if (error) {
+    if (error.message.includes("team_role_requires_team")) {
+      return { error: "Ce rôle nécessite au moins une équipe." };
+    }
+    if (error.message.includes("team_not_in_club")) {
+      return { error: "Une équipe sélectionnée n'appartient pas au club." };
+    }
+    return { error: error.message };
+  }
+
+  revalidatePath("/settings/club");
+  return { ok: true as const };
+}
+
 type CreateRoleInput = {
   name: string;
   accessLevel: AccessLevel;
