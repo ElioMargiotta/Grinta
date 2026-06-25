@@ -2156,6 +2156,14 @@
       "neverConnected": "Jamais connectés",
       "never": "Jamais"
     },
+    "owner": {
+      "title": "Propriétaire du club",
+      "description": "Envoie (ou renvoie) un email d'invitation au propriétaire. Utile si le club a été créé sans email, ou si le premier envoi a échoué.",
+      "placeholder": "email@proprietaire.ch",
+      "send": "Envoyer l'invitation",
+      "sending": "Envoi…",
+      "sent": "Invitation envoyée."
+    },
     "danger": {
       "title": "Gestion du club",
       "archiveTitle": "Archiver le club",

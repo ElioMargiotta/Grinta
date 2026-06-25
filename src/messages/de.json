@@ -2154,6 +2154,14 @@
       "neverConnected": "Nie verbunden",
       "never": "Nie"
     },
+    "owner": {
+      "title": "Vereinsinhaber",
+      "description": "Sende (oder sende erneut) eine Einladungs-E-Mail an den Inhaber. Nützlich, wenn der Club ohne E-Mail erstellt wurde oder der erste Versand fehlschlug.",
+      "placeholder": "email@inhaber.ch",
+      "send": "Einladung senden",
+      "sending": "Senden…",
+      "sent": "Einladung gesendet."
+    },
     "danger": {
       "title": "Clubverwaltung",
       "archiveTitle": "Club archivieren",

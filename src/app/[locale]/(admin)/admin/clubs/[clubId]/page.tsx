@@ -4,6 +4,7 @@ import { ArrowLeft } from "lucide-react";
 import { Link } from "@/i18n/navigation";
 import { getClubDetail } from "@/lib/admin/queries";
 import { LicenseForm } from "@/components/admin/LicenseForm";
+import { InviteOwnerForm } from "@/components/admin/InviteOwnerForm";
 import { ClubDangerZone } from "@/components/admin/ClubDangerZone";
 import { StateBadge, StatCard, UsageMeter, formatDate, formatRelative } from "@/components/admin/ui";
 
@@ -100,6 +101,18 @@ export default async function AdminClubDetailPage({
 
         {/* Members + events */}
         <div className="flex flex-col gap-6">
+          <section>
+            <h2 className="mb-3 text-sm font-semibold text-zinc-900 dark:text-zinc-100">
+              {t("owner.title")}
+            </h2>
+            <div className="rounded-2xl border border-zinc-200 bg-white p-5 dark:border-zinc-800 dark:bg-zinc-900">
+              <p className="mb-3 text-xs text-zinc-500 dark:text-zinc-400">
+                {t("owner.description")}
+              </p>
+              <InviteOwnerForm clubId={clubId} locale={locale} />
+            </div>
+          </section>
+
           <section>
             <h2 className="mb-3 text-sm font-semibold text-zinc-900 dark:text-zinc-100">
               {t("clubs.members")} <span className="text-zinc-400">({detail.members.length})</span>
