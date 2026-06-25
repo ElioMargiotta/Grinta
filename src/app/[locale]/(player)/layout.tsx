@@ -7,6 +7,7 @@ import { getMyMemberships } from "@/lib/club/queries";
 import { clubThemeStyle } from "@/lib/club/theme";
 import { getClubLicenseUsage } from "@/lib/license/queries";
 import { MobileNavigation } from "@/components/layout/MobileNavigation";
+import { ClubAccentSync } from "@/components/layout/ClubAccentSync";
 
 export default async function PlayerLayout({
   children,
@@ -33,6 +34,7 @@ export default async function PlayerLayout({
       className="flex min-h-screen min-h-dvh flex-1 bg-[var(--club-page-bg-light)] dark:bg-[var(--club-page-bg-dark)] print:bg-white"
       style={clubThemeStyle(membership)}
     >
+      <ClubAccentSync color={membership?.theme_primary_color ?? null} />
       <div className="print:hidden">
         <PlayerSidebar currentMembership={membership} />
       </div>
