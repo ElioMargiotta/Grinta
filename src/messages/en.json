@@ -2147,6 +2147,32 @@
     "contactAdmin": "Contact administrator"
   },
   "admin": {
+    "activity": {
+      "title": "Activity",
+      "lastSeen": "Last access",
+      "active30d": "Active (30 d)",
+      "neverConnected": "Never connected",
+      "never": "Never"
+    },
+    "danger": {
+      "title": "Club management",
+      "archiveTitle": "Archive club",
+      "archiveHint": "The club becomes inaccessible to its members. Reversible at any time.",
+      "archive": "Archive",
+      "restoreTitle": "Restore club",
+      "restoreHint": "Reactivates the club and its licence.",
+      "restore": "Restore",
+      "deleteTitle": "Delete permanently",
+      "deleteHint": "Deletes the club and all its data (teams, players, sessions…). Irreversible.",
+      "delete": "Delete",
+      "deleteConfirm": "Delete permanently",
+      "deleting": "Deleting…",
+      "confirmLabel": "Type “{name}” to confirm.",
+      "cancel": "Cancel",
+      "archivedBadge": "Archived",
+      "archivedTitle": "Archived clubs",
+      "archivedOn": "archived on"
+    },
     "nav": {
       "dashboard": "Dashboard",
       "clubs": "Clubs",
@@ -2181,6 +2207,15 @@
       "title": "Clubs",
       "new": "New club",
       "newSubtitle": "Create a club, set its licence and invite its owner.",
+      "directoryLabel": "Club (directory)",
+      "directoryHint": "Pick an official ASF club to pre-fill the name, or enter it manually.",
+      "directoryManual": "— Manual entry —",
+      "directoryLinked": "already created",
+      "directorySearchPlaceholder": "Search a club by name or ASF number…",
+      "directoryAllRegions": "All regions",
+      "directoryNoResults": "No club found.",
+      "directoryClear": "Clear selection",
+      "directoryMore": "+{count} more — refine your search",
       "name": "Name",
       "state": "State",
       "usage": "Usage (tm · pl · staff)",

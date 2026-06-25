@@ -12,7 +12,9 @@ export default async function AdminClubsPage({
   const { locale } = await params;
   setRequestLocale(locale);
   const t = await getTranslations("admin");
-  const clubs = await listClubsOverview();
+  const allClubs = await listClubsOverview();
+  const clubs = allClubs.filter((c) => !c.archived_at);
+  const archived = allClubs.filter((c) => c.archived_at);
 
   return (
     <div className="mx-auto max-w-5xl">
@@ -78,6 +80,38 @@ export default async function AdminClubsPage({
           </tbody>
         </table>
       </div>
+
+      {archived.length > 0 && (
+        <section className="mt-8">
+          <h2 className="mb-3 text-sm font-semibold text-zinc-500 dark:text-zinc-400">
+            {t("danger.archivedTitle")} <span className="text-zinc-400">({archived.length})</span>
+          </h2>
+          <div className="overflow-hidden rounded-xl border border-zinc-200 dark:border-zinc-800">
+            <table className="w-full text-sm">
+              <tbody className="divide-y divide-zinc-100 bg-white dark:divide-zinc-800 dark:bg-zinc-900">
+                {archived.map((c) => (
+                  <tr key={c.club_id} className="hover:bg-zinc-50 dark:hover:bg-zinc-800/50">
+                    <td className="px-4 py-2.5">
+                      <Link
+                        href={`/admin/clubs/${c.club_id}`}
+                        className="font-medium text-zinc-500 hover:underline dark:text-zinc-400"
+                      >
+                        {c.name}
+                      </Link>
+                    </td>
+                    <td className="px-4 py-2.5 tabular-nums text-zinc-400">
+                      {c.teams} · {c.players} · {c.staff}
+                    </td>
+                    <td className="px-4 py-2.5 text-right text-xs text-zinc-400">
+                      {t("danger.archivedOn")} {formatDate(c.archived_at)}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </section>
+      )}
     </div>
   );
 }

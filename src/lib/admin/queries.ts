@@ -6,6 +6,7 @@ export type ClubOverview = {
   club_id: string;
   name: string;
   created_at: string;
+  archived_at: string | null;
   state: LicenseState;
   status: LicenseStatus | null;
   auto_renew: boolean | null;
@@ -76,6 +77,14 @@ export type ClubMemberRow = {
   full_name: string | null;
   role_name: string;
   access_level: string;
+  joined_at: string | null;
+  last_sign_in_at: string | null;
+};
+
+export type ClubActivity = {
+  lastSignInAt: string | null; // most recent connection across all members
+  activeLast30d: number; // members connected within 30 days
+  neverConnected: number; // members who never signed in
 };
 
 export type LicenseEventRow = {
@@ -89,6 +98,7 @@ export type ClubDetail = {
   club_id: string;
   name: string;
   created_at: string;
+  archived_at: string | null;
   license: {
     status: LicenseStatus;
     state: LicenseState;
@@ -104,25 +114,36 @@ export type ClubDetail = {
   } | null;
   usage: { teams: number; players: number; staff: number };
   members: ClubMemberRow[];
+  activity: ClubActivity;
   events: LicenseEventRow[];
 };
 
-type RawMember = {
-  user_id: string;
-  profiles: { full_name: string | null } | { full_name: string | null }[] | null;
-  club_roles: { name: string; access_level: string } | { name: string; access_level: string }[] | null;
-};
+const ACTIVE_WINDOW_DAYS = 30;
 
-function one<T>(v: T | T[] | null): T | null {
-  if (!v) return null;
-  return Array.isArray(v) ? v[0] ?? null : v;
+function computeActivity(members: ClubMemberRow[]): ClubActivity {
+  const horizon = Date.now() - ACTIVE_WINDOW_DAYS * 24 * 60 * 60 * 1000;
+  let lastSignInAt: string | null = null;
+  let activeLast30d = 0;
+  let neverConnected = 0;
+  for (const m of members) {
+    if (!m.last_sign_in_at) {
+      neverConnected += 1;
+      continue;
+    }
+    const ts = new Date(m.last_sign_in_at).getTime();
+    if (ts >= horizon) activeLast30d += 1;
+    if (!lastSignInAt || ts > new Date(lastSignInAt).getTime()) {
+      lastSignInAt = m.last_sign_in_at;
+    }
+  }
+  return { lastSignInAt, activeLast30d, neverConnected };
 }
 
 export async function getClubDetail(clubId: string): Promise<ClubDetail | null> {
   const supabase = await createClient();
 
   const [clubRes, licenseRes, usageRes, membersRes, eventsRes] = await Promise.all([
-    supabase.from("clubs").select("id, name, created_at").eq("id", clubId).maybeSingle(),
+    supabase.from("clubs").select("id, name, created_at, archived_at").eq("id", clubId).maybeSingle(),
     supabase
       .from("club_licenses")
       .select(
@@ -131,10 +152,7 @@ export async function getClubDetail(clubId: string): Promise<ClubDetail | null> 
       .eq("club_id", clubId)
       .maybeSingle(),
     supabase.rpc("club_license_usage", { p_club_id: clubId }),
-    supabase
-      .from("club_memberships")
-      .select("user_id, profiles!inner(full_name), club_roles!inner(name, access_level)")
-      .eq("club_id", clubId),
+    supabase.rpc("admin_club_members", { p_club_id: clubId }),
     supabase
       .from("license_events")
       .select("id, event_type, payload, created_at")
@@ -146,15 +164,14 @@ export async function getClubDetail(clubId: string): Promise<ClubDetail | null> 
   if (!clubRes.data) return null;
 
   const usage = (usageRes.data ?? null) as { state?: LicenseState } | null;
-  const members = ((membersRes.data ?? []) as RawMember[]).map((m) => {
-    const role = one(m.club_roles);
-    return {
-      user_id: m.user_id,
-      full_name: one(m.profiles)?.full_name ?? null,
-      role_name: role?.name ?? "—",
-      access_level: role?.access_level ?? "—",
-    };
-  });
+  const members = ((membersRes.data ?? []) as ClubMemberRow[]).map((m) => ({
+    user_id: m.user_id,
+    full_name: m.full_name ?? null,
+    role_name: m.role_name ?? "—",
+    access_level: m.access_level ?? "—",
+    joined_at: m.joined_at ?? null,
+    last_sign_in_at: m.last_sign_in_at ?? null,
+  }));
 
   const lic = licenseRes.data as ClubDetail["license"];
 
@@ -162,6 +179,7 @@ export async function getClubDetail(clubId: string): Promise<ClubDetail | null> 
     club_id: clubRes.data.id,
     name: clubRes.data.name,
     created_at: clubRes.data.created_at,
+    archived_at: clubRes.data.archived_at ?? null,
     license: lic
       ? { ...lic, state: usage?.state ?? "active" }
       : null,
@@ -171,8 +189,49 @@ export async function getClubDetail(clubId: string): Promise<ClubDetail | null> 
       staff: (usage as { staff?: number } | null)?.staff ?? 0,
     },
     members,
+    activity: computeActivity(members),
     events: (eventsRes.data ?? []) as LicenseEventRow[],
   };
+}
+
+export type DirectoryClub = {
+  id: string;
+  asf_number: string;
+  name: string;
+  association: string;
+  canton: string | null;
+  city: string | null;
+  group_key: string | null;
+  linked: boolean; // already onboarded as a tenant club
+};
+
+/**
+ * Reference catalogue of official ASF clubs (admin-only), with a `linked` flag
+ * marking entries already turned into a tenant so the picker can skip them.
+ */
+export async function listClubDirectory(): Promise<DirectoryClub[]> {
+  const supabase = await createClient();
+
+  const [dirRes, linkedRes] = await Promise.all([
+    supabase
+      .from("club_directory")
+      .select("id, asf_number, name, association, canton, city, group_key")
+      .order("association", { ascending: true })
+      .order("name", { ascending: true }),
+    supabase.from("clubs").select("directory_id").not("directory_id", "is", null),
+  ]);
+
+  if (dirRes.error || !dirRes.data) return [];
+  const linkedIds = new Set(
+    ((linkedRes.data ?? []) as { directory_id: string | null }[])
+      .map((r) => r.directory_id)
+      .filter((v): v is string => v !== null),
+  );
+
+  return (dirRes.data as Omit<DirectoryClub, "linked">[]).map((d) => ({
+    ...d,
+    linked: linkedIds.has(d.id),
+  }));
 }
 
 export type PlatformAdminRow = {
