@@ -13,7 +13,7 @@ export default async function AdminDashboardPage({
   setRequestLocale(locale);
   const t = await getTranslations("admin");
 
-  const clubs = await listClubsOverview();
+  const clubs = (await listClubsOverview()).filter((c) => !c.archived_at);
   const stats = computeDashboardStats(clubs);
   const recent = clubs.slice(0, 8);
 

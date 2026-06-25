@@ -40,6 +40,7 @@ export async function createClubAction(formData: FormData): Promise<ActionResult
   const locale = String(formData.get("locale") ?? "fr");
   const name = String(formData.get("name") ?? "").trim();
   const ownerEmail = String(formData.get("ownerEmail") ?? "").trim().toLowerCase();
+  const directoryId = String(formData.get("directoryId") ?? "").trim() || null;
   if (name.length < 2) return { error: "Le nom du club est requis." };
   if (ownerEmail && !ownerEmail.includes("@")) return { error: "Email propriétaire invalide." };
 
@@ -55,6 +56,7 @@ export async function createClubAction(formData: FormData): Promise<ActionResult
     p_auto_renew: String(formData.get("autoRenew") ?? "") === "on",
     p_quote_reference: String(formData.get("quoteReference") ?? "").trim() || null,
     p_notes: String(formData.get("notes") ?? "").trim() || null,
+    p_directory_id: directoryId,
   });
 
   if (error || !clubId) {
@@ -169,6 +171,67 @@ export async function setLicenseStatusAction(formData: FormData): Promise<Action
   if (error) return { error: error.message };
   revalidatePath(`/${locale}/admin/clubs/${clubId}`);
   return { ok: true };
+}
+
+export async function archiveClubAction(formData: FormData): Promise<ActionResult> {
+  if (!(await guard())) return { error: "forbidden" };
+
+  const clubId = String(formData.get("clubId") ?? "");
+  const locale = String(formData.get("locale") ?? "fr");
+  if (!clubId) return { error: "Club manquant." };
+
+  const supabase = await createClient();
+  const { error } = await supabase.rpc("admin_archive_club", { p_club_id: clubId });
+  if (error) return { error: error.message };
+
+  revalidatePath(`/${locale}/admin/clubs`);
+  revalidatePath(`/${locale}/admin/clubs/${clubId}`);
+  return { ok: true };
+}
+
+export async function restoreClubAction(formData: FormData): Promise<ActionResult> {
+  if (!(await guard())) return { error: "forbidden" };
+
+  const clubId = String(formData.get("clubId") ?? "");
+  const locale = String(formData.get("locale") ?? "fr");
+  if (!clubId) return { error: "Club manquant." };
+
+  const supabase = await createClient();
+  const { error } = await supabase.rpc("admin_restore_club", { p_club_id: clubId });
+  if (error) return { error: error.message };
+
+  revalidatePath(`/${locale}/admin/clubs`);
+  revalidatePath(`/${locale}/admin/clubs/${clubId}`);
+  return { ok: true };
+}
+
+/**
+ * Irreversible hard delete (cascades through every club_id FK). The caller must
+ * re-type the exact club name; the RPC re-checks it server-side. On success we
+ * redirect back to the clubs list since the detail page no longer exists.
+ */
+export async function deleteClubAction(formData: FormData): Promise<ActionResult> {
+  if (!(await guard())) return { error: "forbidden" };
+
+  const clubId = String(formData.get("clubId") ?? "");
+  const locale = String(formData.get("locale") ?? "fr");
+  const confirmName = String(formData.get("confirmName") ?? "");
+  if (!clubId) return { error: "Club manquant." };
+
+  const supabase = await createClient();
+  const { error } = await supabase.rpc("admin_delete_club", {
+    p_club_id: clubId,
+    p_confirm_name: confirmName,
+  });
+  if (error) {
+    if (error.message.includes("name_mismatch")) {
+      return { error: "Le nom saisi ne correspond pas au club." };
+    }
+    return { error: error.message };
+  }
+
+  revalidatePath(`/${locale}/admin/clubs`);
+  redirect(`/${locale}/admin/clubs`);
 }
 
 export async function addPlatformAdminAction(formData: FormData): Promise<ActionResult> {

@@ -2141,6 +2141,32 @@
     "contactAdmin": "Contatta l'amministratore"
   },
   "admin": {
+    "activity": {
+      "title": "Attività",
+      "lastSeen": "Ultimo accesso",
+      "active30d": "Attivi (30 g)",
+      "neverConnected": "Mai connessi",
+      "never": "Mai"
+    },
+    "danger": {
+      "title": "Gestione del club",
+      "archiveTitle": "Archivia il club",
+      "archiveHint": "Il club diventa inaccessibile ai suoi membri. Reversibile in qualsiasi momento.",
+      "archive": "Archivia",
+      "restoreTitle": "Ripristina il club",
+      "restoreHint": "Riattiva il club e la sua licenza.",
+      "restore": "Ripristina",
+      "deleteTitle": "Elimina definitivamente",
+      "deleteHint": "Elimina il club e tutti i suoi dati (squadre, giocatori, sessioni…). Irreversibile.",
+      "delete": "Elimina",
+      "deleteConfirm": "Elimina definitivamente",
+      "deleting": "Eliminazione…",
+      "confirmLabel": "Digita «{name}» per confermare.",
+      "cancel": "Annulla",
+      "archivedBadge": "Archiviato",
+      "archivedTitle": "Club archiviati",
+      "archivedOn": "archiviato il"
+    },
     "nav": {
       "dashboard": "Dashboard",
       "clubs": "Club",
@@ -2175,6 +2201,15 @@
       "title": "Club",
       "new": "Nuovo club",
       "newSubtitle": "Crea un club, definisci la sua licenza e invita il proprietario.",
+      "directoryLabel": "Club (elenco)",
+      "directoryHint": "Scegli un club ufficiale ASF per precompilare il nome, oppure inseriscilo manualmente.",
+      "directoryManual": "— Inserimento manuale —",
+      "directoryLinked": "già creato",
+      "directorySearchPlaceholder": "Cerca un club per nome o numero ASF…",
+      "directoryAllRegions": "Tutte le regioni",
+      "directoryNoResults": "Nessun club trovato.",
+      "directoryClear": "Cancella selezione",
+      "directoryMore": "+{count} altri — affina la ricerca",
       "name": "Nome",
       "state": "Stato",
       "usage": "Utilizzo (sq · gc · staff)",

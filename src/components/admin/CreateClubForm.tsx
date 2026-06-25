@@ -1,25 +1,57 @@
 "use client";
 
-import { useActionState } from "react";
+import { useActionState, useState } from "react";
 import { useTranslations } from "next-intl";
 import { createClubAction } from "@/app/[locale]/(admin)/admin/actions";
 import { LicensePriceEstimate } from "@/components/admin/LicensePriceEstimate";
+import { DirectoryPicker } from "@/components/admin/DirectoryPicker";
+import type { DirectoryClub } from "@/lib/admin/queries";
 
 type State = { error?: string } | null;
 
-export function CreateClubForm({ locale }: { locale: string }) {
+export function CreateClubForm({
+  locale,
+  directory = [],
+}: {
+  locale: string;
+  directory?: DirectoryClub[];
+}) {
   const t = useTranslations("admin");
   const [state, formAction, pending] = useActionState<State, FormData>(
     async (_prev, formData) => createClubAction(formData),
     null,
   );
 
+  const [directoryId, setDirectoryId] = useState("");
+  const [name, setName] = useState("");
+
   return (
     <form action={formAction} className="flex flex-col gap-5">
       <input type="hidden" name="locale" value={locale} />
+      <input type="hidden" name="directoryId" value={directoryId} />
+
+      {directory.length > 0 && (
+        <Field label={t("clubs.directoryLabel")} hint={t("clubs.directoryHint")}>
+          <DirectoryPicker
+            clubs={directory}
+            value={directoryId}
+            onSelect={(id, clubName) => {
+              setDirectoryId(id);
+              if (clubName) setName(clubName);
+            }}
+          />
+        </Field>
+      )}
 
       <Field label={t("clubs.name")}>
-        <input name="name" required maxLength={80} className={inputCls} />
+        <input
+          name="name"
+          required
+          maxLength={80}
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+          className={inputCls}
+        />
       </Field>
 
       <Field label={t("clubs.ownerEmail")} hint={t("clubs.ownerEmailHint")}>

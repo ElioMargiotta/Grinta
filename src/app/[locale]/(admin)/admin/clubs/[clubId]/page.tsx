@@ -4,7 +4,8 @@ import { ArrowLeft } from "lucide-react";
 import { Link } from "@/i18n/navigation";
 import { getClubDetail } from "@/lib/admin/queries";
 import { LicenseForm } from "@/components/admin/LicenseForm";
-import { StateBadge, UsageMeter, formatDate } from "@/components/admin/ui";
+import { ClubDangerZone } from "@/components/admin/ClubDangerZone";
+import { StateBadge, StatCard, UsageMeter, formatDate, formatRelative } from "@/components/admin/ui";
 
 export default async function AdminClubDetailPage({
   params,
@@ -34,10 +35,16 @@ export default async function AdminClubDetailPage({
         <h1 className="text-xl font-semibold tracking-tight text-zinc-900 dark:text-zinc-100">
           {detail.name}
         </h1>
+        {detail.archived_at && (
+          <span className="inline-flex items-center rounded-full bg-zinc-200 px-2 py-0.5 text-[11px] font-medium text-zinc-600 dark:bg-zinc-800 dark:text-zinc-300">
+            {t("danger.archivedBadge")}
+          </span>
+        )}
         {lic && <StateBadge state={lic.state} label={t(`state.${lic.state}`)} />}
       </div>
       <p className="mt-1 text-xs text-zinc-500 dark:text-zinc-400">
         {t("clubs.created")}: {formatDate(detail.created_at)}
+        {detail.archived_at && ` · ${t("danger.archivedOn")} ${formatDate(detail.archived_at)}`}
       </p>
 
       {/* Usage */}
@@ -53,7 +60,17 @@ export default async function AdminClubDetailPage({
         </div>
       </div>
 
-      <div className="mt-6 grid gap-6 md:grid-cols-2">
+      {/* Activity */}
+      <h2 className="mt-8 mb-3 text-sm font-semibold text-zinc-900 dark:text-zinc-100">
+        {t("activity.title")}
+      </h2>
+      <div className="grid grid-cols-3 gap-3">
+        <StatCard label={t("activity.lastSeen")} value={formatRelative(detail.activity.lastSignInAt, t("activity.never"))} />
+        <StatCard label={t("activity.active30d")} value={detail.activity.activeLast30d} />
+        <StatCard label={t("activity.neverConnected")} value={detail.activity.neverConnected} />
+      </div>
+
+      <div className="mt-8 grid gap-6 md:grid-cols-2">
         {/* License edit */}
         <section>
           <h2 className="mb-3 text-sm font-semibold text-zinc-900 dark:text-zinc-100">
@@ -95,9 +112,14 @@ export default async function AdminClubDetailPage({
               ) : (
                 <ul className="divide-y divide-zinc-100 dark:divide-zinc-800">
                   {detail.members.map((m) => (
-                    <li key={m.user_id} className="flex items-center justify-between px-4 py-2.5 text-sm">
-                      <span className="text-zinc-900 dark:text-zinc-100">{m.full_name ?? "—"}</span>
-                      <span className="text-xs text-zinc-500 dark:text-zinc-400">{m.role_name}</span>
+                    <li key={m.user_id} className="flex items-center justify-between gap-2 px-4 py-2.5 text-sm">
+                      <div className="min-w-0">
+                        <div className="truncate text-zinc-900 dark:text-zinc-100">{m.full_name ?? "—"}</div>
+                        <div className="text-[11px] text-zinc-400">{m.role_name}</div>
+                      </div>
+                      <span className="shrink-0 text-xs text-zinc-500 dark:text-zinc-400" title={t("activity.lastSeen")}>
+                        {formatRelative(m.last_sign_in_at, t("activity.never"))}
+                      </span>
                     </li>
                   ))}
                 </ul>
@@ -129,6 +151,15 @@ export default async function AdminClubDetailPage({
             </div>
           </section>
         </div>
+      </div>
+
+      <div className="mt-8">
+        <ClubDangerZone
+          clubId={clubId}
+          clubName={detail.name}
+          locale={locale}
+          archived={detail.archived_at !== null}
+        />
       </div>
     </div>
   );

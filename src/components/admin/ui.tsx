@@ -68,3 +68,15 @@ export function formatDate(iso: string | null): string {
   if (!iso) return "—";
   return new Intl.DateTimeFormat("fr-CH", { dateStyle: "medium" }).format(new Date(iso));
 }
+
+/** Compact relative time ("aujourd'hui", "il y a 3 j", "il y a 2 mois"). */
+export function formatRelative(iso: string | null, neverLabel = "Jamais"): string {
+  if (!iso) return neverLabel;
+  const diffMs = Date.now() - new Date(iso).getTime();
+  const days = Math.floor(diffMs / (24 * 60 * 60 * 1000));
+  if (days <= 0) return "aujourd'hui";
+  if (days === 1) return "hier";
+  if (days < 30) return `il y a ${days} j`;
+  if (days < 365) return `il y a ${Math.floor(days / 30)} mois`;
+  return `il y a ${Math.floor(days / 365)} an${days >= 730 ? "s" : ""}`;
+}
