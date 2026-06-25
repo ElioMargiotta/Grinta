@@ -79,7 +79,7 @@ async function inviteOwner(
   clubName: string,
   email: string,
   locale: string,
-): Promise<void> {
+): Promise<ActionResult> {
   const { data: role } = await supabase
     .from("club_roles")
     .select("id, name")
@@ -87,16 +87,18 @@ async function inviteOwner(
     .eq("access_level", "full")
     .eq("is_system", true)
     .maybeSingle();
-  if (!role) return;
+  if (!role) return { error: "Rôle propriétaire introuvable pour ce club." };
 
-  const { data: token } = await supabase.rpc("create_invitation", {
+  const { data: token, error: inviteErr } = await supabase.rpc("create_invitation", {
     p_club_id: clubId,
     p_email: email,
     p_role_id: role.id,
     p_team_ids: [],
     p_ttl_hours: 336, // 14 days for a club owner
   });
-  if (!token) return;
+  if (inviteErr || !token) {
+    return { error: inviteErr?.message ?? "Échec de la création de l'invitation." };
+  }
 
   const url = `${getSiteUrl()}/${locale}/invite/${token as string}`;
   const tokenHash = createHash("sha256").update(token as string, "utf8").digest("hex");
@@ -105,9 +107,9 @@ async function inviteOwner(
     .select("id, expires_at")
     .eq("token_hash", tokenHash)
     .maybeSingle();
-  if (!invitation) return;
+  if (!invitation) return { error: "Invitation introuvable après création." };
 
-  await sendClubInvitationEmail(supabase, {
+  const emailResult = await sendClubInvitationEmail(supabase, {
     invitationId: invitation.id,
     kind: "staff",
     locale,
@@ -121,6 +123,39 @@ async function inviteOwner(
     expiresAt: invitation.expires_at,
     brandColor: "#18181b",
   });
+
+  if (!emailResult.ok) {
+    return { error: `Invitation créée mais email non envoyé (${emailResult.reason}).` };
+  }
+  return { ok: true };
+}
+
+/**
+ * Send (or re-send) the owner invitation email for an existing club. Useful when
+ * a club was created without an owner email, or the first email failed.
+ */
+export async function inviteClubOwnerAction(formData: FormData): Promise<ActionResult> {
+  if (!(await guard())) return { error: "forbidden" };
+
+  const clubId = String(formData.get("clubId") ?? "");
+  const locale = String(formData.get("locale") ?? "fr");
+  const email = String(formData.get("email") ?? "").trim().toLowerCase();
+  if (!clubId) return { error: "Club manquant." };
+  if (!email.includes("@")) return { error: "Email invalide." };
+
+  const supabase = await createClient();
+  const { data: club } = await supabase
+    .from("clubs")
+    .select("name")
+    .eq("id", clubId)
+    .maybeSingle();
+  if (!club) return { error: "Club introuvable." };
+
+  const result = await inviteOwner(supabase, clubId, club.name, email, locale);
+  if (result.error) return result;
+
+  revalidatePath(`/${locale}/admin/clubs/${clubId}`);
+  return { ok: true };
 }
 
 export async function updateLicenseAction(formData: FormData): Promise<ActionResult> {

@@ -2160,6 +2160,14 @@
       "neverConnected": "Never connected",
       "never": "Never"
     },
+    "owner": {
+      "title": "Club owner",
+      "description": "Send (or re-send) an invitation email to the owner. Useful if the club was created without an email, or the first send failed.",
+      "placeholder": "email@owner.ch",
+      "send": "Send invitation",
+      "sending": "Sending…",
+      "sent": "Invitation sent."
+    },
     "danger": {
       "title": "Club management",
       "archiveTitle": "Archive club",

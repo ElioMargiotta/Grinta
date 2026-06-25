@@ -2154,6 +2154,14 @@
       "neverConnected": "Mai connessi",
       "never": "Mai"
     },
+    "owner": {
+      "title": "Proprietario del club",
+      "description": "Invia (o reinvia) un'email di invito al proprietario. Utile se il club è stato creato senza email, o se il primo invio è fallito.",
+      "placeholder": "email@proprietario.ch",
+      "send": "Invia l'invito",
+      "sending": "Invio…",
+      "sent": "Invito inviato."
+    },
     "danger": {
       "title": "Gestione del club",
       "archiveTitle": "Archivia il club",
