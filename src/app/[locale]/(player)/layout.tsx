@@ -2,6 +2,7 @@ import { setRequestLocale } from "next-intl/server";
 import { PlayerSidebar } from "@/components/layout/PlayerSidebar";
 import { Topbar } from "@/components/layout/Topbar";
 import { requirePersona } from "@/lib/auth/getUser";
+import { getProfile } from "@/lib/auth/user";
 import { resolveCurrentMembership } from "@/lib/club/context";
 import { getMyMemberships } from "@/lib/club/queries";
 import { clubThemeStyle } from "@/lib/club/theme";
@@ -18,10 +19,10 @@ export default async function PlayerLayout({
 }) {
   const { locale } = await params;
   setRequestLocale(locale);
-  const { supabase, user, persona } = await requirePersona(locale, "player");
+  const { user, persona } = await requirePersona(locale, "player");
 
-  const [{ data: profile }, membership, memberships] = await Promise.all([
-    supabase.from("profiles").select("full_name").eq("id", user.id).single(),
+  const [profile, membership, memberships] = await Promise.all([
+    getProfile(),
     resolveCurrentMembership(),
     getMyMemberships(),
   ]);

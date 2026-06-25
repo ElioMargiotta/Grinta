@@ -1,6 +1,7 @@
 import "server-only";
 import { cache } from "react";
 import { createClient } from "@/lib/supabase/server";
+import { getAuthUser } from "@/lib/auth/user";
 import type { ClubMembership } from "./types";
 
 type Row = {
@@ -22,12 +23,10 @@ type Row = {
 };
 
 export const getMyMemberships = cache(async (): Promise<ClubMembership[]> => {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const user = await getAuthUser();
   if (!user) return [];
 
+  const supabase = await createClient();
   const { data, error } = await supabase
     .from("club_memberships")
     .select(

@@ -1,14 +1,13 @@
 import { redirect } from "next/navigation";
 import { cache } from "react";
 import { createClient } from "@/lib/supabase/server";
+import { getAuthUser } from "@/lib/auth/user";
 import { resolveCurrentMembership } from "@/lib/club/context";
 import { resolvePersona, type Persona } from "@/lib/club/persona";
 
 export async function requireUser(locale: string) {
   const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const user = await getAuthUser();
 
   if (!user) redirect(`/${locale}/login`);
   return { supabase, user };
@@ -46,11 +45,9 @@ export async function requirePersona(locale: string, expected: Persona) {
  * Cached per request; safe to call from layouts and nav components.
  */
 export const isPlatformAdmin = cache(async (): Promise<boolean> => {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const user = await getAuthUser();
   if (!user) return false;
+  const supabase = await createClient();
   const { data } = await supabase.rpc("is_platform_admin");
   return data === true;
 });
