@@ -11,6 +11,7 @@ import { clubThemeStyle } from "@/lib/club/theme";
 import { getClubLicenseUsage } from "@/lib/license/queries";
 import type { LicenseUsage } from "@/lib/license/types";
 import { MobileNavigation } from "@/components/layout/MobileNavigation";
+import { ClubAccentSync } from "@/components/layout/ClubAccentSync";
 
 export default async function AppLayout({
   children,
@@ -66,6 +67,7 @@ export default async function AppLayout({
       className="flex min-h-screen min-h-dvh flex-1 bg-[var(--club-page-bg-light)] dark:bg-[var(--club-page-bg-dark)] print:bg-white"
       style={clubThemeStyle(membership)}
     >
+      <ClubAccentSync color={membership?.theme_primary_color ?? null} />
       <div className="print:hidden">
         <Sidebar hasMembership={hasMembership} currentMembership={membership} isAdmin={admin} />
       </div>
