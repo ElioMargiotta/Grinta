@@ -144,9 +144,9 @@
         {
           "name": "Club",
           "discountLabel": "On quote",
-          "price": "from 30 CHF",
+          "price": "25 CHF",
           "priceSuffix": "/ team / month",
-          "sub": "Sliding scale (40 → 30 CHF) by number of teams.",
+          "sub": "Kids football (G/F/E) included. Only development teams (D and up) are billed.",
           "features": [
             "Unlimited teams",
             "Season & microcycle periodization (MD±)",
@@ -414,7 +414,7 @@
         "Data kept year after year",
         "J+S report export"
       ],
-      "pricing": "Sliding scale from 40 to 30 CHF / team / month by number of teams. −5% when paid yearly.",
+      "pricing": "25 CHF / development team (D and up) / month. Kids football (G/F/E) included. −5% when paid yearly.",
       "js": "In Switzerland, Youth+Sport pays back CHF 1.04/h per player: a single subsidized junior session covers a month of Grinta for the team."
     }
   },

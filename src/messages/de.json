@@ -144,9 +144,9 @@
         {
           "name": "Club",
           "discountLabel": "Auf Anfrage",
-          "price": "ab 30 CHF",
+          "price": "25 CHF",
           "priceSuffix": "/ Team / Monat",
-          "sub": "Degressiver Tarif (40 → 30 CHF) je nach Teamanzahl.",
+          "sub": "Kinderfussball (G/F/E) inbegriffen. Nur Ausbildungsteams (D und höher) werden verrechnet.",
           "features": [
             "Unbegrenzte Teams",
             "Saison- & Mikrozyklus-Periodisierung (MD±)",
@@ -414,7 +414,7 @@
         "Daten Jahr für Jahr erhalten",
         "J+S-Export"
       ],
-      "pricing": "Degressiver Tarif von 40 bis 30 CHF / Team / Monat je nach Teamanzahl. −5 % bei jährlicher Zahlung.",
+      "pricing": "25 CHF / Ausbildungsteam (D und höher) / Monat. Kinderfussball (G/F/E) inbegriffen. −5 % bei jährlicher Zahlung.",
       "js": "In der Schweiz zahlt J+S 1,04 CHF/h pro Spieler zurück: ein subventioniertes Junioren-Training deckt einen Monat Grinta fürs Team."
     }
   },
