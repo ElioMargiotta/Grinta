@@ -88,11 +88,6 @@ function formatMdOffset(n: number | null): string {
   return n > 0 ? `MD+${n}` : `MD${n}`;
 }
 
-function lastName(full: string): string {
-  const parts = full.trim().split(/\s+/);
-  return parts.length > 1 ? parts[parts.length - 1] : full;
-}
-
 export function MatchHub({
   teamId,
   match,
@@ -107,6 +102,7 @@ export function MatchHub({
   derived,
   systems,
   selectedPhaseIds,
+  clubLogoUrl,
 }: {
   teamId: string;
   match: MatchHubMatch;
@@ -121,6 +117,7 @@ export function MatchHub({
   eventsInitial: MatchEvent[];
   squadRecap: SquadRecapRow[];
   derived: Record<string, DerivedStat>;
+  clubLogoUrl?: string | null;
 }) {
   const t = useTranslations("planner.match");
   const tCal = useTranslations("teams.calendar.match");
@@ -333,7 +330,7 @@ export function MatchHub({
       const pos = lineup.coords[i] ?? { x: base.x, y: base.y };
       return {
         jerseyNumber: p?.jerseyNumber ?? null,
-        name: p ? lastName(p.fullName) : "?",
+        name: p ? p.fullName : "?",
         role: base.role,
         x: pos.x,
         y: pos.y,
@@ -341,25 +338,20 @@ export function MatchHub({
     })
     .filter((s): s is NonNullable<typeof s> => s !== null);
 
-  // Groupes convocation (remplaçants + non convoqués + indispos) pour le print.
+  // Groupes convocation (remplaçants + absents avec raison) pour le print.
   const usedIds = new Set<string>([...starterIds, ...lineup.subs]);
   const notUsed = roster.filter((p) => !usedIds.has(p.playerId));
-  const notCalled: RosterPlayer[] = [];
-  const byKind: Record<string, RosterPlayer[]> = {
-    injury: [],
-    illness: [],
-    suspension: [],
-    other: [],
-  };
-  for (const p of notUsed) {
-    const u = unavailable[p.playerId];
-    if (u) byKind[u.kind].push(p);
-    else notCalled.push(p);
-  }
   const member = (p: RosterPlayer) => ({
     jerseyNumber: p.jerseyNumber,
     name: p.fullName,
   });
+  const absentMember = (p: RosterPlayer) => {
+    const u = unavailable[p.playerId];
+    const reason = u
+      ? `${t(`prematch.kind.${u.kind}`)}${u.reason ? ` - ${u.reason}` : ""}`
+      : t("prematch.summary.notCalled");
+    return { ...member(p), reason };
+  };
   const printGroups = [
     {
       label: t("prematch.subsTitle"),
@@ -368,15 +360,9 @@ export function MatchHub({
         .filter((p): p is RosterPlayer => Boolean(p))
         .map(member),
     },
-    { label: t("prematch.summary.notCalled"), players: notCalled.map(member) },
-    { label: t("prematch.summary.injury"), players: byKind.injury.map(member) },
-    {
-      label: t("prematch.summary.suspension"),
-      players: byKind.suspension.map(member),
-    },
-    { label: t("prematch.summary.illness"), players: byKind.illness.map(member) },
-    { label: t("prematch.summary.other"), players: byKind.other.map(member) },
+    { label: t("prematch.summary.absents"), players: notUsed.map(absentMember) },
   ].filter((g) => g.players.length > 0);
+  const printPhases = matchPhases.filter((p) => selectedPhaseIds.includes(p.id));
 
   return (
     <div className="flex flex-col gap-6">
@@ -744,14 +730,25 @@ export function MatchHub({
         starters={printStarters}
         groups={printGroups}
         tactics={tactics}
+        phases={printPhases}
+        clubLogoUrl={clubLogoUrl}
         labels={{
           formation: t("prematch.formation"),
           tactics: t("prematch.tacticsTitle"),
+          matchContext: t("prematch.tactics.matchContext"),
+          structures: t("prematch.tactics.structures"),
+          objective: t("prematch.tactics.objective"),
           general: t("prematch.tactics.general"),
           possession: t("prematch.tactics.possession"),
           defense: t("prematch.tactics.defense"),
+          loss: t("prematch.tactics.loss"),
+          regain: t("prematch.tactics.regain"),
           transition: t("prematch.tactics.transition"),
           squad: t("prematch.summary.title"),
+          starters: t("prematch.summary.starters"),
+          setPieces: t("prematch.setPiecesPrint"),
+          reason: t("prematch.summary.reason"),
+          coach: t("prematch.coach"),
         }}
       />
     </div>

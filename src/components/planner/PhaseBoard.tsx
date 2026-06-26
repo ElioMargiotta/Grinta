@@ -2,7 +2,17 @@
 
 import { useRef, useState } from "react";
 import { useTranslations } from "next-intl";
-import { MoveUpRight, Spline, Trash2, User, Users, Circle } from "lucide-react";
+import {
+  Circle,
+  FlagTriangleRight,
+  Goal,
+  MoveUpRight,
+  Spline,
+  Trash2,
+  Triangle,
+  User,
+  Users,
+} from "lucide-react";
 import { FullPitch } from "@/components/sheet/Pitch";
 import { Jersey } from "@/components/planner/Jersey";
 import { pitchLeftPct, pitchTopPct } from "@/components/planner/match/formations";
@@ -22,6 +32,36 @@ const uid = () =>
   typeof crypto !== "undefined" && crypto.randomUUID
     ? crypto.randomUUID()
     : Math.random().toString(36).slice(2);
+
+function buildWavePath(
+  x1: number,
+  y1: number,
+  x2: number,
+  y2: number,
+  amp: number,
+) {
+  const dx = x2 - x1;
+  const dy = y2 - y1;
+  const len = Math.hypot(dx, dy);
+  if (len < 0.5) return `M ${x1} ${y1} L ${x2} ${y2}`;
+  const ux = dx / len;
+  const uy = dy / len;
+  const px = -uy;
+  const py = ux;
+  const segments = Math.max(3, Math.round(len / 7));
+  let d = `M ${x1.toFixed(2)} ${y1.toFixed(2)}`;
+  for (let i = 1; i <= segments; i++) {
+    const tCtrl = (i - 0.5) / segments;
+    const tEnd = i / segments;
+    const sign = i % 2 === 1 ? 1 : -1;
+    const cx = x1 + ux * len * tCtrl + px * amp * sign;
+    const cy = y1 + uy * len * tCtrl + py * amp * sign;
+    const ex = x1 + ux * len * tEnd;
+    const ey = y1 + uy * len * tEnd;
+    d += ` Q ${cx.toFixed(2)} ${cy.toFixed(2)} ${ex.toFixed(2)} ${ey.toFixed(2)}`;
+  }
+  return d;
+}
 
 /**
  * Éditeur visuel d'une phase arrêtée : jetons (nos joueurs / adversaires / ballon)
@@ -43,6 +83,7 @@ export function PhaseBoard({
   const dragRef = useRef<{ id: string; moved: boolean } | null>(null);
   const [arrowMode, setArrowMode] = useState(false);
   const [arrowType, setArrowType] = useState<PhaseArrowKind>("run");
+  const [tokenTool, setTokenTool] = useState<PhaseTokenKind | null>(null);
   const [draft, setDraft] = useState<{
     fromX: number;
     fromY: number;
@@ -63,12 +104,14 @@ export function PhaseBoard({
     };
   }
 
-  function addToken(kind: PhaseTokenKind) {
+  function addToken(kind: PhaseTokenKind, pos: { x: number; y: number }) {
     if (!onChange) return;
     const sameCount = value.tokens.filter((tk) => tk.kind === kind).length;
-    const label = kind === "ball" ? "" : String(sameCount + 1);
-    const y = kind === "us" ? 60 : kind === "them" ? 38 : 50;
-    const token: PhaseToken = { id: uid(), kind, x: 50, y, label };
+    const label =
+      kind === "ball" || kind === "cone" || kind.startsWith("goal")
+        ? ""
+        : String(sameCount + 1);
+    const token: PhaseToken = { id: uid(), kind, x: pos.x, y: pos.y, label };
     onChange({ ...value, tokens: [...value.tokens, token] });
     setSelected(token.id);
   }
@@ -89,6 +132,7 @@ export function PhaseBoard({
     if (readOnly || arrowMode) return;
     e.stopPropagation();
     e.preventDefault();
+    setTokenTool(null);
     dragRef.current = { id, moved: false };
     (e.currentTarget as Element).setPointerCapture(e.pointerId);
   }
@@ -111,12 +155,17 @@ export function PhaseBoard({
 
   // ---- Tracé des flèches (mode flèche) -----------------------------------
   function onBoxDown(e: React.PointerEvent) {
-    if (readOnly || !arrowMode) {
-      if (!arrowMode) setSelected(null);
-      return;
-    }
+    if (readOnly) return;
     const p = toBoard(e);
     if (!p) return;
+    if (tokenTool) {
+      addToken(tokenTool, p);
+      return;
+    }
+    if (!arrowMode) {
+      setSelected(null);
+      return;
+    }
     (e.currentTarget as Element).setPointerCapture(e.pointerId);
     setDraft({ fromX: p.x, fromY: p.y, toX: p.x, toY: p.y });
   }
@@ -149,19 +198,25 @@ export function PhaseBoard({
     <div className={`flex flex-col gap-2 ${className ?? ""}`}>
       {!readOnly ? (
         <div className="flex flex-wrap items-center gap-1.5">
-          <ToolButton onClick={() => addToken("us")} icon={User} label={t("addUs")} />
-          <ToolButton onClick={() => addToken("them")} icon={Users} label={t("addThem")} />
-          <ToolButton onClick={() => addToken("ball")} icon={Circle} label={t("addBall")} />
+          <ToolButton onClick={() => { setTokenTool("us"); setArrowMode(false); }} icon={User} label={t("addUs")} active={tokenTool === "us"} />
+          <ToolButton onClick={() => { setTokenTool("them"); setArrowMode(false); }} icon={Users} label={t("addThem")} active={tokenTool === "them"} />
+          <ToolButton onClick={() => { setTokenTool("gk"); setArrowMode(false); }} icon={FlagTriangleRight} label={t("addGk")} active={tokenTool === "gk"} />
+          <ToolButton onClick={() => { setTokenTool("ball"); setArrowMode(false); }} icon={Circle} label={t("addBall")} active={tokenTool === "ball"} />
+          <ToolButton onClick={() => { setTokenTool("cone"); setArrowMode(false); }} icon={Triangle} label={t("addCone")} active={tokenTool === "cone"} />
+          <ToolButton onClick={() => { setTokenTool("goal-h"); setArrowMode(false); }} icon={Goal} label={t("addGoal")} active={tokenTool === "goal-h"} />
           <span className="mx-1 h-5 w-px bg-[var(--club-line)]" />
           <ToolButton
-            onClick={() => setArrowMode((v) => !v)}
+            onClick={() => {
+              setTokenTool(null);
+              setArrowMode((v) => !v);
+            }}
             icon={MoveUpRight}
             label={t("arrow")}
             active={arrowMode}
           />
           {arrowMode ? (
             <div className="inline-flex overflow-hidden rounded-md border border-[var(--club-line)] text-xs">
-              {(["run", "pass"] as PhaseArrowKind[]).map((k) => (
+              {(["run", "pass", "dribble", "long-ball"] as PhaseArrowKind[]).map((k) => (
                 <button
                   key={k}
                   type="button"
@@ -188,7 +243,7 @@ export function PhaseBoard({
         onPointerUp={onBoxUp}
         onPointerCancel={onBoxUp}
         className={`relative mx-auto w-full max-w-[420px] select-none rounded-lg bg-emerald-700/90 dark:bg-emerald-900/70 ${
-          arrowMode ? "cursor-crosshair" : ""
+          arrowMode || tokenTool ? "cursor-crosshair" : ""
         }`}
         style={{ aspectRatio: "72 / 109", touchAction: "none" }}
       >
@@ -212,20 +267,45 @@ export function PhaseBoard({
               <path d="M0,0 L5,2.5 L0,5 Z" fill="white" />
             </marker>
           </defs>
-          {arrows.map((a) => (
-            <line
-              key={a.id}
-              x1={pitchLeftPct(a.fromX)}
-              y1={pitchTopPct(a.fromY)}
-              x2={pitchLeftPct(a.toX)}
-              y2={pitchTopPct(a.toY)}
-              stroke="white"
-              strokeWidth={1.4}
-              strokeDasharray={a.kind === "pass" ? "3 2" : undefined}
-              markerEnd="url(#phase-arrowhead)"
-              vectorEffect="non-scaling-stroke"
-            />
-          ))}
+          {arrows.map((a) => {
+            const x1 = pitchLeftPct(a.fromX);
+            const y1 = pitchTopPct(a.fromY);
+            const x2 = pitchLeftPct(a.toX);
+            const y2 = pitchTopPct(a.toY);
+            if (a.kind === "dribble") {
+              return (
+                <path
+                  key={a.id}
+                  d={buildWavePath(x1, y1, x2, y2, 1.8)}
+                  fill="none"
+                  stroke="white"
+                  strokeWidth={1.4}
+                  markerEnd="url(#phase-arrowhead)"
+                  vectorEffect="non-scaling-stroke"
+                />
+              );
+            }
+            return (
+              <line
+                key={a.id}
+                x1={x1}
+                y1={y1}
+                x2={x2}
+                y2={y2}
+                stroke="white"
+                strokeWidth={a.kind === "long-ball" ? 1.8 : 1.4}
+                strokeDasharray={
+                  a.kind === "pass"
+                    ? "3 2"
+                    : a.kind === "long-ball"
+                      ? "8 3"
+                      : undefined
+                }
+                markerEnd="url(#phase-arrowhead)"
+                vectorEffect="non-scaling-stroke"
+              />
+            );
+          })}
         </svg>
 
         {/* Jetons */}
@@ -299,21 +379,37 @@ export function PhaseBoard({
 
 function TokenGlyph({ token, selected }: { token: PhaseToken; selected: boolean }) {
   const ring = selected ? "ring-2 ring-amber-300" : "";
-  if (token.kind === "us") {
-    return <Jersey number={token.label || "•"} className={`h-8 w-8 rounded ${ring}`} />;
+  if (token.kind === "us" || token.kind === "gk") {
+    return <Jersey number={token.label || "•"} className={`h-6 w-6 rounded ${ring}`} />;
   }
   if (token.kind === "them") {
     return (
       <span
-        className={`flex h-7 w-7 items-center justify-center rounded-full bg-zinc-900 text-[11px] font-bold text-white shadow ring-2 ring-white/80 ${ring}`}
+        className={`flex h-5 w-5 items-center justify-center rounded-full bg-zinc-900 text-[9px] font-bold text-white shadow ring-1 ring-white/80 ${ring}`}
       >
         {token.label || "•"}
       </span>
     );
   }
+  if (token.kind === "cone") {
+    return (
+      <span
+        className={`block h-0 w-0 border-x-[6px] border-b-[12px] border-x-transparent border-b-orange-500 drop-shadow ${ring}`}
+      />
+    );
+  }
+  if (token.kind === "goal-h" || token.kind === "goal-v") {
+    return (
+      <span
+        className={`block border-2 border-white bg-zinc-900/70 shadow ${
+          token.kind === "goal-h" ? "h-2.5 w-7" : "h-7 w-2.5"
+        } ${ring}`}
+      />
+    );
+  }
   return (
     <span
-      className={`flex h-5 w-5 items-center justify-center rounded-full bg-white text-[10px] shadow ring-1 ring-zinc-900 ${ring}`}
+      className={`flex h-4 w-4 items-center justify-center rounded-full bg-white text-[8px] shadow ring-1 ring-zinc-900 ${ring}`}
     >
       ⚽
     </span>

@@ -45,8 +45,26 @@ export default async function NewSystemPage({
         systemId={null}
         initialName=""
         initialLineup={initialLineup}
-        initialTactics={{ general: "", possession: "", defense: "", transition: "" }}
+        initialTactics={{
+          coaches: "",
+          matchContext: "",
+          structures: "",
+          boards: {
+            possession: { tokens: [], arrows: [] },
+            defense: { tokens: [], arrows: [] },
+            loss: { tokens: [], arrows: [] },
+            regain: { tokens: [], arrows: [] },
+          },
+          objective: "",
+          general: "",
+          possession: "",
+          defense: "",
+          loss: "",
+          regain: "",
+          transition: "",
+        }}
         initialPhases={[]}
+        clubLogoUrl={membership.logo_url}
       />
     </div>
   );

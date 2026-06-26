@@ -87,6 +87,7 @@ export default async function EditSystemPage({
         initialLineup={initialLineup}
         initialTactics={parseTactics(system.tactics)}
         initialPhases={initialPhases}
+        clubLogoUrl={membership.logo_url}
       />
     </div>
   );

@@ -890,6 +890,8 @@
       "backToList": "Zurück zu den Systemen",
       "nameLabel": "Systemname",
       "namePlaceholder": "z. B. Tiefer Block Konter",
+      "print": "Exportieren",
+      "printSubtitle": "Spielsystem",
       "save": "Speichern",
       "compoTitle": "Aufstellung",
       "emptyRoster": "Kein Spieler dieser Mannschaft für die Saison zugewiesen.",
@@ -912,12 +914,17 @@
       "phaseBoard": {
         "addUs": "Spieler",
         "addThem": "Gegner",
+        "addGk": "Torhüter",
         "addBall": "Ball",
+        "addCone": "Hütchen",
+        "addGoal": "Mini-Tor",
         "arrow": "Pfeil",
         "removeToken": "Entfernen",
         "arrowKind": {
           "run": "Lauf",
-          "pass": "Pass"
+          "pass": "Pass",
+          "dribble": "Dribbling",
+          "long-ball": "Langer Ball"
         }
       },
       "err": {
@@ -1415,6 +1422,8 @@
         "defenders": "{count} Verteidiger",
         "importSystem": "System importieren",
         "systemImported": "System „{name}“ importiert — prüfen und speichern.",
+        "setPiecesPrint": "Standardsituationen",
+        "coach": "Coach",
         "convocation": {
           "send": "Aufgebot senden",
           "cancel": "Senden rückgängig",
@@ -1438,23 +1447,41 @@
           "starters": "Startelf",
           "subs": "Ersatzspieler",
           "notCalled": "Nicht aufgeboten",
+          "absents": "Abwesende",
           "injury": "Verletzte",
           "illness": "Kranke",
           "suspension": "Gesperrte",
           "other": "Nicht verfügbar",
+          "reason": "Grund",
           "present": "Verfügbar",
           "absent": "Abwesend",
           "pending": "Ausstehend"
         },
         "tactics": {
+          "coaches": "Coaches",
+          "coachesPlaceholder": "Marco Rossi\nJulien Dupont",
+          "matchContext": "Kontext",
+          "matchContextPlaceholder": "Spieltyp, Wetter, Gruppenzustand, Beobachtungsziel…",
+          "structures": "Systeme / Blöcke",
+          "structuresPlaceholder": "z. B. 4-2-3-1 dann 3-4-3, Linienreferenzen, spezifische Rollen…",
+          "objective": "Spielziel",
+          "objectivePlaceholder": "Erwartetes Ergebnis, kollektive Prioritäten, Haltung, Schwerpunkte…",
           "general": "Allgemein",
           "generalPlaceholder": "Spielplan, Einstellung…",
           "possession": "Im Ballbesitz",
           "possessionPlaceholder": "Spielaufbau, Breite, Abschluss…",
           "defense": "Ohne Ball",
           "defensePlaceholder": "Block, Pressing, Manndeckung…",
+          "loss": "Bei Ballverlust",
+          "lossPlaceholder": "Gegenpressing, Rückzug, Zentrum schützen, taktisches Foul…",
+          "regain": "Bei Balleroberung",
+          "regainPlaceholder": "Erster Pass, schneller Angriff, Ball sichern, Zielspieler…",
           "transition": "Umschalten",
-          "transitionPlaceholder": "Reaktionen bei Verlust/Eroberung…"
+          "transitionPlaceholder": "Reaktionen bei Verlust/Eroberung…",
+          "template": "Allgemeine Vorlage",
+          "detectionTemplate": "Sichtungsvorlage",
+          "previous": "Zurück",
+          "next": "Weiter"
         },
         "callup": {
           "title": "Aufgebot",

@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 import { resolveCurrentSeasonLabel } from "@/lib/club/season";
 import { isStructuringKind } from "@/lib/planner/season";
+import { parseBoard } from "@/lib/planner/tacticalSystems";
 
 type ActionResult = {
   ok?: true;
@@ -494,17 +495,39 @@ export async function setMatchFormationAction(
 
   const formation = trimOrNull(formData.get("formation"), 20);
 
-  // Consignes tactiques : 4 champs texte libres bornés.
-  const tactics: Record<string, string> = {};
+  // Consignes tactiques : champs texte libres bornés, rétrocompatibles avec
+  // l'ancien format (general / transition).
+  const tactics: Record<string, unknown> = {};
   try {
     const parsed = JSON.parse(String(formData.get("tactics") ?? "{}"));
     if (parsed && typeof parsed === "object") {
-      for (const key of ["general", "possession", "defense", "transition"]) {
-        const v = (parsed as Record<string, unknown>)[key];
+      const obj = parsed as Record<string, unknown>;
+      for (const key of [
+        "coaches",
+        "matchContext",
+        "structures",
+        "objective",
+        "general",
+        "possession",
+        "defense",
+        "loss",
+        "regain",
+        "transition",
+      ]) {
+        const v = obj[key];
         if (typeof v === "string" && v.trim()) {
           tactics[key] = v.slice(0, 2000);
         }
       }
+      if (tactics.objective && !tactics.general) tactics.general = tactics.objective;
+      if (tactics.loss && !tactics.transition) tactics.transition = tactics.loss;
+      const rawBoards = obj.boards as Record<string, unknown> | undefined;
+      tactics.boards = {
+        possession: parseBoard(rawBoards?.possession),
+        defense: parseBoard(rawBoards?.defense),
+        loss: parseBoard(rawBoards?.loss),
+        regain: parseBoard(rawBoards?.regain),
+      };
     }
   } catch {
     return { error: "invalid_input" };

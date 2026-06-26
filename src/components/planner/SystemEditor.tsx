@@ -3,13 +3,15 @@
 import { useState, useTransition } from "react";
 import { useTranslations } from "next-intl";
 import { useRouter } from "@/i18n/navigation";
-import { ArrowLeft, Plus, Save, Trash2 } from "lucide-react";
+import { ArrowLeft, Plus, Printer, Save, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 import { LineupBoard, type LineupValue } from "@/components/planner/LineupBoard";
 import { MatchTactics, type TacticsValue } from "@/components/planner/MatchTactics";
 import { PhaseBoard } from "@/components/planner/PhaseBoard";
+import { MatchPrintSheet } from "@/components/planner/MatchPrintSheet";
 import type { RosterPlayer } from "@/components/planner/MatchParticipations";
+import { FORMATIONS } from "@/components/planner/match/formations";
 import {
   EMPTY_BOARD,
   PHASE_KINDS,
@@ -41,6 +43,7 @@ export function SystemEditor({
   initialLineup,
   initialTactics,
   initialPhases,
+  clubLogoUrl,
 }: {
   teamId: string;
   roster: RosterPlayer[];
@@ -49,8 +52,10 @@ export function SystemEditor({
   initialLineup: LineupValue;
   initialTactics: TacticsValue;
   initialPhases: PhaseDraft[];
+  clubLogoUrl?: string | null;
 }) {
   const t = useTranslations("planner.systems");
+  const tMatch = useTranslations("planner.match.prematch");
   const router = useRouter();
 
   const [name, setName] = useState(initialName);
@@ -113,6 +118,40 @@ export function SystemEditor({
     });
   }
 
+  const byId = new Map(roster.map((p) => [p.playerId, p]));
+  const formationSlots = FORMATIONS[lineup.formation] ?? [];
+  const printStarters = lineup.slots
+    .map((playerId, i) => {
+      if (!playerId) return null;
+      const p = byId.get(playerId);
+      const base = formationSlots[i] ?? { x: 50, y: 50, role: "" };
+      const pos = lineup.coords[i] ?? { x: base.x, y: base.y };
+      return {
+        jerseyNumber: p?.jerseyNumber ?? null,
+        name: p?.fullName ?? "?",
+        role: base.role,
+        x: pos.x,
+        y: pos.y,
+      };
+    })
+    .filter((p): p is NonNullable<typeof p> => p !== null);
+  const printGroups = [
+    {
+      label: tMatch("subsTitle"),
+      players: lineup.subs
+        .map((id) => byId.get(id))
+        .filter((p): p is RosterPlayer => Boolean(p))
+        .map((p) => ({ jerseyNumber: p.jerseyNumber, name: p.fullName })),
+    },
+  ].filter((g) => g.players.length > 0);
+  const printPhases = phases.map((p) => ({
+    id: p.id,
+    systemName: name.trim() || t("title"),
+    kind: p.kind,
+    name: p.name || null,
+    board: p.board,
+  }));
+
   return (
     <div className="flex flex-col gap-6">
       <button
@@ -135,6 +174,15 @@ export function SystemEditor({
           />
         </div>
         <div className="flex items-center gap-2">
+          <Button
+            type="button"
+            variant="secondary"
+            size="sm"
+            onClick={() => window.print()}
+          >
+            <Printer className="h-3.5 w-3.5" />
+            {t("print")}
+          </Button>
           {systemId ? (
             <Button
               type="button"
@@ -244,6 +292,36 @@ export function SystemEditor({
           </div>
         )}
       </section>
+
+      <MatchPrintSheet
+        title={name.trim() || t("title")}
+        subtitle={t("printSubtitle")}
+        formation={lineup.formation}
+        starters={printStarters}
+        groups={printGroups}
+        tactics={tactics}
+        phases={printPhases}
+        includeSquadPage={false}
+        clubLogoUrl={clubLogoUrl}
+        labels={{
+          formation: tMatch("formation"),
+          tactics: tMatch("tacticsTitle"),
+          matchContext: tMatch("tactics.matchContext"),
+          structures: tMatch("tactics.structures"),
+          objective: tMatch("tactics.objective"),
+          general: tMatch("tactics.general"),
+          possession: tMatch("tactics.possession"),
+          defense: tMatch("tactics.defense"),
+          loss: tMatch("tactics.loss"),
+          regain: tMatch("tactics.regain"),
+          transition: tMatch("tactics.transition"),
+          squad: t("compoTitle"),
+          starters: tMatch("summary.starters"),
+          setPieces: t("phasesTitle"),
+          reason: tMatch("summary.reason"),
+          coach: tMatch("coach"),
+        }}
+      />
     </div>
   );
 }

@@ -32,6 +32,7 @@ import {
   type TacticalSystem,
 } from "@/lib/planner/tacticalSystems";
 import { requireUser } from "@/lib/auth/getUser";
+import { resolveCurrentMembership } from "@/lib/club/context";
 import { currentSeasonLabel } from "@/lib/planner/seasons";
 
 type AssignmentRow = {
@@ -75,11 +76,25 @@ type EventRow = {
 function tacticsFrom(raw: unknown): TacticsValue {
   const o = (raw ?? {}) as Record<string, unknown>;
   const s = (k: string) => (typeof o[k] === "string" ? (o[k] as string) : "");
+  const objective = s("objective") || s("general");
+  const loss = s("loss") || s("transition");
   return {
-    general: s("general"),
+    coaches: s("coaches"),
+    matchContext: s("matchContext"),
+    structures: s("structures"),
+    boards: {
+      possession: parseBoard((o.boards as Record<string, unknown> | undefined)?.possession),
+      defense: parseBoard((o.boards as Record<string, unknown> | undefined)?.defense),
+      loss: parseBoard((o.boards as Record<string, unknown> | undefined)?.loss),
+      regain: parseBoard((o.boards as Record<string, unknown> | undefined)?.regain),
+    },
+    objective,
+    general: s("general") || objective,
     possession: s("possession"),
     defense: s("defense"),
-    transition: s("transition"),
+    loss,
+    regain: s("regain"),
+    transition: s("transition") || loss,
   };
 }
 
@@ -91,6 +106,7 @@ export default async function MatchPage({
   const { locale, teamId, matchId } = await params;
   setRequestLocale(locale);
   const { supabase } = await requireUser(locale);
+  const membership = await resolveCurrentMembership();
 
   const { data: team } = await supabase
     .from("teams")
@@ -388,6 +404,7 @@ export default async function MatchPage({
             (match.convocation_sent_at as string | null) ?? null,
         }}
         weekSessions={weekSessions}
+        clubLogoUrl={membership?.logo_url ?? null}
       />
     </div>
   );

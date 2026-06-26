@@ -896,6 +896,8 @@
       "backToList": "Back to systems",
       "nameLabel": "System name",
       "namePlaceholder": "e.g. Low block counter-attack",
+      "print": "Export",
+      "printSubtitle": "Tactical system",
       "save": "Save",
       "compoTitle": "Line-up",
       "emptyRoster": "No player assigned to this team for the season.",
@@ -918,12 +920,17 @@
       "phaseBoard": {
         "addUs": "Player",
         "addThem": "Opponent",
+        "addGk": "Goalkeeper",
         "addBall": "Ball",
+        "addCone": "Cone",
+        "addGoal": "Mini-goal",
         "arrow": "Arrow",
         "removeToken": "Remove",
         "arrowKind": {
           "run": "Run",
-          "pass": "Pass"
+          "pass": "Pass",
+          "dribble": "Dribble",
+          "long-ball": "Long ball"
         }
       },
       "err": {
@@ -1421,6 +1428,8 @@
         "defenders": "{count} defenders",
         "importSystem": "Import a system",
         "systemImported": "System \"{name}\" imported — review then save.",
+        "setPiecesPrint": "Set pieces",
+        "coach": "Coach",
         "convocation": {
           "send": "Send call-up",
           "cancel": "Unsend",
@@ -1444,23 +1453,41 @@
           "starters": "Starters",
           "subs": "Substitutes",
           "notCalled": "Not called up",
+          "absents": "Absent",
           "injury": "Injured",
           "illness": "Ill",
           "suspension": "Suspended",
           "other": "Unavailable",
+          "reason": "Reason",
           "present": "Available",
           "absent": "Absent",
           "pending": "Pending"
         },
         "tactics": {
+          "coaches": "Coaches",
+          "coachesPlaceholder": "Marco Rossi\nJulien Dupont",
+          "matchContext": "Context",
+          "matchContextPlaceholder": "Match type, weather, group state, observation objective…",
+          "structures": "Systems / blocks",
+          "structuresPlaceholder": "e.g. 4-2-3-1 then 3-4-3, line references, specific roles…",
+          "objective": "Match objective",
+          "objectivePlaceholder": "Expected result, collective priorities, attitude, focus points…",
           "general": "General",
           "generalPlaceholder": "Game plan, mindset…",
           "possession": "In possession",
           "possessionPlaceholder": "Build-up, width, finishing…",
           "defense": "Out of possession",
           "defensePlaceholder": "Block, pressing, marking…",
+          "loss": "On loss",
+          "lossPlaceholder": "Counter-press, recovery runs, protect the middle, tactical foul…",
+          "regain": "On regain",
+          "regainPlaceholder": "First pass, fast attack, secure possession, target players…",
           "transition": "Transitions",
-          "transitionPlaceholder": "Reactions on loss/recovery…"
+          "transitionPlaceholder": "Reactions on loss/recovery…",
+          "template": "General template",
+          "detectionTemplate": "Detection template",
+          "previous": "Previous",
+          "next": "Next"
         },
         "callup": {
           "title": "Call-up",
