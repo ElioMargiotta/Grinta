@@ -144,7 +144,7 @@
         {
           "name": "Club",
           "discountLabel": "Su preventivo",
-          "price": "40 CHF",
+          "price": "25 CHF",
           "priceSuffix": "/ squadra / mese",
           "sub": "Fatturato solo sulle squadre di formazione (D e oltre).",
           "features": [
@@ -416,7 +416,7 @@
         "Dati conservati anno dopo anno",
         "Export J+S"
       ],
-      "pricing": "40 CHF / squadra di formazione (D e oltre). Calcio dei bambini (G/F/E) incluso. −5% con pagamento annuale.",
+      "pricing": "25 CHF / squadra di formazione (D e oltre). Calcio dei bambini (G/F/E) incluso. −5% con pagamento annuale.",
       "js": "In Svizzera, Gioventù+Sport rimborsa 1,04 CHF/h per giocatore: un solo allenamento giovanile sovvenzionato copre un mese di Grinta per la squadra."
     }
   },

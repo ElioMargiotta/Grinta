@@ -1,7 +1,7 @@
 // Modèle de prix des licences (sur devis) — LOGIQUE PURE, sans I/O.
 //
 // Tarif PLAT : seules les équipes de FORMATION (catégories juniors D/C/B/A +
-// actifs) sont facturées, à 40 CHF/équipe/mois. Le « football des enfants »
+// actifs) sont facturées, à 25 CHF/équipe/mois. Le « football des enfants »
 // (juniors G/F/E, ASF) est INCLUS gratuitement et n'entre pas dans le compte.
 // Annuel = −5 %. Pas de dégression : on ne facture que des équipes à forte
 // valeur, donc un tarif unique est plus juste et plus lisible.
@@ -11,7 +11,7 @@
 
 export const PRICING_CURRENCY = "CHF";
 export const ANNUAL_DISCOUNT = 0.05;
-export const TEAM_RATE = 40; // CHF / équipe facturable / mois
+export const TEAM_RATE = 25; // CHF / équipe facturable / mois
 
 // Catégories ASF (liste de référence figée). « Football des enfants » = inclus.
 export const ENFANTS_CATEGORIES = ["G", "F", "E"] as const;
