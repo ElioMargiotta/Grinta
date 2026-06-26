@@ -19,7 +19,14 @@ export const PHASE_KINDS = [
 ] as const;
 export type PhaseKind = (typeof PHASE_KINDS)[number];
 
-export type PhaseTokenKind = "us" | "them" | "ball";
+export type PhaseTokenKind =
+  | "us"
+  | "them"
+  | "gk"
+  | "ball"
+  | "cone"
+  | "goal-h"
+  | "goal-v";
 export type PhaseToken = {
   id: string;
   kind: PhaseTokenKind;
@@ -27,7 +34,7 @@ export type PhaseToken = {
   y: number; // 0..100
   label: string;
 };
-export type PhaseArrowKind = "run" | "pass";
+export type PhaseArrowKind = "run" | "pass" | "dribble" | "long-ball";
 export type PhaseArrow = {
   id: string;
   fromX: number;
@@ -69,11 +76,31 @@ const clamp = (n: unknown): number =>
 function asTactics(raw: unknown): TacticsValue {
   const o = (raw ?? {}) as Record<string, unknown>;
   const s = (k: string) => (typeof o[k] === "string" ? (o[k] as string) : "");
+  const objective = s("objective") || s("general");
+  const loss = s("loss") || s("transition");
   return {
-    general: s("general"),
+    coaches: s("coaches"),
+    matchContext: s("matchContext"),
+    structures: s("structures"),
+    boards: {
+      possession: parseBoard(
+        (o.boards as Record<string, unknown> | undefined)?.possession,
+      ),
+      defense: parseBoard(
+        (o.boards as Record<string, unknown> | undefined)?.defense,
+      ),
+      loss: parseBoard((o.boards as Record<string, unknown> | undefined)?.loss),
+      regain: parseBoard(
+        (o.boards as Record<string, unknown> | undefined)?.regain,
+      ),
+    },
+    objective,
+    general: s("general") || objective,
     possession: s("possession"),
     defense: s("defense"),
-    transition: s("transition"),
+    loss,
+    regain: s("regain"),
+    transition: s("transition") || loss,
   };
 }
 
@@ -105,7 +132,12 @@ export function parseBoard(raw: unknown): PhaseBoardValue {
   const tokens: PhaseToken[] = Array.isArray(o.tokens)
     ? o.tokens
         .map((t) => t as Record<string, unknown>)
-        .filter((t) => t && (["us", "them", "ball"] as string[]).includes(String(t.kind)))
+        .filter((t) =>
+          t &&
+          (
+            ["us", "them", "gk", "ball", "cone", "goal-h", "goal-v"] as string[]
+          ).includes(String(t.kind)),
+        )
         .map((t) => ({
           id: String(t.id ?? crypto.randomUUID()),
           kind: t.kind as PhaseTokenKind,
@@ -117,7 +149,12 @@ export function parseBoard(raw: unknown): PhaseBoardValue {
   const arrows: PhaseArrow[] = Array.isArray(o.arrows)
     ? o.arrows
         .map((a) => a as Record<string, unknown>)
-        .filter((a) => a && (["run", "pass"] as string[]).includes(String(a.kind)))
+        .filter((a) =>
+          a &&
+          (["run", "pass", "dribble", "long-ball"] as string[]).includes(
+            String(a.kind),
+          ),
+        )
         .map((a) => ({
           id: String(a.id ?? crypto.randomUUID()),
           fromX: clamp(a.fromX),
