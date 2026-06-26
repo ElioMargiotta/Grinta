@@ -1,24 +1,25 @@
 import { forwardRef, type SelectHTMLAttributes } from "react";
+import { cn } from "@/lib/utils";
 
 export interface SelectProps extends SelectHTMLAttributes<HTMLSelectElement> {
   label?: string;
 }
 
 export const Select = forwardRef<HTMLSelectElement, SelectProps>(
-  ({ label, id, className = "", children, ...props }, ref) => (
+  ({ label, id, className, children, ...props }, ref) => (
     <div className="flex flex-col gap-1">
       {label && (
-        <label
-          htmlFor={id}
-          className="text-sm font-medium text-zinc-700 dark:text-zinc-300"
-        >
+        <label htmlFor={id} className="text-sm font-medium text-muted-foreground">
           {label}
         </label>
       )}
       <select
         ref={ref}
         id={id}
-        className={`h-10 rounded-md border border-zinc-300 bg-white px-3 text-sm text-zinc-900 focus:border-zinc-900 focus:outline-none dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100 dark:focus:border-zinc-100 ${className}`}
+        className={cn(
+          "h-10 rounded-md border border-border bg-card px-3 text-sm text-foreground focus:border-ring focus:outline-none focus:ring-2 focus:ring-ring/15",
+          className,
+        )}
         {...props}
       >
         {children}

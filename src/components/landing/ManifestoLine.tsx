@@ -56,7 +56,7 @@ export function ManifestoLine() {
           cx={x}
           cy={30}
           r={5}
-          fill="var(--accent)"
+          fill="var(--brand)"
           className="mani-dot"
           style={{ ["--dot-i" as string]: String(i) }}
         />

@@ -1,13 +1,17 @@
 import type { HTMLAttributes, ReactNode } from "react";
 import type { LucideIcon } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 export function Section({
-  className = "",
+  className,
   ...props
 }: HTMLAttributes<HTMLElement>) {
   return (
     <section
-      className={`rounded-lg border border-[var(--club-line)] bg-white p-6 dark:border-zinc-800 dark:bg-zinc-900 ${className}`}
+      className={cn(
+        "rounded-lg border border-border bg-card p-6 text-card-foreground",
+        className,
+      )}
       {...props}
     />
   );
@@ -15,7 +19,7 @@ export function Section({
 
 export function SectionHeader({
   icon: Icon,
-  iconClassName = "text-[var(--club-primary)]",
+  iconClassName = "text-primary",
   title,
   description,
   action,
@@ -29,16 +33,14 @@ export function SectionHeader({
   className?: string;
 }) {
   return (
-    <div className={`flex items-start justify-between gap-3 ${className}`}>
+    <div className={cn("flex items-start justify-between gap-3", className)}>
       <div className="min-w-0">
-        <h2 className="flex items-center gap-2 text-base font-semibold text-zinc-900 dark:text-zinc-100">
+        <h2 className="flex items-center gap-2 text-base font-semibold text-foreground">
           {Icon ? <Icon className={`h-4 w-4 shrink-0 ${iconClassName}`} /> : null}
           <span className="truncate">{title}</span>
         </h2>
         {description ? (
-          <p className="mt-1 text-sm text-zinc-500 dark:text-zinc-400">
-            {description}
-          </p>
+          <p className="mt-1 text-sm text-muted-foreground">{description}</p>
         ) : null}
       </div>
       {action ? <div className="shrink-0">{action}</div> : null}

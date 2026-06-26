@@ -8,7 +8,7 @@ import { PasswordInput } from "@/components/auth/PasswordInput";
 import { loginAction } from "@/app/[locale]/(auth)/login/actions";
 
 const inputClass =
-  "h-10 w-full rounded-md border border-zinc-300 bg-white px-3 text-sm text-zinc-900 placeholder:text-zinc-400 focus:border-zinc-900 focus:outline-none focus:ring-2 focus:ring-zinc-900/10";
+  "h-10 w-full rounded-md border border-border bg-card px-3 text-sm text-foreground placeholder:text-muted-foreground focus:border-ring focus:outline-none focus:ring-2 focus:ring-ring/15";
 
 export function LoginForm() {
   const t = useTranslations("auth");
@@ -57,7 +57,7 @@ export function LoginForm() {
       </AuthField>
 
       {error && (
-        <div className="rounded-md border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700">
+        <div className="rounded-md border border-destructive/30 bg-destructive/10 px-3 py-2 text-sm text-destructive">
           {error}
         </div>
       )}

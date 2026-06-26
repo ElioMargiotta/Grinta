@@ -16,14 +16,14 @@ export const PasswordInput = forwardRef<
       <input
         ref={ref}
         type={visible ? "text" : "password"}
-        className={`h-10 w-full rounded-md border border-zinc-300 bg-white px-3 pr-10 text-sm text-zinc-900 placeholder:text-zinc-400 focus:border-zinc-900 focus:outline-none focus:ring-2 focus:ring-zinc-900/10 ${className}`}
+        className={`h-10 w-full rounded-md border border-border bg-card px-3 pr-10 text-sm text-foreground placeholder:text-muted-foreground focus:border-ring focus:outline-none focus:ring-2 focus:ring-ring/15 ${className}`}
         {...props}
       />
       <button
         type="button"
         onClick={() => setVisible((v) => !v)}
         aria-label={visible ? t("hidePassword") : t("showPassword")}
-        className="absolute inset-y-0 right-0 flex w-10 items-center justify-center text-zinc-500 hover:text-zinc-900"
+        className="absolute inset-y-0 right-0 flex w-10 items-center justify-center text-muted-foreground hover:text-foreground"
       >
         {visible ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
       </button>

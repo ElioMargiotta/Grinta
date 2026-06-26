@@ -1,14 +1,57 @@
 @import "tailwindcss";
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
 
 /* Make `dark:` opt-in via a class instead of the OS media query.
    We never add the class, so the site is always in light mode for now. */
 @custom-variant dark (&:where(.dark, .dark *));
 
 @theme inline {
-  --color-background: #ffffff;
-  --color-foreground: #18181b;
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
+  --font-heading: var(--font-geist-sans);
+  /* Grinta brand (formerly --accent, renamed to avoid shadcn's semantic --accent) */
+  --color-brand: var(--brand);
+  --color-brand-soft: var(--brand-soft);
+  --color-brand-ink: var(--brand-ink);
+  --color-sidebar-ring: var(--sidebar-ring);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar: var(--sidebar);
+  --color-chart-5: var(--chart-5);
+  --color-chart-4: var(--chart-4);
+  --color-chart-3: var(--chart-3);
+  --color-chart-2: var(--chart-2);
+  --color-chart-1: var(--chart-1);
+  --color-ring: var(--ring);
+  --color-input: var(--input);
+  --color-border: var(--border);
+  --color-destructive: var(--destructive);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-accent: var(--accent);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-muted: var(--muted);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-secondary: var(--secondary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-primary: var(--primary);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-popover: var(--popover);
+  --color-card-foreground: var(--card-foreground);
+  --color-card: var(--card);
+  --radius-sm: calc(var(--radius) * 0.6);
+  --radius-md: calc(var(--radius) * 0.8);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) * 1.4);
+  --radius-2xl: calc(var(--radius) * 1.8);
+  --radius-3xl: calc(var(--radius) * 2.2);
+  --radius-4xl: calc(var(--radius) * 2.6);
 }
 
 :root {
@@ -20,15 +63,50 @@
   --line: #e7e5e0;
   --line-2: #d4d4d0;
   --paper: #ffffff;
-  --accent: oklch(53.576% 0.19004 33.59);
-  --accent-soft: oklch(0.96 0.04 35);
-  --accent-ink: oklch(0.36 0.12 35);
+  /* Grinta brand color (marketing/identity) — renamed from --accent */
+  --brand: oklch(53.576% 0.19004 33.59);
+  --brand-soft: oklch(0.96 0.04 35);
+  --brand-ink: oklch(0.36 0.12 35);
+  /* shadcn semantic tokens mapped to the Grinta palette + per-club accent */
+  --background: #ffffff;
+  --foreground: #18181b;
+  --card: #ffffff;
+  --card-foreground: #18181b;
+  --popover: #ffffff;
+  --popover-foreground: #18181b;
+  --primary: var(--club-primary, #18181b);
+  --primary-foreground: var(--club-primary-foreground, #ffffff);
+  --secondary: var(--bg-2);
+  --secondary-foreground: #18181b;
+  --muted: var(--bg-2);
+  --muted-foreground: var(--ink-3);
+  --accent: var(--club-primary-soft, #f4f4f5);
+  --accent-foreground: #18181b;
+  --destructive: oklch(0.577 0.245 27.325);
+  --border: var(--club-line, var(--line));
+  --input: var(--club-line, var(--line));
+  --ring: var(--club-primary, #18181b);
+  --chart-1: oklch(0.87 0 0);
+  --chart-2: oklch(0.556 0 0);
+  --chart-3: oklch(0.439 0 0);
+  --chart-4: oklch(0.371 0 0);
+  --chart-5: oklch(0.269 0 0);
+  --radius: 0.625rem;
+  --sidebar: oklch(0.985 0 0);
+  --sidebar-foreground: oklch(0.145 0 0);
+  --sidebar-primary: oklch(0.205 0 0);
+  --sidebar-primary-foreground: oklch(0.985 0 0);
+  --sidebar-accent: oklch(0.97 0 0);
+  --sidebar-accent-foreground: oklch(0.205 0 0);
+  --sidebar-border: oklch(0.922 0 0);
+  --sidebar-ring: oklch(0.708 0 0);
 }
 
 html,
 body {
   height: 100%;
   background-color: #ffffff;
+  overflow-x: clip;
 }
 
 body {
@@ -74,17 +152,122 @@ html.dark body {
 
 .grinta-grid {
   background-image:
-    linear-gradient(to right, rgba(24, 24, 27, 0.04) 1px, transparent 1px),
-    linear-gradient(to bottom, rgba(24, 24, 27, 0.04) 1px, transparent 1px);
+    linear-gradient(to right, color-mix(in oklch, var(--ink) 6%, transparent) 1px, transparent 1px),
+    linear-gradient(to bottom, color-mix(in oklch, var(--ink) 6%, transparent) 1px, transparent 1px);
   background-size: 56px 56px;
+}
+
+/* ── Floating brand blobs — organic, drifting page background ──────── */
+.blob {
+  position: absolute;
+  border-radius: 42% 58% 60% 40% / 50% 45% 55% 50%;
+  filter: blur(90px);
+  will-change: transform, border-radius;
+}
+
+/* Fine film grain over the blob field — kills banding, adds a premium feel. */
+.grain {
+  position: absolute;
+  inset: 0;
+  opacity: 0.05;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-size: 180px 180px;
+}
+.blob-a {
+  width: 55vw;
+  height: 55vw;
+  max-width: 640px;
+  max-height: 640px;
+  top: 2%;
+  left: 0%;
+  background: color-mix(in oklch, var(--brand) 46%, transparent);
+  opacity: 0.42;
+  animation: blob-drift-a 18s ease-in-out infinite;
+}
+.blob-b {
+  width: 48vw;
+  height: 48vw;
+  max-width: 560px;
+  max-height: 560px;
+  top: 22%;
+  right: -4%;
+  background: color-mix(in oklch, var(--brand) 42%, transparent);
+  opacity: 0.55;
+  animation: blob-drift-b 22s ease-in-out infinite;
+}
+.blob-c {
+  width: 44vw;
+  height: 44vw;
+  max-width: 520px;
+  max-height: 520px;
+  top: 34%;
+  left: 16%;
+  background: color-mix(in oklch, var(--brand) 32%, transparent);
+  opacity: 0.5;
+  animation: blob-drift-c 26s ease-in-out infinite;
+}
+.blob-d {
+  width: 50vw;
+  height: 50vw;
+  max-width: 560px;
+  max-height: 560px;
+  top: 52%;
+  right: 2%;
+  background: color-mix(in oklch, var(--brand) 40%, transparent);
+  opacity: 0.5;
+  animation: blob-drift-a 24s ease-in-out infinite;
+  animation-delay: -6s;
+}
+.blob-e {
+  width: 46vw;
+  height: 46vw;
+  max-width: 520px;
+  max-height: 520px;
+  top: 70%;
+  left: -4%;
+  background: color-mix(in oklch, var(--brand) 30%, transparent);
+  opacity: 0.45;
+  animation: blob-drift-b 28s ease-in-out infinite;
+  animation-delay: -10s;
+}
+.blob-f {
+  width: 42vw;
+  height: 42vw;
+  max-width: 480px;
+  max-height: 480px;
+  top: 86%;
+  right: 14%;
+  background: color-mix(in oklch, var(--brand) 26%, transparent);
+  opacity: 0.42;
+  animation: blob-drift-c 30s ease-in-out infinite;
+  animation-delay: -4s;
+}
+@keyframes blob-drift-a {
+  0%, 100% { transform: translate3d(0, 0, 0) scale(1); border-radius: 42% 58% 60% 40% / 50% 45% 55% 50%; }
+  25% { transform: translate3d(14vw, 14vh, 0) scale(1.3); border-radius: 60% 40% 45% 55% / 55% 60% 40% 45%; }
+  50% { transform: translate3d(-8vw, 26vh, 0) scale(0.72); border-radius: 50% 50% 35% 65% / 60% 40% 60% 40%; }
+  75% { transform: translate3d(16vw, 10vh, 0) scale(1.12); border-radius: 45% 55% 55% 45% / 38% 55% 45% 62%; }
+}
+@keyframes blob-drift-b {
+  0%, 100% { transform: translate3d(0, 0, 0) scale(1); border-radius: 55% 45% 50% 50% / 45% 55% 45% 55%; }
+  33% { transform: translate3d(-20vw, 16vh, 0) scale(1.35); border-radius: 40% 60% 55% 45% / 60% 40% 55% 45%; }
+  66% { transform: translate3d(-6vw, -10vh, 0) scale(0.78); border-radius: 60% 40% 40% 60% / 50% 60% 40% 50%; }
+}
+@keyframes blob-drift-c {
+  0%, 100% { transform: translate3d(0, 0, 0) scale(1); border-radius: 48% 52% 60% 40% / 55% 50% 50% 45%; }
+  30% { transform: translate3d(18vw, -14vh, 0) scale(1.28); border-radius: 60% 40% 45% 55% / 45% 55% 60% 40%; }
+  60% { transform: translate3d(-16vw, 8vh, 0) scale(0.8); border-radius: 40% 60% 55% 45% / 60% 45% 40% 55%; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .blob { animation: none !important; }
 }
 
 .pitch-stripes {
   background:
     repeating-linear-gradient(
       90deg,
-      color-mix(in oklch, var(--accent) 14%, transparent) 0 56px,
-      color-mix(in oklch, var(--accent) 8%, transparent) 56px 112px
+      color-mix(in oklch, var(--brand) 14%, transparent) 0 56px,
+      color-mix(in oklch, var(--brand) 8%, transparent) 56px 112px
     );
 }
 
@@ -102,11 +285,11 @@ html.dark body {
 }
 
 .dot-accent {
-  background: var(--accent);
+  background: var(--brand);
 }
 
 .btn-accent {
-  background: var(--accent);
+  background: var(--brand);
   color: #fff;
 }
 .btn-accent:hover {
@@ -114,20 +297,20 @@ html.dark body {
 }
 .btn-ink {
   background: var(--ink);
-  color: #fff;
+  color: var(--bg);
 }
 .btn-ink:hover {
-  background: #000;
+  filter: brightness(0.9);
 }
 
 .text-accent-ink {
-  color: var(--accent-ink);
+  color: var(--brand-ink);
 }
 .bg-accent-soft {
-  background: var(--accent-soft);
+  background: var(--brand-soft);
 }
 .border-accent {
-  border-color: color-mix(in oklch, var(--accent) 35%, transparent);
+  border-color: color-mix(in oklch, var(--brand) 35%, transparent);
 }
 
 .no-scrollbar::-webkit-scrollbar {
@@ -381,5 +564,60 @@ html.dark body {
     border: 0 !important;
     box-shadow: none !important;
     color: #000 !important;
+  }
+}
+
+.dark {
+  /* Marketing/legacy palette — dark variants (landing, contact, legal) */
+  --bg: #0a0a0a;
+  --bg-2: #161618;
+  --paper: #18181b;
+  --ink: #f4f4f5;
+  --ink-2: #d4d4d8;
+  --ink-3: #a1a1aa;
+  --line: #27272a;
+  --line-2: #3f3f46;
+  --background: oklch(0.145 0 0);
+  --foreground: oklch(0.985 0 0);
+  --card: oklch(0.205 0 0);
+  --card-foreground: oklch(0.985 0 0);
+  --popover: oklch(0.205 0 0);
+  --popover-foreground: oklch(0.985 0 0);
+  --primary: var(--club-primary, oklch(0.922 0 0));
+  --primary-foreground: var(--club-primary-foreground, oklch(0.205 0 0));
+  --secondary: oklch(0.269 0 0);
+  --secondary-foreground: oklch(0.985 0 0);
+  --muted: oklch(0.269 0 0);
+  --muted-foreground: oklch(0.708 0 0);
+  --accent: oklch(0.269 0 0);
+  --accent-foreground: oklch(0.985 0 0);
+  --destructive: oklch(0.704 0.191 22.216);
+  --border: var(--club-line, oklch(1 0 0 / 10%));
+  --input: oklch(1 0 0 / 15%);
+  --ring: var(--club-primary, oklch(0.556 0 0));
+  --chart-1: oklch(0.87 0 0);
+  --chart-2: oklch(0.556 0 0);
+  --chart-3: oklch(0.439 0 0);
+  --chart-4: oklch(0.371 0 0);
+  --chart-5: oklch(0.269 0 0);
+  --sidebar: oklch(0.205 0 0);
+  --sidebar-foreground: oklch(0.985 0 0);
+  --sidebar-primary: oklch(0.488 0.243 264.376);
+  --sidebar-primary-foreground: oklch(0.985 0 0);
+  --sidebar-accent: oklch(0.269 0 0);
+  --sidebar-accent-foreground: oklch(0.985 0 0);
+  --sidebar-border: oklch(1 0 0 / 10%);
+  --sidebar-ring: oklch(0.556 0 0);
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+  html {
+    @apply font-sans;
   }
 }
