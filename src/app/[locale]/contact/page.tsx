@@ -84,7 +84,7 @@ export default async function ContactPage({
                 >
                   <Check
                     className="mt-0.5 h-3.5 w-3.5 shrink-0"
-                    style={{ color: "var(--accent-ink)" }}
+                    style={{ color: "var(--brand-ink)" }}
                   />
                   {point}
                 </li>
@@ -98,7 +98,7 @@ export default async function ContactPage({
             </p>
             <p
               className="mt-3 rounded-lg px-3.5 py-2.5 text-[13px] leading-relaxed"
-              style={{ background: "var(--accent-soft)", color: "var(--accent-ink)" }}
+              style={{ background: "var(--brand-soft)", color: "var(--brand-ink)" }}
             >
               {t("devis.js")}
             </p>

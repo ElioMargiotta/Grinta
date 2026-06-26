@@ -66,9 +66,21 @@ export default async function LocaleHome({
 
   return (
     <div
-      className="min-h-screen"
-      style={{ background: "var(--bg)", color: "var(--ink)" }}
+      className="relative isolate min-h-screen overflow-x-clip"
+      style={{ backgroundColor: "var(--bg)", color: "var(--ink)" }}
     >
+      <div
+        aria-hidden
+        className="pointer-events-none fixed inset-0 -z-10 overflow-hidden"
+        style={{ backgroundColor: "var(--bg)" }}
+      >
+        <span className="blob blob-a" />
+        <span className="blob blob-b" />
+        <span className="blob blob-c" />
+        <span className="blob blob-d" />
+        <span className="blob blob-e" />
+        <span className="blob blob-f" />
+      </div>
       <NavBar />
 
       <main>
@@ -90,15 +102,6 @@ async function Hero() {
   const t = await getTranslations("landing.hero");
   return (
     <section className="relative overflow-hidden">
-      <div
-        className="absolute inset-x-0 -top-40 h-[120%] pointer-events-none"
-        style={{
-          background:
-            "radial-gradient(60% 50% at 78% 30%, color-mix(in oklch, var(--accent) 22%, transparent) 0%, transparent 65%)," +
-            "radial-gradient(50% 40% at 12% 60%, color-mix(in oklch, var(--accent) 10%, transparent) 0%, transparent 70%)",
-        }}
-      />
-      <div className="absolute inset-0 grinta-grid pointer-events-none opacity-40" />
       <div className="relative mx-auto max-w-7xl px-6 lg:px-10 pt-16 pb-24 lg:pt-24 lg:pb-28">
         <div className="grid lg:grid-cols-12 gap-10 lg:gap-14 items-end">
           <div className="lg:col-span-6">
@@ -109,7 +112,7 @@ async function Hero() {
               </div>
             </Reveal>
             <Reveal delay={80}>
-              <h1 className="h-display mt-5 text-5xl sm:text-6xl lg:text-7xl font-semibold">
+              <h1 className="h-display mt-5 text-[clamp(1.9rem,8vw,4.5rem)] font-semibold">
                 {t("title1")}
                 <br />
                 {t("title2Prefix")}{" "}
@@ -146,7 +149,7 @@ async function Hero() {
               </div>
             </Reveal>
             <Reveal delay={320}>
-              <dl className="mt-12 grid grid-cols-3 gap-6 max-w-lg">
+              <dl className="mt-12 grid grid-cols-3 gap-4 sm:gap-6 max-w-lg [&>div]:min-w-0">
                 <div>
                   <dt
                     className="text-[11px] font-mono uppercase tracking-widest"
@@ -183,7 +186,7 @@ async function Hero() {
               </dl>
             </Reveal>
           </div>
-          <div className="lg:col-span-6">
+          <div className="hidden lg:block lg:col-span-6">
             <Reveal delay={200}>
               <div className="relative mx-auto flex w-full max-w-[520px] flex-col items-center gap-6">
                 <GrintaLogoIcon
@@ -208,10 +211,6 @@ async function Hero() {
           </div>
         </div>
       </div>
-      <div
-        className="absolute inset-x-0 bottom-0 h-32 pointer-events-none"
-        style={{ background: "linear-gradient(to bottom, transparent, var(--bg))" }}
-      />
     </section>
   );
 }
@@ -226,7 +225,7 @@ async function Manifesto({ pillars }: { pillars: Pillar[] }) {
           <div className="max-w-3xl">
             <div className="eyebrow-mono">{t("eyebrow")}</div>
             <h2
-              className="h-display mt-4 text-4xl sm:text-5xl font-semibold tracking-tight"
+              className="h-display mt-4 text-[clamp(1.6rem,5.5vw,3rem)] font-semibold tracking-tight"
               style={{ textWrap: "balance" }}
             >
               {t("title")}
@@ -315,7 +314,7 @@ async function PricingSection({ tiers }: { tiers: Tier[] }) {
         <Reveal>
           <div className="max-w-2xl">
             <div className="eyebrow-mono">{t("eyebrow")}</div>
-            <h2 className="h-display mt-4 text-4xl sm:text-5xl font-semibold">
+            <h2 className="h-display mt-4 text-[clamp(1.6rem,5.5vw,3rem)] font-semibold">
               {t("title")}
             </h2>
           </div>
@@ -378,7 +377,7 @@ async function PricingSection({ tiers }: { tiers: Tier[] }) {
                   {tier.highlight && (
                     <div
                       className="flex items-center gap-2 rounded-xl px-3.5 py-3 text-[14px] font-semibold"
-                      style={{ background: "var(--accent-soft)", color: "var(--accent-ink)" }}
+                      style={{ background: "var(--brand-soft)", color: "var(--brand-ink)" }}
                     >
                       <Gift className="h-[18px] w-[18px] shrink-0" />
                       {tier.highlight}
@@ -395,7 +394,7 @@ async function PricingSection({ tiers }: { tiers: Tier[] }) {
                       <li key={f} className="flex items-center gap-2">
                         <Check
                           className="h-3.5 w-3.5"
-                          style={{ color: "var(--accent-ink)" }}
+                          style={{ color: "var(--brand-ink)" }}
                         />
                         {f}
                       </li>
@@ -450,33 +449,33 @@ async function FinalCTA() {
         <Reveal>
           <div
             className="rounded-3xl px-8 py-14 sm:px-14 sm:py-20 relative overflow-hidden"
-            style={{ background: "var(--ink)", color: "#fafaf7" }}
+            style={{ background: "var(--ink)", color: "var(--bg)" }}
           >
             <div className="absolute inset-0 pitch-stripes opacity-[0.18] pointer-events-none" />
             <div
               className="absolute -inset-40 pointer-events-none"
               style={{
                 background:
-                  "radial-gradient(40% 40% at 80% 30%, color-mix(in oklch, var(--accent) 50%, transparent) 0%, transparent 60%)",
+                  "radial-gradient(40% 40% at 80% 30%, color-mix(in oklch, var(--brand) 50%, transparent) 0%, transparent 60%)",
               }}
             />
             <div className="relative grid lg:grid-cols-12 gap-10 items-end">
               <div className="lg:col-span-8">
                 <div
                   className="eyebrow-mono"
-                  style={{ color: "rgba(250,250,247,.55)" }}
+                  style={{ color: "color-mix(in oklch, var(--bg) 55%, transparent)" }}
                 >
                   {t("eyebrow")}
                 </div>
                 <h2
-                  className="h-display mt-4 text-4xl sm:text-5xl lg:text-6xl font-semibold"
+                  className="h-display mt-4 text-[clamp(1.9rem,6vw,3.75rem)] font-semibold"
                   style={{ textWrap: "balance" }}
                 >
                   {t("title1")}
                   <br />
                   <span
                     className="italic"
-                    style={{ color: "var(--accent)" }}
+                    style={{ color: "var(--brand)" }}
                   >
                     {t("title2Accent")}
                   </span>{" "}
@@ -485,7 +484,7 @@ async function FinalCTA() {
                 <p
                   className="mt-6 max-w-xl text-[15px] leading-relaxed"
                   style={{
-                    color: "rgba(250,250,247,.7)",
+                    color: "color-mix(in oklch, var(--bg) 70%, transparent)",
                     textWrap: "pretty",
                   }}
                 >
@@ -503,7 +502,7 @@ async function FinalCTA() {
                 <a
                   href="#flow"
                   className="text-[13px] font-medium"
-                  style={{ color: "rgba(250,250,247,.7)" }}
+                  style={{ color: "color-mix(in oklch, var(--bg) 70%, transparent)" }}
                 >
                   {t("ctaSecondary")}
                 </a>

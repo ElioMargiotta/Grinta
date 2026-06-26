@@ -79,7 +79,7 @@ function FlowText({ step, side }: { step: Step; side: "left" | "right" }) {
         {step.badge && (
           <span
             className="text-[10px] font-mono uppercase tracking-widest"
-            style={{ color: "var(--accent-ink)" }}
+            style={{ color: "var(--brand-ink)" }}
           >
             {step.badge}
           </span>
@@ -165,7 +165,7 @@ function Snake({
           cx={a.x}
           cy={a.y}
           r={5}
-          fill="var(--accent)"
+          fill="var(--brand)"
           className="snake-dot"
           style={{ ["--dot-i" as string]: String(i) }}
         />
@@ -273,7 +273,7 @@ export function FlowSection() {
         <div className="mx-auto max-w-2xl text-center">
           <div className="eyebrow-mono">{t("eyebrow")}</div>
           <h2
-            className="h-display mt-4 text-4xl sm:text-5xl font-semibold tracking-tight"
+            className="h-display mt-4 text-[clamp(1.6rem,5.5vw,3rem)] font-semibold tracking-tight"
             style={{ textWrap: "balance" }}
           >
             {t("titlePrefix")}{" "}
@@ -315,7 +315,7 @@ export function PlayerFlowSection() {
         <div className="mx-auto max-w-2xl text-center">
           <div className="eyebrow-mono">{t("eyebrow")}</div>
           <h2
-            className="h-display mt-4 text-4xl sm:text-5xl font-semibold tracking-tight"
+            className="h-display mt-4 text-[clamp(1.6rem,5.5vw,3rem)] font-semibold tracking-tight"
             style={{ textWrap: "balance" }}
           >
             {t("titlePrefix")}{" "}

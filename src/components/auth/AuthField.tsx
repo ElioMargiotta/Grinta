@@ -15,12 +15,12 @@ export function AuthField({
 }) {
   return (
     <div className="flex flex-col gap-1.5">
-      <label htmlFor={htmlFor} className="text-sm font-medium text-zinc-800">
+      <label htmlFor={htmlFor} className="text-sm font-medium text-foreground">
         {label}
-        {required && <span className="ml-0.5 text-red-600">*</span>}
+        {required && <span className="ml-0.5 text-destructive">*</span>}
       </label>
       {children}
-      {help && <p className="text-xs text-zinc-500">{help}</p>}
+      {help && <p className="text-xs text-muted-foreground">{help}</p>}
     </div>
   );
 }
