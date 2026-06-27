@@ -2,7 +2,7 @@
 
 import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
-import { Mail, Copy, Check, X, Send, MessageCircle } from "lucide-react";
+import { Mail, Copy, Check, X, Send, MessageCircle, UserCircle, Users } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { Section, SectionHeader } from "@/components/ui/Section";
 import { Input } from "@/components/ui/Input";
@@ -52,6 +52,8 @@ export function InvitePlayerSection({
   const router = useRouter();
   const [email, setEmail] = useState(defaultEmail);
   const [teamId, setTeamId] = useState<string>("");
+  // Cible du lien : le joueur lui-même ou un parent/tuteur (Lot C).
+  const [target, setTarget] = useState<"player" | "guardian">("player");
   const [error, setError] = useState<string | null>(null);
   const [lastUrl, setLastUrl] = useState<string | null>(null);
   const [lastEmailTo, setLastEmailTo] = useState<string | null>(null);
@@ -74,6 +76,7 @@ export function InvitePlayerSection({
     fd.set("locale", locale);
     fd.set("playerId", playerId);
     fd.set("email", email.trim());
+    fd.set("target", target);
     if (teamId) fd.set("teamId", teamId);
 
     startTransition(async () => {
@@ -144,15 +147,44 @@ export function InvitePlayerSection({
     <Section>
       <SectionHeader icon={Mail} title={t("title")} className="mb-3" />
 
-      {isLinkedToUser ? (
-        <p className="text-sm text-zinc-600 dark:text-zinc-400">
+      {isLinkedToUser && target === "player" ? (
+        <p className="mb-4 rounded-md bg-emerald-50 px-3 py-2 text-sm text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-300">
           {t("alreadyLinked")}
         </p>
       ) : (
-        <>
-          <p className="mb-4 text-sm text-zinc-600 dark:text-zinc-400">
-            {t("description")}
-          </p>
+        <p className="mb-4 text-sm text-zinc-600 dark:text-zinc-400">
+          {target === "guardian" ? t("descriptionGuardian") : t("description")}
+        </p>
+      )}
+
+      <>
+          {/* Cible : joueur lui-même ou parent/tuteur. */}
+          <div className="mb-3 grid grid-cols-2 gap-2">
+            {(
+              [
+                { value: "player", icon: UserCircle, labelKey: "targetPlayer" },
+                { value: "guardian", icon: Users, labelKey: "targetGuardian" },
+              ] as const
+            ).map(({ value, icon: Icon, labelKey }) => {
+              const active = target === value;
+              return (
+                <button
+                  key={value}
+                  type="button"
+                  onClick={() => setTarget(value)}
+                  aria-pressed={active}
+                  className={`inline-flex items-center justify-center gap-1.5 rounded-md border px-3 py-2 text-sm font-medium transition-colors ${
+                    active
+                      ? "border-[var(--club-primary)] bg-[var(--club-primary-soft)] text-[var(--club-primary)]"
+                      : "border-zinc-200 bg-white text-zinc-600 hover:border-zinc-300 dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-300"
+                  }`}
+                >
+                  <Icon className="h-4 w-4" />
+                  {t(labelKey)}
+                </button>
+              );
+            })}
+          </div>
 
           <form onSubmit={handleCreate} className="flex flex-col gap-3">
             <Input
@@ -234,8 +266,7 @@ export function InvitePlayerSection({
               </div>
             </div>
           )}
-        </>
-      )}
+      </>
 
       {resendNotice && (
         <div

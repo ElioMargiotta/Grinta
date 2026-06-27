@@ -2050,7 +2050,8 @@
         "team_readonly": "Read-only on assigned team"
       },
       "confirmIdentity": "You are signed in as <strong>{account}</strong>. Confirm to link this account to the profile above.",
-      "confirmIdentityEmailNote": "This invitation was addressed to a different email — that’s fine, the link works for any signed-in account."
+      "confirmIdentityEmailNote": "This invitation was addressed to a different email — that’s fine, the link works for any signed-in account.",
+      "invitedAsGuardian": "as the <strong>parent/guardian</strong> of <strong>{name}</strong> ({team})"
     }
   },
   "invitations": {
@@ -2073,7 +2074,8 @@
       "club_inactive": "This club is currently inactive.",
       "rpc_error": "Couldn't process the invitation. Please try again.",
       "missing_id": "Missing invitation id.",
-      "already_linked_to_other_player": "Your account is already linked to another player profile in this club. Ask the coach to merge the profiles."
+      "already_linked_to_other_player": "Your account is already linked to another player profile in this club. Ask the coach to merge the profiles.",
+      "too_many_guardians": "This player already has the maximum number of linked parents."
     }
   },
   "invitePlayer": {
@@ -2115,7 +2117,10 @@
     "emailOptionalHint": "Optional — leave empty to share a claim link via WhatsApp.",
     "shareWhatsApp": "Share on WhatsApp",
     "whatsappMessage": "Join our club on Grinta — tap the link to link your account:",
-    "claimLinkLabel": "Claim link (no email)"
+    "claimLinkLabel": "Claim link (no email)",
+    "descriptionGuardian": "Generate a link for a parent/guardian to follow this player (convocations, etc.).",
+    "targetPlayer": "The player",
+    "targetGuardian": "A parent"
   },
   "libraries": {
     "noDiagram": "No diagram",

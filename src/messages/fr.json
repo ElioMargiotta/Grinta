@@ -2050,7 +2050,8 @@
         "team_readonly": "Lecture seule sur l'équipe assignée"
       },
       "confirmIdentity": "Vous êtes connecté en tant que <strong>{account}</strong>. Confirmez pour rattacher ce compte à la fiche ci-dessus.",
-      "confirmIdentityEmailNote": "Cette invitation visait un autre email — ce n’est pas un problème, le lien fonctionne pour tout compte connecté."
+      "confirmIdentityEmailNote": "Cette invitation visait un autre email — ce n’est pas un problème, le lien fonctionne pour tout compte connecté.",
+      "invitedAsGuardian": "en tant que <strong>parent/tuteur</strong> de <strong>{name}</strong> ({team})"
     }
   },
   "invitations": {
@@ -2073,7 +2074,8 @@
       "club_inactive": "Ce club est actuellement inactif.",
       "rpc_error": "Impossible de traiter l'invitation. Réessaie.",
       "missing_id": "Identifiant d'invitation manquant.",
-      "already_linked_to_other_player": "Ton compte est déjà rattaché à un autre profil joueur dans ce club. Demande au coach de fusionner les fiches."
+      "already_linked_to_other_player": "Ton compte est déjà rattaché à un autre profil joueur dans ce club. Demande au coach de fusionner les fiches.",
+      "too_many_guardians": "Ce joueur a déjà le nombre maximum de parents liés."
     }
   },
   "invitePlayer": {
@@ -2115,7 +2117,10 @@
     "emailOptionalHint": "Optionnel — laissez vide pour partager un lien à réclamer via WhatsApp.",
     "shareWhatsApp": "Partager sur WhatsApp",
     "whatsappMessage": "Rejoins notre club sur Grinta — clique sur le lien pour rattacher ton compte :",
-    "claimLinkLabel": "Lien à réclamer (sans email)"
+    "claimLinkLabel": "Lien à réclamer (sans email)",
+    "descriptionGuardian": "Générez un lien pour qu’un parent/tuteur suive ce joueur (convocations, etc.).",
+    "targetPlayer": "Le joueur",
+    "targetGuardian": "Un parent"
   },
   "libraries": {
     "noDiagram": "Pas de schéma",

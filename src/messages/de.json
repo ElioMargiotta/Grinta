@@ -2044,7 +2044,8 @@
         "team_readonly": "Nur lesen auf zugewiesenem Team"
       },
       "confirmIdentity": "Du bist angemeldet als <strong>{account}</strong>. Bestätige, um dieses Konto mit dem obigen Profil zu verknüpfen.",
-      "confirmIdentityEmailNote": "Diese Einladung war an eine andere E-Mail gerichtet — das ist in Ordnung, der Link funktioniert für jedes angemeldete Konto."
+      "confirmIdentityEmailNote": "Diese Einladung war an eine andere E-Mail gerichtet — das ist in Ordnung, der Link funktioniert für jedes angemeldete Konto.",
+      "invitedAsGuardian": "als <strong>Elternteil</strong> von <strong>{name}</strong> ({team})"
     }
   },
   "invitations": {
@@ -2067,7 +2068,8 @@
       "club_inactive": "Dieser Club ist derzeit inaktiv.",
       "rpc_error": "Einladung konnte nicht verarbeitet werden. Bitte erneut versuchen.",
       "missing_id": "Einladungs-ID fehlt.",
-      "already_linked_to_other_player": "Dein Konto ist bereits mit einem anderen Spielerprofil in diesem Verein verknüpft. Bitte den Trainer, die Profile zusammenzuführen."
+      "already_linked_to_other_player": "Dein Konto ist bereits mit einem anderen Spielerprofil in diesem Verein verknüpft. Bitte den Trainer, die Profile zusammenzuführen.",
+      "too_many_guardians": "Dieser Spieler hat bereits die maximale Anzahl verknüpfter Eltern."
     }
   },
   "invitePlayer": {
@@ -2109,7 +2111,10 @@
     "emailOptionalHint": "Optional — leer lassen, um einen Einlöse-Link per WhatsApp zu teilen.",
     "shareWhatsApp": "Auf WhatsApp teilen",
     "whatsappMessage": "Tritt unserem Verein auf Grinta bei — tippe auf den Link, um dein Konto zu verknüpfen:",
-    "claimLinkLabel": "Einlöse-Link (ohne E-Mail)"
+    "claimLinkLabel": "Einlöse-Link (ohne E-Mail)",
+    "descriptionGuardian": "Erstelle einen Link, damit ein Elternteil diesem Spieler folgen kann (Aufgebote usw.).",
+    "targetPlayer": "Der Spieler",
+    "targetGuardian": "Ein Elternteil"
   },
   "libraries": {
     "noDiagram": "Kein Diagramm",

@@ -37,6 +37,12 @@ export async function createPlayerInviteAction(
   const locale = String(formData.get("locale") ?? "fr");
   const playerId = String(formData.get("playerId") ?? "").trim();
   const teamId = String(formData.get("teamId") ?? "").trim();
+  // Cible du lien : le joueur lui-même ('player' → players.user_id) ou un
+  // parent/tuteur ('guardian' → player_guardians). Défaut : player.
+  const target =
+    String(formData.get("target") ?? "player") === "guardian"
+      ? "guardian"
+      : "player";
   // L'email est désormais OPTIONNEL : un lien réclamable se partage par
   // WhatsApp/copier. S'il est fourni, on l'utilise pour l'envoi + la
   // traçabilité et on garde les garde-fous d'unicité.
@@ -67,10 +73,9 @@ export async function createPlayerInviteAction(
     return { ok: false, error: "player_not_in_club" };
   }
 
-  // Pre-check (email fourni uniquement) : si un compte avec cet email est déjà
-  // lié à une AUTRE fiche de ce club, l'unique index (club_id, user_id)
-  // bloquerait la réclamation. On échoue tôt avec un message clair.
-  if (email) {
+  // Pre-check (cible joueur + email fourni uniquement) : un tuteur ne pose
+  // jamais players.user_id, donc l'unique index ne le concerne pas.
+  if (target === "player" && email) {
     const { data: conflictPlayerId } = await supabase.rpc(
       "player_email_already_linked_in_club",
       {
@@ -91,7 +96,7 @@ export async function createPlayerInviteAction(
     .from("club_invitations")
     .insert({
       club_id: membership.club_id,
-      kind: "player",
+      kind: target,
       email: email || null,
       token_hash: tokenHash,
       player_id: playerId,

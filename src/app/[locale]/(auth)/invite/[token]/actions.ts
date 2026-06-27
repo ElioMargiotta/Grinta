@@ -8,7 +8,7 @@ import { setCurrentPersona } from "@/lib/club/persona";
 type InvitationPreview = {
   id: string;
   club_id: string;
-  kind: "staff" | "player";
+  kind: "staff" | "player" | "guardian";
   status: "pending" | "accepted" | "revoked" | "expired";
 };
 
@@ -21,10 +21,12 @@ export type AcceptInviteError =
   | "email_mismatch"
   | "club_inactive"
   | "already_linked_to_other_player"
+  | "too_many_guardians"
   | "rpc_error";
 
 function mapError(message: string | undefined): AcceptInviteError {
   if (!message) return "rpc_error";
+  if (message.includes("too_many_guardians")) return "too_many_guardians";
   if (message.includes("already_linked_to_other_player")) return "already_linked_to_other_player";
   if (message.includes("invitation_not_found")) return "invitation_not_found";
   if (message.includes("invitation_not_pending")) return "invitation_not_pending";

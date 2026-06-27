@@ -7,7 +7,7 @@ type InvitationPreview = {
   id: string;
   club_id: string;
   club_name: string;
-  kind: "staff" | "player";
+  kind: "staff" | "player" | "guardian";
   email: string | null;
   role_name: string | null;
   player_first_name: string | null;
@@ -79,17 +79,24 @@ export default async function AcceptInvitePage({
     );
   }
 
+  const playerFullName = `${preview.player_first_name ?? ""} ${preview.player_last_name ?? ""}`.trim();
   const detail =
-    preview.kind === "player"
-      ? t.rich("invitedAsPlayer", {
-          name: `${preview.player_first_name ?? ""} ${preview.player_last_name ?? ""}`.trim(),
+    preview.kind === "guardian"
+      ? t.rich("invitedAsGuardian", {
+          name: playerFullName,
           team: preview.team_name ?? t("noTeam"),
           strong: (chunks) => <strong>{chunks}</strong>,
         })
-      : t.rich("invitedAsStaff", {
-          role: preview.role_name ?? "",
-          strong: (chunks) => <strong>{chunks}</strong>,
-        });
+      : preview.kind === "player"
+        ? t.rich("invitedAsPlayer", {
+            name: playerFullName,
+            team: preview.team_name ?? t("noTeam"),
+            strong: (chunks) => <strong>{chunks}</strong>,
+          })
+        : t.rich("invitedAsStaff", {
+            role: preview.role_name ?? "",
+            strong: (chunks) => <strong>{chunks}</strong>,
+          });
 
   const {
     data: { user },
