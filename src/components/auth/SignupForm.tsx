@@ -6,6 +6,7 @@ import { useTranslations, useLocale } from "next-intl";
 import { Button } from "@/components/ui/Button";
 import { AuthField } from "@/components/auth/AuthField";
 import { PasswordInput } from "@/components/auth/PasswordInput";
+import { TurnstileWidget } from "@/components/auth/TurnstileWidget";
 import { signupAction } from "@/app/[locale]/(auth)/signup/actions";
 
 type PersonaChoice = "staff" | "player" | "dual";
@@ -126,6 +127,8 @@ export function SignupForm() {
           })}
         </div>
       </fieldset>
+
+      <TurnstileWidget />
 
       {error && (
         <div className="rounded-md border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700">

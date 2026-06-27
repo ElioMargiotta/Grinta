@@ -574,7 +574,10 @@
     "resetSuccessCta": "Weiter",
     "resetInvalidTitle": "Ungültiger oder abgelaufener Link",
     "resetInvalidBody": "Dieser Link zum Zurücksetzen ist nicht mehr gültig. Fordere einen neuen an.",
-    "resetRequestAgain": "Neuen Link anfordern"
+    "resetRequestAgain": "Neuen Link anfordern",
+    "continueWithGoogle": "Mit Google fortfahren",
+    "continueWithApple": "Mit Apple fortfahren",
+    "orSeparator": "oder"
   },
   "dashboard": {
     "title": "Dashboard",
@@ -2783,7 +2786,12 @@
     "save": "Speichern",
     "saving": "Speichern…",
     "saved": "Einstellung gespeichert.",
-    "saveError": "Einstellung konnte nicht gespeichert werden."
+    "saveError": "Einstellung konnte nicht gespeichert werden.",
+    "usernameLabel": "Benutzername",
+    "usernameHelp": "Dein öffentlicher Handle (3–30 Zeichen: Buchstaben, Zahlen, . _ -). Für Erwähnungen.",
+    "usernamePlaceholder": "z. B. coach.martin",
+    "usernameTaken": "Dieser Benutzername ist bereits vergeben.",
+    "usernameInvalid": "Ungültiger Benutzername (3–30 Zeichen: a–z, 0–9, . _ -)."
   },
   "evaluation": {
     "header": "Spielerbewertung",

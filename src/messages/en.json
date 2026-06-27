@@ -580,7 +580,10 @@
     "resetSuccessCta": "Continue",
     "resetInvalidTitle": "Invalid or expired link",
     "resetInvalidBody": "This reset link is no longer valid. Request a new one.",
-    "resetRequestAgain": "Request a new link"
+    "resetRequestAgain": "Request a new link",
+    "continueWithGoogle": "Continue with Google",
+    "continueWithApple": "Continue with Apple",
+    "orSeparator": "or"
   },
   "dashboard": {
     "title": "Dashboard",
@@ -2789,7 +2792,12 @@
     "save": "Save",
     "saving": "Saving…",
     "saved": "Preference saved.",
-    "saveError": "Could not save your preference."
+    "saveError": "Could not save your preference.",
+    "usernameLabel": "Username",
+    "usernameHelp": "Your public handle (3–30 chars: letters, numbers, . _ -). Used for mentions.",
+    "usernamePlaceholder": "e.g. coach.martin",
+    "usernameTaken": "This username is already taken.",
+    "usernameInvalid": "Invalid username (3–30 chars: a–z, 0–9, . _ -)."
   },
   "evaluation": {
     "header": "Player evaluation",

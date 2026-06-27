@@ -580,7 +580,10 @@
     "resetSuccessCta": "Continuer",
     "resetInvalidTitle": "Lien invalide ou expiré",
     "resetInvalidBody": "Ce lien de réinitialisation n'est plus valide. Demandez-en un nouveau.",
-    "resetRequestAgain": "Demander un nouveau lien"
+    "resetRequestAgain": "Demander un nouveau lien",
+    "continueWithGoogle": "Continuer avec Google",
+    "continueWithApple": "Continuer avec Apple",
+    "orSeparator": "ou"
   },
   "dashboard": {
     "title": "Tableau de bord",
@@ -2785,7 +2788,12 @@
     "save": "Enregistrer",
     "saving": "Enregistrement…",
     "saved": "Préférence enregistrée.",
-    "saveError": "Impossible d'enregistrer ta préférence."
+    "saveError": "Impossible d'enregistrer ta préférence.",
+    "usernameLabel": "Nom d'utilisateur",
+    "usernameHelp": "Votre identifiant public (3–30 caractères : lettres, chiffres, . _ -). Utilisé pour les mentions.",
+    "usernamePlaceholder": "ex. coach.martin",
+    "usernameTaken": "Ce nom d'utilisateur est déjà pris.",
+    "usernameInvalid": "Identifiant invalide (3–30 caractères : a–z, 0–9, . _ -)."
   },
   "evaluation": {
     "header": "Évaluation joueur",

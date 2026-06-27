@@ -8,9 +8,15 @@ export async function loginAction(formData: FormData) {
   const email = String(formData.get("email") ?? "");
   const password = String(formData.get("password") ?? "");
   const locale = String(formData.get("locale") ?? "fr");
+  // Turnstile injecte ce champ caché dans le form quand le CAPTCHA est actif.
+  const captchaToken = String(formData.get("cf-turnstile-response") ?? "");
 
   const supabase = await createClient();
-  const { error } = await supabase.auth.signInWithPassword({ email, password });
+  const { error } = await supabase.auth.signInWithPassword({
+    email,
+    password,
+    options: captchaToken ? { captchaToken } : undefined,
+  });
 
   if (error) {
     if (

@@ -273,6 +273,29 @@ npm run db:status:prod           # what's applied on production
   Database → Backups (or `supabase db dump --db-url "$SUPABASE_DB_URL_PROD"`).
 - `supabase/.env.db` holds DB passwords — it is gitignored, keep it that way.
 
+## 5b. Auth providers & anti-bot (Lot A — comptes joueur/parent/staff)
+
+Configuration **hors migrations** (dashboard Supabase + Vercel) :
+
+### OAuth Google / Apple
+1. Supabase → Authentication → Providers → **Google** : activer, coller le
+   Client ID / Secret (Google Cloud Console → OAuth consent + Credentials).
+2. Supabase → Providers → **Apple** : activer, renseigner Services ID + clé
+   (Apple Developer, ~99 $/an). Activable plus tard sans casser Google.
+3. Authentication → URL Configuration → **Redirect URLs** : ajouter
+   `https://grintaclub.app/*/auth/callback` (prod), les URLs de preview Vercel
+   (`https://*.vercel.app/*/auth/callback`) et `http://localhost:3000/*/auth/callback`.
+4. Rien à coder : les boutons appellent `signInWithOAuth` → route
+   `/{locale}/auth/callback` (déjà en place).
+
+### CAPTCHA anti-bot (Cloudflare Turnstile — gratuit, optionnel)
+1. Cloudflare → Turnstile → créer un widget → **site key** + **secret**.
+2. Supabase → Authentication → Settings → **Enable CAPTCHA protection** →
+   Turnstile → coller le secret. (S'applique à signup **et** login **et** reset
+   password — les trois formulaires envoient déjà le token `cf-turnstile-response`.)
+3. Vercel env : `NEXT_PUBLIC_TURNSTILE_SITE_KEY=<site key>` (et `.env.local` en dev).
+   Sans cette variable le widget ne s'affiche pas et l'auth reste inchangée.
+
 ## 6. Troubleshooting
 
 - **`db push` wants to re-run the baseline on production** → the

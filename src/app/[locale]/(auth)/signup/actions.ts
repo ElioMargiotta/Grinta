@@ -13,6 +13,8 @@ export async function signupAction(formData: FormData) {
   const rawPersona = String(formData.get("personaPreference") ?? "staff");
   const personaPreference =
     rawPersona === "player" || rawPersona === "dual" ? rawPersona : "staff";
+  // Turnstile injecte ce champ caché dans le form quand le CAPTCHA est actif.
+  const captchaToken = String(formData.get("cf-turnstile-response") ?? "");
 
   const supabase = await createClient();
   const { data, error } = await supabase.auth.signUp({
@@ -21,6 +23,7 @@ export async function signupAction(formData: FormData) {
     options: {
       data: { full_name: fullName, persona_preference: personaPreference },
       emailRedirectTo: `${getSiteUrl()}/${locale}/confirm`,
+      ...(captchaToken ? { captchaToken } : {}),
     },
   });
 

@@ -43,3 +43,38 @@ export async function updatePersonaPreferenceAction(formData: FormData) {
   revalidatePath("/", "layout");
   return { ok: true as const };
 }
+
+export type SetUsernameResult =
+  | { ok: true }
+  | { ok: false; error: "invalid" | "taken" | "unauthorized" | "db_error" };
+
+/**
+ * Pose/maj le handle public du compte courant via la RPC set_username
+ * (validation format + unicité insensible à la casse côté DB). Mappe les
+ * exceptions Postgres en codes traduisibles pour l'UI.
+ */
+export async function setUsernameAction(
+  formData: FormData,
+): Promise<SetUsernameResult> {
+  const username = String(formData.get("username") ?? "").trim().toLowerCase();
+
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) return { ok: false, error: "unauthorized" };
+
+  const { error } = await supabase.rpc("set_username", { p_username: username });
+  if (error) {
+    if (error.message?.includes("username_taken")) {
+      return { ok: false, error: "taken" };
+    }
+    if (error.message?.includes("username_invalid")) {
+      return { ok: false, error: "invalid" };
+    }
+    return { ok: false, error: "db_error" };
+  }
+
+  revalidatePath("/", "layout");
+  return { ok: true };
+}

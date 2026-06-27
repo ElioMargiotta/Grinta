@@ -5,6 +5,7 @@ import { useTranslations, useLocale } from "next-intl";
 import { Button } from "@/components/ui/Button";
 import { AuthField } from "@/components/auth/AuthField";
 import { PasswordInput } from "@/components/auth/PasswordInput";
+import { TurnstileWidget } from "@/components/auth/TurnstileWidget";
 import { loginAction } from "@/app/[locale]/(auth)/login/actions";
 
 const inputClass =
@@ -55,6 +56,8 @@ export function LoginForm() {
           placeholder={t("passwordPlaceholder")}
         />
       </AuthField>
+
+      <TurnstileWidget />
 
       {error && (
         <div className="rounded-md border border-destructive/30 bg-destructive/10 px-3 py-2 text-sm text-destructive">

@@ -9,6 +9,7 @@ import { clubThemeStyle } from "@/lib/club/theme";
 import { getClubLicenseUsage } from "@/lib/license/queries";
 import { Topbar } from "@/components/layout/Topbar";
 import { AccountPersonaForm } from "@/components/account/AccountPersonaForm";
+import { AccountUsernameForm } from "@/components/account/AccountUsernameForm";
 
 export default async function AccountPage({
   params,
@@ -23,9 +24,13 @@ export default async function AccountPage({
   const [{ data: profile }, persona, membership, memberships] = await Promise.all([
     supabase
       .from("profiles")
-      .select("full_name, persona_preference")
+      .select("full_name, persona_preference, username")
       .eq("id", user.id)
-      .maybeSingle<{ full_name: string | null; persona_preference: string | null }>(),
+      .maybeSingle<{
+        full_name: string | null;
+        persona_preference: string | null;
+        username: string | null;
+      }>(),
     resolvePersona(),
     resolveCurrentMembership(),
     getMyMemberships(),
@@ -84,6 +89,10 @@ export default async function AccountPage({
                 {user.email}
               </div>
             </div>
+
+            <AccountUsernameForm initialUsername={profile?.username ?? null} />
+
+            <div className="my-6 h-px bg-zinc-200 dark:bg-zinc-800" />
 
             <AccountPersonaForm initialPreference={preference} />
           </div>

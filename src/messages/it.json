@@ -574,7 +574,10 @@
     "resetSuccessCta": "Continua",
     "resetInvalidTitle": "Link non valido o scaduto",
     "resetInvalidBody": "Questo link di reimpostazione non è più valido. Richiedine uno nuovo.",
-    "resetRequestAgain": "Richiedi un nuovo link"
+    "resetRequestAgain": "Richiedi un nuovo link",
+    "continueWithGoogle": "Continua con Google",
+    "continueWithApple": "Continua con Apple",
+    "orSeparator": "o"
   },
   "dashboard": {
     "title": "Dashboard",
@@ -2783,7 +2786,12 @@
     "save": "Salva",
     "saving": "Salvataggio…",
     "saved": "Preferenza salvata.",
-    "saveError": "Impossibile salvare la preferenza."
+    "saveError": "Impossibile salvare la preferenza.",
+    "usernameLabel": "Nome utente",
+    "usernameHelp": "Il tuo handle pubblico (3–30 caratteri: lettere, numeri, . _ -). Usato per le menzioni.",
+    "usernamePlaceholder": "es. coach.martin",
+    "usernameTaken": "Questo nome utente è già in uso.",
+    "usernameInvalid": "Nome utente non valido (3–30 caratteri: a–z, 0–9, . _ -)."
   },
   "evaluation": {
     "header": "Valutazione giocatore",
