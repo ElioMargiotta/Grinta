@@ -61,10 +61,16 @@ export async function acceptInvitationAction(formData: FormData) {
   if (error) return { error: mapError(error.message) };
 
   if (preview.kind === "staff") {
+    await supabase.from("profiles").update({ can_coach: true }).eq("id", user.id);
     await setCurrentClubId(preview.club_id);
     await setCurrentPersona("staff");
     redirect(`/${locale}/dashboard`);
+  } else if (preview.kind === "guardian") {
+    await supabase.from("profiles").update({ can_parent: true }).eq("id", user.id);
+    await setCurrentPersona("parent");
+    redirect(`/${locale}/me`);
   } else {
+    await supabase.from("profiles").update({ can_play: true }).eq("id", user.id);
     await setCurrentPersona("player");
     redirect(`/${locale}/me`);
   }

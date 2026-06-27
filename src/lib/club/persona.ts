@@ -6,8 +6,9 @@ import { getAuthUser, getProfile } from "@/lib/auth/user";
 import { resolveCurrentMembership } from "./context";
 
 export type Persona = "staff" | "player";
-export type PersonaAvailability = "staff" | "player" | "dual";
-// 'parent' = compte tuteur : vue portail joueur (gère les fiches de ses enfants).
+export type PersonaProfile = "staff" | "player" | "parent";
+export type PersonaAvailability = "staff" | "player" | "parent" | "multi";
+// Ancien champ conservé pour compatibilité; les capacités can_* sont la source.
 export type PersonaPreference = "staff" | "player" | "dual" | "parent";
 
 const CURRENT_PERSONA_COOKIE = "grinta_current_persona";
@@ -16,6 +17,8 @@ const COOKIE_MAX_AGE_DAYS = 365;
 export type PersonaState = {
   available: PersonaAvailability;
   active: Persona;
+  activeProfile: PersonaProfile;
+  profiles: PersonaProfile[];
   playerId: string | null;
   playerClubId: string | null;
   // Stated intent from signup (or account settings). Drives switcher
@@ -24,13 +27,13 @@ export type PersonaState = {
   preference: PersonaPreference;
 };
 
-export async function getCurrentPersona(): Promise<Persona | null> {
+export async function getCurrentPersona(): Promise<PersonaProfile | null> {
   const store = await cookies();
   const value = store.get(CURRENT_PERSONA_COOKIE)?.value;
-  return value === "staff" || value === "player" ? value : null;
+  return value === "staff" || value === "player" || value === "parent" ? value : null;
 }
 
-export async function setCurrentPersona(persona: Persona): Promise<void> {
+export async function setCurrentPersona(persona: PersonaProfile): Promise<void> {
   const store = await cookies();
   try {
     store.set(CURRENT_PERSONA_COOKIE, persona, {
@@ -59,6 +62,22 @@ function normalizePreference(value: unknown): PersonaPreference {
   return value === "player" || value === "dual" || value === "parent"
     ? value
     : "staff";
+}
+
+function resolveProfiles(profile: Awaited<ReturnType<typeof getProfile>>): PersonaProfile[] {
+  const profiles: PersonaProfile[] = [];
+
+  if (profile?.can_coach) profiles.push("staff");
+  if (profile?.can_play) profiles.push("player");
+  if (profile?.can_parent) profiles.push("parent");
+
+  if (profiles.length > 0) return profiles;
+
+  const preference = normalizePreference(profile?.persona_preference);
+  if (preference === "dual") return ["staff", "player"];
+  if (preference === "player") return ["player"];
+  if (preference === "parent") return ["parent"];
+  return ["staff"];
 }
 
 /**
@@ -93,25 +112,22 @@ export const resolvePersona = cache(async (): Promise<PersonaState | null> => {
   ]);
 
   const preference = normalizePreference(profile?.persona_preference);
+  const profiles = resolveProfiles(profile);
   const cookiePersona = await getCurrentPersona();
+  const activeProfile =
+    cookiePersona && profiles.includes(cookiePersona)
+      ? cookiePersona
+      : profiles[0];
 
-  let available: PersonaAvailability;
-  let active: Persona;
-  if (preference === "dual") {
-    available = "dual";
-    active = cookiePersona ?? "staff";
-  } else if (preference === "player" || preference === "parent") {
-    // Le parent utilise le portail joueur (il gère les fiches de ses enfants).
-    available = "player";
-    active = "player";
-  } else {
-    available = "staff";
-    active = "staff";
-  }
+  const available: PersonaAvailability =
+    profiles.length > 1 ? "multi" : profiles[0];
+  const active: Persona = activeProfile === "staff" ? "staff" : "player";
 
   return {
     available,
     active,
+    activeProfile,
+    profiles,
     playerId: playerRow?.id ?? null,
     playerClubId: playerRow?.club_id ?? null,
     preference,

@@ -18,6 +18,7 @@ import {
 import { useTranslations } from "next-intl";
 import { useState } from "react";
 import { Link, usePathname } from "@/i18n/navigation";
+import type { PersonaProfile } from "@/lib/club/persona";
 
 const STAFF_PRIMARY = [
   { href: "/dashboard", key: "dashboard", icon: LayoutDashboard },
@@ -60,14 +61,24 @@ export function MobileNavigation({
   mode,
   hasMembership = false,
   isAdmin = false,
+  activeProfile = "player",
+  guardianCount = 0,
 }: {
   mode: "staff" | "player";
   hasMembership?: boolean;
   isAdmin?: boolean;
+  activeProfile?: PersonaProfile;
+  guardianCount?: number;
 }) {
   const t = useTranslations("nav");
   const pathname = usePathname();
   const [moreOpen, setMoreOpen] = useState(false);
+  const meKey =
+    activeProfile === "parent"
+      ? guardianCount === 1
+        ? "parentChild"
+        : "parentChildren"
+      : "playerMe";
 
   let primary: readonly NavItem[] = PLAYER_ITEMS;
   let more: NavItem[] = [];
@@ -144,7 +155,9 @@ export function MobileNavigation({
                 }`}
               >
                 <Icon className="h-5 w-5" />
-                <span className="max-w-full truncate">{t(key)}</span>
+                <span className="max-w-full truncate">
+                  {t(key === "playerMe" ? meKey : key)}
+                </span>
               </Link>
             );
           })}

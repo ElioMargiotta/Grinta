@@ -39,10 +39,16 @@ export async function createClubAction(formData: FormData): Promise<ActionResult
 
   const locale = String(formData.get("locale") ?? "fr");
   const name = String(formData.get("name") ?? "").trim();
-  const ownerEmail = String(formData.get("ownerEmail") ?? "").trim().toLowerCase();
+  const ownerIdentifier = String(formData.get("ownerIdentifier") ?? formData.get("ownerEmail") ?? "").trim();
+  const ownerEmail =
+    ownerIdentifier.includes("@") && !ownerIdentifier.startsWith("@")
+      ? ownerIdentifier.toLowerCase()
+      : "";
   const directoryId = String(formData.get("directoryId") ?? "").trim() || null;
   if (name.length < 2) return { error: "Le nom du club est requis." };
-  if (ownerEmail && !ownerEmail.includes("@")) return { error: "Email propriétaire invalide." };
+  if (ownerIdentifier && !ownerEmail && !ownerIdentifier.startsWith("@")) {
+    return { error: "Compte propriétaire invalide." };
+  }
 
   const supabase = await createClient();
 
@@ -65,8 +71,8 @@ export async function createClubAction(formData: FormData): Promise<ActionResult
   const newClubId = clubId as string;
 
   // Send the owner invitation (best-effort: club is created regardless).
-  if (ownerEmail) {
-    await inviteOwner(supabase, newClubId, name, ownerEmail, locale);
+  if (ownerIdentifier) {
+    await inviteOwner(supabase, newClubId, name, ownerIdentifier, locale);
   }
 
   revalidatePath(`/${locale}/admin/clubs`);
@@ -77,7 +83,7 @@ async function inviteOwner(
   supabase: Awaited<ReturnType<typeof createClient>>,
   clubId: string,
   clubName: string,
-  email: string,
+  identifier: string,
   locale: string,
 ): Promise<ActionResult> {
   const { data: role } = await supabase
@@ -88,6 +94,45 @@ async function inviteOwner(
     .eq("is_system", true)
     .maybeSingle();
   if (!role) return { error: "Rôle propriétaire introuvable pour ce club." };
+
+  const isEmail = identifier.includes("@") && !identifier.startsWith("@");
+  const email = isEmail ? identifier.toLowerCase() : "";
+  const { data: resolvedTarget, error: resolveError } = await supabase
+    .rpc("resolve_invitation_target", { p_identifier: identifier })
+    .maybeSingle<{
+      user_id: string;
+      email: string | null;
+      username: string | null;
+      full_name: string | null;
+    }>();
+  if (resolveError) return { error: resolveError.message };
+  if (!isEmail && !resolvedTarget?.user_id) {
+    return { error: "Aucun compte ne correspond à ce nom d'utilisateur." };
+  }
+
+  if (resolvedTarget?.user_id) {
+    const { error: targetedErr } = await supabase.rpc(
+      "create_targeted_staff_invitation",
+      {
+        p_club_id: clubId,
+        p_target_user_id: resolvedTarget.user_id,
+        p_email: resolvedTarget.email,
+        p_role_id: role.id,
+        p_team_ids: [],
+        p_ttl_hours: 336,
+      },
+    );
+    if (targetedErr) {
+      return { error: targetedErr.message ?? "Échec de la création de l'invitation." };
+    }
+    await supabase
+      .from("profiles")
+      .update({ can_coach: true })
+      .eq("id", resolvedTarget.user_id);
+    return { ok: true };
+  }
+
+  if (!email) return { error: "Email invalide." };
 
   const { data: token, error: inviteErr } = await supabase.rpc("create_invitation", {
     p_club_id: clubId,
@@ -139,9 +184,11 @@ export async function inviteClubOwnerAction(formData: FormData): Promise<ActionR
 
   const clubId = String(formData.get("clubId") ?? "");
   const locale = String(formData.get("locale") ?? "fr");
-  const email = String(formData.get("email") ?? "").trim().toLowerCase();
+  const identifier = String(
+    formData.get("identifier") ?? formData.get("email") ?? "",
+  ).trim();
   if (!clubId) return { error: "Club manquant." };
-  if (!email.includes("@")) return { error: "Email invalide." };
+  if (!identifier) return { error: "Compte ou email requis." };
 
   const supabase = await createClient();
   const { data: club } = await supabase
@@ -151,7 +198,7 @@ export async function inviteClubOwnerAction(formData: FormData): Promise<ActionR
     .maybeSingle();
   if (!club) return { error: "Club introuvable." };
 
-  const result = await inviteOwner(supabase, clubId, club.name, email, locale);
+  const result = await inviteOwner(supabase, clubId, club.name, identifier, locale);
   if (result.error) return result;
 
   revalidatePath(`/${locale}/admin/clubs/${clubId}`);

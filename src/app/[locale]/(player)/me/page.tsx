@@ -39,11 +39,12 @@ type PlayerRow = {
 
 type InvitationRow = {
   id: string;
-  kind: "staff" | "player";
+  kind: "staff" | "player" | "guardian";
   expires_at: string;
   clubs: { name: string } | null;
   club_roles: { name: string } | null;
   teams: { name: string } | null;
+  players: { first_name: string | null; last_name: string | null } | null;
 };
 
 type SharedEvaluationRow = {
@@ -72,14 +73,18 @@ export default async function PlayerMePage({
 }) {
   const { locale } = await params;
   setRequestLocale(locale);
-  const { supabase } = await requirePersona(locale, "player");
+  const { supabase, persona } = await requirePersona(locale, "player");
   const t = await getTranslations("playerMe");
   const tInv = await getTranslations("invitations");
 
   // Profil actif du portail (Lot E) : self ou enfant (tuteur), choisi via le
   // sélecteur. La RLS autorise le tuteur à lire la fiche de son enfant.
   const linkedPlayers = await getLinkedPlayers();
-  const activePlayer = await resolveActivePlayer(linkedPlayers);
+  const activePlayer = await resolveActivePlayer(
+    linkedPlayers,
+    persona.activeProfile === "parent" ? "guardian" : "self",
+  );
+  const isParentProfile = persona.activeProfile === "parent";
 
   const [{ data: player }, { data: invitationRows }] = await Promise.all([
     activePlayer
@@ -100,7 +105,8 @@ export default async function PlayerMePage({
         `id, kind, expires_at,
          clubs!inner(name),
          club_roles(name),
-         teams(name)`,
+         teams(name),
+         players(first_name, last_name)`,
       )
       .eq("status", "pending")
       .gt("expires_at", new Date().toISOString())
@@ -108,20 +114,27 @@ export default async function PlayerMePage({
       .returns<InvitationRow[]>(),
   ]);
 
-  const invitations: PendingInvitation[] = (invitationRows ?? []).map((r) => ({
-    id: r.id,
-    kind: r.kind,
-    clubName: r.clubs?.name ?? "—",
-    roleName: r.club_roles?.name ?? null,
-    teamName: r.teams?.name ?? null,
-    expiresAt: r.expires_at,
-  }));
+  const visibleInvitationKind = isParentProfile ? "guardian" : "player";
+  const invitations: PendingInvitation[] = (invitationRows ?? [])
+    .filter((r) => r.kind === visibleInvitationKind)
+    .map((r) => ({
+      id: r.id,
+      kind: r.kind,
+      clubName: r.clubs?.name ?? "—",
+      roleName: r.club_roles?.name ?? null,
+      teamName: r.teams?.name ?? null,
+      playerName: r.players
+        ? `${r.players.first_name ?? ""} ${r.players.last_name ?? ""}`.trim() ||
+          null
+        : null,
+      expiresAt: r.expires_at,
+    }));
 
   if (!player) {
     return (
       <div className="mx-auto flex w-full max-w-3xl flex-col gap-6">
         <h1 className="text-2xl font-semibold text-zinc-900 dark:text-zinc-100">
-          {t("title")}
+          {isParentProfile ? t("parentTitle") : t("title")}
         </h1>
 
         <Section>
@@ -132,7 +145,9 @@ export default async function PlayerMePage({
             <p className="text-sm text-zinc-600 dark:text-zinc-400">
               {invitations.length > 0
                 ? tInv("welcomeWithInvites")
-                : tInv("welcomeNoInvites")}
+                : isParentProfile
+                  ? tInv("welcomeNoChildInvites")
+                  : tInv("welcomeNoInvites")}
             </p>
           </div>
         </Section>

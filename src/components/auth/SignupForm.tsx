@@ -1,21 +1,18 @@
 "use client";
 
-import { useEffect, useMemo, useState, useTransition } from "react";
-import { CheckCircle2, Shield, UserCircle, Users, Check, X, Loader2 } from "lucide-react";
+import { useState, useTransition } from "react";
+import { CheckCircle2, Shield, UserCircle, Users } from "lucide-react";
 import { useTranslations, useLocale } from "next-intl";
 import { Button } from "@/components/ui/Button";
 import { AuthField } from "@/components/auth/AuthField";
 import { PasswordInput } from "@/components/auth/PasswordInput";
 import { TurnstileWidget } from "@/components/auth/TurnstileWidget";
-import { createClient } from "@/lib/supabase/client";
 import { signupAction } from "@/app/[locale]/(auth)/signup/actions";
 
 type PersonaChoice = "staff" | "player" | "parent";
 
 const inputClass =
   "h-10 w-full rounded-md border border-zinc-300 bg-white px-3 text-sm text-zinc-900 placeholder:text-zinc-400 focus:border-zinc-900 focus:outline-none focus:ring-2 focus:ring-zinc-900/10";
-
-const USERNAME_RE = /^[a-z0-9_.-]{3,30}$/;
 
 function isStrongPassword(pw: string): boolean {
   return (
@@ -30,41 +27,11 @@ function isStrongPassword(pw: string): boolean {
 export function SignupForm() {
   const t = useTranslations("auth");
   const locale = useLocale();
-  const supabase = useMemo(() => createClient(), []);
   const [error, setError] = useState<string | null>(null);
   const [confirmed, setConfirmed] = useState(false);
   const [persona, setPersona] = useState<PersonaChoice>("staff");
   const [password, setPassword] = useState("");
-  const [username, setUsername] = useState("");
-  // Résultat asynchrone du check de dispo uniquement ; les états "idle"/"invalid"
-  // sont dérivés (évite un setState synchrone dans l'effet).
-  const [checkState, setCheckState] = useState<
-    "idle" | "checking" | "available" | "taken"
-  >("idle");
   const [isPending, startTransition] = useTransition();
-
-  const normalizedUsername = username.trim().toLowerCase();
-  const formatValid = USERNAME_RE.test(normalizedUsername);
-  const usernameState: "idle" | "checking" | "available" | "taken" | "invalid" =
-    !normalizedUsername ? "idle" : !formatValid ? "invalid" : checkState;
-
-  // Vérification de disponibilité du handle (debounce 400 ms), façon LinkedIn :
-  // le vrai nom s'affiche, le username doit être unique pour retrouver/inviter.
-  useEffect(() => {
-    if (!normalizedUsername || !formatValid) return;
-    let cancelled = false;
-    const handle = window.setTimeout(async () => {
-      setCheckState("checking");
-      const { data } = await supabase.rpc("is_username_available", {
-        p_username: normalizedUsername,
-      });
-      if (!cancelled) setCheckState(data === false ? "taken" : "available");
-    }, 400);
-    return () => {
-      cancelled = true;
-      window.clearTimeout(handle);
-    };
-  }, [normalizedUsername, formatValid, supabase]);
 
   if (confirmed) {
     return (
@@ -86,7 +53,7 @@ export function SignupForm() {
       action={(formData) => {
         setError(null);
         formData.set("locale", locale);
-        formData.set("username", normalizedUsername);
+        formData.set("personaPreference", persona);
         startTransition(async () => {
           const result = await signupAction(formData);
           if (result?.errorCode) setError(t(result.errorCode));
@@ -140,50 +107,6 @@ export function SignupForm() {
         </AuthField>
       </div>
 
-      <AuthField
-        label={t("username")}
-        htmlFor="username"
-        help={t("usernameHelp")}
-        required
-      >
-        <div className="relative">
-          <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-sm text-zinc-400">
-            @
-          </span>
-          <input
-            id="username"
-            name="username"
-            value={username}
-            onChange={(e) => {
-              setUsername(e.target.value);
-              setCheckState("idle");
-            }}
-            autoComplete="off"
-            spellCheck={false}
-            required
-            placeholder={t("usernamePlaceholder")}
-            className={`${inputClass} pl-7 pr-9`}
-          />
-          <span className="absolute right-3 top-1/2 -translate-y-1/2">
-            {usernameState === "checking" && (
-              <Loader2 className="h-4 w-4 animate-spin text-zinc-400" />
-            )}
-            {usernameState === "available" && (
-              <Check className="h-4 w-4 text-emerald-600" />
-            )}
-            {(usernameState === "taken" || usernameState === "invalid") && (
-              <X className="h-4 w-4 text-red-500" />
-            )}
-          </span>
-        </div>
-      </AuthField>
-      {usernameState === "taken" && (
-        <p className="-mt-3 text-xs text-red-600">{t("usernameTaken")}</p>
-      )}
-      {usernameState === "invalid" && (
-        <p className="-mt-3 text-xs text-red-600">{t("invalidUsername")}</p>
-      )}
-
       <AuthField label={t("email")} htmlFor="email" help={t("emailHelp")} required>
         <input
           id="email"
@@ -221,7 +144,6 @@ export function SignupForm() {
           {t("accountTypeLabel")}
         </legend>
         <p className="text-xs text-zinc-500">{t("accountTypeHelp")}</p>
-        <input type="hidden" name="personaPreference" value={persona} />
         <div className="grid grid-cols-1 gap-2 sm:grid-cols-3">
           {(
             [
@@ -263,7 +185,7 @@ export function SignupForm() {
         type="submit"
         loading={isPending}
         loadingLabel={t("submittingSignup")}
-        disabled={isPending || usernameState === "taken" || usernameState === "invalid" || !passwordOk}
+        disabled={isPending || !passwordOk}
         className="w-full"
       >
         {t("submitSignup")}

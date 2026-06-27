@@ -2,8 +2,19 @@
 
 import { useRef, useState, useTransition } from "react";
 import { useLocale, useTranslations } from "next-intl";
-import { ImageUp, Pencil, Shield, Trash2, UserMinus, Users } from "lucide-react";
+import {
+  Check,
+  Copy,
+  ImageUp,
+  MessageCircle,
+  Pencil,
+  Shield,
+  Trash2,
+  UserMinus,
+  Users,
+} from "lucide-react";
 import { Button } from "@/components/ui/Button";
+import { AccountDirectoryInput } from "@/components/account/AccountDirectoryInput";
 import type { AccessLevel } from "@/lib/club/types";
 import {
   createRoleAction,
@@ -89,7 +100,9 @@ export function ClubSettings({ data }: { data: Data }) {
   const shownLogo = logoPreview ?? (logoRemoved ? null : data.clubIdentity.logo_url);
   const [invitedEmail, setInvitedEmail] = useState<string | null>(null);
   const [inviteEmailSent, setInviteEmailSent] = useState<boolean>(true);
+  const [inviteDirect, setInviteDirect] = useState<boolean>(false);
   const [inviteLinkFallback, setInviteLinkFallback] = useState<string | null>(null);
+  const [inviteCopied, setInviteCopied] = useState(false);
   const [inviteError, setInviteError] = useState<string | null>(null);
   const [selectedRoleId, setSelectedRoleId] = useState<string>(
     data.roles[0]?.id ?? "",
@@ -435,32 +448,33 @@ export function ClubSettings({ data }: { data: Data }) {
             action={(formData) => {
               setInviteError(null);
               setInvitedEmail(null);
+              setInviteDirect(false);
               setInviteLinkFallback(null);
+              setInviteCopied(false);
               formData.set("locale", locale);
-              const email = String(formData.get("email") ?? "");
+              const email = String(formData.get("identifier") ?? "");
               startTransition(async () => {
                 const result = await inviteMemberAction(formData);
                 if ("error" in result) {
                   setInviteError(result.error);
                 } else {
-                  setInvitedEmail(email);
+                  setInvitedEmail(result.targetLabel ?? email);
                   setInviteEmailSent(result.emailSent);
-                  setInviteLinkFallback(result.emailSent ? null : result.url);
+                  setInviteDirect(result.direct);
+                  setInviteLinkFallback(result.url);
                 }
               });
             }}
           >
             <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
-              <label className="flex flex-col gap-1 text-sm">
-                <span className="font-medium text-zinc-700">{t("invite.email")}</span>
-                <input
-                  type="email"
-                  name="email"
-                  required
-                  placeholder={t("invite.emailPlaceholder")}
-                  className={inputClass}
-                />
-              </label>
+              <AccountDirectoryInput
+                name="identifier"
+                label={t("invite.identifier")}
+                required
+                placeholder={t("invite.identifierPlaceholder")}
+                hint={t("invite.identifierHint")}
+                inputClassName={inputClass}
+              />
               <label className="flex flex-col gap-1 text-sm">
                 <span className="font-medium text-zinc-700">{t("invite.role")}</span>
                 <select
@@ -512,18 +526,55 @@ export function ClubSettings({ data }: { data: Data }) {
             {invitedEmail && (
               <div
                 className={
-                  inviteEmailSent
+                  inviteDirect || inviteEmailSent
                     ? "rounded-md border border-emerald-200 bg-emerald-50 px-3 py-2 text-sm text-emerald-800"
                     : "rounded-md border border-amber-200 bg-amber-50 px-3 py-2 text-sm text-amber-800"
                 }
               >
-                {t.rich(inviteEmailSent ? "invite.emailSent" : "invite.emailFailed", {
+                {inviteDirect
+                  ? t.rich("invite.directSaved", {
+                      target: invitedEmail,
+                      strong: (chunks) => <strong>{chunks}</strong>,
+                    })
+                  : t.rich(inviteEmailSent ? "invite.emailSent" : "invite.emailFailed", {
                   email: invitedEmail,
                   strong: (chunks) => <strong>{chunks}</strong>,
-                })}
-                {!inviteEmailSent && inviteLinkFallback && (
-                  <div className="mt-2 break-all font-mono text-[11px] text-amber-900">
-                    {inviteLinkFallback}
+                    })}
+                {!inviteDirect && inviteLinkFallback && (
+                  <div className="mt-3 rounded-md border border-zinc-200 bg-white/70 p-3 text-xs text-zinc-800">
+                    <div className="mb-1 font-medium">
+                      {t("invite.linkReady")}
+                    </div>
+                    <div className="break-all font-mono text-[11px]">
+                      {inviteLinkFallback}
+                    </div>
+                    <div className="mt-2 flex flex-wrap items-center gap-2">
+                      <a
+                        href={`https://wa.me/?text=${encodeURIComponent(`${t("invite.whatsappMessage")} ${inviteLinkFallback}`)}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center gap-1 rounded-md bg-[#25D366] px-2.5 py-1.5 text-[11px] font-semibold text-white hover:brightness-95"
+                      >
+                        <MessageCircle className="h-3.5 w-3.5" />
+                        {t("invite.shareLink")}
+                      </a>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          navigator.clipboard.writeText(inviteLinkFallback);
+                          setInviteCopied(true);
+                          window.setTimeout(() => setInviteCopied(false), 1500);
+                        }}
+                        className="inline-flex items-center gap-1 rounded-md border border-zinc-200 bg-white px-2.5 py-1.5 text-[11px] font-medium text-zinc-700 hover:bg-zinc-50"
+                      >
+                        {inviteCopied ? (
+                          <Check className="h-3.5 w-3.5" />
+                        ) : (
+                          <Copy className="h-3.5 w-3.5" />
+                        )}
+                        {inviteCopied ? t("invite.copied") : t("invite.copyLink")}
+                      </button>
+                    </div>
                   </div>
                 )}
               </div>

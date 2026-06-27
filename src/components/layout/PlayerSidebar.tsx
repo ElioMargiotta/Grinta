@@ -5,6 +5,7 @@ import { useTranslations } from "next-intl";
 import Image from "next/image";
 import { Link, usePathname } from "@/i18n/navigation";
 import type { ClubMembership } from "@/lib/club/types";
+import type { PersonaProfile } from "@/lib/club/persona";
 
 // Minimal player-side nav. The player is read-only on their own record and
 // consults the schedule / teams of clubs they are licensed at.
@@ -16,13 +17,23 @@ const PLAYER_ITEMS = [
 
 export function PlayerSidebar({
   currentMembership,
+  activeProfile,
+  guardianCount,
 }: {
   currentMembership: ClubMembership | null;
+  activeProfile: PersonaProfile;
+  guardianCount: number;
 }) {
   const t = useTranslations("nav");
   const ts = useTranslations("sidebar");
   const pathname = usePathname();
   const logoUrl = currentMembership?.logo_url;
+  const meKey =
+    activeProfile === "parent"
+      ? guardianCount === 1
+        ? "parentChild"
+        : "parentChildren"
+      : "playerMe";
 
   return (
     <aside className="sticky top-0 hidden h-screen w-16 shrink-0 border-r border-[var(--club-line)] bg-white md:flex md:flex-col lg:w-60 dark:border-zinc-800 dark:bg-zinc-950">
@@ -70,8 +81,8 @@ export function PlayerSidebar({
             <Link
               key={href}
               href={href}
-              title={t(key)}
-              aria-label={t(key)}
+              title={t(key === "playerMe" ? meKey : key)}
+              aria-label={t(key === "playerMe" ? meKey : key)}
               className={`group relative flex items-center justify-center gap-3 rounded-lg px-2 py-2.5 text-xs font-medium transition-colors lg:justify-start lg:px-3 lg:py-2 lg:text-sm ${
                 active
                   ? "bg-[var(--club-primary)] text-[var(--club-primary-foreground)] shadow-sm"
@@ -85,7 +96,9 @@ export function PlayerSidebar({
                     : "text-zinc-400 group-hover:text-zinc-600 dark:group-hover:text-zinc-200"
                 }`}
               />
-              <span className="hidden lg:inline">{t(key)}</span>
+              <span className="hidden lg:inline">
+                {t(key === "playerMe" ? meKey : key)}
+              </span>
             </Link>
           );
         })}

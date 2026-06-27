@@ -27,6 +27,7 @@ function translateError(
 
 type Props = {
   sessionId: string;
+  playerId: string;
   deadlinePassed: boolean;
   initialStatus: "present" | "absent" | null;
   initialReason: string | null;
@@ -34,6 +35,7 @@ type Props = {
 
 export function AttendanceRSVP({
   sessionId,
+  playerId,
   deadlinePassed,
   initialStatus,
   initialReason,
@@ -51,6 +53,7 @@ export function AttendanceRSVP({
     startTransition(async () => {
       const result = await respondToSessionAction({
         sessionId,
+        playerId,
         status: next,
         reason: justification,
         locale,

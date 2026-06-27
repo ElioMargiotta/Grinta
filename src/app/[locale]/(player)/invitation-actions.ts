@@ -87,10 +87,27 @@ export async function acceptInvitationByIdAction(
   } = await supabase.auth.getUser();
   if (!user) return { ok: false, error: "unauthenticated" };
 
+  const { data: invitation } = await supabase
+    .from("club_invitations")
+    .select("kind")
+    .eq("id", id)
+    .maybeSingle<{ kind: "staff" | "player" | "guardian" }>();
+
   const { error } = await supabase.rpc("accept_invitation_by_id", {
     p_invitation_id: id,
   });
   if (error) return { ok: false, error: mapRpcError(error.message), message: error.message };
+
+  if (invitation?.kind === "guardian") {
+    await supabase.from("profiles").update({ can_parent: true }).eq("id", user.id);
+    await setCurrentPersona("parent");
+  } else if (invitation?.kind === "player") {
+    await supabase.from("profiles").update({ can_play: true }).eq("id", user.id);
+    await setCurrentPersona("player");
+  } else if (invitation?.kind === "staff") {
+    await supabase.from("profiles").update({ can_coach: true }).eq("id", user.id);
+    await setCurrentPersona("staff");
+  }
 
   revalidatePath("/", "layout");
   return { ok: true, redirectTo: `/${locale}/me` };

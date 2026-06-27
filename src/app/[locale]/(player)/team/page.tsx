@@ -1,6 +1,7 @@
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { Section } from "@/components/ui/Section";
 import { requirePersona } from "@/lib/auth/getUser";
+import { getLinkedPlayers, resolveActivePlayer } from "@/lib/player/profiles";
 
 type AssignmentRow = {
   team_id: string;
@@ -17,8 +18,12 @@ export default async function PlayerTeamPage({
   setRequestLocale(locale);
   const { supabase, persona } = await requirePersona(locale, "player");
   const t = await getTranslations("playerTeam");
+  const activePlayer = await resolveActivePlayer(
+    await getLinkedPlayers(),
+    persona.activeProfile === "parent" ? "guardian" : "self",
+  );
 
-  if (!persona.playerId) {
+  if (!activePlayer) {
     return (
       <div className="mx-auto flex w-full max-w-3xl flex-col gap-6">
         <h1 className="text-2xl font-semibold text-zinc-900 dark:text-zinc-100">
@@ -34,7 +39,7 @@ export default async function PlayerTeamPage({
   const { data } = await supabase
     .from("player_team_assignments")
     .select(`team_id, season, teams!inner(id, name, club_id)`)
-    .eq("player_id", persona.playerId)
+    .eq("player_id", activePlayer.playerId)
     .returns<AssignmentRow[]>();
 
   const assignments = (data ?? []).filter((a): a is AssignmentRow & { teams: NonNullable<AssignmentRow["teams"]> } => Boolean(a.teams));

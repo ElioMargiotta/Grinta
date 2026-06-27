@@ -11,6 +11,7 @@ import { sendClubInvitationEmail } from "@/lib/email/invitations";
 export type InviteActionError =
   | "missing_fields"
   | "invalid_email"
+  | "username_not_found"
   | "player_not_in_club"
   | "email_already_linked_to_other_player"
   | "rate_limited"
@@ -23,12 +24,24 @@ export type CreatePlayerInviteResult =
       token: string;
       expiresAt: string;
       emailSent: boolean;
+      direct: boolean;
+      targetLabel?: string;
       emailError?: string;
     }
   | { ok: false; error: InviteActionError; message?: string };
 
 function isPlausibleEmail(value: string): boolean {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
+}
+
+function normalizeInviteIdentifier(value: string): string {
+  return value.trim().replace(/^@+/, (match) => (match ? "@" : ""));
+}
+
+function isUsernameIdentifier(value: string): boolean {
+  const raw = value.trim();
+  const username = raw.startsWith("@") ? raw.slice(1) : raw;
+  return username.length > 0 && !username.includes("@");
 }
 
 export async function createPlayerInviteAction(
@@ -43,15 +56,18 @@ export async function createPlayerInviteAction(
     String(formData.get("target") ?? "player") === "guardian"
       ? "guardian"
       : "player";
-  // L'email est désormais OPTIONNEL : un lien réclamable se partage par
-  // WhatsApp/copier. S'il est fourni, on l'utilise pour l'envoi + la
-  // traçabilité et on garde les garde-fous d'unicité.
-  const email = String(formData.get("email") ?? "").trim().toLowerCase();
+  // Identifiant optionnel : @username ou email. Vide = lien réclamable à
+  // partager (WhatsApp/copier).
+  const inviteIdentifier = normalizeInviteIdentifier(
+    String(formData.get("email") ?? ""),
+  );
+  const isEmailInvite = inviteIdentifier.includes("@") && !inviteIdentifier.startsWith("@");
+  const email = isEmailInvite ? inviteIdentifier.toLowerCase() : "";
 
   if (!playerId) {
     return { ok: false, error: "missing_fields" };
   }
-  if (email && !isPlausibleEmail(email)) {
+  if (isEmailInvite && !isPlausibleEmail(email)) {
     return { ok: false, error: "invalid_email" };
   }
 
@@ -89,6 +105,37 @@ export async function createPlayerInviteAction(
     }
   }
 
+  let targetUserId: string | null = null;
+  let targetLabel: string | null = null;
+  let resolvedEmail: string | null = null;
+  if (inviteIdentifier) {
+    const { data: resolvedTarget, error: resolveError } = await supabase
+      .rpc("resolve_invitation_target", { p_identifier: inviteIdentifier })
+      .maybeSingle<{
+        user_id: string;
+        email: string | null;
+        username: string | null;
+        full_name: string | null;
+      }>();
+
+    if (resolveError) {
+      console.error("[createPlayerInviteAction] target resolve failed", {
+        message: resolveError.message,
+        details: resolveError.details,
+      });
+      return { ok: false, error: "db_error", message: resolveError.message };
+    }
+
+    if (resolvedTarget?.user_id) {
+      targetUserId = resolvedTarget.user_id;
+      resolvedEmail = resolvedTarget.email;
+      targetLabel =
+        resolvedTarget.username ? `@${resolvedTarget.username}` : resolvedTarget.email;
+    } else if (isUsernameIdentifier(inviteIdentifier)) {
+      return { ok: false, error: "username_not_found" };
+    }
+  }
+
   const token = randomBytes(24).toString("base64url");
   const tokenHash = createHash("sha256").update(token, "utf8").digest("hex");
 
@@ -98,6 +145,7 @@ export async function createPlayerInviteAction(
       club_id: membership.club_id,
       kind: target,
       email: email || null,
+      target_user_id: targetUserId,
       token_hash: tokenHash,
       player_id: playerId,
       team_id: teamId || null,
@@ -121,6 +169,22 @@ export async function createPlayerInviteAction(
     return { ok: false, error: "db_error", message: error.message };
   }
 
+  if (targetUserId) {
+    const capability =
+      target === "guardian" ? { can_parent: true } : { can_play: true };
+    const { error: capabilityError } = await supabase
+      .from("profiles")
+      .update(capability)
+      .eq("id", targetUserId);
+    if (capabilityError) {
+      console.error("[createPlayerInviteAction] capability update failed", {
+        targetUserId,
+        target,
+        message: capabilityError.message,
+      });
+    }
+  }
+
   const url = `${getSiteUrl()}/${locale}/invite/${token}`;
 
   let teamName: string | null = null;
@@ -141,14 +205,14 @@ export async function createPlayerInviteAction(
 
   const playerName = `${player.first_name ?? ""} ${player.last_name ?? ""}`.trim() || null;
 
-  // Envoi email seulement si une adresse a été fournie. Sans email, le lien est
-  // purement réclamable (partage WhatsApp/copier).
-  const emailResult = email
+  // Si le compte existe déjà, l'invitation apparaît directement dans son
+  // portail. On n'envoie un email/lien que pour les invitations non ciblées.
+  const emailResult = email && !targetUserId
     ? await sendClubInvitationEmail(supabase, {
         invitationId: created.id,
         kind: "player",
         locale,
-        to: email,
+        to: resolvedEmail ?? email,
         clubName: membership.club_name,
         inviterName: profile?.full_name ?? null,
         roleName: null,
@@ -167,6 +231,8 @@ export async function createPlayerInviteAction(
     url,
     token,
     expiresAt: created.expires_at,
+    direct: Boolean(targetUserId),
+    ...(targetLabel ? { targetLabel } : {}),
     emailSent: emailResult.ok,
     ...(emailResult.ok ? {} : { emailError: emailResult.reason }),
   };

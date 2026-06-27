@@ -5,9 +5,9 @@ import { useRouter } from "next/navigation";
 import { Mail, Copy, Check, X, Send, MessageCircle, UserCircle, Users } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { Section, SectionHeader } from "@/components/ui/Section";
-import { Input } from "@/components/ui/Input";
 import { Button } from "@/components/ui/Button";
 import { Select } from "@/components/ui/Select";
+import { AccountDirectoryInput } from "@/components/account/AccountDirectoryInput";
 import {
   createPlayerInviteAction,
   resendPlayerInviteAction,
@@ -27,6 +27,7 @@ type EmailStatus =
 export type PlayerInvitation = {
   id: string;
   email: string | null;
+  targetLabel: string | null;
   status: "pending" | "accepted" | "revoked" | "expired";
   team_id: string | null;
   expires_at: string;
@@ -58,6 +59,7 @@ export function InvitePlayerSection({
   const [error, setError] = useState<string | null>(null);
   const [lastUrl, setLastUrl] = useState<string | null>(null);
   const [lastEmailTo, setLastEmailTo] = useState<string | null>(null);
+  const [lastDirectTarget, setLastDirectTarget] = useState<string | null>(null);
   const [lastEmailSent, setLastEmailSent] = useState<boolean>(false);
   const [copied, setCopied] = useState(false);
   const [resendNotice, setResendNotice] = useState<
@@ -72,6 +74,7 @@ export function InvitePlayerSection({
     setError(null);
     setLastUrl(null);
     setLastEmailTo(null);
+    setLastDirectTarget(null);
     setResendNotice(null);
     const fd = new FormData();
     fd.set("locale", locale);
@@ -86,8 +89,9 @@ export function InvitePlayerSection({
         setError(t(`errors.${result.error}`));
         return;
       }
-      setLastUrl(result.url);
-      setLastEmailTo(email.trim() || null);
+      setLastUrl(result.direct ? null : result.url);
+      setLastEmailTo(result.direct ? null : email.trim() || null);
+      setLastDirectTarget(result.direct ? result.targetLabel ?? email.trim() : null);
       setLastEmailSent(result.emailSent);
       setCopied(false);
       router.refresh();
@@ -208,14 +212,14 @@ export function InvitePlayerSection({
           </div>
 
           <form onSubmit={handleCreate} className="flex flex-col gap-3">
-            <Input
-              id="invite-email"
-              type="email"
-              label={t("emailLabel")}
+            <AccountDirectoryInput
+              name="email"
+              label={t("identifierLabel")}
               value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              placeholder={t("emailPlaceholder")}
-              hint={t("emailOptionalHint")}
+              onValueChange={setEmail}
+              placeholder={t("identifierPlaceholder")}
+              hint={t("identifierHint")}
+              inputClassName="h-10 w-full rounded-md border border-zinc-300 bg-white px-3 text-sm text-zinc-900 placeholder:text-zinc-400 focus:border-zinc-900 focus:outline-none focus:ring-2 focus:ring-zinc-900/10 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100"
             />
             {teams.length > 0 && (
               <Select
@@ -243,6 +247,15 @@ export function InvitePlayerSection({
               </Button>
             </div>
           </form>
+
+          {lastDirectTarget && (
+            <div className="mt-4 rounded-md border border-emerald-200 bg-emerald-50 p-3 text-xs font-medium text-emerald-800 dark:border-emerald-500/30 dark:bg-emerald-950/30 dark:text-emerald-200">
+              <div className="flex items-center gap-1">
+                <Check className="h-3.5 w-3.5" />
+                {t("directInviteSaved", { target: lastDirectTarget })}
+              </div>
+            </div>
+          )}
 
           {lastUrl && (
             <div className="mt-4 rounded-md border border-[var(--club-line)] bg-[var(--club-primary-soft)] p-3 text-xs">
@@ -316,7 +329,7 @@ export function InvitePlayerSection({
               >
                 <div className="min-w-0 flex-1">
                   <div className="truncate font-medium text-zinc-900 dark:text-zinc-100">
-                    {inv.email ?? t("claimLinkLabel")}
+                    {inv.targetLabel ?? inv.email ?? t("claimLinkLabel")}
                   </div>
                   <div className="truncate text-[11px] text-zinc-500">
                     {inv.email ? `${emailStatusLabel(inv.email_status)} · ` : ""}

@@ -8,9 +8,7 @@ import { resolvePersona } from "@/lib/club/persona";
 export type SignupErrorCode =
   | "emailExists"
   | "weakPassword"
-  | "missingFields"
-  | "invalidUsername"
-  | "usernameTaken";
+  | "missingFields";
 
 // Standard de sécurité : ≥12 caractères, au moins une minuscule, une majuscule,
 // un chiffre et un caractère spécial.
@@ -24,8 +22,6 @@ function isStrongPassword(pw: string): boolean {
   );
 }
 
-const USERNAME_RE = /^[a-z0-9_.-]{3,30}$/;
-
 export async function signupAction(formData: FormData) {
   const email = String(formData.get("email") ?? "").trim();
   const password = String(formData.get("password") ?? "");
@@ -33,36 +29,24 @@ export async function signupAction(formData: FormData) {
   const lastName = String(formData.get("lastName") ?? "").trim();
   const birthDate = String(formData.get("birthDate") ?? "").trim();
   const phone = String(formData.get("phone") ?? "").trim();
-  const username = String(formData.get("username") ?? "").trim().toLowerCase();
   const locale = String(formData.get("locale") ?? "fr");
   const rawPersona = String(formData.get("personaPreference") ?? "staff");
   const personaPreference = (
-    ["player", "dual", "parent"] as const
-  ).includes(rawPersona as "player" | "dual" | "parent")
+    ["staff", "player", "parent"] as const
+  ).includes(rawPersona as "staff" | "player" | "parent")
     ? rawPersona
     : "staff";
   // Turnstile injecte ce champ caché dans le form quand le CAPTCHA est actif.
   const captchaToken = String(formData.get("cf-turnstile-response") ?? "");
 
-  if (!email || !firstName || !lastName || !username) {
+  if (!email || !firstName || !lastName) {
     return { errorCode: "missingFields" as SignupErrorCode };
-  }
-  if (!USERNAME_RE.test(username)) {
-    return { errorCode: "invalidUsername" as SignupErrorCode };
   }
   if (!isStrongPassword(password)) {
     return { errorCode: "weakPassword" as SignupErrorCode };
   }
 
   const supabase = await createClient();
-
-  // Pré-check de disponibilité du handle (l'index unique reste le garde-fou).
-  const { data: available } = await supabase.rpc("is_username_available", {
-    p_username: username,
-  });
-  if (available === false) {
-    return { errorCode: "usernameTaken" as SignupErrorCode };
-  }
 
   const fullName = `${firstName} ${lastName}`.trim();
   const { data, error } = await supabase.auth.signUp({
@@ -75,8 +59,10 @@ export async function signupAction(formData: FormData) {
         last_name: lastName,
         birth_date: birthDate || null,
         phone: phone || null,
-        username,
         persona_preference: personaPreference,
+        can_coach: personaPreference === "staff",
+        can_play: personaPreference === "player",
+        can_parent: personaPreference === "parent",
       },
       emailRedirectTo: `${getSiteUrl()}/${locale}/confirm`,
       ...(captchaToken ? { captchaToken } : {}),

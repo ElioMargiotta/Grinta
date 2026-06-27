@@ -5,6 +5,7 @@ import { useTranslations } from "next-intl";
 import { createClubAction } from "@/app/[locale]/(admin)/admin/actions";
 import { LicensePriceEstimate } from "@/components/admin/LicensePriceEstimate";
 import { DirectoryPicker } from "@/components/admin/DirectoryPicker";
+import { AccountDirectoryInput } from "@/components/account/AccountDirectoryInput";
 import type { DirectoryClub } from "@/lib/admin/queries";
 
 type State = { error?: string } | null;
@@ -54,9 +55,13 @@ export function CreateClubForm({
         />
       </Field>
 
-      <Field label={t("clubs.ownerEmail")} hint={t("clubs.ownerEmailHint")}>
-        <input name="ownerEmail" type="email" className={inputCls} />
-      </Field>
+      <AccountDirectoryInput
+        name="ownerIdentifier"
+        label={t("clubs.ownerEmail")}
+        hint={t("clubs.ownerEmailHint")}
+        placeholder={t("owner.placeholder")}
+        inputClassName={inputCls}
+      />
 
       <fieldset className="grid grid-cols-3 gap-3">
         <Field label={t("license.maxTeams")} hint={t("license.unlimitedHint")}>

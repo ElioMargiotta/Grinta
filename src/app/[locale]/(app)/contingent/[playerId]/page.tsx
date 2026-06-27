@@ -130,7 +130,7 @@ export default async function ContingentPlayerPage({
     listClubTeams(membership.club_id, season),
     supabase
       .from("club_invitations")
-      .select("id, email, status, team_id, expires_at, email_status, email_sent_at")
+      .select("id, email, target_user_id, status, team_id, expires_at, email_status, email_sent_at")
       .eq("player_id", playerId)
       .eq("status", "pending")
       .order("created_at", { ascending: false }),
@@ -245,9 +245,32 @@ export default async function ContingentPlayerPage({
     };
   });
 
+  const inviteTargetIds = [
+    ...new Set(
+      (inviteRows ?? [])
+        .map((r) => r.target_user_id as string | null)
+        .filter((id): id is string => Boolean(id)),
+    ),
+  ];
+  const { data: inviteTargetProfiles } = inviteTargetIds.length
+    ? await supabase
+        .from("profiles")
+        .select("id, full_name, username")
+        .in("id", inviteTargetIds)
+    : { data: [] };
+  const inviteTargetById = new Map(
+    (inviteTargetProfiles ?? []).map((p) => [
+      p.id as string,
+      (p.username ? `@${p.username}` : (p.full_name as string | null)) ?? null,
+    ]),
+  );
+
   const pendingInvitations: PlayerInvitation[] = (inviteRows ?? []).map((r) => ({
     id: r.id as string,
     email: (r.email as string | null) ?? null,
+    targetLabel: r.target_user_id
+      ? inviteTargetById.get(r.target_user_id as string) ?? null
+      : null,
     status: r.status as PlayerInvitation["status"],
     team_id: (r.team_id as string | null) ?? null,
     expires_at: r.expires_at as string,

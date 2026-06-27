@@ -13,10 +13,11 @@ import {
 
 export type PendingInvitation = {
   id: string;
-  kind: "staff" | "player";
+  kind: "staff" | "player" | "guardian";
   clubName: string;
   roleName: string | null;
   teamName: string | null;
+  playerName: string | null;
   expiresAt: string;
 };
 
@@ -75,11 +76,16 @@ export function PendingInvitationsCard({
                 {inv.clubName}
               </div>
               <div className="text-xs text-zinc-500 dark:text-zinc-400">
-                {inv.kind === "player"
-                  ? inv.teamName
-                    ? t("playerWithTeam", { team: inv.teamName })
-                    : t("playerNoTeam")
-                  : t("staffAs", { role: inv.roleName ?? "" })}
+                {inv.kind === "guardian"
+                  ? t("childInvitation", {
+                      name: inv.playerName ?? t("childFallback"),
+                      team: inv.teamName ?? "—",
+                    })
+                  : inv.kind === "player"
+                    ? inv.teamName
+                      ? t("playerWithTeam", { team: inv.teamName })
+                      : t("playerNoTeam")
+                    : t("staffAs", { role: inv.roleName ?? "" })}
               </div>
             </div>
             <div className="flex shrink-0 items-center gap-2">

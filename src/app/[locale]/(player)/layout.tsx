@@ -39,16 +39,24 @@ export default async function PlayerLayout({
   const displayName = profile?.full_name?.trim() || user.email || "";
   const licenseUsage = membership ? await getClubLicenseUsage(membership.club_id) : null;
 
-  // Profils liés (self + enfants/tuteur, multi-clubs) + profil actif (Lot E).
+  // Profils liés, séparés par sous-profil actif : Joueur = self, Parent = enfants.
   const linkedPlayers = await getLinkedPlayers();
-  const activePlayer = await resolveActivePlayer(linkedPlayers);
-  const switcherProfiles = linkedPlayers.map((p) => ({
+  const visibleLinkedPlayers =
+    persona.activeProfile === "parent"
+      ? linkedPlayers.filter((p) => p.relation === "guardian")
+      : linkedPlayers.filter((p) => p.relation === "self");
+  const activePlayer = await resolveActivePlayer(
+    visibleLinkedPlayers,
+    persona.activeProfile === "parent" ? "guardian" : "self",
+  );
+  const switcherProfiles = visibleLinkedPlayers.map((p) => ({
     playerId: p.playerId,
     clubName: p.clubName,
     name: `${p.firstName} ${p.lastName}`.trim(),
     relation: p.relation,
     status: p.status,
   }));
+  const guardianCount = linkedPlayers.filter((p) => p.relation === "guardian").length;
 
   return (
     <div
@@ -57,7 +65,11 @@ export default async function PlayerLayout({
     >
       <ClubAccentSync color={membership?.theme_primary_color ?? null} />
       <div className="print:hidden">
-        <PlayerSidebar currentMembership={membership} />
+        <PlayerSidebar
+          currentMembership={membership}
+          activeProfile={persona.activeProfile}
+          guardianCount={guardianCount}
+        />
       </div>
       <div className="flex min-w-0 flex-1 flex-col">
         <div className="print:hidden">
@@ -86,7 +98,11 @@ export default async function PlayerLayout({
         <main className="flex-1 p-4 pb-24 md:p-5 lg:p-6 print:p-0">{children}</main>
       </div>
       <div className="print:hidden">
-        <MobileNavigation mode="player" />
+        <MobileNavigation
+          mode="player"
+          activeProfile={persona.activeProfile}
+          guardianCount={guardianCount}
+        />
       </div>
     </div>
   );
