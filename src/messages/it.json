@@ -3171,5 +3171,13 @@
     "convocationBody": "{opponent} · {date}",
     "convocationBodyNoOpponent": "{date}",
     "viewAll": "Apri"
+  },
+  "playerPortal": {
+    "childTag": "(figlio)",
+    "status": {
+      "inactive": "inattivo",
+      "left": "andato",
+      "archived": "archiviato"
+    }
   }
 }

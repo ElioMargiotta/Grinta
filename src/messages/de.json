@@ -3171,5 +3171,13 @@
     "convocationBody": "{opponent} · {date}",
     "convocationBodyNoOpponent": "{date}",
     "viewAll": "Öffnen"
+  },
+  "playerPortal": {
+    "childTag": "(Kind)",
+    "status": {
+      "inactive": "inaktiv",
+      "left": "weg",
+      "archived": "archiviert"
+    }
   }
 }

@@ -13,6 +13,8 @@ import {
   listRecentNotifications,
   getUnreadNotificationCount,
 } from "@/lib/notifications/queries";
+import { getLinkedPlayers, resolveActivePlayer } from "@/lib/player/profiles";
+import { PlayerProfileSwitcher } from "@/components/player/PlayerProfileSwitcher";
 
 export default async function PlayerLayout({
   children,
@@ -36,6 +38,17 @@ export default async function PlayerLayout({
 
   const displayName = profile?.full_name?.trim() || user.email || "";
   const licenseUsage = membership ? await getClubLicenseUsage(membership.club_id) : null;
+
+  // Profils liés (self + enfants/tuteur, multi-clubs) + profil actif (Lot E).
+  const linkedPlayers = await getLinkedPlayers();
+  const activePlayer = await resolveActivePlayer(linkedPlayers);
+  const switcherProfiles = linkedPlayers.map((p) => ({
+    playerId: p.playerId,
+    clubName: p.clubName,
+    name: `${p.firstName} ${p.lastName}`.trim(),
+    relation: p.relation,
+    status: p.status,
+  }));
 
   return (
     <div
@@ -62,6 +75,14 @@ export default async function PlayerLayout({
             }}
           />
         </div>
+        {switcherProfiles.length > 1 && activePlayer && (
+          <div className="border-b border-[var(--club-line)] px-4 py-2 print:hidden md:px-5 lg:px-6">
+            <PlayerProfileSwitcher
+              profiles={switcherProfiles}
+              activeId={activePlayer.playerId}
+            />
+          </div>
+        )}
         <main className="flex-1 p-4 pb-24 md:p-5 lg:p-6 print:p-0">{children}</main>
       </div>
       <div className="print:hidden">

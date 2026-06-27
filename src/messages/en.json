@@ -3177,5 +3177,13 @@
     "convocationBody": "{opponent} · {date}",
     "convocationBodyNoOpponent": "{date}",
     "viewAll": "Open"
+  },
+  "playerPortal": {
+    "childTag": "(child)",
+    "status": {
+      "inactive": "inactive",
+      "left": "left",
+      "archived": "archived"
+    }
   }
 }

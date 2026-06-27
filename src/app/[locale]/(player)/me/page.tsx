@@ -2,6 +2,7 @@ import { getTranslations, setRequestLocale } from "next-intl/server";
 import { ClipboardList } from "lucide-react";
 import { Section, SectionHeader } from "@/components/ui/Section";
 import { requirePersona } from "@/lib/auth/getUser";
+import { getLinkedPlayers, resolveActivePlayer } from "@/lib/player/profiles";
 import {
   PendingInvitationsCard,
   type PendingInvitation,
@@ -71,22 +72,28 @@ export default async function PlayerMePage({
 }) {
   const { locale } = await params;
   setRequestLocale(locale);
-  const { supabase, user } = await requirePersona(locale, "player");
+  const { supabase } = await requirePersona(locale, "player");
   const t = await getTranslations("playerMe");
   const tInv = await getTranslations("invitations");
 
+  // Profil actif du portail (Lot E) : self ou enfant (tuteur), choisi via le
+  // sélecteur. La RLS autorise le tuteur à lire la fiche de son enfant.
+  const linkedPlayers = await getLinkedPlayers();
+  const activePlayer = await resolveActivePlayer(linkedPlayers);
+
   const [{ data: player }, { data: invitationRows }] = await Promise.all([
-    supabase
-      .from("players")
-      .select(
-        `id, club_id, first_name, last_name, birth_date, position, jersey_number,
+    activePlayer
+      ? supabase
+          .from("players")
+          .select(
+            `id, club_id, first_name, last_name, birth_date, position, jersey_number,
          strong_foot, license_number, js_number, email, phone, nationality,
          address, postal_code, city, canton, photo_url,
          dual_licence_club, dual_licence_level, dual_licence_team`,
-      )
-      .eq("user_id", user.id)
-      .limit(1)
-      .maybeSingle<PlayerRow>(),
+          )
+          .eq("id", activePlayer.playerId)
+          .maybeSingle<PlayerRow>()
+      : Promise.resolve({ data: null as PlayerRow | null }),
     supabase
       .from("club_invitations")
       .select(
