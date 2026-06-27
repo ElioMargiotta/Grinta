@@ -2114,7 +2114,26 @@
     "claimLinkLabel": "Link da riscattare (senza email)",
     "descriptionGuardian": "Genera un link affinché un genitore segua questo giocatore (convocazioni, ecc.).",
     "targetPlayer": "Il giocatore",
-    "targetGuardian": "Un genitore"
+    "targetGuardian": "Un genitore",
+    "unlink": "Scollega",
+    "unlinkConfirm": "Scollegare questo account dalla scheda giocatore?",
+    "status": {
+      "active": "Attivo",
+      "inactive": "Inattivo",
+      "left": "Andato",
+      "archived": "Archiviato"
+    },
+    "lifecycle": {
+      "title": "Ciclo di vita",
+      "statusLabel": "Stato della scheda",
+      "guardiansTitle": "Genitori collegati",
+      "noGuardians": "Nessun genitore ancora collegato.",
+      "guardianUnnamed": "Account collegato",
+      "removeGuardian": "Rimuovi",
+      "removeGuardianConfirm": "Rimuovere questo collegamento genitore?",
+      "confirm_left": "Segnare questo giocatore come uscito dal club? La cronologia è conservata.",
+      "confirm_archived": "Archiviare questa scheda? Sarà nascosta dalla rosa."
+    }
   },
   "libraries": {
     "noDiagram": "Nessun diagramma",
@@ -2611,6 +2630,12 @@
     "account": {
       "linkedTitle": "Account collegato — riceve le notifiche",
       "notLinkedTitle": "Nessun account collegato — non notificato"
+    },
+    "status": {
+      "active": "Attivo",
+      "inactive": "Inattivo",
+      "left": "Andato",
+      "archived": "Archiviato"
     }
   },
   "playerMe": {

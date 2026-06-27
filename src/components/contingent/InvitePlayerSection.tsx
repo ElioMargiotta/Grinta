@@ -13,6 +13,7 @@ import {
   resendPlayerInviteAction,
   revokePlayerInviteAction,
 } from "@/app/[locale]/(app)/contingent/invite-actions";
+import { unlinkPlayerAccountAction } from "@/app/[locale]/(app)/contingent/lifecycle-actions";
 
 type EmailStatus =
   | "pending"
@@ -93,6 +94,17 @@ export function InvitePlayerSection({
     });
   }
 
+  function handleUnlink() {
+    if (!window.confirm(t("unlinkConfirm"))) return;
+    const fd = new FormData();
+    fd.set("locale", locale);
+    fd.set("playerId", playerId);
+    startTransition(async () => {
+      await unlinkPlayerAccountAction(fd);
+      router.refresh();
+    });
+  }
+
   function handleRevoke(inviteId: string) {
     const fd = new FormData();
     fd.set("locale", locale);
@@ -148,9 +160,18 @@ export function InvitePlayerSection({
       <SectionHeader icon={Mail} title={t("title")} className="mb-3" />
 
       {isLinkedToUser && target === "player" ? (
-        <p className="mb-4 rounded-md bg-emerald-50 px-3 py-2 text-sm text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-300">
-          {t("alreadyLinked")}
-        </p>
+        <div className="mb-4 flex items-center justify-between gap-3 rounded-md bg-emerald-50 px-3 py-2 text-sm text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-300">
+          <span>{t("alreadyLinked")}</span>
+          <button
+            type="button"
+            onClick={handleUnlink}
+            disabled={isPending}
+            className="inline-flex shrink-0 items-center gap-1 rounded-md px-2 py-1 text-[11px] font-medium text-red-600 hover:bg-red-50 dark:text-red-400 dark:hover:bg-red-950/40"
+          >
+            <X className="h-3 w-3" />
+            {t("unlink")}
+          </button>
+        </div>
       ) : (
         <p className="mb-4 text-sm text-zinc-600 dark:text-zinc-400">
           {target === "guardian" ? t("descriptionGuardian") : t("description")}

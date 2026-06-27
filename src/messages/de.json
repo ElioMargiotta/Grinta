@@ -2114,7 +2114,26 @@
     "claimLinkLabel": "Einlöse-Link (ohne E-Mail)",
     "descriptionGuardian": "Erstelle einen Link, damit ein Elternteil diesem Spieler folgen kann (Aufgebote usw.).",
     "targetPlayer": "Der Spieler",
-    "targetGuardian": "Ein Elternteil"
+    "targetGuardian": "Ein Elternteil",
+    "unlink": "Trennen",
+    "unlinkConfirm": "Dieses Konto vom Spielerprofil trennen?",
+    "status": {
+      "active": "Aktiv",
+      "inactive": "Inaktiv",
+      "left": "Weg",
+      "archived": "Archiviert"
+    },
+    "lifecycle": {
+      "title": "Lebenszyklus",
+      "statusLabel": "Profilstatus",
+      "guardiansTitle": "Verknüpfte Eltern",
+      "noGuardians": "Noch kein Elternteil verknüpft.",
+      "guardianUnnamed": "Verknüpftes Konto",
+      "removeGuardian": "Entfernen",
+      "removeGuardianConfirm": "Diese Elternverknüpfung entfernen?",
+      "confirm_left": "Diesen Spieler als Vereinsaustritt markieren? Verlauf bleibt erhalten.",
+      "confirm_archived": "Profil archivieren? Es wird im Kader ausgeblendet."
+    }
   },
   "libraries": {
     "noDiagram": "Kein Diagramm",
@@ -2611,6 +2630,12 @@
     "account": {
       "linkedTitle": "Verknüpftes Konto — erhält Benachrichtigungen",
       "notLinkedTitle": "Kein verknüpftes Konto — keine Benachrichtigung"
+    },
+    "status": {
+      "active": "Aktiv",
+      "inactive": "Inaktiv",
+      "left": "Weg",
+      "archived": "Archiviert"
     }
   },
   "playerMe": {

@@ -2120,7 +2120,26 @@
     "claimLinkLabel": "Claim link (no email)",
     "descriptionGuardian": "Generate a link for a parent/guardian to follow this player (convocations, etc.).",
     "targetPlayer": "The player",
-    "targetGuardian": "A parent"
+    "targetGuardian": "A parent",
+    "unlink": "Unlink",
+    "unlinkConfirm": "Unlink this account from the player profile?",
+    "status": {
+      "active": "Active",
+      "inactive": "Inactive",
+      "left": "Left",
+      "archived": "Archived"
+    },
+    "lifecycle": {
+      "title": "Lifecycle",
+      "statusLabel": "Profile status",
+      "guardiansTitle": "Linked parents",
+      "noGuardians": "No parent linked yet.",
+      "guardianUnnamed": "Linked account",
+      "removeGuardian": "Remove",
+      "removeGuardianConfirm": "Remove this parent link?",
+      "confirm_left": "Mark this player as having left the club? Their history is kept.",
+      "confirm_archived": "Archive this profile? It will be hidden from the roster."
+    }
   },
   "libraries": {
     "noDiagram": "No diagram",
@@ -2617,6 +2636,12 @@
     "account": {
       "linkedTitle": "Linked account — receives notifications",
       "notLinkedTitle": "No linked account — not notified"
+    },
+    "status": {
+      "active": "Active",
+      "inactive": "Inactive",
+      "left": "Left",
+      "archived": "Archived"
     }
   },
   "playerMe": {

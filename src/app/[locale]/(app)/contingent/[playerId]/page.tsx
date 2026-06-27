@@ -98,13 +98,13 @@ export default async function ContingentPlayerPage({
     .select(
       `id, first_name, last_name, birth_date, position, jersey_number, notes,
        strong_foot, license_number, js_number, email, phone, nationality,
-       address, postal_code, city, canton, user_id,
+       address, postal_code, city, canton, user_id, status,
        guardian_name, guardian_email, guardian_phone,
        guardian2_name, guardian2_email, guardian2_phone,
        dual_licence_club, dual_licence_level, dual_licence_team`,
     )
     .eq("id", playerId)
-    .single<EditablePlayer & { user_id: string | null }>();
+    .single<EditablePlayer & { user_id: string | null; status: string | null }>();
 
   if (!player) notFound();
 
@@ -115,6 +115,7 @@ export default async function ContingentPlayerPage({
     { data: assignments },
     teams,
     { data: inviteRows },
+    { data: guardianRows },
     { rows: evalRows, shareAvailable: evaluationsShareAvailable },
     { data: metricRows },
     { data: measurementRows },
@@ -133,6 +134,10 @@ export default async function ContingentPlayerPage({
       .eq("player_id", playerId)
       .eq("status", "pending")
       .order("created_at", { ascending: false }),
+    supabase
+      .from("player_guardians")
+      .select("id, relation, user_id, profiles ( full_name, username )")
+      .eq("player_id", playerId),
     loadEvaluations(supabase, playerId),
     supabase
       .from("physical_metrics")
@@ -250,6 +255,26 @@ export default async function ContingentPlayerPage({
     email_sent_at: (r.email_sent_at as string | null) ?? null,
   }));
 
+  type GuardianQueryRow = {
+    id: string;
+    relation: string | null;
+    // PostgREST type l'embed to-one comme un tableau ; on normalise.
+    profiles:
+      | { full_name: string | null; username: string | null }
+      | { full_name: string | null; username: string | null }[]
+      | null;
+  };
+  const guardians = ((guardianRows ?? []) as unknown as GuardianQueryRow[]).map(
+    (g) => {
+      const prof = Array.isArray(g.profiles) ? g.profiles[0] : g.profiles;
+      return {
+        id: g.id,
+        relation: g.relation ?? "guardian",
+        name: prof?.full_name?.trim() || prof?.username || null,
+      };
+    },
+  );
+
   const fullName = `${player.first_name} ${player.last_name}`;
 
   return (
@@ -268,6 +293,8 @@ export default async function ContingentPlayerPage({
         teams={teams}
         currentTeamIds={currentTeamIds}
         pendingInvitations={pendingInvitations}
+        guardians={guardians}
+        playerStatus={(player.status as "active" | "inactive" | "left" | "archived" | null) ?? "active"}
         evaluations={evaluations}
         evaluationsShareAvailable={evaluationsShareAvailable}
         physicalMetrics={physicalMetrics}

@@ -2120,7 +2120,26 @@
     "claimLinkLabel": "Lien à réclamer (sans email)",
     "descriptionGuardian": "Générez un lien pour qu’un parent/tuteur suive ce joueur (convocations, etc.).",
     "targetPlayer": "Le joueur",
-    "targetGuardian": "Un parent"
+    "targetGuardian": "Un parent",
+    "unlink": "Délier",
+    "unlinkConfirm": "Délier ce compte de la fiche joueur ?",
+    "status": {
+      "active": "Actif",
+      "inactive": "Inactif",
+      "left": "Parti",
+      "archived": "Archivé"
+    },
+    "lifecycle": {
+      "title": "Cycle de vie",
+      "statusLabel": "Statut de la fiche",
+      "guardiansTitle": "Parents liés",
+      "noGuardians": "Aucun parent lié pour le moment.",
+      "guardianUnnamed": "Compte lié",
+      "removeGuardian": "Retirer",
+      "removeGuardianConfirm": "Retirer ce lien parent ?",
+      "confirm_left": "Marquer ce joueur comme parti du club ? Son historique est conservé.",
+      "confirm_archived": "Archiver cette fiche ? Elle sera masquée du roster."
+    }
   },
   "libraries": {
     "noDiagram": "Pas de schéma",
@@ -2613,6 +2632,12 @@
     "account": {
       "linkedTitle": "Compte lié — reçoit les notifications",
       "notLinkedTitle": "Aucun compte lié — non notifié"
+    },
+    "status": {
+      "active": "Actif",
+      "inactive": "Inactif",
+      "left": "Parti",
+      "archived": "Archivé"
     }
   },
   "playerMe": {
