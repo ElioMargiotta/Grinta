@@ -2593,7 +2593,11 @@
       "deleteConfirm": "Eliminare definitivamente questo indicatore? Anche le misurazioni registrate verranno eliminate."
     },
     "presence": "Presenza",
-    "available": "Disponibile"
+    "available": "Disponibile",
+    "account": {
+      "linkedTitle": "Account collegato — riceve le notifiche",
+      "notLinkedTitle": "Nessun account collegato — non notificato"
+    }
   },
   "playerMe": {
     "title": "La mia scheda",
@@ -3108,5 +3112,20 @@
       "missing_match": "Partita mancante",
       "unknown": "Si è verificato un errore"
     }
+  },
+  "notifications": {
+    "title": "Notifiche",
+    "empty": "Ancora nulla qui",
+    "noUnread": "Sei aggiornato",
+    "markAllRead": "Segna tutte come lette",
+    "tabUnread": "Non lette ({count})",
+    "tabAll": "Tutte",
+    "dismissAria": "Rimuovi notifica",
+    "bellAria": "Notifiche",
+    "unreadAria": "{count} non lette",
+    "convocationTitle": "Convocazione · {team}",
+    "convocationBody": "{opponent} · {date}",
+    "convocationBodyNoOpponent": "{date}",
+    "viewAll": "Apri"
   }
 }

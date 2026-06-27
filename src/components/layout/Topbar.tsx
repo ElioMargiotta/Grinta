@@ -10,10 +10,19 @@ import { ClubSwitcher } from "./ClubSwitcher";
 import { SeasonSwitcher } from "./SeasonSwitcher";
 import { PersonaSwitcher } from "./PersonaSwitcher";
 import { LocaleSwitcher } from "./LocaleSwitcher";
+import { NotificationBell } from "./NotificationBell";
 import type { ClubMembership } from "@/lib/club/types";
 import type { PersonaState } from "@/lib/club/persona";
 import type { LicenseUsage } from "@/lib/license/types";
+import type { NotificationRow, NotificationView } from "@/lib/notifications/types";
 import { ThemeToggle } from "./ThemeToggle";
+
+export type TopbarNotifications = {
+  userId: string;
+  view: NotificationView;
+  items: NotificationRow[];
+  unread: number;
+};
 
 function initials(name: string) {
   const trimmed = name.trim();
@@ -31,6 +40,7 @@ export function Topbar({
   persona,
   currentSeason,
   seasons,
+  notifications,
 }: {
   userName: string;
   currentMembership: ClubMembership | null;
@@ -39,6 +49,7 @@ export function Topbar({
   persona?: PersonaState | null;
   currentSeason?: string | null;
   seasons?: string[];
+  notifications?: TopbarNotifications | null;
 }) {
   const t = useTranslations("nav");
   const tp = useTranslations("topbar");
@@ -92,6 +103,14 @@ export function Topbar({
         )}
       </div>
       <div className="flex shrink-0 items-center gap-0.5 sm:gap-1">
+        {notifications && (
+          <NotificationBell
+            userId={notifications.userId}
+            view={notifications.view}
+            initialItems={notifications.items}
+            initialUnread={notifications.unread}
+          />
+        )}
         <ThemeToggle />
         <LocaleSwitcher variant="subtle" />
         <Link

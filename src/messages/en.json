@@ -2599,7 +2599,11 @@
       "deleteConfirm": "Permanently delete this indicator? The measurements recorded for it will also be deleted."
     },
     "presence": "Attendance",
-    "available": "Available"
+    "available": "Available",
+    "account": {
+      "linkedTitle": "Linked account — receives notifications",
+      "notLinkedTitle": "No linked account — not notified"
+    }
   },
   "playerMe": {
     "title": "My profile",
@@ -3114,5 +3118,20 @@
       "missing_match": "Missing match",
       "unknown": "Something went wrong"
     }
+  },
+  "notifications": {
+    "title": "Notifications",
+    "empty": "Nothing here yet",
+    "noUnread": "You're all caught up",
+    "markAllRead": "Mark all as read",
+    "tabUnread": "Unread ({count})",
+    "tabAll": "All",
+    "dismissAria": "Dismiss notification",
+    "bellAria": "Notifications",
+    "unreadAria": "{count} unread",
+    "convocationTitle": "Call-up · {team}",
+    "convocationBody": "{opponent} · {date}",
+    "convocationBodyNoOpponent": "{date}",
+    "viewAll": "Open"
   }
 }

@@ -9,6 +9,10 @@ import { clubThemeStyle } from "@/lib/club/theme";
 import { getClubLicenseUsage } from "@/lib/license/queries";
 import { MobileNavigation } from "@/components/layout/MobileNavigation";
 import { ClubAccentSync } from "@/components/layout/ClubAccentSync";
+import {
+  listRecentNotifications,
+  getUnreadNotificationCount,
+} from "@/lib/notifications/queries";
 
 export default async function PlayerLayout({
   children,
@@ -21,11 +25,14 @@ export default async function PlayerLayout({
   setRequestLocale(locale);
   const { user, persona } = await requirePersona(locale, "player");
 
-  const [profile, membership, memberships] = await Promise.all([
-    getProfile(),
-    resolveCurrentMembership(),
-    getMyMemberships(),
-  ]);
+  const [profile, membership, memberships, notifItems, notifUnread] =
+    await Promise.all([
+      getProfile(),
+      resolveCurrentMembership(),
+      getMyMemberships(),
+      listRecentNotifications("player"),
+      getUnreadNotificationCount("player"),
+    ]);
 
   const displayName = profile?.full_name?.trim() || user.email || "";
   const licenseUsage = membership ? await getClubLicenseUsage(membership.club_id) : null;
@@ -47,6 +54,12 @@ export default async function PlayerLayout({
             memberships={memberships}
             licenseUsage={licenseUsage}
             persona={persona}
+            notifications={{
+              userId: user.id,
+              view: "player",
+              items: notifItems,
+              unread: notifUnread,
+            }}
           />
         </div>
         <main className="flex-1 p-4 pb-24 md:p-5 lg:p-6 print:p-0">{children}</main>

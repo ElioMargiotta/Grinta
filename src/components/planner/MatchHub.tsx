@@ -203,8 +203,10 @@ export function MatchHub({
     });
   }
 
-  function saveLineup() {
-    setLineupMsg(null);
+  // Persiste la compo affichée (formation + tactique + squad → called_up). Partagé
+  // par « Enregistrer » et par l'envoi de convocation, qui doit toujours partir
+  // sur la sélection à l'écran et non sur le dernier état sauvegardé.
+  async function persistLineup() {
     const fSlots = FORMATIONS[lineup.formation] ?? [];
     const squad = [
       ...lineup.slots
@@ -232,8 +234,13 @@ export function MatchHub({
     fd.set("formation", lineup.formation);
     fd.set("tactics", JSON.stringify(tactics));
     fd.set("squad", JSON.stringify(squad));
+    return setMatchFormationAction(fd);
+  }
+
+  function saveLineup() {
+    setLineupMsg(null);
     startSaveLineup(async () => {
-      const r = await setMatchFormationAction(fd);
+      const r = await persistLineup();
       if (r?.error) setLineupMsg(r.error);
       else {
         setLineupMsg(t("prematch.saved"));
@@ -246,11 +253,21 @@ export function MatchHub({
     if (send && !window.confirm(t("prematch.convocation.sendConfirm"))) return;
     if (!send && !window.confirm(t("prematch.convocation.cancelConfirm"))) return;
     setConvocationMsg(null);
-    const fd = new FormData();
-    fd.set("teamId", teamId);
-    fd.set("matchId", match.id);
-    fd.set("send", String(send));
     startSendConvocation(async () => {
+      // À l'envoi, on sauvegarde d'abord la compo en cours : la convocation part
+      // ainsi sur la sélection affichée (sinon on enverrait l'avant-modif).
+      if (send) {
+        const lr = await persistLineup();
+        if (lr?.error) {
+          setConvocationMsg(lr.error);
+          return;
+        }
+        setLineupMsg(t("prematch.saved"));
+      }
+      const fd = new FormData();
+      fd.set("teamId", teamId);
+      fd.set("matchId", match.id);
+      fd.set("send", String(send));
       const r = await setMatchConvocationSentAction(fd);
       if (r?.error) setConvocationMsg(r.error);
       else {

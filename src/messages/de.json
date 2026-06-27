@@ -2593,7 +2593,11 @@
       "deleteConfirm": "Diesen Indikator endgültig löschen? Die dafür erfassten Messwerte werden ebenfalls gelöscht."
     },
     "presence": "Anwesenheit",
-    "available": "Verfügbar"
+    "available": "Verfügbar",
+    "account": {
+      "linkedTitle": "Verknüpftes Konto — erhält Benachrichtigungen",
+      "notLinkedTitle": "Kein verknüpftes Konto — keine Benachrichtigung"
+    }
   },
   "playerMe": {
     "title": "Mein Profil",
@@ -3108,5 +3112,20 @@
       "missing_match": "Spiel fehlt",
       "unknown": "Etwas ist schiefgelaufen"
     }
+  },
+  "notifications": {
+    "title": "Benachrichtigungen",
+    "empty": "Noch nichts vorhanden",
+    "noUnread": "Alles erledigt",
+    "markAllRead": "Alle als gelesen markieren",
+    "tabUnread": "Ungelesen ({count})",
+    "tabAll": "Alle",
+    "dismissAria": "Benachrichtigung entfernen",
+    "bellAria": "Benachrichtigungen",
+    "unreadAria": "{count} ungelesen",
+    "convocationTitle": "Aufgebot · {team}",
+    "convocationBody": "{opponent} · {date}",
+    "convocationBodyNoOpponent": "{date}",
+    "viewAll": "Öffnen"
   }
 }
