@@ -16,6 +16,7 @@ import { ClubPlayerForm, type EditablePlayer } from "./ClubPlayerForm";
 import { DeletePlayerSection } from "./DeletePlayerSection";
 import { DualLicenceBlock } from "./DualLicenceBlock";
 import { InvitePlayerSection, type PlayerInvitation } from "./InvitePlayerSection";
+import { PlayerLifecycleSection, type GuardianRow } from "./PlayerLifecycleSection";
 import { TeamAssignmentsBlock } from "./TeamAssignmentsBlock";
 import {
   EvaluationsSection,
@@ -67,6 +68,8 @@ export function ContingentPlayerProfile({
   teams,
   currentTeamIds,
   pendingInvitations,
+  guardians,
+  playerStatus,
   evaluations,
   evaluationsShareAvailable,
   physicalMetrics,
@@ -83,6 +86,8 @@ export function ContingentPlayerProfile({
   teams: ClubTeamOption[];
   currentTeamIds: string[];
   pendingInvitations: PlayerInvitation[];
+  guardians: GuardianRow[];
+  playerStatus: "active" | "inactive" | "left" | "archived";
   evaluations: EvaluationRow[];
   evaluationsShareAvailable: boolean;
   physicalMetrics: PhysicalMetric[];
@@ -329,6 +334,12 @@ export function ContingentPlayerProfile({
             teams={teams.map((team) => ({ id: team.id, name: team.name }))}
             pendingInvitations={pendingInvitations}
             isLinkedToUser={Boolean(player.user_id)}
+          />
+          <PlayerLifecycleSection
+            locale={locale}
+            playerId={player.id}
+            status={playerStatus}
+            guardians={guardians}
           />
           <DeletePlayerSection playerId={player.id} playerName={fullName} />
         </div>

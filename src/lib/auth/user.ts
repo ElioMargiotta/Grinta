@@ -25,6 +25,9 @@ export const getAuthUser = cache(async (): Promise<User | null> => {
 export type UserProfile = {
   full_name: string | null;
   persona_preference: string | null;
+  can_coach: boolean | null;
+  can_play: boolean | null;
+  can_parent: boolean | null;
 };
 
 /**
@@ -38,7 +41,7 @@ export const getProfile = cache(async (): Promise<UserProfile | null> => {
   const supabase = await createClient();
   const { data } = await supabase
     .from("profiles")
-    .select("full_name, persona_preference")
+    .select("full_name, persona_preference, can_coach, can_play, can_parent")
     .eq("id", user.id)
     .maybeSingle();
   return (data as UserProfile | null) ?? null;

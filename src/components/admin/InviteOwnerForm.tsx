@@ -4,6 +4,7 @@ import { useActionState } from "react";
 import { useTranslations } from "next-intl";
 import { Mail } from "lucide-react";
 import { inviteClubOwnerAction } from "@/app/[locale]/(admin)/admin/actions";
+import { AccountDirectoryInput } from "@/components/account/AccountDirectoryInput";
 
 type State = { ok?: true; error?: string } | null;
 
@@ -19,12 +20,13 @@ export function InviteOwnerForm({ clubId, locale }: { clubId: string; locale: st
       <input type="hidden" name="locale" value={locale} />
       <input type="hidden" name="clubId" value={clubId} />
       <div className="flex gap-2">
-        <input
-          name="email"
-          type="email"
+        <AccountDirectoryInput
+          name="identifier"
+          label={t("owner.identifier")}
           required
           placeholder={t("owner.placeholder")}
-          className="w-full rounded-lg border border-zinc-300 bg-white px-3 py-2 text-sm text-zinc-900 outline-none focus:border-zinc-500 dark:border-zinc-700 dark:bg-zinc-950 dark:text-zinc-100"
+          inputClassName="w-full rounded-lg border border-zinc-300 bg-white px-3 py-2 text-sm text-zinc-900 outline-none focus:border-zinc-500 dark:border-zinc-700 dark:bg-zinc-950 dark:text-zinc-100"
+          className="min-w-0 flex-1"
         />
         <button
           type="submit"

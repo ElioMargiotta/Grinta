@@ -6,12 +6,23 @@ import { useTranslations, useLocale } from "next-intl";
 import { Button } from "@/components/ui/Button";
 import { AuthField } from "@/components/auth/AuthField";
 import { PasswordInput } from "@/components/auth/PasswordInput";
+import { TurnstileWidget } from "@/components/auth/TurnstileWidget";
 import { signupAction } from "@/app/[locale]/(auth)/signup/actions";
 
-type PersonaChoice = "staff" | "player" | "dual";
+type PersonaChoice = "staff" | "player" | "parent";
 
 const inputClass =
   "h-10 w-full rounded-md border border-zinc-300 bg-white px-3 text-sm text-zinc-900 placeholder:text-zinc-400 focus:border-zinc-900 focus:outline-none focus:ring-2 focus:ring-zinc-900/10";
+
+function isStrongPassword(pw: string): boolean {
+  return (
+    pw.length >= 12 &&
+    /[a-z]/.test(pw) &&
+    /[A-Z]/.test(pw) &&
+    /\d/.test(pw) &&
+    /[^A-Za-z0-9]/.test(pw)
+  );
+}
 
 export function SignupForm() {
   const t = useTranslations("auth");
@@ -19,6 +30,7 @@ export function SignupForm() {
   const [error, setError] = useState<string | null>(null);
   const [confirmed, setConfirmed] = useState(false);
   const [persona, setPersona] = useState<PersonaChoice>("staff");
+  const [password, setPassword] = useState("");
   const [isPending, startTransition] = useTransition();
 
   if (confirmed) {
@@ -33,36 +45,67 @@ export function SignupForm() {
     );
   }
 
+  const passwordOk = password === "" || isStrongPassword(password);
+
   return (
     <form
       className="flex flex-col gap-5"
       action={(formData) => {
         setError(null);
         formData.set("locale", locale);
+        formData.set("personaPreference", persona);
         startTransition(async () => {
           const result = await signupAction(formData);
-          if (result?.errorCode === "emailExists")
-            setError(t("emailAlreadyExists"));
+          if (result?.errorCode) setError(t(result.errorCode));
           else if (result?.error) setError(result.error);
           else if (result?.needsConfirmation) setConfirmed(true);
         });
       }}
     >
-      <AuthField
-        label={t("fullName")}
-        htmlFor="fullName"
-        help={t("fullNameHelp")}
-        required
-      >
-        <input
-          id="fullName"
-          name="fullName"
-          autoComplete="name"
-          required
-          placeholder={t("namePlaceholder")}
-          className={inputClass}
-        />
-      </AuthField>
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+        <AuthField label={t("firstName")} htmlFor="firstName" required>
+          <input
+            id="firstName"
+            name="firstName"
+            autoComplete="given-name"
+            required
+            placeholder={t("firstNamePlaceholder")}
+            className={inputClass}
+          />
+        </AuthField>
+        <AuthField label={t("lastName")} htmlFor="lastName" required>
+          <input
+            id="lastName"
+            name="lastName"
+            autoComplete="family-name"
+            required
+            placeholder={t("lastNamePlaceholder")}
+            className={inputClass}
+          />
+        </AuthField>
+      </div>
+
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+        <AuthField label={t("birthDate")} htmlFor="birthDate">
+          <input
+            id="birthDate"
+            name="birthDate"
+            type="date"
+            autoComplete="bday"
+            className={inputClass}
+          />
+        </AuthField>
+        <AuthField label={t("phone")} htmlFor="phone">
+          <input
+            id="phone"
+            name="phone"
+            type="tel"
+            autoComplete="tel"
+            placeholder={t("phonePlaceholder")}
+            className={inputClass}
+          />
+        </AuthField>
+      </div>
 
       <AuthField label={t("email")} htmlFor="email" help={t("emailHelp")} required>
         <input
@@ -79,7 +122,7 @@ export function SignupForm() {
       <AuthField
         label={t("password")}
         htmlFor="password"
-        help={t("passwordHelpSignup")}
+        help={t("passwordPolicyHint")}
         required
       >
         <PasswordInput
@@ -87,23 +130,26 @@ export function SignupForm() {
           name="password"
           autoComplete="new-password"
           required
-          minLength={6}
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
           placeholder={t("passwordPlaceholder")}
         />
       </AuthField>
+      {!passwordOk && (
+        <p className="-mt-3 text-xs text-red-600">{t("weakPassword")}</p>
+      )}
 
       <fieldset className="flex flex-col gap-2">
         <legend className="text-sm font-medium text-zinc-900">
-          {t("personaChoiceLabel")}
+          {t("accountTypeLabel")}
         </legend>
-        <p className="text-xs text-zinc-500">{t("personaChoiceHelp")}</p>
-        <input type="hidden" name="personaPreference" value={persona} />
+        <p className="text-xs text-zinc-500">{t("accountTypeHelp")}</p>
         <div className="grid grid-cols-1 gap-2 sm:grid-cols-3">
           {(
             [
-              { value: "staff", icon: Shield, labelKey: "personaChoiceStaff" },
-              { value: "player", icon: UserCircle, labelKey: "personaChoicePlayer" },
-              { value: "dual", icon: Users, labelKey: "personaChoiceDual" },
+              { value: "staff", icon: Shield, labelKey: "accountTypeStaff" },
+              { value: "player", icon: UserCircle, labelKey: "accountTypePlayer" },
+              { value: "parent", icon: Users, labelKey: "accountTypeParent" },
             ] as const
           ).map(({ value, icon: Icon, labelKey }) => {
             const active = persona === value;
@@ -127,6 +173,8 @@ export function SignupForm() {
         </div>
       </fieldset>
 
+      <TurnstileWidget />
+
       {error && (
         <div className="rounded-md border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700">
           {error}
@@ -137,6 +185,7 @@ export function SignupForm() {
         type="submit"
         loading={isPending}
         loadingLabel={t("submittingSignup")}
+        disabled={isPending || !passwordOk}
         className="w-full"
       >
         {t("submitSignup")}

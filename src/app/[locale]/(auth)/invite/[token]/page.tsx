@@ -7,8 +7,8 @@ type InvitationPreview = {
   id: string;
   club_id: string;
   club_name: string;
-  kind: "staff" | "player";
-  email: string;
+  kind: "staff" | "player" | "guardian";
+  email: string | null;
   role_name: string | null;
   player_first_name: string | null;
   player_last_name: string | null;
@@ -79,17 +79,24 @@ export default async function AcceptInvitePage({
     );
   }
 
+  const playerFullName = `${preview.player_first_name ?? ""} ${preview.player_last_name ?? ""}`.trim();
   const detail =
-    preview.kind === "player"
-      ? t.rich("invitedAsPlayer", {
-          name: `${preview.player_first_name ?? ""} ${preview.player_last_name ?? ""}`.trim(),
+    preview.kind === "guardian"
+      ? t.rich("invitedAsGuardian", {
+          name: playerFullName,
           team: preview.team_name ?? t("noTeam"),
           strong: (chunks) => <strong>{chunks}</strong>,
         })
-      : t.rich("invitedAsStaff", {
-          role: preview.role_name ?? "",
-          strong: (chunks) => <strong>{chunks}</strong>,
-        });
+      : preview.kind === "player"
+        ? t.rich("invitedAsPlayer", {
+            name: playerFullName,
+            team: preview.team_name ?? t("noTeam"),
+            strong: (chunks) => <strong>{chunks}</strong>,
+          })
+        : t.rich("invitedAsStaff", {
+            role: preview.role_name ?? "",
+            strong: (chunks) => <strong>{chunks}</strong>,
+          });
 
   const {
     data: { user },
@@ -103,12 +110,14 @@ export default async function AcceptInvitePage({
             {t("joinClub", { club: preview.club_name })}
           </h1>
           <p className="mt-1 text-sm text-zinc-600">{detail}</p>
-          <p className="mt-1 text-sm text-zinc-600">
-            {t.rich("invitationSentTo", {
-              email: preview.email,
-              strong: (chunks) => <strong>{chunks}</strong>,
-            })}
-          </p>
+          {preview.email && (
+            <p className="mt-1 text-sm text-zinc-600">
+              {t.rich("invitationSentTo", {
+                email: preview.email,
+                strong: (chunks) => <strong>{chunks}</strong>,
+              })}
+            </p>
+          )}
         </div>
         <div className="rounded-md border border-zinc-200 bg-white p-4">
           <p className="text-sm text-zinc-700">{t("connectOrCreate")}</p>
@@ -131,21 +140,14 @@ export default async function AcceptInvitePage({
     );
   }
 
-  if (user.email?.toLowerCase() !== preview.email.toLowerCase()) {
-    return (
-      <div className="flex flex-col gap-3 rounded-md border border-red-200 bg-red-50 p-5">
-        <h1 className="text-base font-semibold text-red-900">{t("wrongAccount")}</h1>
-        <p className="text-sm text-red-800">
-          {t.rich("wrongAccountDesc1", {
-            invitedEmail: preview.email,
-            currentEmail: user.email ?? "",
-            strong: (chunks) => <strong>{chunks}</strong>,
-          })}
-        </p>
-        <p className="text-sm text-red-800">{t("wrongAccountDesc2")}</p>
-      </div>
-    );
-  }
+  // Lien réclamable (Lot B) : plus de blocage sur l'email. On affiche un écran
+  // de CONFIRMATION D'IDENTITÉ — le compte connecté voit précisément quelle
+  // fiche il va rattacher avant de valider. Si l'invitation portait un email
+  // différent de celui du compte, on l'indique sans bloquer (le coach contrôle
+  // la diffusion du lien ; il peut délier en cas d'erreur).
+  const emailDiffers =
+    preview.email && user.email &&
+    preview.email.toLowerCase() !== user.email.toLowerCase();
 
   return (
     <div className="flex flex-col gap-6">
@@ -155,6 +157,19 @@ export default async function AcceptInvitePage({
         </h1>
         <p className="mt-1 text-sm text-zinc-600">{detail}</p>
       </div>
+
+      <div className="rounded-md border border-zinc-200 bg-zinc-50 p-4 text-sm text-zinc-700">
+        <p>
+          {t.rich("confirmIdentity", {
+            account: user.email ?? "",
+            strong: (chunks) => <strong>{chunks}</strong>,
+          })}
+        </p>
+        {emailDiffers && (
+          <p className="mt-2 text-amber-700">{t("confirmIdentityEmailNote")}</p>
+        )}
+      </div>
+
       <AcceptInvitationForm token={token} />
     </div>
   );

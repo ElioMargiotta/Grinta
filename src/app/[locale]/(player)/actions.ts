@@ -6,6 +6,7 @@ import { createClient } from "@/lib/supabase/server";
 
 type RespondInput = {
   sessionId: string;
+  playerId?: string;
   status: "present" | "absent";
   reason?: string;
   locale: string;
@@ -22,6 +23,7 @@ const ERROR_KEYS = new Set([
 
 export async function respondToSessionAction({
   sessionId,
+  playerId,
   status,
   reason,
   locale,
@@ -42,11 +44,18 @@ export async function respondToSessionAction({
   } = await supabase.auth.getUser();
   if (!user) redirect(`/${locale}/login`);
 
-  const { error } = await supabase.rpc("respond_to_session", {
-    p_session_id: sessionId,
-    p_status: status,
-    p_reason: reason ?? null,
-  });
+  const { error } = playerId
+    ? await supabase.rpc("respond_to_session_for_player", {
+        p_session_id: sessionId,
+        p_player_id: playerId,
+        p_status: status,
+        p_reason: reason ?? null,
+      })
+    : await supabase.rpc("respond_to_session", {
+        p_session_id: sessionId,
+        p_status: status,
+        p_reason: reason ?? null,
+      });
 
   if (error) {
     const code = ERROR_KEYS.has(error.message) ? error.message : "unknown";
@@ -59,6 +68,7 @@ export async function respondToSessionAction({
 
 type RespondMatchInput = {
   matchId: string;
+  playerId?: string;
   status: "available" | "unavailable";
   reason?: string;
   locale: string;
@@ -77,6 +87,7 @@ const MATCH_ERROR_KEYS = new Set([
 
 export async function respondToMatchAction({
   matchId,
+  playerId,
   status,
   reason,
   locale,
@@ -99,11 +110,18 @@ export async function respondToMatchAction({
   } = await supabase.auth.getUser();
   if (!user) redirect(`/${locale}/login`);
 
-  const { error } = await supabase.rpc("respond_to_match", {
-    p_match_id: matchId,
-    p_status: status,
-    p_reason: reason ?? null,
-  });
+  const { error } = playerId
+    ? await supabase.rpc("respond_to_match_for_player", {
+        p_match_id: matchId,
+        p_player_id: playerId,
+        p_status: status,
+        p_reason: reason ?? null,
+      })
+    : await supabase.rpc("respond_to_match", {
+        p_match_id: matchId,
+        p_status: status,
+        p_reason: reason ?? null,
+      });
 
   if (error) {
     const code = MATCH_ERROR_KEYS.has(error.message) ? error.message : "unknown";

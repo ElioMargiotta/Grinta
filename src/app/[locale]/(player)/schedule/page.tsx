@@ -3,6 +3,7 @@ import { Card } from "@/components/ui/Card";
 import { AttendanceRSVP } from "@/components/player/AttendanceRSVP";
 import { MatchRSVP } from "@/components/player/MatchRSVP";
 import { requirePersona } from "@/lib/auth/getUser";
+import { getLinkedPlayers, resolveActivePlayer } from "@/lib/player/profiles";
 
 type MatchCallupRow = {
   match_id: string;
@@ -78,8 +79,12 @@ export default async function PlayerSchedulePage({
   const { supabase, persona } = await requirePersona(locale, "player");
   const t = await getTranslations("playerSchedule");
   const currentLocale = await getLocale();
+  const activePlayer = await resolveActivePlayer(
+    await getLinkedPlayers(),
+    persona.activeProfile === "parent" ? "guardian" : "self",
+  );
 
-  if (!persona.playerId) {
+  if (!activePlayer) {
     return (
       <div className="mx-auto flex w-full max-w-3xl flex-col gap-6">
         <h1 className="text-2xl font-semibold text-zinc-900 dark:text-zinc-100">
@@ -95,7 +100,7 @@ export default async function PlayerSchedulePage({
   const { data: assignments } = await supabase
     .from("player_team_assignments")
     .select("team_id")
-    .eq("player_id", persona.playerId);
+    .eq("player_id", activePlayer.playerId);
   const teamIds = Array.from(new Set((assignments ?? []).map((a) => a.team_id as string)));
 
   if (teamIds.length === 0) {
@@ -132,7 +137,7 @@ export default async function PlayerSchedulePage({
     ? await supabase
         .from("session_attendances")
         .select("session_id, announced_status, announced_reason")
-        .eq("player_id", persona.playerId)
+        .eq("player_id", activePlayer.playerId)
         .in("session_id", sessionIds)
         .returns<AttendanceRow[]>()
     : { data: [] as AttendanceRow[] };
@@ -141,8 +146,11 @@ export default async function PlayerSchedulePage({
     (attendanceData ?? []).map((a) => [a.session_id, a]),
   );
 
-  // Convocations match à venir (RPC SECURITY DEFINER scopée au joueur courant).
-  const { data: matchData } = await supabase.rpc("player_match_callups");
+  // Convocations match à venir pour la fiche active. La RPC vérifie self ou parent.
+  const { data: matchData } = await supabase.rpc(
+    "player_match_callups_for_player",
+    { p_player_id: activePlayer.playerId },
+  );
   const matches = (matchData ?? []) as MatchCallupRow[];
 
   return (
@@ -184,6 +192,7 @@ export default async function PlayerSchedulePage({
                   <div className="border-t border-zinc-200 pt-3 dark:border-zinc-800">
                     <MatchRSVP
                       matchId={m.match_id}
+                      playerId={activePlayer.playerId}
                       initialStatus={m.availability}
                       initialReason={m.availability_reason}
                     />
@@ -228,6 +237,7 @@ export default async function PlayerSchedulePage({
                   <div className="border-t border-zinc-200 pt-3 dark:border-zinc-800">
                     <AttendanceRSVP
                       sessionId={s.id}
+                      playerId={activePlayer.playerId}
                       deadlinePassed={deadlinePassed(s)}
                       initialStatus={attendance?.announced_status ?? null}
                       initialReason={attendance?.announced_reason ?? null}

@@ -34,6 +34,8 @@ export type ContingentPlayer = {
   /** True iff `players.user_id IS NOT NULL` — le joueur a un compte lié (reçoit
    *  les notifs : convocations, etc.). Sinon il ne reçoit rien. */
   has_account: boolean;
+  /** Cycle de vie de la fiche (Lot D) : active|inactive|left|archived. */
+  status: "active" | "inactive" | "left" | "archived";
   assignments: ContingentAssignment[];
   /** Indisponibilité active aujourd'hui (médical/discipline), sinon null. */
   unavailabilityKind: UnavailabilityKind | null;
@@ -453,6 +455,11 @@ export function ContingentList({
                             className="inline-flex items-center rounded-full border border-amber-300 bg-amber-100 px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-amber-800 dark:border-amber-500/40 dark:bg-amber-900/40 dark:text-amber-200"
                           >
                             {tDual("badge")}
+                          </span>
+                        )}
+                        {p.status !== "active" && (
+                          <span className="inline-flex items-center rounded-full border border-zinc-300 bg-zinc-100 px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-zinc-600 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-300">
+                            {t(`status.${p.status}`)}
                           </span>
                         )}
                         {p.has_account ? (
