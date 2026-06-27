@@ -5,43 +5,101 @@ import { createClient } from "@/lib/supabase/server";
 import { getSiteUrl } from "@/lib/site-url";
 import { resolvePersona } from "@/lib/club/persona";
 
+export type SignupErrorCode =
+  | "emailExists"
+  | "weakPassword"
+  | "missingFields"
+  | "invalidUsername"
+  | "usernameTaken";
+
+// Standard de sécurité : ≥12 caractères, au moins une minuscule, une majuscule,
+// un chiffre et un caractère spécial.
+function isStrongPassword(pw: string): boolean {
+  return (
+    pw.length >= 12 &&
+    /[a-z]/.test(pw) &&
+    /[A-Z]/.test(pw) &&
+    /\d/.test(pw) &&
+    /[^A-Za-z0-9]/.test(pw)
+  );
+}
+
+const USERNAME_RE = /^[a-z0-9_.-]{3,30}$/;
+
 export async function signupAction(formData: FormData) {
-  const email = String(formData.get("email") ?? "");
+  const email = String(formData.get("email") ?? "").trim();
   const password = String(formData.get("password") ?? "");
-  const fullName = String(formData.get("fullName") ?? "");
+  const firstName = String(formData.get("firstName") ?? "").trim();
+  const lastName = String(formData.get("lastName") ?? "").trim();
+  const birthDate = String(formData.get("birthDate") ?? "").trim();
+  const phone = String(formData.get("phone") ?? "").trim();
+  const username = String(formData.get("username") ?? "").trim().toLowerCase();
   const locale = String(formData.get("locale") ?? "fr");
   const rawPersona = String(formData.get("personaPreference") ?? "staff");
-  const personaPreference =
-    rawPersona === "player" || rawPersona === "dual" ? rawPersona : "staff";
+  const personaPreference = (
+    ["player", "dual", "parent"] as const
+  ).includes(rawPersona as "player" | "dual" | "parent")
+    ? rawPersona
+    : "staff";
   // Turnstile injecte ce champ caché dans le form quand le CAPTCHA est actif.
   const captchaToken = String(formData.get("cf-turnstile-response") ?? "");
 
+  if (!email || !firstName || !lastName || !username) {
+    return { errorCode: "missingFields" as SignupErrorCode };
+  }
+  if (!USERNAME_RE.test(username)) {
+    return { errorCode: "invalidUsername" as SignupErrorCode };
+  }
+  if (!isStrongPassword(password)) {
+    return { errorCode: "weakPassword" as SignupErrorCode };
+  }
+
   const supabase = await createClient();
+
+  // Pré-check de disponibilité du handle (l'index unique reste le garde-fou).
+  const { data: available } = await supabase.rpc("is_username_available", {
+    p_username: username,
+  });
+  if (available === false) {
+    return { errorCode: "usernameTaken" as SignupErrorCode };
+  }
+
+  const fullName = `${firstName} ${lastName}`.trim();
   const { data, error } = await supabase.auth.signUp({
     email,
     password,
     options: {
-      data: { full_name: fullName, persona_preference: personaPreference },
+      data: {
+        full_name: fullName,
+        first_name: firstName,
+        last_name: lastName,
+        birth_date: birthDate || null,
+        phone: phone || null,
+        username,
+        persona_preference: personaPreference,
+      },
       emailRedirectTo: `${getSiteUrl()}/${locale}/confirm`,
       ...(captchaToken ? { captchaToken } : {}),
     },
   });
 
   if (error) {
-    // Surfaced when email confirmations are disabled.
     if (
       error.code === "user_already_exists" ||
       /already registered|already exists/i.test(error.message)
     ) {
-      return { errorCode: "emailExists" as const };
+      return { errorCode: "emailExists" as SignupErrorCode };
+    }
+    if (error.code === "weak_password" || /password/i.test(error.message)) {
+      return { errorCode: "weakPassword" as SignupErrorCode };
     }
     return { error: error.message };
   }
 
-  // With email confirmations enabled, Supabase obfuscates an existing account:
-  // it returns a user with an empty identities array and no error.
+  // Avec confirmation email activée, Supabase masque un compte existant :
+  // user renvoyé avec identities vide et aucune erreur.
   if (data.user && (data.user.identities?.length ?? 0) === 0) {
-    return { errorCode: "emailExists" as const };
+    return { errorCode: "emailExists" as SignupErrorCode };
   }
 
   if (data.session) {

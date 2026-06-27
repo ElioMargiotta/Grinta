@@ -583,7 +583,28 @@
     "resetRequestAgain": "Demander un nouveau lien",
     "continueWithGoogle": "Continuer avec Google",
     "continueWithApple": "Continuer avec Apple",
-    "orSeparator": "ou"
+    "orSeparator": "ou",
+    "firstName": "Prénom",
+    "firstNamePlaceholder": "Marie",
+    "lastName": "Nom",
+    "lastNamePlaceholder": "Dupont",
+    "birthDate": "Date de naissance",
+    "phone": "Téléphone",
+    "phonePlaceholder": "+41 79 123 45 67",
+    "username": "Nom d'utilisateur",
+    "usernameHelp": "Votre identifiant public unique — on peut vous trouver et vous inviter par ce nom.",
+    "usernamePlaceholder": "marie.dupont",
+    "usernameTaken": "Ce nom d'utilisateur est déjà pris.",
+    "invalidUsername": "3–30 caractères : a–z, 0–9, point, underscore, tiret.",
+    "passwordPolicyHint": "Au moins 12 caractères, avec majuscule et minuscule, un chiffre et un caractère spécial.",
+    "weakPassword": "Mot de passe trop faible : min 12 caractères avec maj/min, un chiffre et un caractère spécial.",
+    "missingFields": "Merci de remplir tous les champs obligatoires.",
+    "emailExists": "Un compte existe déjà pour cet email.",
+    "accountTypeLabel": "Type de compte",
+    "accountTypeHelp": "Modifiable plus tard dans les réglages du compte.",
+    "accountTypeStaff": "Entraîneur",
+    "accountTypePlayer": "Joueur",
+    "accountTypeParent": "Parent"
   },
   "dashboard": {
     "title": "Tableau de bord",
@@ -2130,7 +2151,7 @@
       "archived": "Archivé"
     },
     "lifecycle": {
-      "title": "Cycle de vie",
+      "title": "Statut & accès",
       "statusLabel": "Statut de la fiche",
       "guardiansTitle": "Parents liés",
       "noGuardians": "Aucun parent lié pour le moment.",

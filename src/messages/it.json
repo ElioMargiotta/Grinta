@@ -577,7 +577,28 @@
     "resetRequestAgain": "Richiedi un nuovo link",
     "continueWithGoogle": "Continua con Google",
     "continueWithApple": "Continua con Apple",
-    "orSeparator": "o"
+    "orSeparator": "o",
+    "firstName": "Nome",
+    "firstNamePlaceholder": "Maria",
+    "lastName": "Cognome",
+    "lastNamePlaceholder": "Rossi",
+    "birthDate": "Data di nascita",
+    "phone": "Telefono",
+    "phonePlaceholder": "+41 79 123 45 67",
+    "username": "Nome utente",
+    "usernameHelp": "Il tuo handle pubblico unico — gli altri ti trovano e ti invitano con questo.",
+    "usernamePlaceholder": "maria.rossi",
+    "usernameTaken": "Questo nome utente è già in uso.",
+    "invalidUsername": "3–30 caratteri: a–z, 0–9, punto, underscore, trattino.",
+    "passwordPolicyHint": "Almeno 12 caratteri, con maiuscole e minuscole, un numero e un carattere speciale.",
+    "weakPassword": "Password troppo debole: min 12 caratteri con maiuscole/minuscole, un numero e un carattere speciale.",
+    "missingFields": "Compila tutti i campi obbligatori.",
+    "emailExists": "Esiste già un account per questa email.",
+    "accountTypeLabel": "Tipo di account",
+    "accountTypeHelp": "Modificabile in seguito nelle impostazioni account.",
+    "accountTypeStaff": "Allenatore",
+    "accountTypePlayer": "Giocatore",
+    "accountTypeParent": "Genitore"
   },
   "dashboard": {
     "title": "Dashboard",
@@ -2124,7 +2145,7 @@
       "archived": "Archiviato"
     },
     "lifecycle": {
-      "title": "Ciclo di vita",
+      "title": "Stato e accesso",
       "statusLabel": "Stato della scheda",
       "guardiansTitle": "Genitori collegati",
       "noGuardians": "Nessun genitore ancora collegato.",

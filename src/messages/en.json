@@ -583,7 +583,28 @@
     "resetRequestAgain": "Request a new link",
     "continueWithGoogle": "Continue with Google",
     "continueWithApple": "Continue with Apple",
-    "orSeparator": "or"
+    "orSeparator": "or",
+    "firstName": "First name",
+    "firstNamePlaceholder": "Jane",
+    "lastName": "Last name",
+    "lastNamePlaceholder": "Doe",
+    "birthDate": "Date of birth",
+    "phone": "Phone",
+    "phonePlaceholder": "+41 79 123 45 67",
+    "username": "Username",
+    "usernameHelp": "Your unique public handle — others can find and invite you by it.",
+    "usernamePlaceholder": "jane.doe",
+    "usernameTaken": "This username is already taken.",
+    "invalidUsername": "3–30 characters: a–z, 0–9, dot, underscore, hyphen.",
+    "passwordPolicyHint": "At least 12 characters, with upper- and lowercase, a number and a special character.",
+    "weakPassword": "Password too weak: min 12 chars with upper/lowercase, a number and a special character.",
+    "missingFields": "Please fill in all required fields.",
+    "emailExists": "An account already exists for this email.",
+    "accountTypeLabel": "Account type",
+    "accountTypeHelp": "You can adjust this later in your account settings.",
+    "accountTypeStaff": "Coach",
+    "accountTypePlayer": "Player",
+    "accountTypeParent": "Parent"
   },
   "dashboard": {
     "title": "Dashboard",
@@ -2130,7 +2151,7 @@
       "archived": "Archived"
     },
     "lifecycle": {
-      "title": "Lifecycle",
+      "title": "Status & access",
       "statusLabel": "Profile status",
       "guardiansTitle": "Linked parents",
       "noGuardians": "No parent linked yet.",

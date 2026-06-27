@@ -577,7 +577,28 @@
     "resetRequestAgain": "Neuen Link anfordern",
     "continueWithGoogle": "Mit Google fortfahren",
     "continueWithApple": "Mit Apple fortfahren",
-    "orSeparator": "oder"
+    "orSeparator": "oder",
+    "firstName": "Vorname",
+    "firstNamePlaceholder": "Maria",
+    "lastName": "Nachname",
+    "lastNamePlaceholder": "Muster",
+    "birthDate": "Geburtsdatum",
+    "phone": "Telefon",
+    "phonePlaceholder": "+41 79 123 45 67",
+    "username": "Benutzername",
+    "usernameHelp": "Dein eindeutiger öffentlicher Handle — andere finden und laden dich darüber ein.",
+    "usernamePlaceholder": "maria.muster",
+    "usernameTaken": "Dieser Benutzername ist bereits vergeben.",
+    "invalidUsername": "3–30 Zeichen: a–z, 0–9, Punkt, Unterstrich, Bindestrich.",
+    "passwordPolicyHint": "Mindestens 12 Zeichen, mit Gross-/Kleinbuchstaben, einer Zahl und einem Sonderzeichen.",
+    "weakPassword": "Passwort zu schwach: min. 12 Zeichen mit Gross-/Kleinschreibung, Zahl und Sonderzeichen.",
+    "missingFields": "Bitte alle Pflichtfelder ausfüllen.",
+    "emailExists": "Für diese E-Mail existiert bereits ein Konto.",
+    "accountTypeLabel": "Kontotyp",
+    "accountTypeHelp": "Später in den Kontoeinstellungen änderbar.",
+    "accountTypeStaff": "Trainer",
+    "accountTypePlayer": "Spieler",
+    "accountTypeParent": "Elternteil"
   },
   "dashboard": {
     "title": "Dashboard",
@@ -2124,7 +2145,7 @@
       "archived": "Archiviert"
     },
     "lifecycle": {
-      "title": "Lebenszyklus",
+      "title": "Status & Zugang",
       "statusLabel": "Profilstatus",
       "guardiansTitle": "Verknüpfte Eltern",
       "noGuardians": "Noch kein Elternteil verknüpft.",

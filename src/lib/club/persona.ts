@@ -7,7 +7,8 @@ import { resolveCurrentMembership } from "./context";
 
 export type Persona = "staff" | "player";
 export type PersonaAvailability = "staff" | "player" | "dual";
-export type PersonaPreference = "staff" | "player" | "dual";
+// 'parent' = compte tuteur : vue portail joueur (gère les fiches de ses enfants).
+export type PersonaPreference = "staff" | "player" | "dual" | "parent";
 
 const CURRENT_PERSONA_COOKIE = "grinta_current_persona";
 const COOKIE_MAX_AGE_DAYS = 365;
@@ -55,7 +56,9 @@ export async function clearCurrentPersona(): Promise<void> {
 }
 
 function normalizePreference(value: unknown): PersonaPreference {
-  return value === "player" || value === "dual" ? value : "staff";
+  return value === "player" || value === "dual" || value === "parent"
+    ? value
+    : "staff";
 }
 
 /**
@@ -97,7 +100,8 @@ export const resolvePersona = cache(async (): Promise<PersonaState | null> => {
   if (preference === "dual") {
     available = "dual";
     active = cookiePersona ?? "staff";
-  } else if (preference === "player") {
+  } else if (preference === "player" || preference === "parent") {
+    // Le parent utilise le portail joueur (il gère les fiches de ses enfants).
     available = "player";
     active = "player";
   } else {
