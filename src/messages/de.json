@@ -2042,7 +2042,9 @@
         "extended": "Erweiterter Zugriff (alle Teams)",
         "team": "Zugewiesenes Team",
         "team_readonly": "Nur lesen auf zugewiesenem Team"
-      }
+      },
+      "confirmIdentity": "Du bist angemeldet als <strong>{account}</strong>. Bestätige, um dieses Konto mit dem obigen Profil zu verknüpfen.",
+      "confirmIdentityEmailNote": "Diese Einladung war an eine andere E-Mail gerichtet — das ist in Ordnung, der Link funktioniert für jedes angemeldete Konto."
     }
   },
   "invitations": {
@@ -2103,7 +2105,11 @@
     "pendingEmailOpened": "E-Mail geöffnet",
     "pendingEmailBounced": "E-Mail abgewiesen",
     "pendingEmailFailed": "Senden fehlgeschlagen",
-    "pendingEmailPending": "Wird gesendet"
+    "pendingEmailPending": "Wird gesendet",
+    "emailOptionalHint": "Optional — leer lassen, um einen Einlöse-Link per WhatsApp zu teilen.",
+    "shareWhatsApp": "Auf WhatsApp teilen",
+    "whatsappMessage": "Tritt unserem Verein auf Grinta bei — tippe auf den Link, um dein Konto zu verknüpfen:",
+    "claimLinkLabel": "Einlöse-Link (ohne E-Mail)"
   },
   "libraries": {
     "noDiagram": "Kein Diagramm",

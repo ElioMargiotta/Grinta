@@ -2,7 +2,7 @@
 
 import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
-import { Mail, Copy, Check, X, Send } from "lucide-react";
+import { Mail, Copy, Check, X, Send, MessageCircle } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { Section, SectionHeader } from "@/components/ui/Section";
 import { Input } from "@/components/ui/Input";
@@ -25,7 +25,7 @@ type EmailStatus =
 
 export type PlayerInvitation = {
   id: string;
-  email: string;
+  email: string | null;
   status: "pending" | "accepted" | "revoked" | "expired";
   team_id: string | null;
   expires_at: string;
@@ -56,6 +56,7 @@ export function InvitePlayerSection({
   const [lastUrl, setLastUrl] = useState<string | null>(null);
   const [lastEmailTo, setLastEmailTo] = useState<string | null>(null);
   const [lastEmailSent, setLastEmailSent] = useState<boolean>(false);
+  const [copied, setCopied] = useState(false);
   const [resendNotice, setResendNotice] = useState<
     | { kind: "success"; email: string }
     | { kind: "error" }
@@ -82,8 +83,9 @@ export function InvitePlayerSection({
         return;
       }
       setLastUrl(result.url);
-      setLastEmailTo(email.trim());
+      setLastEmailTo(email.trim() || null);
       setLastEmailSent(result.emailSent);
+      setCopied(false);
       router.refresh();
     });
   }
@@ -160,7 +162,7 @@ export function InvitePlayerSection({
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               placeholder={t("emailPlaceholder")}
-              required
+              hint={t("emailOptionalHint")}
             />
             {teams.length > 0 && (
               <Select
@@ -196,25 +198,40 @@ export function InvitePlayerSection({
                   <Check className="h-3 w-3" />
                   {t("emailSent", { email: lastEmailTo })}
                 </div>
-              ) : (
+              ) : lastEmailTo ? (
                 <div className="mb-2 font-medium text-amber-700 dark:text-amber-300">
                   {t("emailFailed")}
                 </div>
-              )}
+              ) : null}
               <div className="mb-1 font-medium text-zinc-700 dark:text-zinc-200">
                 {lastEmailSent ? t("linkFallback") : t("linkReady")}
               </div>
               <div className="break-all font-mono text-[11px] text-zinc-700 dark:text-zinc-300">
                 {lastUrl}
               </div>
-              <button
-                type="button"
-                onClick={() => navigator.clipboard.writeText(lastUrl)}
-                className="mt-2 inline-flex items-center gap-1 text-[11px] font-medium text-[var(--club-primary)] hover:underline"
-              >
-                <Copy className="h-3 w-3" />
-                {t("copy")}
-              </button>
+              <div className="mt-2 flex flex-wrap items-center gap-2">
+                <a
+                  href={`https://wa.me/?text=${encodeURIComponent(`${t("whatsappMessage")} ${lastUrl}`)}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-1 rounded-md bg-[#25D366] px-2.5 py-1.5 text-[11px] font-semibold text-white hover:brightness-95"
+                >
+                  <MessageCircle className="h-3.5 w-3.5" />
+                  {t("shareWhatsApp")}
+                </a>
+                <button
+                  type="button"
+                  onClick={() => {
+                    navigator.clipboard.writeText(lastUrl);
+                    setCopied(true);
+                    window.setTimeout(() => setCopied(false), 1500);
+                  }}
+                  className="inline-flex items-center gap-1 rounded-md border border-[var(--club-line)] px-2.5 py-1.5 text-[11px] font-medium text-[var(--club-primary)] hover:bg-white/50"
+                >
+                  {copied ? <Check className="h-3.5 w-3.5" /> : <Copy className="h-3.5 w-3.5" />}
+                  {copied ? t("copied") : t("copy")}
+                </button>
+              </div>
             </div>
           )}
         </>
@@ -247,25 +264,27 @@ export function InvitePlayerSection({
               >
                 <div className="min-w-0 flex-1">
                   <div className="truncate font-medium text-zinc-900 dark:text-zinc-100">
-                    {inv.email}
+                    {inv.email ?? t("claimLinkLabel")}
                   </div>
                   <div className="truncate text-[11px] text-zinc-500">
-                    {emailStatusLabel(inv.email_status)} ·{" "}
+                    {inv.email ? `${emailStatusLabel(inv.email_status)} · ` : ""}
                     {t("expiresAt", {
                       date: new Date(inv.expires_at).toLocaleDateString(locale),
                     })}
                   </div>
                 </div>
                 <div className="flex shrink-0 items-center gap-1">
-                  <button
-                    type="button"
-                    onClick={() => handleResend(inv.id, inv.email)}
-                    disabled={isPending}
-                    className="inline-flex items-center gap-1 rounded-md px-2 py-1 text-[11px] font-medium text-zinc-600 hover:bg-zinc-100 dark:text-zinc-300 dark:hover:bg-zinc-800"
-                  >
-                    <Send className="h-3 w-3" />
-                    {t("resend")}
-                  </button>
+                  {inv.email && (
+                    <button
+                      type="button"
+                      onClick={() => handleResend(inv.id, inv.email!)}
+                      disabled={isPending}
+                      className="inline-flex items-center gap-1 rounded-md px-2 py-1 text-[11px] font-medium text-zinc-600 hover:bg-zinc-100 dark:text-zinc-300 dark:hover:bg-zinc-800"
+                    >
+                      <Send className="h-3 w-3" />
+                      {t("resend")}
+                    </button>
+                  )}
                   <button
                     type="button"
                     onClick={() => handleRevoke(inv.id)}

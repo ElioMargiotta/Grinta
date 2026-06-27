@@ -37,12 +37,15 @@ export async function createPlayerInviteAction(
   const locale = String(formData.get("locale") ?? "fr");
   const playerId = String(formData.get("playerId") ?? "").trim();
   const teamId = String(formData.get("teamId") ?? "").trim();
+  // L'email est désormais OPTIONNEL : un lien réclamable se partage par
+  // WhatsApp/copier. S'il est fourni, on l'utilise pour l'envoi + la
+  // traçabilité et on garde les garde-fous d'unicité.
   const email = String(formData.get("email") ?? "").trim().toLowerCase();
 
-  if (!playerId || !email) {
+  if (!playerId) {
     return { ok: false, error: "missing_fields" };
   }
-  if (!isPlausibleEmail(email)) {
+  if (email && !isPlausibleEmail(email)) {
     return { ok: false, error: "invalid_email" };
   }
 
@@ -64,20 +67,21 @@ export async function createPlayerInviteAction(
     return { ok: false, error: "player_not_in_club" };
   }
 
-  // Pre-check: if a user with this email already exists AND is linked to a
-  // different player in this club, the unique index (club_id, user_id) would
-  // block acceptance. Fail fast so the coach sees a clear message instead of
-  // sending an email that can never be accepted.
-  const { data: conflictPlayerId } = await supabase.rpc(
-    "player_email_already_linked_in_club",
-    {
-      p_club_id: membership.club_id,
-      p_email: email,
-      p_player_id: playerId,
-    },
-  );
-  if (conflictPlayerId) {
-    return { ok: false, error: "email_already_linked_to_other_player" };
+  // Pre-check (email fourni uniquement) : si un compte avec cet email est déjà
+  // lié à une AUTRE fiche de ce club, l'unique index (club_id, user_id)
+  // bloquerait la réclamation. On échoue tôt avec un message clair.
+  if (email) {
+    const { data: conflictPlayerId } = await supabase.rpc(
+      "player_email_already_linked_in_club",
+      {
+        p_club_id: membership.club_id,
+        p_email: email,
+        p_player_id: playerId,
+      },
+    );
+    if (conflictPlayerId) {
+      return { ok: false, error: "email_already_linked_to_other_player" };
+    }
   }
 
   const token = randomBytes(24).toString("base64url");
@@ -88,7 +92,7 @@ export async function createPlayerInviteAction(
     .insert({
       club_id: membership.club_id,
       kind: "player",
-      email,
+      email: email || null,
       token_hash: tokenHash,
       player_id: playerId,
       team_id: teamId || null,
@@ -132,20 +136,24 @@ export async function createPlayerInviteAction(
 
   const playerName = `${player.first_name ?? ""} ${player.last_name ?? ""}`.trim() || null;
 
-  const emailResult = await sendClubInvitationEmail(supabase, {
-    invitationId: created.id,
-    kind: "player",
-    locale,
-    to: email,
-    clubName: membership.club_name,
-    inviterName: profile?.full_name ?? null,
-    roleName: null,
-    playerName,
-    teamName,
-    acceptUrl: url,
-    expiresAt: created.expires_at,
-    brandColor: membership.theme_primary_color,
-  });
+  // Envoi email seulement si une adresse a été fournie. Sans email, le lien est
+  // purement réclamable (partage WhatsApp/copier).
+  const emailResult = email
+    ? await sendClubInvitationEmail(supabase, {
+        invitationId: created.id,
+        kind: "player",
+        locale,
+        to: email,
+        clubName: membership.club_name,
+        inviterName: profile?.full_name ?? null,
+        roleName: null,
+        playerName,
+        teamName,
+        acceptUrl: url,
+        expiresAt: created.expires_at,
+        brandColor: membership.theme_primary_color,
+      })
+    : ({ ok: false, reason: "no_email" } as const);
 
   revalidatePath(`/${locale}/contingent/${playerId}`);
 

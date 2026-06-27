@@ -2048,7 +2048,9 @@
         "extended": "Extended access (all teams)",
         "team": "Assigned team access",
         "team_readonly": "Read-only on assigned team"
-      }
+      },
+      "confirmIdentity": "You are signed in as <strong>{account}</strong>. Confirm to link this account to the profile above.",
+      "confirmIdentityEmailNote": "This invitation was addressed to a different email — that’s fine, the link works for any signed-in account."
     }
   },
   "invitations": {
@@ -2109,7 +2111,11 @@
     "pendingEmailOpened": "Email opened",
     "pendingEmailBounced": "Email bounced",
     "pendingEmailFailed": "Send failed",
-    "pendingEmailPending": "Sending"
+    "pendingEmailPending": "Sending",
+    "emailOptionalHint": "Optional — leave empty to share a claim link via WhatsApp.",
+    "shareWhatsApp": "Share on WhatsApp",
+    "whatsappMessage": "Join our club on Grinta — tap the link to link your account:",
+    "claimLinkLabel": "Claim link (no email)"
   },
   "libraries": {
     "noDiagram": "No diagram",

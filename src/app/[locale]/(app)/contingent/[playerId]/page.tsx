@@ -242,7 +242,7 @@ export default async function ContingentPlayerPage({
 
   const pendingInvitations: PlayerInvitation[] = (inviteRows ?? []).map((r) => ({
     id: r.id as string,
-    email: r.email as string,
+    email: (r.email as string | null) ?? null,
     status: r.status as PlayerInvitation["status"],
     team_id: (r.team_id as string | null) ?? null,
     expires_at: r.expires_at as string,

@@ -53,7 +53,9 @@ export async function acceptInvitationAction(formData: FormData) {
   const preview = (previewRows as InvitationPreview[] | null)?.[0];
   if (!preview) return { error: "invitation_not_found" as AcceptInviteError };
 
-  const { error } = await supabase.rpc("accept_invitation", { p_token: token });
+  // Lien réclamable (Lot B) : aucune contrainte d'email, le compte authentifié
+  // rattache la fiche après confirmation d'identité affichée sur la page.
+  const { error } = await supabase.rpc("claim_invitation", { p_token: token });
   if (error) return { error: mapError(error.message) };
 
   if (preview.kind === "staff") {

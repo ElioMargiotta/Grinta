@@ -2042,7 +2042,9 @@
         "extended": "Accesso esteso (tutte le squadre)",
         "team": "Accesso alla squadra assegnata",
         "team_readonly": "Sola lettura sulla squadra assegnata"
-      }
+      },
+      "confirmIdentity": "Hai effettuato l’accesso come <strong>{account}</strong>. Conferma per collegare questo account al profilo qui sopra.",
+      "confirmIdentityEmailNote": "Questo invito era indirizzato a un’altra email — va bene, il link funziona per qualsiasi account connesso."
     }
   },
   "invitations": {
@@ -2103,7 +2105,11 @@
     "pendingEmailOpened": "Email aperta",
     "pendingEmailBounced": "Email respinta",
     "pendingEmailFailed": "Invio fallito",
-    "pendingEmailPending": "In invio"
+    "pendingEmailPending": "In invio",
+    "emailOptionalHint": "Facoltativo — lascia vuoto per condividere un link da riscattare via WhatsApp.",
+    "shareWhatsApp": "Condividi su WhatsApp",
+    "whatsappMessage": "Unisciti al nostro club su Grinta — tocca il link per collegare il tuo account:",
+    "claimLinkLabel": "Link da riscattare (senza email)"
   },
   "libraries": {
     "noDiagram": "Nessun diagramma",
