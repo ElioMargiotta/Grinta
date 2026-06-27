@@ -698,6 +698,19 @@ export async function setMatchConvocationSentAction(
     .eq("team_id", teamId);
   if (error) return { error: "db_error" };
 
+  // Notification Hub : à l'envoi, on prévient chaque joueur convoqué disposant
+  // d'un compte lié (idempotent par match/joueur). L'échec d'émission ne doit
+  // pas faire échouer l'envoi de la convocation lui-même.
+  if (send) {
+    const { error: notifyError } = await access.supabase.rpc(
+      "emit_match_convocation_notifications",
+      { p_match_id: matchId },
+    );
+    if (notifyError) {
+      console.error("emit_match_convocation_notifications", notifyError);
+    }
+  }
+
   revalidatePath(`/[locale]/planner/${teamId}/match/${matchId}`, "page");
   return { ok: true };
 }

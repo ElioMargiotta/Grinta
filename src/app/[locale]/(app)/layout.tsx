@@ -13,6 +13,10 @@ import { getClubLicenseUsage } from "@/lib/license/queries";
 import type { LicenseUsage } from "@/lib/license/types";
 import { MobileNavigation } from "@/components/layout/MobileNavigation";
 import { ClubAccentSync } from "@/components/layout/ClubAccentSync";
+import {
+  listRecentNotifications,
+  getUnreadNotificationCount,
+} from "@/lib/notifications/queries";
 
 export default async function AppLayout({
   children,
@@ -32,12 +36,15 @@ export default async function AppLayout({
     redirect(`/${locale}/me`);
   }
 
-  const [profile, membership, memberships, admin] = await Promise.all([
-    getProfile(),
-    resolveCurrentMembership(),
-    getMyMemberships(),
-    isPlatformAdmin(),
-  ]);
+  const [profile, membership, memberships, admin, notifItems, notifUnread] =
+    await Promise.all([
+      getProfile(),
+      resolveCurrentMembership(),
+      getMyMemberships(),
+      isPlatformAdmin(),
+      listRecentNotifications("staff"),
+      getUnreadNotificationCount("staff"),
+    ]);
 
   const displayName = profile?.full_name?.trim() || user.email || "";
   const hasMembership = memberships.length > 0;
@@ -82,6 +89,12 @@ export default async function AppLayout({
             persona={persona}
             currentSeason={currentSeason}
             seasons={seasons}
+            notifications={{
+              userId: user.id,
+              view: "staff",
+              items: notifItems,
+              unread: notifUnread,
+            }}
           />
         </div>
         <main className="flex-1 p-4 pb-24 md:p-5 lg:p-6 print:p-0">{children}</main>

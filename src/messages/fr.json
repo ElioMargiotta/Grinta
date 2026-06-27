@@ -2568,7 +2568,11 @@
       "deleteConfirm": "Supprimer définitivement cet indicateur ? Les mesures enregistrées pour cet indicateur seront aussi supprimées."
     },
     "presence": "Présence",
-    "available": "Dispo"
+    "available": "Dispo",
+    "account": {
+      "linkedTitle": "Compte lié — reçoit les notifications",
+      "notLinkedTitle": "Aucun compte lié — non notifié"
+    }
   },
   "playerMe": {
     "title": "Ma fiche",
@@ -3083,5 +3087,20 @@
       "missing_match": "Match manquant",
       "unknown": "Une erreur est survenue"
     }
+  },
+  "notifications": {
+    "title": "Notifications",
+    "empty": "Rien pour le moment",
+    "noUnread": "Tout est à jour",
+    "markAllRead": "Tout marquer comme lu",
+    "tabUnread": "Non lues ({count})",
+    "tabAll": "Toutes",
+    "dismissAria": "Retirer la notification",
+    "bellAria": "Notifications",
+    "unreadAria": "{count} non lue(s)",
+    "convocationTitle": "Convocation · {team}",
+    "convocationBody": "{opponent} · {date}",
+    "convocationBodyNoOpponent": "{date}",
+    "viewAll": "Ouvrir"
   }
 }

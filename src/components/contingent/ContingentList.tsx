@@ -7,7 +7,7 @@ import { Card } from "@/components/ui/Card";
 import { Input } from "@/components/ui/Input";
 import { Select } from "@/components/ui/Select";
 import { Button } from "@/components/ui/Button";
-import { ArrowDown, ArrowUp, Trash2 } from "lucide-react";
+import { ArrowDown, ArrowUp, Link2, Link2Off, Trash2 } from "lucide-react";
 import {
   bulkAssignPlayersToTeamAction,
   bulkDeletePlayersAction,
@@ -31,6 +31,9 @@ export type ContingentPlayer = {
   birth_date: string | null;
   /** True iff `players.dual_licence_club IS NOT NULL` — drives the "DL" badge (EPIC #34). */
   has_dual_licence: boolean;
+  /** True iff `players.user_id IS NOT NULL` — le joueur a un compte lié (reçoit
+   *  les notifs : convocations, etc.). Sinon il ne reçoit rien. */
+  has_account: boolean;
   assignments: ContingentAssignment[];
   /** Indisponibilité active aujourd'hui (médical/discipline), sinon null. */
   unavailabilityKind: UnavailabilityKind | null;
@@ -450,6 +453,23 @@ export function ContingentList({
                             className="inline-flex items-center rounded-full border border-amber-300 bg-amber-100 px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-amber-800 dark:border-amber-500/40 dark:bg-amber-900/40 dark:text-amber-200"
                           >
                             {tDual("badge")}
+                          </span>
+                        )}
+                        {p.has_account ? (
+                          <span
+                            title={t("account.linkedTitle")}
+                            aria-label={t("account.linkedTitle")}
+                            className="inline-flex items-center text-emerald-600 dark:text-emerald-400"
+                          >
+                            <Link2 className="h-3.5 w-3.5" />
+                          </span>
+                        ) : (
+                          <span
+                            title={t("account.notLinkedTitle")}
+                            aria-label={t("account.notLinkedTitle")}
+                            className="inline-flex items-center text-zinc-300 dark:text-zinc-600"
+                          >
+                            <Link2Off className="h-3.5 w-3.5" />
                           </span>
                         )}
                       </div>
