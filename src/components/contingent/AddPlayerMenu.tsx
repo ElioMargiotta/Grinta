@@ -63,7 +63,7 @@ export function AddPlayerMenu() {
         onClick={() => setOpen((v) => !v)}
         aria-haspopup="menu"
         aria-expanded={open}
-        className="inline-flex items-center gap-2 rounded-lg bg-[var(--club-primary)] px-3 py-2 text-sm font-medium text-[var(--club-primary-foreground)] shadow-sm transition hover:brightness-110"
+        className="inline-flex items-center gap-2 rounded-lg bg-primary px-3 py-2 text-sm font-medium text-primary-foreground shadow-sm transition hover:brightness-110 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
       >
         <Plus className="h-4 w-4" />
         {t("trigger")}
@@ -81,19 +81,19 @@ export function AddPlayerMenu() {
           // in dead space between the button and the first menu item.
           className="absolute right-0 z-20 w-72 pt-2"
         >
-        <div className="overflow-hidden rounded-xl border border-zinc-200 bg-white shadow-lg dark:border-zinc-800 dark:bg-zinc-950">
+        <div className="overflow-hidden rounded-xl border border-border bg-card shadow-lg">
           <Link
             href="/contingent/new"
             role="menuitem"
-            className="flex items-start gap-3 px-4 py-3 text-sm transition hover:bg-[var(--club-primary-soft)]"
+            className="flex items-start gap-3 px-4 py-3 text-sm transition hover:bg-accent"
             onClick={() => setOpen(false)}
           >
-            <UserPlus className="mt-0.5 h-4 w-4 shrink-0 text-zinc-500" />
+            <UserPlus className="mt-0.5 h-4 w-4 shrink-0 text-muted-foreground" />
             <span className="flex flex-col">
-              <span className="font-medium text-zinc-900 dark:text-zinc-100">
+              <span className="font-medium text-foreground">
                 {t("manual")}
               </span>
-              <span className="text-xs text-zinc-500 dark:text-zinc-400">
+              <span className="text-xs text-muted-foreground">
                 {t("manualHint")}
               </span>
             </span>
@@ -101,15 +101,15 @@ export function AddPlayerMenu() {
           <Link
             href="/contingent/import"
             role="menuitem"
-            className="flex items-start gap-3 border-t border-zinc-100 px-4 py-3 text-sm transition hover:bg-[var(--club-primary-soft)] dark:border-zinc-800"
+            className="flex items-start gap-3 border-t border-border px-4 py-3 text-sm transition hover:bg-accent"
             onClick={() => setOpen(false)}
           >
-            <FileUp className="mt-0.5 h-4 w-4 shrink-0 text-zinc-500" />
+            <FileUp className="mt-0.5 h-4 w-4 shrink-0 text-muted-foreground" />
             <span className="flex flex-col">
-              <span className="font-medium text-zinc-900 dark:text-zinc-100">
+              <span className="font-medium text-foreground">
                 {t("import")}
               </span>
-              <span className="text-xs text-zinc-500 dark:text-zinc-400">
+              <span className="text-xs text-muted-foreground">
                 {t("importHint")}
               </span>
             </span>

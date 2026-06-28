@@ -156,7 +156,7 @@ export function ClubPlayerForm({
       )}
 
       <details
-        className="sm:col-span-2 rounded-lg border border-zinc-200 px-3 py-2 dark:border-zinc-800"
+        className="sm:col-span-2 rounded-lg border border-border px-3 py-2"
         open={Boolean(
           player &&
             (player.license_number ||
@@ -166,7 +166,7 @@ export function ClubPlayerForm({
               player.address),
         )}
       >
-        <summary className="cursor-pointer text-sm font-medium text-zinc-700 dark:text-zinc-300">
+        <summary className="cursor-pointer text-sm font-medium text-foreground">
           {t("moreDetails")}
         </summary>
         <div className="mt-3 grid gap-3 sm:grid-cols-2">
@@ -238,7 +238,7 @@ export function ClubPlayerForm({
             label={t("canton")}
             defaultValue={player?.canton ?? ""}
           />
-          <div className="sm:col-span-2 mt-2 text-xs font-semibold uppercase tracking-wider text-zinc-500 dark:text-zinc-400">
+          <div className="sm:col-span-2 mt-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
             {t("guardianSection")}
           </div>
           <Input
@@ -286,7 +286,7 @@ export function ClubPlayerForm({
         </div>
       </details>
 
-      {error && <p className="sm:col-span-2 text-sm text-red-600">{error}</p>}
+      {error && <p className="sm:col-span-2 text-sm text-destructive">{error}</p>}
       {saved && !error && (
         <p className="sm:col-span-2 text-sm text-emerald-700 dark:text-emerald-300">
           {t("saved")}

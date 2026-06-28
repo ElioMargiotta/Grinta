@@ -290,18 +290,18 @@ export function ContingentList({
         </Select>
       </div>
 
-      <p className="text-sm text-zinc-500 dark:text-zinc-400">
+      <p className="text-sm text-muted-foreground">
         {t("count", { n: filtered.length, total: players.length })}
       </p>
 
       {selected.size > 0 && (
-        <Card className="border-[var(--club-primary)] bg-[var(--club-primary-soft)]/50">
+        <Card className="border-primary bg-accent/50">
           <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
             <div className="flex flex-col gap-1">
-              <div className="text-sm font-medium text-zinc-900 dark:text-zinc-100">
+              <div className="text-sm font-medium text-foreground">
                 {tBulk("selected", { n: selected.size })}
               </div>
-              <p className="text-xs text-zinc-600 dark:text-zinc-400">
+              <p className="text-xs text-muted-foreground">
                 {tBulk("hint")}
               </p>
             </div>
@@ -370,12 +370,12 @@ export function ContingentList({
             </div>
           </div>
           {confirmingDelete && (
-            <p className="mt-2 text-sm text-red-700 dark:text-red-300">
+            <p className="mt-2 text-sm text-destructive">
               {tBulk("confirmHint", { n: selected.size })}
             </p>
           )}
           {bulkError && (
-            <p className="mt-2 text-sm text-red-600">{bulkError}</p>
+            <p className="mt-2 text-sm text-destructive">{bulkError}</p>
           )}
           {bulkMessage && !bulkError && (
             <p className="mt-2 text-sm text-emerald-700 dark:text-emerald-300">
@@ -387,14 +387,14 @@ export function ContingentList({
 
       {filtered.length === 0 ? (
         <Card>
-          <p className="text-sm text-zinc-600 dark:text-zinc-400">
+          <p className="text-sm text-muted-foreground">
             {t("empty")}
           </p>
         </Card>
       ) : (
         <Card className="p-0">
           <table className="w-full text-sm">
-            <thead className="border-b border-zinc-200 text-left text-zinc-500 dark:border-zinc-800 dark:text-zinc-400">
+            <thead className="border-b border-border text-left text-muted-foreground">
               <tr>
                 <th className="w-10 px-4 py-2">
                   <input
@@ -422,8 +422,8 @@ export function ContingentList({
                 return (
                   <tr
                     key={p.id}
-                    className={`border-b border-zinc-100 last:border-0 dark:border-zinc-800 ${
-                      isOn ? "bg-[var(--club-primary-soft)]/40" : ""
+                    className={`border-b border-border last:border-0 ${
+                      isOn ? "bg-accent/40" : ""
                     }`}
                   >
                     <td className="px-4 py-2">
@@ -436,14 +436,14 @@ export function ContingentList({
                         onChange={() => toggleOne(p.id)}
                       />
                     </td>
-                    <td className="px-4 py-2 text-zinc-500">
+                    <td className="px-4 py-2 text-muted-foreground">
                       {p.jersey_number ?? "—"}
                     </td>
                     <td className="px-4 py-2">
                       <div className="flex items-center gap-2">
                         <Link
                           href={`/contingent/${p.id}`}
-                          className="font-medium text-[var(--club-primary)] hover:underline"
+                          className="font-medium text-primary hover:underline"
                         >
                           {p.first_name} {p.last_name}
                         </Link>
@@ -467,14 +467,14 @@ export function ContingentList({
                           <span
                             title={t("account.notLinkedTitle")}
                             aria-label={t("account.notLinkedTitle")}
-                            className="inline-flex items-center text-zinc-300 dark:text-zinc-600"
+                            className="inline-flex items-center text-muted-foreground"
                           >
                             <Link2Off className="h-3.5 w-3.5" />
                           </span>
                         )}
                       </div>
                     </td>
-                    <td className="px-4 py-2 text-zinc-500">
+                    <td className="px-4 py-2 text-muted-foreground">
                       {p.position ?? "—"}
                     </td>
                     <td className="px-4 py-2">
@@ -489,9 +489,9 @@ export function ContingentList({
                         </span>
                       )}
                     </td>
-                    <td className="px-4 py-2 text-zinc-500">
+                    <td className="px-4 py-2 text-muted-foreground">
                       {p.presenceRate === null ? (
-                        <span className="text-zinc-400">—</span>
+                        <span className="text-muted-foreground">—</span>
                       ) : (
                         <span className="font-mono tabular-nums">
                           {Math.round(p.presenceRate * 100)}%
@@ -500,7 +500,7 @@ export function ContingentList({
                     </td>
                     <td className="px-4 py-2">
                       {p.assignments.length === 0 ? (
-                        <span className="text-zinc-400 italic">
+                        <span className="text-muted-foreground italic">
                           {t("statusUnassigned")}
                         </span>
                       ) : (
@@ -509,7 +509,7 @@ export function ContingentList({
                             <Link
                               key={a.team_id}
                               href={`/teams/${a.team_id}`}
-                              className="inline-flex items-center rounded-full border border-zinc-200 bg-white px-2 py-0.5 text-xs text-zinc-700 hover:border-[var(--club-primary)] hover:text-[var(--club-primary)] dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-300"
+                              className="inline-flex items-center rounded-full border border-border bg-card px-2 py-0.5 text-xs text-foreground hover:border-primary hover:text-primary"
                             >
                               {a.team_name ?? a.team_id.slice(0, 6)}
                             </Link>
@@ -517,7 +517,7 @@ export function ContingentList({
                         </div>
                       )}
                     </td>
-                    <td className="px-4 py-2 text-zinc-500">
+                    <td className="px-4 py-2 text-muted-foreground">
                       {p.birth_date ?? "—"}
                     </td>
                   </tr>
@@ -547,8 +547,8 @@ function SortHeader({
       <button
         type="button"
         onClick={onClick}
-        className={`inline-flex items-center gap-1 transition-colors hover:text-zinc-900 dark:hover:text-zinc-100 ${
-          active ? "text-zinc-900 dark:text-zinc-100" : ""
+        className={`inline-flex items-center gap-1 transition-colors hover:text-foreground ${
+          active ? "text-foreground" : ""
         }`}
       >
         {label}
