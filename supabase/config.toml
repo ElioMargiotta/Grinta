@@ -223,13 +223,14 @@ double_confirm_changes = true
 # If enabled, users need to confirm their email address before signing in.
 enable_confirmations = true
 # If enabled, users will need to reauthenticate or have logged in recently to change their password.
-secure_password_change = false
+secure_password_change = true
 # Controls the minimum amount of time that must pass before sending another signup confirmation or password reset email.
 max_frequency = "1s"
 # Number of characters used in the email OTP.
 otp_length = 6
-# Number of seconds before the email OTP expires (defaults to 1 hour).
-otp_expiry = 3600
+# Number of seconds before the email OTP expires (réduit à 15 min pour limiter
+# la fenêtre d'exploitation d'un lien de reset/confirmation intercepté).
+otp_expiry = 900
 
 # Production-ready SMTP server (Resend).
 # Applied to the hosted project on `supabase config push`.
@@ -252,11 +253,12 @@ sender_name = "Grinta"
 subject = "Confirm your Grinta signup"
 content_path = "./supabase/templates/confirmation.html"
 
-# Uncomment to customize notification email template
-# [auth.email.notification.password_changed]
-# enabled = true
-# subject = "Your password has been changed"
-# content_path = "./templates/password_changed_notification.html"
+# Notifie l'utilisateur quand son mot de passe change : s'il n'en est pas
+# l'auteur (email compromis), il peut réagir immédiatement. Template par défaut
+# GoTrue — pas de content_path pour éviter un fichier à maintenir.
+[auth.email.notification.password_changed]
+enabled = true
+subject = "Votre mot de passe Grinta a été modifié"
 
 [auth.sms]
 # Allow/disallow new user signups via SMS to your project.
@@ -302,10 +304,10 @@ auth_token = "env(SUPABASE_AUTH_SMS_TWILIO_AUTH_TOKEN)"
 # Control how many MFA factors can be enrolled at once per user.
 max_enrolled_factors = 10
 
-# Control MFA via App Authenticator (TOTP)
+# Control MFA via App Authenticator (TOTP). Opt-in 2FA: gratuit, par compte.
 [auth.mfa.totp]
-enroll_enabled = false
-verify_enabled = false
+enroll_enabled = true
+verify_enabled = true
 
 # Configure MFA via Phone Messaging
 [auth.mfa.phone]

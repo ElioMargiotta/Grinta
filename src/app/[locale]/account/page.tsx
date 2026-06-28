@@ -13,6 +13,9 @@ import {
   type AccountCapability,
 } from "@/components/account/AccountPersonaForm";
 import { AccountIdentityForm } from "@/components/account/AccountIdentityForm";
+import { TwoFactorSection } from "@/components/account/TwoFactorSection";
+import { ChangePasswordSection } from "@/components/account/ChangePasswordSection";
+import { ChangeEmailSection } from "@/components/account/ChangeEmailSection";
 
 export default async function AccountPage({
   params,
@@ -63,6 +66,22 @@ export default async function AccountPage({
   const backHref = persona?.active === "player" ? "/me" : "/dashboard";
 
   const licenseUsage = membership ? await getClubLicenseUsage(membership.club_id) : null;
+
+  // Résilient : si la MFA n'est pas (encore) activée côté projet, l'API peut
+  // renvoyer une réponse inattendue — on retombe alors sur "aucun facteur".
+  let totpFactor: { id: string } | null = null;
+  try {
+    const { data: factorsData } = await supabase.auth.mfa.listFactors();
+    totpFactor = factorsData?.totp?.[0] ?? null;
+  } catch {
+    totpFactor = null;
+  }
+
+  let recoveryRemaining = 0;
+  if (totpFactor) {
+    const { data } = await supabase.rpc("count_unused_mfa_recovery_codes");
+    recoveryRemaining = typeof data === "number" ? data : 0;
+  }
 
   return (
     <div
@@ -120,6 +139,28 @@ export default async function AccountPage({
             <div className="my-6 h-px bg-zinc-200 dark:bg-zinc-800" />
 
             <AccountPersonaForm initialCapabilities={capabilities} />
+
+            <div className="my-6 h-px bg-zinc-200 dark:bg-zinc-800" />
+
+            <TwoFactorSection
+              enrolled={!!totpFactor}
+              recoveryRemaining={recoveryRemaining}
+            />
+
+            <div className="my-6 h-px bg-zinc-200 dark:bg-zinc-800" />
+
+            <ChangePasswordSection
+              has2FA={!!totpFactor}
+              factorId={totpFactor?.id ?? null}
+            />
+
+            <div className="my-6 h-px bg-zinc-200 dark:bg-zinc-800" />
+
+            <ChangeEmailSection
+              currentEmail={user.email ?? ""}
+              has2FA={!!totpFactor}
+              factorId={totpFactor?.id ?? null}
+            />
           </div>
         </div>
       </main>

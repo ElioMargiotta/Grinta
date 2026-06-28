@@ -3,6 +3,7 @@
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { resolvePersona } from "@/lib/club/persona";
+import { mfaChallengeRequired } from "@/lib/auth/mfa";
 
 export async function loginAction(formData: FormData) {
   const email = String(formData.get("email") ?? "");
@@ -32,6 +33,12 @@ export async function loginAction(formData: FormData) {
       return { errorCode: "emailNotConfirmed" as const };
     }
     return { error: error.message };
+  }
+
+  // 2FA opt-in : si le compte a un facteur TOTP vérifié, la session est en aal1
+  // après le mot de passe — on passe par le challenge avant d'entrer dans l'app.
+  if (await mfaChallengeRequired()) {
+    redirect(`/${locale}/mfa`);
   }
 
   // Land the user on the right side based on their persona preference, so a

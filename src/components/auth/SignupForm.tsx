@@ -1,35 +1,24 @@
 "use client";
 
 import { useState, useTransition } from "react";
-import { CheckCircle2, Shield, UserCircle, Users } from "lucide-react";
+import { CheckCircle2 } from "lucide-react";
 import { useTranslations, useLocale } from "next-intl";
 import { Button } from "@/components/ui/Button";
 import { AuthField } from "@/components/auth/AuthField";
 import { PasswordInput } from "@/components/auth/PasswordInput";
 import { TurnstileWidget } from "@/components/auth/TurnstileWidget";
+import type { PersonaChoice } from "@/components/auth/PersonaPicker";
+import { isStrongPassword } from "@/lib/auth/password";
 import { signupAction } from "@/app/[locale]/(auth)/signup/actions";
 
-type PersonaChoice = "staff" | "player" | "parent";
-
 const inputClass =
-  "h-10 w-full rounded-md border border-zinc-300 bg-white px-3 text-sm text-zinc-900 placeholder:text-zinc-400 focus:border-zinc-900 focus:outline-none focus:ring-2 focus:ring-zinc-900/10";
+  "h-10 w-full rounded-lg border border-border bg-background px-3 text-sm text-foreground placeholder:text-muted-foreground transition-colors focus:border-[var(--brand)] focus:outline-none focus:ring-2 focus:ring-[color-mix(in_oklch,var(--brand)_22%,transparent)]";
 
-function isStrongPassword(pw: string): boolean {
-  return (
-    pw.length >= 12 &&
-    /[a-z]/.test(pw) &&
-    /[A-Z]/.test(pw) &&
-    /\d/.test(pw) &&
-    /[^A-Za-z0-9]/.test(pw)
-  );
-}
-
-export function SignupForm() {
+export function SignupForm({ persona }: { persona: PersonaChoice }) {
   const t = useTranslations("auth");
   const locale = useLocale();
   const [error, setError] = useState<string | null>(null);
   const [confirmed, setConfirmed] = useState(false);
-  const [persona, setPersona] = useState<PersonaChoice>("staff");
   const [password, setPassword] = useState("");
   const [isPending, startTransition] = useTransition();
 
@@ -138,40 +127,6 @@ export function SignupForm() {
       {!passwordOk && (
         <p className="-mt-3 text-xs text-red-600">{t("weakPassword")}</p>
       )}
-
-      <fieldset className="flex flex-col gap-2">
-        <legend className="text-sm font-medium text-zinc-900">
-          {t("accountTypeLabel")}
-        </legend>
-        <p className="text-xs text-zinc-500">{t("accountTypeHelp")}</p>
-        <div className="grid grid-cols-1 gap-2 sm:grid-cols-3">
-          {(
-            [
-              { value: "staff", icon: Shield, labelKey: "accountTypeStaff" },
-              { value: "player", icon: UserCircle, labelKey: "accountTypePlayer" },
-              { value: "parent", icon: Users, labelKey: "accountTypeParent" },
-            ] as const
-          ).map(({ value, icon: Icon, labelKey }) => {
-            const active = persona === value;
-            return (
-              <button
-                key={value}
-                type="button"
-                onClick={() => setPersona(value)}
-                aria-pressed={active}
-                className={`flex items-center gap-2 rounded-md border px-3 py-2 text-left text-sm transition-colors ${
-                  active
-                    ? "border-zinc-900 bg-zinc-900 text-white"
-                    : "border-zinc-300 bg-white text-zinc-700 hover:border-zinc-400"
-                }`}
-              >
-                <Icon className="h-4 w-4 shrink-0" />
-                <span>{t(labelKey)}</span>
-              </button>
-            );
-          })}
-        </div>
-      </fieldset>
 
       <TurnstileWidget />
 
