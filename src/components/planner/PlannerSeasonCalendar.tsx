@@ -119,23 +119,23 @@ export function PlannerSeasonCalendar({
     });
 
   return (
-    <div className="rounded-[12px] border border-zinc-200 bg-white">
+    <div className="rounded-[12px] border border-border bg-card">
       {/* En-tête : mois + navigation */}
-      <div className="flex items-center justify-between border-b border-zinc-200 px-4 py-3">
-        <div className="text-[13px] font-semibold capitalize text-zinc-950">{monthLabel}</div>
+      <div className="flex items-center justify-between border-b border-border px-4 py-3">
+        <div className="text-[13px] font-semibold capitalize text-foreground">{monthLabel}</div>
         <div className="flex items-center gap-1">
           <button
             type="button"
             onClick={() => shiftMonth(-1)}
             aria-label={t("calPrev")}
-            className="inline-flex h-7 w-7 items-center justify-center rounded-[7px] border border-zinc-200 text-zinc-500 transition hover:bg-zinc-50 hover:text-zinc-950"
+            className="inline-flex h-7 w-7 items-center justify-center rounded-[7px] border border-border text-muted-foreground transition hover:bg-accent hover:text-foreground"
           >
             <ChevronLeft className="h-4 w-4" />
           </button>
           <button
             type="button"
             onClick={() => setCursor(initialMonth)}
-            className="h-7 rounded-[7px] border border-zinc-200 px-2.5 text-[11px] font-medium text-zinc-600 transition hover:bg-zinc-50 hover:text-zinc-950"
+            className="h-7 rounded-[7px] border border-border px-2.5 text-[11px] font-medium text-muted-foreground transition hover:bg-accent hover:text-foreground"
           >
             {t("calToday")}
           </button>
@@ -143,7 +143,7 @@ export function PlannerSeasonCalendar({
             type="button"
             onClick={() => shiftMonth(1)}
             aria-label={t("calNext")}
-            className="inline-flex h-7 w-7 items-center justify-center rounded-[7px] border border-zinc-200 text-zinc-500 transition hover:bg-zinc-50 hover:text-zinc-950"
+            className="inline-flex h-7 w-7 items-center justify-center rounded-[7px] border border-border text-muted-foreground transition hover:bg-accent hover:text-foreground"
           >
             <ChevronRight className="h-4 w-4" />
           </button>
@@ -152,18 +152,18 @@ export function PlannerSeasonCalendar({
 
       {/* Aide + légende */}
       <div className="flex flex-wrap items-center justify-between gap-2 px-4 pt-3 text-[11px]">
-        <span className="text-zinc-500">{t("calPickHint")}</span>
-        <div className="flex items-center gap-3 text-zinc-500">
+        <span className="text-muted-foreground">{t("calPickHint")}</span>
+        <div className="flex items-center gap-3 text-muted-foreground">
           <span className="inline-flex items-center gap-1.5">
-            <span className="h-3 w-3 rounded-[4px] bg-red-100 ring-1 ring-inset ring-red-200" />
+            <span className="h-3 w-3 rounded-[4px] bg-accent ring-1 ring-inset ring-primary/30" />
             {t("calAnchor")}
           </span>
           <span className="inline-flex items-center gap-1.5">
-            <span className="h-3 w-3 rounded-[4px] bg-zinc-100 ring-1 ring-inset ring-zinc-200" />
+            <span className="h-3 w-3 rounded-[4px] bg-muted ring-1 ring-inset ring-border" />
             {t("calMatch")}
           </span>
           <span className="inline-flex items-center gap-1.5">
-            <span className="h-3 w-3 rounded-[4px] bg-red-500" />
+            <span className="h-3 w-3 rounded-[4px] bg-primary" />
             {t("calSelected")}
           </span>
         </div>
@@ -175,7 +175,7 @@ export function PlannerSeasonCalendar({
           {weekdayLabels.map((w) => (
             <div
               key={w}
-              className="pb-1 text-center text-[10px] font-semibold uppercase tracking-[0.08em] text-zinc-400"
+              className="pb-1 text-center text-[10px] font-semibold uppercase tracking-[0.08em] text-muted-foreground"
             >
               {w}
             </div>
@@ -205,19 +205,19 @@ export function PlannerSeasonCalendar({
                   inMonth ? "" : "opacity-30",
                   outOfRange ? "cursor-not-allowed opacity-20" : "",
                   isReprise
-                    ? "bg-red-500 ring-2 ring-red-500"
+                    ? "bg-primary ring-2 ring-primary"
                     : outOfRange
                       ? ""
                       : inFrame
-                        ? "bg-zinc-50 hover:bg-zinc-100"
-                        : "hover:bg-zinc-100",
-                  isToday && !isReprise ? "ring-1 ring-inset ring-zinc-300" : "",
+                        ? "bg-muted hover:bg-accent"
+                        : "hover:bg-accent",
+                  isToday && !isReprise ? "ring-1 ring-inset ring-border" : "",
                 ].join(" ")}
               >
                 <span
                   className={[
                     "text-[12px] font-medium leading-none",
-                    isReprise ? "text-white" : "text-zinc-700",
+                    isReprise ? "text-primary-foreground" : "text-foreground",
                   ].join(" ")}
                 >
                   {day.getUTCDate()}
@@ -229,8 +229,8 @@ export function PlannerSeasonCalendar({
                       isReprise
                         ? "bg-white/25 text-white"
                         : hasAnchor
-                          ? "bg-red-100 text-red-700"
-                          : "bg-zinc-100 text-zinc-600",
+                          ? "bg-accent text-primary"
+                          : "bg-muted text-muted-foreground",
                     ].join(" ")}
                   >
                     {label ?? t("calMatch")}
@@ -244,12 +244,12 @@ export function PlannerSeasonCalendar({
       </div>
 
       {/* Matchs du mois affiché */}
-      <div className="border-t border-zinc-200 px-4 py-3">
-        <div className="mb-2 text-[10px] font-semibold uppercase tracking-[0.1em] text-zinc-400">
+      <div className="border-t border-border px-4 py-3">
+        <div className="mb-2 text-[10px] font-semibold uppercase tracking-[0.1em] text-muted-foreground">
           {t("calMonthMatches", { n: monthMatches.length })}
         </div>
         {monthMatches.length === 0 ? (
-          <p className="text-[12px] text-zinc-400">{t("calNoMatchMonth")}</p>
+          <p className="text-[12px] text-muted-foreground">{t("calNoMatchMonth")}</p>
         ) : (
           <ul className="flex flex-col gap-1.5">
             {monthMatches.map((m) => {
@@ -271,21 +271,21 @@ export function PlannerSeasonCalendar({
                     type="button"
                     disabled={outOfRange}
                     onClick={() => onPick(ymd)}
-                    className="flex w-full items-center gap-2.5 rounded-[8px] px-2 py-1.5 text-left transition hover:bg-zinc-50 disabled:cursor-not-allowed disabled:opacity-30"
+                    className="flex w-full items-center gap-2.5 rounded-[8px] px-2 py-1.5 text-left transition hover:bg-accent disabled:cursor-not-allowed disabled:opacity-30"
                   >
                     <span
                       className={`h-2 w-2 shrink-0 rounded-full ${
-                        isStructuringKind(m.kind) ? "bg-red-500" : "border border-zinc-300"
+                        isStructuringKind(m.kind) ? "bg-primary" : "border border-input"
                       }`}
                     />
-                    <span className="w-24 shrink-0 text-[11px] font-medium text-zinc-500">
+                    <span className="w-24 shrink-0 text-[11px] font-medium text-muted-foreground">
                       {dateStr} · {timeStr}
                     </span>
-                    <span className="min-w-0 flex-1 truncate text-[12px] text-zinc-900">
+                    <span className="min-w-0 flex-1 truncate text-[12px] text-foreground">
                       {m.summary ?? m.opponent ?? "—"}
                     </span>
                     {m.location ? (
-                      <span className="hidden items-center gap-1 truncate text-[11px] text-zinc-400 sm:flex">
+                      <span className="hidden items-center gap-1 truncate text-[11px] text-muted-foreground sm:flex">
                         <MapPin className="h-3 w-3 shrink-0" />
                         {m.location}
                       </span>
@@ -361,7 +361,7 @@ export function PlannerDateField({
 
   return (
     <div className="flex flex-col gap-1.5" ref={rootRef}>
-      <label htmlFor={id} className="text-sm font-medium text-zinc-900">
+      <label htmlFor={id} className="text-sm font-medium text-foreground">
         {label}
       </label>
       <div className="relative">
@@ -371,12 +371,12 @@ export function PlannerDateField({
           onClick={() => setOpen((v) => !v)}
           aria-haspopup="dialog"
           aria-expanded={open}
-          className={`flex h-10 w-full items-center justify-between gap-2 rounded-lg border bg-white px-3 text-left text-sm text-zinc-900 shadow-sm transition hover:border-zinc-300 focus:outline-none focus:ring-2 focus:ring-zinc-900/10 ${
-            open ? "border-zinc-900 ring-2 ring-zinc-900/10" : "border-zinc-200"
+          className={`flex h-10 w-full items-center justify-between gap-2 rounded-lg border bg-card px-3 text-left text-sm text-foreground shadow-sm transition hover:border-input focus:outline-none focus:ring-2 focus:ring-ring/15 ${
+            open ? "border-ring ring-2 ring-ring/15" : "border-border"
           }`}
         >
-          <span className={value ? "" : "text-zinc-400"}>{formatted}</span>
-          <CalendarDays className="h-4 w-4 shrink-0 text-zinc-400" />
+          <span className={value ? "" : "text-muted-foreground"}>{formatted}</span>
+          <CalendarDays className="h-4 w-4 shrink-0 text-muted-foreground" />
         </button>
         {open ? (
           <div className="absolute left-0 z-30 mt-2 w-[min(92vw,420px)] rounded-[12px] shadow-[0_12px_32px_rgb(0_0_0/0.12)]">
@@ -395,7 +395,7 @@ export function PlannerDateField({
           </div>
         ) : null}
       </div>
-      {hint ? <span className="text-xs text-zinc-500">{hint}</span> : null}
+      {hint ? <span className="text-xs text-muted-foreground">{hint}</span> : null}
     </div>
   );
 }
