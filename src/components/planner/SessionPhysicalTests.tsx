@@ -162,18 +162,18 @@ export function SessionPhysicalTests({
     <div className="flex flex-col gap-4">
       <div className="flex items-start justify-between gap-3">
         <div>
-          <h2 className="flex items-center gap-2 text-base font-semibold text-zinc-900 dark:text-zinc-100">
-            <Activity className="h-4 w-4 text-[var(--club-primary)]" />
+          <h2 className="flex items-center gap-2 text-base font-semibold text-foreground">
+            <Activity className="h-4 w-4 text-primary" />
             {t("title")}
           </h2>
-          <p className="mt-0.5 text-[13px] text-zinc-500 dark:text-zinc-400">{t("intro")}</p>
+          <p className="mt-0.5 text-[13px] text-muted-foreground">{t("intro")}</p>
         </div>
         {canRecord && available.length > 0 ? (
           <select
             value={picker}
             disabled={pending}
             onChange={(e) => attach(e.target.value)}
-            className="rounded-md border border-zinc-300 bg-white px-2 py-1.5 text-[13px] text-zinc-900 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100"
+            className="rounded-lg border border-border bg-card px-2 py-1.5 text-[13px] text-foreground focus:border-ring focus:outline-none focus:ring-2 focus:ring-ring/15"
           >
             <option value="">{t("addTest")}</option>
             {available.map((m) => (
@@ -187,13 +187,13 @@ export function SessionPhysicalTests({
       </div>
 
       {error ? (
-        <div className="rounded-md border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700 dark:border-red-900/50 dark:bg-red-950/30 dark:text-red-300">
+        <div className="rounded-md border border-destructive/30 bg-destructive/10 px-3 py-2 text-sm text-destructive">
           {error}
         </div>
       ) : null}
 
       {attached.length === 0 ? (
-        <div className="rounded-md border border-dashed border-zinc-300 p-6 text-center text-sm text-zinc-500 dark:border-zinc-700 dark:text-zinc-400">
+        <div className="rounded-md border border-dashed border-border p-6 text-center text-sm text-muted-foreground">
           {t("none")}
         </div>
       ) : (
@@ -206,7 +206,7 @@ export function SessionPhysicalTests({
                   key={m.id}
                   type="button"
                   onClick={() => setOpenProtocol((id) => (id === m.id ? null : m.id))}
-                  className="inline-flex items-center gap-1 rounded-full border border-zinc-300 px-2.5 py-1 text-[12px] text-zinc-600 hover:bg-zinc-50 dark:border-zinc-700 dark:text-zinc-300 dark:hover:bg-zinc-800"
+                  className="inline-flex items-center gap-1 rounded-full border border-border px-2.5 py-1 text-[12px] text-muted-foreground hover:bg-accent"
                 >
                   <Info className="h-3.5 w-3.5" />
                   {m.name}
@@ -219,16 +219,16 @@ export function SessionPhysicalTests({
               const m = attached.find((x) => x.id === openProtocol);
               if (!m) return null;
               return (
-                <div className="rounded-md border border-zinc-200 bg-zinc-50/60 p-3 dark:border-zinc-800 dark:bg-zinc-800/30">
-                  <div className="mb-1 text-[13px] font-semibold text-zinc-900 dark:text-zinc-100">
+                <div className="rounded-md border border-border bg-muted/60 p-3">
+                  <div className="mb-1 text-[13px] font-semibold text-foreground">
                     {m.name}
-                    {m.unit ? <span className="ml-1.5 text-[11px] font-normal text-zinc-400">{m.unit}</span> : null}
+                    {m.unit ? <span className="ml-1.5 text-[11px] font-normal text-muted-foreground">{m.unit}</span> : null}
                   </div>
                   {m.description ? (
-                    <p className="text-[13px] text-zinc-600 dark:text-zinc-300">{m.description}</p>
+                    <p className="text-[13px] text-foreground">{m.description}</p>
                   ) : null}
                   {m.protocol ? (
-                    <p className="mt-1 whitespace-pre-wrap text-[13px] text-zinc-600 dark:text-zinc-300">
+                    <p className="mt-1 whitespace-pre-wrap text-[13px] text-foreground">
                       {m.protocol}
                     </p>
                   ) : null}
@@ -238,9 +238,9 @@ export function SessionPhysicalTests({
           ) : null}
 
           {/* Grille joueurs × tests */}
-          <div className="overflow-x-auto rounded-md border border-zinc-200 dark:border-zinc-800">
+          <div className="overflow-x-auto rounded-md border border-border">
             <table className="w-full text-sm">
-              <thead className="bg-zinc-50 text-left text-[11px] uppercase tracking-widest text-zinc-500 dark:bg-zinc-900 dark:text-zinc-400">
+              <thead className="bg-muted text-left text-[11px] uppercase tracking-widest text-muted-foreground">
                 <tr>
                   <th className="px-3 py-2">{t("colPlayer")}</th>
                   <th className="px-3 py-2">{t("colStatus")}</th>
@@ -249,7 +249,7 @@ export function SessionPhysicalTests({
                       <div className="flex items-center justify-center gap-1">
                         <span>
                           {m.name}
-                          {m.unit ? <span className="ml-1 normal-case text-zinc-400">{m.unit}</span> : null}
+                          {m.unit ? <span className="ml-1 normal-case text-muted-foreground">{m.unit}</span> : null}
                         </span>
                         {canRecord ? (
                           <button
@@ -258,7 +258,7 @@ export function SessionPhysicalTests({
                             disabled={pending}
                             title={t("detach")}
                             aria-label={t("detach")}
-                            className="rounded p-0.5 text-zinc-400 hover:bg-red-50 hover:text-red-600 dark:hover:bg-red-950/30"
+                            className="rounded p-0.5 text-muted-foreground hover:bg-destructive/10 hover:text-destructive"
                           >
                             <X className="h-3.5 w-3.5" />
                           </button>
@@ -268,7 +268,7 @@ export function SessionPhysicalTests({
                   ))}
                 </tr>
               </thead>
-              <tbody className="divide-y divide-zinc-200 dark:divide-zinc-800">
+              <tbody className="divide-y divide-border">
                 {players.map((p) => {
                   const avail = availability[p.playerId] ?? { status: "available" };
                   const status = statusMap.get(p.playerId) ?? statusFromAvailability(avail);
@@ -278,19 +278,19 @@ export function SessionPhysicalTests({
                       ? tMed(`kind.${avail.kind}`)
                       : null;
                   return (
-                    <tr key={p.playerId} className="bg-white dark:bg-zinc-950">
+                    <tr key={p.playerId} className="bg-card">
                       <td className="px-3 py-2">
                         <div className="flex items-center gap-2">
                           {p.jerseyNumber !== null && (
-                            <span className="flex h-6 w-6 items-center justify-center rounded-full bg-[var(--club-primary-soft)] text-[11px] font-semibold text-[var(--club-primary)]">
+                            <span className="flex h-6 w-6 items-center justify-center rounded-full bg-accent text-[11px] font-semibold text-primary">
                               {p.jerseyNumber}
                             </span>
                           )}
                           <span
                             className={
                               present
-                                ? "font-medium text-zinc-900 dark:text-zinc-100"
-                                : "font-medium text-zinc-400 line-through dark:text-zinc-500"
+                                ? "font-medium text-foreground"
+                                : "font-medium text-muted-foreground line-through"
                             }
                           >
                             {p.fullName}
@@ -318,7 +318,7 @@ export function SessionPhysicalTests({
                         return (
                           <td key={m.id} className="px-2 py-1 text-center">
                             {!present ? (
-                              <span className="text-zinc-300 dark:text-zinc-600">—</span>
+                              <span className="text-muted-foreground">—</span>
                             ) : canRecord ? (
                               <input
                                 type="text"
@@ -342,10 +342,10 @@ export function SessionPhysicalTests({
                                   }
                                 }}
                                 placeholder="—"
-                                className="eval-input w-16 rounded-md border border-transparent bg-zinc-50 px-2 py-1 text-center font-mono tabular-nums text-zinc-900 hover:border-zinc-300 focus:border-[var(--club-primary)] focus:bg-white focus:outline-none dark:bg-zinc-800/50 dark:text-zinc-100 dark:focus:bg-zinc-800"
+                                className="eval-input w-16 rounded-md border border-transparent bg-muted px-2 py-1 text-center font-mono tabular-nums text-foreground hover:border-input focus:border-ring focus:bg-card focus:outline-none focus:ring-2 focus:ring-ring/15"
                               />
                             ) : (
-                              <span className="font-mono tabular-nums text-zinc-700 dark:text-zinc-300">
+                              <span className="font-mono tabular-nums text-foreground">
                                 {fmt(val) || "—"}
                               </span>
                             )}
@@ -357,7 +357,7 @@ export function SessionPhysicalTests({
                 })}
                 {players.length === 0 && (
                   <tr>
-                    <td colSpan={attached.length + 2} className="px-3 py-6 text-center text-zinc-500">
+                    <td colSpan={attached.length + 2} className="px-3 py-6 text-center text-muted-foreground">
                       {t("emptyRoster")}
                     </td>
                   </tr>
@@ -398,10 +398,10 @@ function StatusControl({
     const cur = options.find((o) => o.value === status) ?? options[0];
     const Icon = cur.icon;
     return (
-      <span className="inline-flex items-center gap-1.5 text-[12px] text-zinc-600 dark:text-zinc-300">
+      <span className="inline-flex items-center gap-1.5 text-[12px] text-foreground">
         <Icon className="h-3.5 w-3.5" />
         {periodKindLabel ?? cur.label}
-        {reason ? <span className="italic text-zinc-400">· {reason}</span> : null}
+        {reason ? <span className="italic text-muted-foreground">· {reason}</span> : null}
       </span>
     );
   }
@@ -414,7 +414,7 @@ function StatusControl({
 
   return (
     <div className="flex items-center gap-2">
-      <div className="inline-flex overflow-hidden rounded-md border border-zinc-200 dark:border-zinc-700">
+      <div className="inline-flex overflow-hidden rounded-md border border-border">
         {options.map((o, i) => {
           const Icon = o.icon;
           const active = status === o.value;
@@ -428,11 +428,11 @@ function StatusControl({
               aria-label={o.label}
               aria-pressed={active}
               className={`flex h-7 w-7 items-center justify-center transition-colors disabled:opacity-50 ${
-                i > 0 ? "border-l border-zinc-200 dark:border-zinc-700" : ""
+                i > 0 ? "border-l border-border" : ""
               } ${
                 active
                   ? toneActive[o.tone]
-                  : "bg-white text-zinc-400 hover:bg-zinc-50 dark:bg-zinc-900 dark:hover:bg-zinc-800"
+                  : "bg-card text-muted-foreground hover:bg-accent"
               }`}
             >
               <Icon className="h-3.5 w-3.5" />
@@ -441,9 +441,9 @@ function StatusControl({
         })}
       </div>
       {periodKindLabel && status === "injured" ? (
-        <span className="text-[11px] text-zinc-400">{periodKindLabel}</span>
+        <span className="text-[11px] text-muted-foreground">{periodKindLabel}</span>
       ) : null}
-      {reason ? <span className="text-[11px] italic text-zinc-400">{reason}</span> : null}
+      {reason ? <span className="text-[11px] italic text-muted-foreground">{reason}</span> : null}
     </div>
   );
 }
