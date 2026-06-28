@@ -3,6 +3,7 @@
 import { Moon, Sun } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useSyncExternalStore } from "react";
+import { Button } from "@/components/ui/Button";
 
 const THEME_EVENT = "grinta-theme-change";
 
@@ -35,15 +36,17 @@ export function ThemeToggle() {
   }
 
   return (
-    <button
+    <Button
       type="button"
+      variant="ghost"
+      size="icon"
       onClick={toggleTheme}
       title={dark ? t("useLightTheme") : t("useDarkTheme")}
       aria-label={dark ? t("useLightTheme") : t("useDarkTheme")}
       aria-pressed={dark}
-      className="inline-flex h-8 w-8 items-center justify-center rounded-md text-zinc-600 transition-colors hover:bg-zinc-100 hover:text-zinc-900 dark:text-zinc-300 dark:hover:bg-zinc-800 dark:hover:text-white"
+      className="h-8 w-8 rounded-md"
     >
       {dark ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
-    </button>
+    </Button>
   );
 }
