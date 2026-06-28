@@ -11,7 +11,7 @@ import { signupAction } from "@/app/[locale]/(auth)/signup/actions";
 type PersonaChoice = "staff" | "player" | "dual";
 
 const inputClass =
-  "h-10 w-full rounded-md border border-zinc-300 bg-white px-3 text-sm text-zinc-900 placeholder:text-zinc-400 focus:border-zinc-900 focus:outline-none focus:ring-2 focus:ring-zinc-900/10";
+  "h-10 w-full rounded-lg border border-border bg-card px-3 text-sm text-foreground placeholder:text-muted-foreground focus:border-ring focus:outline-none focus:ring-2 focus:ring-ring/15";
 
 export function SignupForm() {
   const t = useTranslations("auth");
@@ -93,10 +93,10 @@ export function SignupForm() {
       </AuthField>
 
       <fieldset className="flex flex-col gap-2">
-        <legend className="text-sm font-medium text-zinc-900">
+        <legend className="text-sm font-medium text-foreground">
           {t("personaChoiceLabel")}
         </legend>
-        <p className="text-xs text-zinc-500">{t("personaChoiceHelp")}</p>
+        <p className="text-xs text-muted-foreground">{t("personaChoiceHelp")}</p>
         <input type="hidden" name="personaPreference" value={persona} />
         <div className="grid grid-cols-1 gap-2 sm:grid-cols-3">
           {(
@@ -113,10 +113,10 @@ export function SignupForm() {
                 type="button"
                 onClick={() => setPersona(value)}
                 aria-pressed={active}
-                className={`flex items-center gap-2 rounded-md border px-3 py-2 text-left text-sm transition-colors ${
+                className={`flex items-center gap-2 rounded-lg border px-3 py-2 text-left text-sm transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring ${
                   active
-                    ? "border-zinc-900 bg-zinc-900 text-white"
-                    : "border-zinc-300 bg-white text-zinc-700 hover:border-zinc-400"
+                    ? "border-primary bg-primary text-primary-foreground"
+                    : "border-border bg-card text-foreground hover:border-input"
                 }`}
               >
                 <Icon className="h-4 w-4 shrink-0" />
@@ -128,7 +128,7 @@ export function SignupForm() {
       </fieldset>
 
       {error && (
-        <div className="rounded-md border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700">
+        <div className="rounded-md border border-destructive/30 bg-destructive/10 px-3 py-2 text-sm text-destructive">
           {error}
         </div>
       )}

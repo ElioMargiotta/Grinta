@@ -9,7 +9,7 @@ import { Link } from "@/i18n/navigation";
 import { requestPasswordResetAction } from "@/app/[locale]/forgot-password/actions";
 
 const inputClass =
-  "h-10 w-full rounded-md border border-zinc-300 bg-white px-3 text-sm text-zinc-900 placeholder:text-zinc-400 focus:border-zinc-900 focus:outline-none focus:ring-2 focus:ring-zinc-900/10";
+  "h-10 w-full rounded-lg border border-border bg-card px-3 text-sm text-foreground placeholder:text-muted-foreground focus:border-ring focus:outline-none focus:ring-2 focus:ring-ring/15";
 
 export function ForgotPasswordForm() {
   const t = useTranslations("auth");
@@ -28,7 +28,7 @@ export function ForgotPasswordForm() {
           </h2>
           <p className="text-sm text-emerald-800">{t("forgotSent")}</p>
         </div>
-        <Link href="/login" className="text-sm font-medium text-zinc-900 underline">
+        <Link href="/login" className="text-sm font-medium text-foreground underline">
           {t("backToLogin")}
         </Link>
       </div>
@@ -38,8 +38,8 @@ export function ForgotPasswordForm() {
   return (
     <div className="flex flex-col gap-6">
       <div>
-        <h1 className="text-xl font-semibold text-zinc-900">{t("forgotTitle")}</h1>
-        <p className="mt-1 text-sm text-zinc-600">{t("forgotSubtitle")}</p>
+        <h1 className="text-xl font-semibold text-foreground">{t("forgotTitle")}</h1>
+        <p className="mt-1 text-sm text-muted-foreground">{t("forgotSubtitle")}</p>
       </div>
 
       <form
@@ -67,7 +67,7 @@ export function ForgotPasswordForm() {
         </AuthField>
 
         {error && (
-          <div className="rounded-md border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700">
+          <div className="rounded-md border border-destructive/30 bg-destructive/10 px-3 py-2 text-sm text-destructive">
             {error}
           </div>
         )}
@@ -82,8 +82,8 @@ export function ForgotPasswordForm() {
         </Button>
       </form>
 
-      <p className="text-center text-sm text-zinc-600">
-        <Link href="/login" className="font-medium text-zinc-900 underline">
+      <p className="text-center text-sm text-muted-foreground">
+        <Link href="/login" className="font-medium text-foreground underline">
           {t("backToLogin")}
         </Link>
       </p>

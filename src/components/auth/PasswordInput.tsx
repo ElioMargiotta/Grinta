@@ -3,6 +3,8 @@
 import { Eye, EyeOff } from "lucide-react";
 import { forwardRef, useState, type InputHTMLAttributes } from "react";
 import { useTranslations } from "next-intl";
+import { cn } from "@/lib/utils";
+import { fieldVariants } from "@/components/ui/field";
 
 export const PasswordInput = forwardRef<
   HTMLInputElement,
@@ -16,7 +18,7 @@ export const PasswordInput = forwardRef<
       <input
         ref={ref}
         type={visible ? "text" : "password"}
-        className={`h-10 w-full rounded-md border border-border bg-card px-3 pr-10 text-sm text-foreground placeholder:text-muted-foreground focus:border-ring focus:outline-none focus:ring-2 focus:ring-ring/15 ${className}`}
+        className={cn(fieldVariants(), "h-10 px-3 pr-10", className)}
         {...props}
       />
       <button
