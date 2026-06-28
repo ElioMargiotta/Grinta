@@ -300,7 +300,7 @@ export function PlannerSeasonView({
 
   return (
     <div className="flex flex-col gap-6">
-      <section className="border-y border-zinc-200 py-5 dark:border-zinc-800">
+      <section className="border-y border-border py-5">
         <div className="flex flex-wrap items-end justify-between gap-4">
           <Select
             id="segment-filter"
@@ -320,7 +320,7 @@ export function PlannerSeasonView({
                 type="button"
                 onClick={clearSeason}
                 disabled={isClearing}
-                className="inline-flex h-8 items-center justify-center gap-1.5 rounded-[8px] border border-red-200 bg-white px-3 text-[12px] font-medium text-red-600 transition hover:bg-red-50 disabled:opacity-60 dark:border-red-900/50 dark:bg-zinc-900 dark:text-red-400 dark:hover:bg-red-950/40"
+                className="inline-flex h-8 items-center justify-center gap-1.5 rounded-[8px] border border-destructive/30 bg-card px-3 text-[12px] font-medium text-destructive transition hover:bg-destructive/10 disabled:opacity-60"
               >
                 <Trash2 className="h-3.5 w-3.5" />
                 {isClearing ? t("clearing") : t("clearSeason")}
@@ -329,7 +329,7 @@ export function PlannerSeasonView({
             <button
               type="button"
               onClick={() => setEditingSegment(selectedSegment)}
-              className="inline-flex h-8 items-center justify-center gap-1.5 rounded-[8px] bg-zinc-950 px-3 text-[12px] font-medium text-white transition hover:bg-zinc-800 dark:bg-zinc-100 dark:text-zinc-900 dark:hover:bg-zinc-200"
+              className="inline-flex h-8 items-center justify-center gap-1.5 rounded-[8px] bg-primary px-3 text-[12px] font-medium text-primary-foreground transition hover:brightness-95"
             >
               <Settings2 className="h-3.5 w-3.5" />
               {generated ? t("editPlanning") : t("createPlanning")}
@@ -345,35 +345,35 @@ export function PlannerSeasonView({
       ) : (
         <>
           <section>
-            <div className="mb-3 flex items-center justify-between border-b border-zinc-200 pb-2 dark:border-zinc-800">
-              <div className="text-[11px] font-semibold uppercase tracking-[0.1em] text-zinc-400">
+            <div className="mb-3 flex items-center justify-between border-b border-border pb-2">
+              <div className="text-[11px] font-semibold uppercase tracking-[0.1em] text-muted-foreground">
                 {tw("gridTitle")}
               </div>
-              <div className="text-xs text-zinc-500">
+              <div className="text-xs text-muted-foreground">
                 {tw("weekN", { n: rows.length })} · {tw(`segment.${selectedSegment}`)}
               </div>
             </div>
 
-            <div className="overflow-x-auto rounded-[10px] border border-zinc-200 dark:border-zinc-800">
+            <div className="overflow-x-auto rounded-[10px] border border-border">
               <table className="w-full border-collapse text-[12px]">
                 <thead>
-                  <tr className="bg-zinc-50 text-left text-[10px] font-semibold uppercase tracking-[0.06em] text-zinc-400 dark:bg-zinc-950">
-                    <th className="w-12 border-b border-zinc-200 px-2.5 py-2 dark:border-zinc-800">
+                  <tr className="bg-muted text-left text-[10px] font-semibold uppercase tracking-[0.06em] text-muted-foreground">
+                    <th className="w-12 border-b border-border px-2.5 py-2">
                       {tw("col.week")}
                     </th>
-                    <th className="border-b border-l border-zinc-200 px-2.5 py-2 dark:border-zinc-800">
+                    <th className="border-b border-l border-border px-2.5 py-2">
                       {tw("col.date")}
                     </th>
-                    <th className="border-b border-l border-zinc-200 px-2.5 py-2 dark:border-zinc-800">
+                    <th className="border-b border-l border-border px-2.5 py-2">
                       {tw("col.phase")}
                     </th>
-                    <th className="border-b border-l border-zinc-200 px-2.5 py-2 dark:border-zinc-800">
+                    <th className="border-b border-l border-border px-2.5 py-2">
                       {tw("col.theme")}
                     </th>
-                    <th className="border-b border-l border-zinc-200 px-2.5 py-2 dark:border-zinc-800">
+                    <th className="border-b border-l border-border px-2.5 py-2">
                       {tw("col.trainings")}
                     </th>
-                    <th className="border-b border-l border-zinc-200 px-2.5 py-2 dark:border-zinc-800">
+                    <th className="border-b border-l border-border px-2.5 py-2">
                       {tw("col.match")}
                     </th>
                   </tr>
@@ -395,12 +395,12 @@ export function PlannerSeasonView({
                           <tr>
                             <td
                               colSpan={6}
-                              className="border-y border-dashed border-zinc-300 bg-zinc-100 px-3 py-4 text-center dark:border-zinc-700 dark:bg-zinc-900"
+                              className="border-y border-dashed border-border bg-muted px-3 py-4 text-center"
                             >
-                              <div className="text-[10px] font-bold uppercase tracking-[0.1em] text-zinc-500">
+                              <div className="text-[10px] font-bold uppercase tracking-[0.1em] text-muted-foreground">
                                 {tw("pauseTitle")}
                               </div>
-                              <div className="mt-1 text-xs font-medium text-zinc-600 dark:text-zinc-300">
+                              <div className="mt-1 text-xs font-medium text-foreground">
                                 {tw("pauseDates", {
                                   start: new Date(`${pause.start}T00:00:00`).toLocaleDateString(locale),
                                   end: new Date(`${pause.end}T00:00:00`).toLocaleDateString(locale),
@@ -413,7 +413,7 @@ export function PlannerSeasonView({
                           <tr>
                             <td
                               colSpan={6}
-                              className="border-y border-zinc-200 bg-zinc-100 px-2.5 py-1.5 text-[10px] font-bold uppercase tracking-[0.08em] text-zinc-600 dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-300"
+                              className="border-y border-border bg-muted px-2.5 py-1.5 text-[10px] font-bold uppercase tracking-[0.08em] text-foreground"
                             >
                               {tw(`segment.${tour}`)}
                             </td>
@@ -440,7 +440,7 @@ export function PlannerSeasonView({
           </section>
 
           <section>
-            <div className="mb-3 text-[11px] font-semibold uppercase tracking-[0.1em] text-zinc-400">
+            <div className="mb-3 text-[11px] font-semibold uppercase tracking-[0.1em] text-muted-foreground">
               {tw("statsTitle")}
             </div>
             <div className="grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-5">
@@ -491,22 +491,22 @@ function RowView({
   const match = row.match;
   const outcome = match ? outcomeOf(match) : null;
   const hasScore = match?.home_score != null && match?.away_score != null;
-  const td = "border-b border-l border-zinc-100 px-2.5 py-1.5 align-middle dark:border-zinc-800";
+  const td = "border-b border-l border-border px-2.5 py-1.5 align-middle";
 
   const outcomeChip =
     outcome === "win"
       ? "bg-emerald-100 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-300"
       : outcome === "loss"
         ? "bg-red-100 text-red-700 dark:bg-red-950/40 dark:text-red-300"
-        : "bg-zinc-200 text-zinc-700 dark:bg-zinc-700 dark:text-zinc-200";
+        : "bg-muted text-foreground";
 
   return (
-    <tr className="text-zinc-700 odd:bg-white even:bg-zinc-50/50 hover:bg-red-50/40 dark:text-zinc-300 dark:odd:bg-zinc-900 dark:even:bg-zinc-950/40 dark:hover:bg-zinc-800/40">
-      <td className="border-b border-zinc-100 px-2.5 py-1.5 align-middle font-semibold text-zinc-900 dark:border-zinc-800 dark:text-zinc-100">
-        {isWeek ? tw("weekBadge", { n }) : <span className="text-zinc-300">—</span>}
+    <tr className="text-foreground odd:bg-card even:bg-muted/40 hover:bg-accent">
+      <td className="border-b border-border px-2.5 py-1.5 align-middle font-semibold text-foreground">
+        {isWeek ? tw("weekBadge", { n }) : <span className="text-muted-foreground">—</span>}
       </td>
       <td className={`${td} whitespace-nowrap capitalize`}>{dateStr}</td>
-      <td className={`${td} whitespace-nowrap text-zinc-500`}>
+      <td className={`${td} whitespace-nowrap text-muted-foreground`}>
         {phase && tw.has(`phase.${phase}`) ? tw(`phase.${phase}`) : phase ?? "—"}
       </td>
       <td className={td}>
@@ -522,12 +522,12 @@ function RowView({
             </span>
           </span>
         ) : (
-          <span className="text-zinc-300">—</span>
+          <span className="text-muted-foreground">—</span>
         )}
       </td>
       <td className={td}>
         {sessions.length === 0 ? (
-          <span className="text-zinc-300">—</span>
+          <span className="text-muted-foreground">—</span>
         ) : (
           <span className="flex flex-wrap gap-1">
             {sessions.map((s) => (
@@ -536,7 +536,7 @@ function RowView({
                 type="button"
                 onClick={() => onOpenSession(s.id)}
                 title={s.theme ?? undefined}
-                className="inline-flex items-center gap-1 rounded-[5px] bg-zinc-100 px-1.5 py-0.5 text-[10px] font-medium capitalize text-zinc-600 transition hover:bg-zinc-200 dark:bg-zinc-800 dark:text-zinc-300 dark:hover:bg-zinc-700"
+                className="inline-flex items-center gap-1 rounded-[5px] bg-muted px-1.5 py-0.5 text-[10px] font-medium capitalize text-muted-foreground transition hover:bg-accent"
               >
                 {new Date(`${s.date}T00:00:00`).toLocaleDateString(locale, { weekday: "short" })}
               </button>
@@ -549,9 +549,9 @@ function RowView({
           <button
             type="button"
             onClick={() => onOpenMatch(match.id)}
-            className="inline-flex min-w-0 items-center gap-1.5 font-medium text-[var(--club-primary)] hover:underline"
+            className="inline-flex min-w-0 items-center gap-1.5 font-medium text-primary hover:underline"
           >
-            <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-[var(--club-primary)]" />
+            <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-primary" />
             <span className="truncate">
               {match.home_away === "away" ? "@ " : ""}
               {match.summary ?? match.opponent ?? t("matchFallback")}
@@ -567,7 +567,7 @@ function RowView({
             ) : null}
           </button>
         ) : (
-          <span className="text-zinc-300">—</span>
+          <span className="text-muted-foreground">—</span>
         )}
       </td>
     </tr>
@@ -576,11 +576,11 @@ function RowView({
 
 function Stat({ label, value }: { label: string; value: number }) {
   return (
-    <div className="rounded-[10px] border border-zinc-200 bg-white px-3 py-2.5 dark:border-zinc-800 dark:bg-zinc-900">
-      <div className="text-2xl font-semibold tabular-nums leading-none text-zinc-950 dark:text-zinc-100">
+    <div className="rounded-[10px] border border-border bg-card px-3 py-2.5">
+      <div className="text-2xl font-semibold tabular-nums leading-none text-foreground">
         {value}
       </div>
-      <div className="mt-1.5 text-[10px] font-semibold uppercase tracking-[0.08em] text-zinc-400">
+      <div className="mt-1.5 text-[10px] font-semibold uppercase tracking-[0.08em] text-muted-foreground">
         {label}
       </div>
     </div>
@@ -589,11 +589,11 @@ function Stat({ label, value }: { label: string; value: number }) {
 
 function EmptyState({ title, hint }: { title: string; hint: string }) {
   return (
-    <div className="flex flex-col items-center gap-3 rounded-lg border border-dashed border-[var(--club-line)] bg-white/40 p-8 text-center dark:bg-zinc-900/30">
-      <CalendarDays className="h-8 w-8 text-zinc-300" />
+    <div className="flex flex-col items-center gap-3 rounded-lg border border-dashed border-border bg-muted/40 p-8 text-center">
+      <CalendarDays className="h-8 w-8 text-muted-foreground" />
       <div>
-        <div className="text-sm font-semibold text-zinc-900 dark:text-zinc-100">{title}</div>
-        <p className="mt-1 max-w-md text-sm text-zinc-500 dark:text-zinc-400">{hint}</p>
+        <div className="text-sm font-semibold text-foreground">{title}</div>
+        <p className="mt-1 max-w-md text-sm text-muted-foreground">{hint}</p>
       </div>
     </div>
   );
