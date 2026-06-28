@@ -1,6 +1,7 @@
 import { redirect } from "next/navigation";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { Mail } from "lucide-react";
+import { Button } from "@/components/ui/Button";
 
 // Landing for users who have an invitation token from outside the in-app
 // banner flow (e.g. someone pasted them a /invite/<token> URL). The primary
@@ -27,10 +28,10 @@ export default async function InviteLandingPage({
   return (
     <div className="mx-auto flex w-full max-w-xl flex-col gap-6">
       <div>
-        <h1 className="text-2xl font-semibold tracking-tight text-zinc-900 dark:text-zinc-100">
+        <h1 className="text-2xl font-semibold tracking-tight text-foreground">
           {t("title")}
         </h1>
-        <p className="mt-1 text-sm text-zinc-600 dark:text-zinc-400">
+        <p className="mt-1 text-sm text-muted-foreground">
           {t("subtitle")}
         </p>
       </div>
@@ -45,11 +46,11 @@ export default async function InviteLandingPage({
         </p>
       </div>
 
-      <div className="rounded-lg border border-[var(--club-line)] bg-white p-6 dark:border-zinc-800 dark:bg-zinc-900">
-        <div className="text-sm font-medium text-zinc-900 dark:text-zinc-100">
+      <div className="rounded-xl border border-border bg-card p-6">
+        <div className="text-sm font-medium text-foreground">
           {t("haveTokenTitle")}
         </div>
-        <p className="mt-1 text-sm text-zinc-600 dark:text-zinc-400">
+        <p className="mt-1 text-sm text-muted-foreground">
           {t("haveTokenSubtitle")}
         </p>
         <form action={gotoTokenAction} className="mt-4 flex flex-col gap-3">
@@ -58,14 +59,11 @@ export default async function InviteLandingPage({
             name="token"
             required
             placeholder={t("tokenPlaceholder")}
-            className="w-full rounded-md border border-zinc-300 bg-white px-3 py-2 text-sm text-zinc-900 outline-none focus:border-zinc-900 dark:border-zinc-700 dark:bg-zinc-950 dark:text-zinc-100 dark:focus:border-zinc-100"
+            className="w-full rounded-lg border border-border bg-card px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground outline-none focus:border-ring focus:ring-2 focus:ring-ring/15"
           />
-          <button
-            type="submit"
-            className="self-start rounded-md bg-zinc-900 px-4 py-2 text-sm font-medium text-white hover:bg-zinc-800 dark:bg-white dark:text-zinc-900 dark:hover:bg-zinc-200"
-          >
+          <Button type="submit" className="self-start">
             {t("continue")}
-          </button>
+          </Button>
         </form>
       </div>
     </div>

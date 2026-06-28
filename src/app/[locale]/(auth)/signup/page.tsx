@@ -14,13 +14,13 @@ export default async function SignupPage({
   return (
     <div className="flex flex-col gap-6">
       <div>
-        <h1 className="text-xl font-semibold text-zinc-900">{t("signupTitle")}</h1>
-        <p className="mt-1 text-sm text-zinc-600">{t("signupSubtitle")}</p>
+        <h1 className="text-xl font-semibold text-foreground">{t("signupTitle")}</h1>
+        <p className="mt-1 text-sm text-muted-foreground">{t("signupSubtitle")}</p>
       </div>
       <SignupForm />
-      <p className="text-center text-sm text-zinc-600">
+      <p className="text-center text-sm text-muted-foreground">
         {t("haveAccount")}{" "}
-        <Link href="/login" className="font-medium text-zinc-900 underline">
+        <Link href="/login" className="font-medium text-foreground underline">
           {t("switchToLogin")}
         </Link>
       </p>

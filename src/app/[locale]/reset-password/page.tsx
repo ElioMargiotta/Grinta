@@ -2,6 +2,7 @@ import { setRequestLocale, getTranslations } from "next-intl/server";
 import { AuthShell } from "@/components/auth/AuthShell";
 import { ResetPasswordForm } from "@/components/auth/ResetPasswordForm";
 import { Link } from "@/i18n/navigation";
+import { buttonVariants } from "@/components/ui/Button";
 import { createClient } from "@/lib/supabase/server";
 
 export default async function ResetPasswordPage({
@@ -30,15 +31,12 @@ export default async function ResetPasswordPage({
       <AuthShell>
         <div className="flex flex-col items-center gap-5 text-center">
           <div>
-            <h1 className="text-xl font-semibold text-zinc-900">
+            <h1 className="text-xl font-semibold text-foreground">
               {t("resetInvalidTitle")}
             </h1>
-            <p className="mt-2 text-sm text-zinc-600">{t("resetInvalidBody")}</p>
+            <p className="mt-2 text-sm text-muted-foreground">{t("resetInvalidBody")}</p>
           </div>
-          <Link
-            href="/forgot-password"
-            className="inline-flex items-center justify-center rounded-lg bg-zinc-900 px-5 py-2.5 text-sm font-medium text-white transition-colors hover:bg-zinc-800"
-          >
+          <Link href="/forgot-password" className={buttonVariants()}>
             {t("resetRequestAgain")}
           </Link>
         </div>
