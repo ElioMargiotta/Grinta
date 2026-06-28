@@ -44,8 +44,8 @@ export const THEME_COLORS: Record<ThemeKey, { bg: string; border: string; dot: s
     dot: "#8b5cf6",
   },
   decharge: {
-    bg: "bg-zinc-100 dark:bg-zinc-800/60",
-    border: "border-l-zinc-400",
+    bg: "bg-muted",
+    border: "border-l-muted-foreground",
     dot: "#94a3b8",
   },
   jeux_polysport: {
@@ -122,11 +122,11 @@ export function MicrocycleThemePicker({
       role="dialog"
       className={
         placement === "inline"
-          ? "z-10 mt-2 w-full rounded-lg border border-zinc-200 bg-white p-3 shadow-sm dark:border-zinc-700 dark:bg-zinc-900"
-          : "absolute left-1/2 top-full z-30 mt-1 w-72 -translate-x-1/2 rounded-lg border border-zinc-200 bg-white p-3 shadow-xl dark:border-zinc-700 dark:bg-zinc-900"
+          ? "z-10 mt-2 w-full rounded-lg border border-border bg-card p-3 shadow-sm"
+          : "absolute left-1/2 top-full z-30 mt-1 w-72 -translate-x-1/2 rounded-lg border border-border bg-card p-3 shadow-xl"
       }
     >
-      <div className="mb-2 text-[11px] font-semibold uppercase tracking-wide text-zinc-500 dark:text-zinc-400">
+      <div className="mb-2 text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">
         {t("quickFill")}
       </div>
       <div className="grid grid-cols-1 gap-1">
@@ -142,15 +142,15 @@ export function MicrocycleThemePicker({
               }}
               className={`flex items-center gap-2 rounded-md border px-2 py-1.5 text-left text-xs transition-colors ${
                 isActive
-                  ? "border-zinc-900 bg-zinc-50 dark:border-zinc-100 dark:bg-zinc-800"
-                  : "border-zinc-200 hover:bg-zinc-50 dark:border-zinc-700 dark:hover:bg-zinc-800"
+                  ? "border-primary bg-accent"
+                  : "border-border hover:bg-accent"
               }`}
             >
               <span
                 className="inline-block h-2.5 w-2.5 rounded-full"
                 style={{ background: THEME_COLORS[key].dot }}
               />
-              <span className="flex-1 text-zinc-800 dark:text-zinc-100">
+              <span className="flex-1 text-foreground">
                 {t(`option.${key}`)}
               </span>
             </button>
@@ -158,8 +158,8 @@ export function MicrocycleThemePicker({
         })}
       </div>
 
-      <div className="mt-3 border-t border-zinc-200 pt-3 dark:border-zinc-700">
-        <div className="mb-1 text-[11px] font-semibold uppercase tracking-wide text-zinc-500 dark:text-zinc-400">
+      <div className="mt-3 border-t border-border pt-3">
+        <div className="mb-1 text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">
           {t("format")}
         </div>
         <div className="flex flex-wrap gap-1">
@@ -170,8 +170,8 @@ export function MicrocycleThemePicker({
               onClick={() => setFormat(format === f ? "" : f)}
               className={`rounded-full border px-2 py-1 text-[11px] font-medium transition-colors ${
                 format === f
-                  ? "border-zinc-900 bg-zinc-900 text-white dark:border-zinc-100 dark:bg-zinc-100 dark:text-zinc-900"
-                  : "border-zinc-200 text-zinc-700 hover:bg-zinc-50 dark:border-zinc-700 dark:text-zinc-300 dark:hover:bg-zinc-800"
+                  ? "border-primary bg-primary text-primary-foreground"
+                  : "border-border text-foreground hover:bg-accent"
               }`}
             >
               {t(`formatOption.${f}`)}
@@ -180,8 +180,8 @@ export function MicrocycleThemePicker({
         </div>
       </div>
 
-      <div className="mt-3 border-t border-zinc-200 pt-3 dark:border-zinc-700">
-        <label className="text-[11px] font-semibold uppercase tracking-wide text-zinc-500 dark:text-zinc-400">
+      <div className="mt-3 border-t border-border pt-3">
+        <label className="text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">
           {t("notes")}
         </label>
         <textarea
@@ -189,11 +189,11 @@ export function MicrocycleThemePicker({
           onChange={(e) => setNotes(e.target.value)}
           rows={2}
           placeholder={t("notesPlaceholder")}
-          className="mt-1 w-full rounded-md border border-zinc-200 bg-white px-2 py-1.5 text-xs text-zinc-900 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100"
+          className="mt-1 w-full rounded-lg border border-border bg-card px-2 py-1.5 text-xs text-foreground focus:border-ring focus:outline-none focus:ring-2 focus:ring-ring/15"
         />
       </div>
 
-      {error ? <p className="mt-2 text-xs text-red-600">{error}</p> : null}
+      {error ? <p className="mt-2 text-xs text-destructive">{error}</p> : null}
 
       <div className="mt-3 flex justify-between gap-2">
         <Button

@@ -115,7 +115,7 @@ export function AttendanceRoster({
         <Stat label={t("statActualPresent")} value={counts.actualPresent} />
       </div>
 
-      <div className="flex flex-wrap items-end gap-3 rounded-md border border-zinc-200 bg-white p-3 dark:border-zinc-800 dark:bg-zinc-900">
+      <div className="flex flex-wrap items-end gap-3 rounded-md border border-border bg-card p-3">
         <Input
           id="deadline-hours"
           name="deadline-hours"
@@ -136,16 +136,16 @@ export function AttendanceRoster({
         >
           {t("deadlineSave")}
         </Button>
-        <p className="text-[11px] text-zinc-500 dark:text-zinc-400">
+        <p className="text-[11px] text-muted-foreground">
           {t("deadlineHint")}
         </p>
       </div>
 
-      {error && <p className="text-sm text-red-600">{error}</p>}
+      {error && <p className="text-sm text-destructive">{error}</p>}
 
       {roster.length > 0 ? (
         <div className="flex flex-wrap items-center gap-2">
-          <span className="text-[12px] text-zinc-500 dark:text-zinc-400">
+          <span className="text-[12px] text-muted-foreground">
             {t("bulkLabel")}
           </span>
           <button
@@ -169,16 +169,16 @@ export function AttendanceRoster({
         </div>
       ) : null}
 
-      <div className="overflow-hidden rounded-md border border-zinc-200 dark:border-zinc-800">
+      <div className="overflow-hidden rounded-md border border-border">
         <table className="w-full text-sm">
-          <thead className="bg-zinc-50 text-left text-[11px] uppercase tracking-widest text-zinc-500 dark:bg-zinc-900 dark:text-zinc-400">
+          <thead className="bg-muted text-left text-[11px] uppercase tracking-widest text-muted-foreground">
             <tr>
               <th className="px-3 py-2">{t("colPlayer")}</th>
               <th className="px-3 py-2">{t("colAnnounced")}</th>
               <th className="px-3 py-2">{t("colActual")}</th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-zinc-200 dark:divide-zinc-800">
+          <tbody className="divide-y divide-border">
             {roster.map((entry) => (
               <RosterRow
                 key={entry.playerId}
@@ -192,7 +192,7 @@ export function AttendanceRoster({
             ))}
             {roster.length === 0 && (
               <tr>
-                <td colSpan={3} className="px-3 py-6 text-center text-zinc-500">
+                <td colSpan={3} className="px-3 py-6 text-center text-muted-foreground">
                   {t("emptyRoster")}
                 </td>
               </tr>
@@ -206,11 +206,11 @@ export function AttendanceRoster({
 
 function Stat({ label, value }: { label: string; value: number }) {
   return (
-    <div className="rounded-md border border-zinc-200 bg-white px-3 py-2 dark:border-zinc-800 dark:bg-zinc-900">
-      <div className="text-[10px] font-mono uppercase tracking-widest text-zinc-500 dark:text-zinc-400">
+    <div className="rounded-md border border-border bg-card px-3 py-2">
+      <div className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground">
         {label}
       </div>
-      <div className="text-lg font-semibold text-zinc-900 dark:text-zinc-100">
+      <div className="text-lg font-semibold text-foreground">
         {value}
       </div>
     </div>
@@ -258,15 +258,15 @@ function RosterRow({
   };
 
   return (
-    <tr className="bg-white dark:bg-zinc-950">
+    <tr className="bg-card">
       <td className="px-3 py-3">
         <div className="flex items-center gap-2">
           {entry.jerseyNumber !== null && (
-            <span className="flex h-7 w-7 items-center justify-center rounded-full bg-[var(--club-primary-soft)] text-[11px] font-semibold text-[var(--club-primary)]">
+            <span className="flex h-7 w-7 items-center justify-center rounded-full bg-accent text-[11px] font-semibold text-primary">
               {entry.jerseyNumber}
             </span>
           )}
-          <span className="font-medium text-zinc-900 dark:text-zinc-100">
+          <span className="font-medium text-foreground">
             {entry.fullName}
           </span>
         </div>
@@ -276,14 +276,14 @@ function RosterRow({
           <div className="flex flex-col gap-1">
             <KindBadge kind={unavail.kind} label={tMed(`kind.${unavail.kind}`)} />
             {unavail.reason ? (
-              <span className="flex items-start gap-1 text-[11px] italic text-zinc-500 dark:text-zinc-400">
+              <span className="flex items-start gap-1 text-[11px] italic text-muted-foreground">
                 <MessageSquare className="mt-0.5 h-3 w-3 shrink-0" />
                 {unavail.reason}
               </span>
             ) : null}
           </div>
         ) : entry.announcedStatus === null ? (
-          <span className="text-[12px] text-zinc-400">{t("noResponse")}</span>
+          <span className="text-[12px] text-muted-foreground">{t("noResponse")}</span>
         ) : (
           <div className="flex flex-col gap-1">
             <span
@@ -301,7 +301,7 @@ function RosterRow({
               {entry.announcedStatus === "present" ? t("present") : t("absent")}
             </span>
             {entry.announcedStatus === "absent" && entry.announcedReason && (
-              <span className="flex items-start gap-1 text-[11px] italic text-zinc-500 dark:text-zinc-400">
+              <span className="flex items-start gap-1 text-[11px] italic text-muted-foreground">
                 <MessageSquare className="mt-0.5 h-3 w-3 shrink-0" />
                 {entry.announcedReason}
               </span>
@@ -312,7 +312,7 @@ function RosterRow({
       <td className="px-3 py-3">
         <div className="flex flex-col gap-1">
           {unavail ? (
-            <span className="text-[12px] italic text-zinc-400">{tMed("excused")}</span>
+            <span className="text-[12px] italic text-muted-foreground">{tMed("excused")}</span>
           ) : null}
           <div className="flex gap-1">
             <IconToggle
@@ -343,7 +343,7 @@ function RosterRow({
               <Minus className="h-3.5 w-3.5" />
             </IconToggle>
           </div>
-          {rowError && <span className="text-[11px] text-red-600">{rowError}</span>}
+          {rowError && <span className="text-[11px] text-destructive">{rowError}</span>}
         </div>
       </td>
     </tr>
@@ -368,13 +368,13 @@ function IconToggle({
   const toneStyles = {
     positive: active
       ? "bg-emerald-600 text-white border-emerald-600"
-      : "border-zinc-300 text-zinc-500 hover:bg-emerald-50 hover:text-emerald-700 dark:border-zinc-700",
+      : "border-input text-muted-foreground hover:bg-emerald-50 hover:text-emerald-700",
     negative: active
       ? "bg-red-600 text-white border-red-600"
-      : "border-zinc-300 text-zinc-500 hover:bg-red-50 hover:text-red-700 dark:border-zinc-700",
+      : "border-input text-muted-foreground hover:bg-red-50 hover:text-red-700",
     neutral: active
-      ? "bg-zinc-700 text-white border-zinc-700"
-      : "border-zinc-300 text-zinc-500 hover:bg-zinc-100 dark:border-zinc-700",
+      ? "bg-foreground text-background border-foreground"
+      : "border-input text-muted-foreground hover:bg-accent",
   } as const;
 
   return (
