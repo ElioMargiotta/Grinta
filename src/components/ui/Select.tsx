@@ -1,5 +1,6 @@
 import { forwardRef, type SelectHTMLAttributes } from "react";
 import { cn } from "@/lib/utils";
+import { fieldVariants } from "@/components/ui/field";
 
 export interface SelectProps extends SelectHTMLAttributes<HTMLSelectElement> {
   label?: string;
@@ -16,10 +17,7 @@ export const Select = forwardRef<HTMLSelectElement, SelectProps>(
       <select
         ref={ref}
         id={id}
-        className={cn(
-          "h-10 rounded-md border border-border bg-card px-3 text-sm text-foreground focus:border-ring focus:outline-none focus:ring-2 focus:ring-ring/15",
-          className,
-        )}
+        className={cn(fieldVariants(), "h-10 px-3", className)}
         {...props}
       >
         {children}
