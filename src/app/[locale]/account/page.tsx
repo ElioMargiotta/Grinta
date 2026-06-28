@@ -8,6 +8,7 @@ import { getMyMemberships } from "@/lib/club/queries";
 import { clubThemeStyle } from "@/lib/club/theme";
 import { getClubLicenseUsage } from "@/lib/license/queries";
 import { Topbar } from "@/components/layout/Topbar";
+import { Card } from "@/components/ui/Card";
 import { AccountPersonaForm } from "@/components/account/AccountPersonaForm";
 
 export default async function AccountPage({
@@ -43,7 +44,7 @@ export default async function AccountPage({
 
   return (
     <div
-      className="flex min-h-screen flex-1 flex-col bg-[var(--club-page-bg)] dark:bg-zinc-950"
+      className="flex min-h-screen flex-1 flex-col bg-background"
       style={clubThemeStyle(membership)}
     >
       <Topbar
@@ -57,36 +58,36 @@ export default async function AccountPage({
         <div className="mx-auto flex w-full max-w-2xl flex-col gap-6">
           <Link
             href={backHref}
-            className="inline-flex w-fit items-center gap-1.5 text-sm font-medium text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100"
+            className="inline-flex w-fit items-center gap-1.5 text-sm font-medium text-muted-foreground hover:text-foreground"
           >
             <ArrowLeft className="h-4 w-4" />
             {t("back")}
           </Link>
 
           <div>
-            <h1 className="text-2xl font-semibold text-zinc-900 dark:text-zinc-100">
+            <h1 className="text-2xl font-semibold text-foreground">
               {t("title")}
             </h1>
-            <p className="mt-1 text-sm text-zinc-600 dark:text-zinc-400">
+            <p className="mt-1 text-sm text-muted-foreground">
               {t("subtitle")}
             </p>
           </div>
 
-          <div className="rounded-xl border border-zinc-200 bg-white p-6 shadow-sm dark:border-zinc-800 dark:bg-zinc-900 sm:p-8">
+          <Card padded={false} className="p-6 sm:p-8">
             <div className="mb-5">
-              <div className="text-xs font-mono uppercase tracking-widest text-zinc-500 dark:text-zinc-400">
+              <div className="text-xs font-mono uppercase tracking-widest text-muted-foreground">
                 {t("identityLabel")}
               </div>
-              <div className="mt-1 text-base font-medium text-zinc-900 dark:text-zinc-100">
+              <div className="mt-1 text-base font-medium text-foreground">
                 {displayName || user.email}
               </div>
-              <div className="text-xs text-zinc-500 dark:text-zinc-400">
+              <div className="text-xs text-muted-foreground">
                 {user.email}
               </div>
             </div>
 
             <AccountPersonaForm initialPreference={preference} />
-          </div>
+          </Card>
         </div>
       </main>
     </div>
