@@ -10,8 +10,8 @@ import { createClient } from "@/lib/supabase/client";
 // l'URL de callback en liste blanche ; sans config, le bouton renverra une
 // erreur claire côté Supabase.
 
-const GoogleIcon = () => (
-  <svg viewBox="0 0 24 24" className="h-4 w-4" aria-hidden>
+const GoogleIcon = ({ className = "h-4 w-4" }: { className?: string }) => (
+  <svg viewBox="0 0 24 24" className={className} aria-hidden>
     <path
       fill="#4285F4"
       d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 0 1-2.2 3.32v2.76h3.56c2.08-1.92 3.28-4.74 3.28-8.09Z"
@@ -31,13 +31,19 @@ const GoogleIcon = () => (
   </svg>
 );
 
-const AppleIcon = () => (
-  <svg viewBox="0 0 24 24" className="h-4 w-4" aria-hidden fill="currentColor">
+const AppleIcon = ({ className = "h-4 w-4" }: { className?: string }) => (
+  <svg viewBox="0 0 24 24" className={className} aria-hidden fill="currentColor">
     <path d="M16.36 12.78c.02 2.5 2.19 3.33 2.22 3.34-.02.06-.35 1.2-1.15 2.37-.69 1.02-1.41 2.03-2.54 2.05-1.11.02-1.47-.66-2.74-.66-1.27 0-1.67.64-2.72.68-1.09.04-1.92-1.1-2.62-2.11-1.42-2.07-2.51-5.85-1.05-8.41.72-1.27 2.02-2.08 3.43-2.1 1.07-.02 2.08.72 2.74.72.65 0 1.88-.89 3.17-.76.54.02 2.06.22 3.03 1.65-.08.05-1.81 1.06-1.79 3.16M14.3 4.85c.58-.7.97-1.68.86-2.65-.84.03-1.85.56-2.45 1.26-.54.62-1.01 1.61-.88 2.56.93.07 1.89-.47 2.47-1.17" />
   </svg>
 );
 
-export function OAuthButtons({ next }: { next?: string }) {
+export function OAuthButtons({
+  next,
+  variant = "buttons",
+}: {
+  next?: string;
+  variant?: "buttons" | "icons";
+}) {
   const t = useTranslations("auth");
   const locale = useLocale();
   const [loading, setLoading] = useState<"google" | "apple" | null>(null);
@@ -59,6 +65,47 @@ export function OAuthButtons({ next }: { next?: string }) {
       setLoading(null);
     }
     // En cas de succès, le navigateur est redirigé vers le provider.
+  }
+
+  if (variant === "icons") {
+    return (
+      <div className="flex flex-col gap-3">
+        <div className="flex items-center gap-3 text-xs text-[var(--ink-3)]">
+          <span className="h-px flex-1 bg-[var(--line)]" />
+          {t("orSeparator")}
+          <span className="h-px flex-1 bg-[var(--line)]" />
+        </div>
+
+        <div className="flex items-center justify-center gap-3">
+          <button
+            type="button"
+            onClick={() => signIn("google")}
+            disabled={loading !== null}
+            aria-label={t("continueWithGoogle")}
+            title={t("continueWithGoogle")}
+            className="flex h-12 w-12 items-center justify-center rounded-full border border-[var(--line)] bg-[var(--paper)] transition-colors hover:border-[var(--line-2)] hover:bg-[var(--bg-2)] disabled:opacity-60"
+          >
+            <GoogleIcon className="h-5 w-5" />
+          </button>
+          <button
+            type="button"
+            onClick={() => signIn("apple")}
+            disabled={loading !== null}
+            aria-label={t("continueWithApple")}
+            title={t("continueWithApple")}
+            className="flex h-12 w-12 items-center justify-center rounded-full border border-[var(--line)] bg-[var(--paper)] text-[var(--ink)] transition-colors hover:border-[var(--line-2)] hover:bg-[var(--bg-2)] disabled:opacity-60"
+          >
+            <AppleIcon className="h-5 w-5" />
+          </button>
+        </div>
+
+        {error && (
+          <div className="rounded-md border border-destructive/30 bg-destructive/10 px-3 py-2 text-sm text-destructive">
+            {error}
+          </div>
+        )}
+      </div>
+    );
   }
 
   return (

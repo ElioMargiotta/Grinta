@@ -2,6 +2,7 @@ import { redirect } from "next/navigation";
 import { cache } from "react";
 import { createClient } from "@/lib/supabase/server";
 import { getAuthUser } from "@/lib/auth/user";
+import { mfaChallengeRequired } from "@/lib/auth/mfa";
 import { resolveCurrentMembership } from "@/lib/club/context";
 import { resolvePersona, type Persona } from "@/lib/club/persona";
 
@@ -10,6 +11,14 @@ export async function requireUser(locale: string) {
   const user = await getAuthUser();
 
   if (!user) redirect(`/${locale}/login`);
+
+  // 2FA opt-in : si le compte a un facteur TOTP vérifié mais que la session
+  // est encore en aal1, on bloque tout l'app derrière le challenge /mfa.
+  // (Les comptes sans 2FA ont nextLevel = aal1 → jamais redirigés.)
+  if (await mfaChallengeRequired()) {
+    redirect(`/${locale}/mfa`);
+  }
+
   return { supabase, user };
 }
 

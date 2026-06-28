@@ -163,6 +163,8 @@ html.dark body {
   border-radius: 42% 58% 60% 40% / 50% 45% 55% 50%;
   filter: blur(90px);
   will-change: transform, border-radius;
+  /* Fond recoloré en douceur quand un profil change la teinte (--brand). */
+  transition: background 600ms ease;
 }
 
 /* Fine film grain over the blob field — kills banding, adds a premium feel. */
