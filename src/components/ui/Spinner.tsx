@@ -1,33 +1,36 @@
 import type { SVGProps } from "react";
+import { cva, type VariantProps } from "class-variance-authority";
+import { cn } from "@/lib/utils";
 
-type Size = "xs" | "sm" | "md" | "lg";
-type Tone = "accent" | "ink" | "current" | "inverse";
+export const spinnerVariants = cva("animate-spin", {
+  variants: {
+    size: {
+      xs: "h-3 w-3",
+      sm: "h-4 w-4",
+      md: "h-6 w-6",
+      lg: "h-10 w-10",
+    },
+    tone: {
+      accent: "text-[var(--accent,oklch(53.576%_0.19004_33.59))]",
+      ink: "text-[var(--ink,#18181b)]",
+      current: "text-current",
+      inverse: "text-white",
+    },
+  },
+  defaultVariants: { size: "sm", tone: "current" },
+});
 
-export interface SpinnerProps extends Omit<SVGProps<SVGSVGElement>, "size"> {
-  size?: Size;
-  tone?: Tone;
+export interface SpinnerProps
+  extends Omit<SVGProps<SVGSVGElement>, "size">,
+    VariantProps<typeof spinnerVariants> {
   label?: string;
 }
 
-const sizes: Record<Size, string> = {
-  xs: "h-3 w-3",
-  sm: "h-4 w-4",
-  md: "h-6 w-6",
-  lg: "h-10 w-10",
-};
-
-const tones: Record<Tone, string> = {
-  accent: "text-[var(--accent,oklch(53.576%_0.19004_33.59))]",
-  ink: "text-[var(--ink,#18181b)]",
-  current: "text-current",
-  inverse: "text-white",
-};
-
 export function Spinner({
-  size = "sm",
-  tone = "current",
+  size,
+  tone,
   label,
-  className = "",
+  className,
   ...props
 }: SpinnerProps) {
   return (
@@ -37,7 +40,7 @@ export function Spinner({
       aria-hidden={label ? undefined : true}
       viewBox="0 0 24 24"
       fill="none"
-      className={`${sizes[size]} ${tones[tone]} animate-spin ${className}`}
+      className={cn(spinnerVariants({ size, tone }), className)}
       {...props}
     >
       <circle
