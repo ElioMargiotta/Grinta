@@ -5,6 +5,7 @@ import { useTranslations } from "next-intl";
 import { CalendarRange, Check, Download, X } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { Select } from "@/components/ui/Select";
+import { Dialog, DialogContent } from "@/components/ui/Dialog";
 import { importSeasonContentAction } from "@/app/[locale]/(app)/teams/season-import-actions";
 
 export type ImportSourceTeam = {
@@ -131,19 +132,18 @@ function ImportDialog({
   };
 
   return (
-    <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4"
-      role="dialog"
-      aria-modal="true"
-    >
-      <div className="flex max-h-[88vh] w-full max-w-lg flex-col overflow-hidden rounded-2xl border border-[var(--club-line)] bg-white shadow-xl dark:border-zinc-800 dark:bg-zinc-900">
-        <div className="flex items-start justify-between gap-3 border-b border-[var(--club-line)] px-5 py-4">
+    <Dialog open onOpenChange={(o) => { if (!o) onClose(); }}>
+      <DialogContent
+        showClose={false}
+        className="flex max-h-[88vh] max-w-lg flex-col gap-0 overflow-hidden rounded-2xl p-0"
+      >
+        <div className="flex items-start justify-between gap-3 border-b border-border px-5 py-4">
           <div>
-            <div className="flex items-center gap-2 text-base font-semibold text-zinc-900 dark:text-zinc-100">
-              <CalendarRange className="h-4 w-4 text-[var(--club-primary)]" />
+            <div className="flex items-center gap-2 text-base font-semibold text-foreground">
+              <CalendarRange className="h-4 w-4 text-primary" />
               {t("title")}
             </div>
-            <p className="mt-1 text-sm text-zinc-500 dark:text-zinc-400">
+            <p className="mt-1 text-sm text-muted-foreground">
               {t("subtitle", { season: targetSeason })}
             </p>
           </div>
@@ -151,7 +151,7 @@ function ImportDialog({
             type="button"
             onClick={onClose}
             aria-label={t("cancel")}
-            className="rounded-md p-1 text-zinc-400 hover:bg-zinc-100 hover:text-zinc-700 dark:hover:bg-zinc-800"
+            className="rounded-md p-1 text-muted-foreground hover:bg-accent hover:text-foreground"
           >
             <X className="h-5 w-5" />
           </button>
@@ -173,23 +173,23 @@ function ImportDialog({
 
           <div>
             <div className="mb-1.5 flex items-center justify-between">
-              <span className="text-sm font-medium text-zinc-900 dark:text-zinc-100">
+              <span className="text-sm font-medium text-foreground">
                 {t("teamsLabel")}
               </span>
               {teams.length > 0 ? (
                 <button
                   type="button"
                   onClick={toggleAll}
-                  className="text-xs font-medium text-[var(--club-primary)] hover:underline"
+                  className="text-xs font-medium text-primary hover:underline"
                 >
                   {allSelected ? t("selectNone") : t("selectAll")}
                 </button>
               ) : null}
             </div>
             {teams.length === 0 ? (
-              <p className="text-sm text-zinc-500 dark:text-zinc-400">{t("noTeams")}</p>
+              <p className="text-sm text-muted-foreground">{t("noTeams")}</p>
             ) : (
-              <ul className="flex max-h-56 flex-col gap-1 overflow-y-auto rounded-lg border border-[var(--club-line)] p-1">
+              <ul className="flex max-h-56 flex-col gap-1 overflow-y-auto rounded-lg border border-border p-1">
                 {teams.map((tm) => {
                   const checked = selected.has(tm.id);
                   return (
@@ -197,23 +197,23 @@ function ImportDialog({
                       <button
                         type="button"
                         onClick={() => toggle(tm.id)}
-                        className="flex w-full items-center gap-3 rounded-md px-2 py-2 text-left text-sm hover:bg-[var(--club-primary-soft)]"
+                        className="flex w-full items-center gap-3 rounded-md px-2 py-2 text-left text-sm hover:bg-accent"
                       >
                         <span
                           className={`flex h-5 w-5 shrink-0 items-center justify-center rounded border ${
                             checked
-                              ? "border-[var(--club-primary)] bg-[var(--club-primary)] text-[var(--club-primary-foreground)]"
-                              : "border-zinc-300 dark:border-zinc-600"
+                              ? "border-primary bg-primary text-primary-foreground"
+                              : "border-input"
                           }`}
                         >
                           {checked ? <Check className="h-3.5 w-3.5" /> : null}
                         </span>
                         <span className="min-w-0">
-                          <span className="block truncate font-medium text-zinc-900 dark:text-zinc-100">
+                          <span className="block truncate font-medium text-foreground">
                             {tm.name}
                           </span>
                           {tm.age_group ? (
-                            <span className="block truncate text-xs text-zinc-500 dark:text-zinc-400">
+                            <span className="block truncate text-xs text-muted-foreground">
                               {tm.age_group}
                             </span>
                           ) : null}
@@ -227,7 +227,7 @@ function ImportDialog({
           </div>
 
           <fieldset className="flex flex-col gap-2">
-            <legend className="mb-1 text-sm font-medium text-zinc-900 dark:text-zinc-100">
+            <legend className="mb-1 text-sm font-medium text-foreground">
               {t("includeLabel")}
             </legend>
             <CheckRow
@@ -256,7 +256,7 @@ function ImportDialog({
               className={`text-sm ${
                 msg.ok
                   ? "text-emerald-700 dark:text-emerald-400"
-                  : "text-red-600 dark:text-red-400"
+                  : "text-destructive"
               }`}
             >
               {msg.text}
@@ -264,7 +264,7 @@ function ImportDialog({
           ) : null}
         </div>
 
-        <div className="flex items-center justify-end gap-2 border-t border-[var(--club-line)] px-5 py-3">
+        <div className="flex items-center justify-end gap-2 border-t border-border px-5 py-3">
           <Button variant="ghost" size="sm" onClick={onClose} disabled={isPending}>
             {t("cancel")}
           </Button>
@@ -279,8 +279,8 @@ function ImportDialog({
             {t("submit")}
           </Button>
         </div>
-      </div>
-    </div>
+      </DialogContent>
+    </Dialog>
   );
 }
 
@@ -303,26 +303,26 @@ function CheckRow({
       onClick={disabled ? undefined : onChange}
       aria-pressed={checked}
       disabled={disabled}
-      className={`flex items-start gap-3 rounded-lg border p-3 text-left transition ${
+      className={`flex items-start gap-3 rounded-lg border p-3 text-left transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring ${
         checked
-          ? "border-[var(--club-primary)] bg-[var(--club-primary-soft)]"
-          : "border-[var(--club-line)] hover:border-zinc-300 dark:hover:border-zinc-600"
+          ? "border-primary bg-accent"
+          : "border-border hover:border-input"
       } ${disabled ? "cursor-default opacity-90" : ""}`}
     >
       <span
         className={`mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded border ${
           checked
-            ? "border-[var(--club-primary)] bg-[var(--club-primary)] text-[var(--club-primary-foreground)]"
-            : "border-zinc-300 dark:border-zinc-600"
+            ? "border-primary bg-primary text-primary-foreground"
+            : "border-input"
         }`}
       >
         {checked ? <Check className="h-3.5 w-3.5" /> : null}
       </span>
       <span className="min-w-0">
-        <span className="block text-sm font-medium text-zinc-900 dark:text-zinc-100">
+        <span className="block text-sm font-medium text-foreground">
           {label}
         </span>
-        <span className="block text-xs text-zinc-500 dark:text-zinc-400">{hint}</span>
+        <span className="block text-xs text-muted-foreground">{hint}</span>
       </span>
     </button>
   );
