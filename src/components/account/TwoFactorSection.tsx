@@ -115,9 +115,12 @@ export function TwoFactorSection({
         router.refresh();
         return;
       }
-      console.error("[disable mfa]", result);
-      if (result?.errorCode === "invalidCode") setError(t("invalidCode"));
-      else setError(t("genericError"));
+      if (result?.errorCode === "invalidCode") {
+        setError(t("invalidCode"));
+      } else {
+        console.error("[disable mfa]", result);
+        setError(t("genericError"));
+      }
       setDisableCode("");
     });
   }
