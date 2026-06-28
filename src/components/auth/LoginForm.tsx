@@ -1,11 +1,14 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { useRef, useState, useTransition } from "react";
 import { useTranslations, useLocale } from "next-intl";
 import { Button } from "@/components/ui/Button";
 import { AuthField } from "@/components/auth/AuthField";
 import { PasswordInput } from "@/components/auth/PasswordInput";
-import { TurnstileWidget } from "@/components/auth/TurnstileWidget";
+import {
+  TurnstileWidget,
+  type TurnstileHandle,
+} from "@/components/auth/TurnstileWidget";
 import { loginAction } from "@/app/[locale]/(auth)/login/actions";
 
 const inputClass =
@@ -14,19 +17,36 @@ const inputClass =
 export function LoginForm() {
   const t = useTranslations("auth");
   const locale = useLocale();
+  const turnstileRef = useRef<TurnstileHandle | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
 
   return (
     <form
       className="flex flex-col gap-5"
-      action={(formData) => {
+      onSubmit={(event) => {
+        event.preventDefault();
         setError(null);
-        formData.set("locale", locale);
+
+        const form = event.currentTarget;
+        if (!form.reportValidity()) return;
+
         startTransition(async () => {
-          const result = await loginAction(formData);
-          if (result?.errorCode) setError(t(result.errorCode));
-          else if (result?.error) setError(result.error);
+          try {
+            const captchaToken = await turnstileRef.current?.execute();
+            const formData = new FormData(form);
+            formData.set("locale", locale);
+            if (captchaToken) {
+              formData.set("cf-turnstile-response", captchaToken);
+            }
+            const result = await loginAction(formData);
+            if (result?.errorCode) setError(t(result.errorCode));
+            else if (result?.error) setError(result.error);
+          } catch {
+            setError(t("genericError"));
+          } finally {
+            turnstileRef.current?.reset();
+          }
         });
       }}
     >
@@ -57,7 +77,7 @@ export function LoginForm() {
         />
       </AuthField>
 
-      <TurnstileWidget />
+      <TurnstileWidget ref={turnstileRef} />
 
       {error && (
         <div className="rounded-md border border-destructive/30 bg-destructive/10 px-3 py-2 text-sm text-destructive">

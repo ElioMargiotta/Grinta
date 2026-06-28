@@ -1,12 +1,15 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { useRef, useState, useTransition } from "react";
 import { CheckCircle2 } from "lucide-react";
 import { useTranslations, useLocale } from "next-intl";
 import { Button } from "@/components/ui/Button";
 import { AuthField } from "@/components/auth/AuthField";
 import { PasswordInput } from "@/components/auth/PasswordInput";
-import { TurnstileWidget } from "@/components/auth/TurnstileWidget";
+import {
+  TurnstileWidget,
+  type TurnstileHandle,
+} from "@/components/auth/TurnstileWidget";
 import type { PersonaChoice } from "@/components/auth/PersonaPicker";
 import { isStrongPassword } from "@/lib/auth/password";
 import { signupAction } from "@/app/[locale]/(auth)/signup/actions";
@@ -17,6 +20,7 @@ const inputClass =
 export function SignupForm({ persona }: { persona: PersonaChoice }) {
   const t = useTranslations("auth");
   const locale = useLocale();
+  const turnstileRef = useRef<TurnstileHandle | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [confirmed, setConfirmed] = useState(false);
   const [password, setPassword] = useState("");
@@ -39,15 +43,31 @@ export function SignupForm({ persona }: { persona: PersonaChoice }) {
   return (
     <form
       className="flex flex-col gap-5"
-      action={(formData) => {
+      onSubmit={(event) => {
+        event.preventDefault();
         setError(null);
-        formData.set("locale", locale);
-        formData.set("personaPreference", persona);
+
+        const form = event.currentTarget;
+        if (!form.reportValidity() || !passwordOk) return;
+
         startTransition(async () => {
-          const result = await signupAction(formData);
-          if (result?.errorCode) setError(t(result.errorCode));
-          else if (result?.error) setError(result.error);
-          else if (result?.needsConfirmation) setConfirmed(true);
+          try {
+            const captchaToken = await turnstileRef.current?.execute();
+            const formData = new FormData(form);
+            formData.set("locale", locale);
+            formData.set("personaPreference", persona);
+            if (captchaToken) {
+              formData.set("cf-turnstile-response", captchaToken);
+            }
+            const result = await signupAction(formData);
+            if (result?.errorCode) setError(t(result.errorCode));
+            else if (result?.error) setError(result.error);
+            else if (result?.needsConfirmation) setConfirmed(true);
+          } catch {
+            setError(t("genericError"));
+          } finally {
+            turnstileRef.current?.reset();
+          }
         });
       }}
     >
@@ -128,7 +148,7 @@ export function SignupForm({ persona }: { persona: PersonaChoice }) {
         <p className="-mt-3 text-xs text-red-600">{t("weakPassword")}</p>
       )}
 
-      <TurnstileWidget />
+      <TurnstileWidget ref={turnstileRef} />
 
       {error && (
         <div className="rounded-md border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700">
