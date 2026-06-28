@@ -47,3 +47,6 @@ next-env.d.ts
 # keep root clean — source PDFs belong in public/documents/
 /*.pdf
 /*.svg
+
+# graphify dependency-graph artifact (local analysis only)
+/graphify-out/
