@@ -111,7 +111,7 @@ function tourOfYmd(ymd: string): "first_round" | "second_round" {
 function statusDot(status: SectionStatus) {
   if (status === "complete") return "bg-emerald-500";
   if (status === "partial") return "bg-amber-400";
-  return "bg-zinc-200";
+  return "bg-muted";
 }
 
 function ThemeSelect({
@@ -565,21 +565,21 @@ export function PlannerSeasonWizard({
           <div className="mx-auto flex w-full max-w-[1120px] flex-col gap-4 py-1">
             <section className="flex items-start justify-between gap-4">
               <div>
-                <div className="text-[10px] font-semibold uppercase tracking-[0.14em] text-red-600">
+                <div className="text-[10px] font-semibold uppercase tracking-[0.14em] text-primary">
                   {t("eyebrow.calendar")}
                 </div>
-                <h2 className="mt-1 text-[22px] font-semibold tracking-[-0.02em] text-[#0c0c0d]">
+                <h2 className="mt-1 text-[22px] font-semibold tracking-[-0.02em] text-foreground">
                   {t("calendarTitle")}
                 </h2>
-                <p className="mt-0.5 max-w-[620px] text-[12px] leading-4 text-zinc-500">
+                <p className="mt-0.5 max-w-[620px] text-[12px] leading-4 text-muted-foreground">
                   {t("calendarSubtitle")}
                 </p>
               </div>
               <div className="shrink-0 text-right">
-                <div className="text-[10px] font-semibold uppercase tracking-[0.12em] text-zinc-400">
+                <div className="text-[10px] font-semibold uppercase tracking-[0.12em] text-muted-foreground">
                   {t("seasonLabel")}
                 </div>
-                <div className="mt-0.5 text-sm font-semibold text-zinc-950">
+                <div className="mt-0.5 text-sm font-semibold text-foreground">
                   {seasonLabel}
                 </div>
               </div>
@@ -606,10 +606,10 @@ export function PlannerSeasonWizard({
           <div className="mx-auto flex w-full max-w-[1120px] flex-col gap-8 py-1">
             <section>
               <div className="mb-2 flex items-center justify-between gap-2">
-                <div className="text-[11px] font-semibold uppercase tracking-[0.1em] text-zinc-400">
+                <div className="text-[11px] font-semibold uppercase tracking-[0.1em] text-muted-foreground">
                   {t("tourLabel")}
                 </div>
-                <div className="text-[11px] font-semibold text-zinc-950">{seasonLabel}</div>
+                <div className="text-[11px] font-semibold text-foreground">{seasonLabel}</div>
               </div>
               {/* Planification au niveau du tour — la saison complète se
                   consulte/génère depuis le Résumé. */}
@@ -621,8 +621,8 @@ export function PlannerSeasonWizard({
                     onClick={() => switchFrame(seg)}
                     className={`h-7 border-b text-center text-[11px] font-semibold transition ${
                       segment === seg
-                        ? "border-red-500 text-zinc-950"
-                        : "border-zinc-200 text-zinc-500 hover:border-zinc-400 hover:text-zinc-900"
+                        ? "border-primary text-foreground"
+                        : "border-border text-muted-foreground hover:border-input hover:text-foreground"
                     }`}
                   >
                     {t(`segment.${seg}`)}
@@ -632,7 +632,7 @@ export function PlannerSeasonWizard({
             </section>
 
             <section>
-              <div className="mb-4 text-[11px] font-semibold uppercase tracking-[0.1em] text-zinc-400">
+              <div className="mb-4 text-[11px] font-semibold uppercase tracking-[0.1em] text-muted-foreground">
                 {t("boundsTitle")}
               </div>
               <div className="grid gap-3 sm:grid-cols-2">
@@ -673,7 +673,7 @@ export function PlannerSeasonWizard({
 
             <section>
               <div className="mb-4 flex items-center justify-between gap-3">
-                <div className="text-[11px] font-semibold uppercase tracking-[0.1em] text-zinc-400">
+                <div className="text-[11px] font-semibold uppercase tracking-[0.1em] text-muted-foreground">
                   {t("rhythmTitle")}
                 </div>
                 <Button type="button" variant="secondary" size="sm" onClick={addSlot}>
@@ -685,7 +685,7 @@ export function PlannerSeasonWizard({
                 {slots.map((slot) => (
                   <li
                     key={slot.id}
-                    className="grid gap-2 border-t border-zinc-200 py-3 sm:grid-cols-[1fr_1fr_1fr_1.4fr_auto]"
+                    className="grid gap-2 border-t border-border py-3 sm:grid-cols-[1fr_1fr_1fr_1.4fr_auto]"
                   >
                     <Select
                       id={`slot-day-${slot.id}`}
@@ -728,7 +728,7 @@ export function PlannerSeasonWizard({
                     <button
                       type="button"
                       onClick={() => removeSlot(slot.id)}
-                      className="self-end rounded-[8px] p-2 text-zinc-400 transition hover:bg-white hover:text-red-600"
+                      className="self-end rounded-[8px] p-2 text-muted-foreground transition hover:bg-accent hover:text-destructive"
                       title={t("removeSlot")}
                     >
                       <Trash2 className="h-4 w-4" />
@@ -741,13 +741,13 @@ export function PlannerSeasonWizard({
             <section>
               <div className="mb-4 flex items-center justify-between gap-3">
                 <div>
-                  <div className="text-[11px] font-semibold uppercase tracking-[0.1em] text-zinc-400">
+                  <div className="text-[11px] font-semibold uppercase tracking-[0.1em] text-muted-foreground">
                     {t("cyclesTitle")}
                   </div>
-                  <div className="mt-1 text-xs text-zinc-500">
+                  <div className="mt-1 text-xs text-muted-foreground">
                     {t("coverage", { defined: definedWeeks, total: workWeeks })}
                   </div>
-                  <div className="mt-1 text-xs text-zinc-500">{t("cyclesHint")}</div>
+                  <div className="mt-1 text-xs text-muted-foreground">{t("cyclesHint")}</div>
                 </div>
                 <Button type="button" variant="secondary" size="sm" onClick={addMeso}>
                   <Plus className="h-3.5 w-3.5" />
@@ -759,7 +759,7 @@ export function PlannerSeasonWizard({
                   <div className="text-[10px] font-semibold uppercase tracking-[0.1em] text-sky-600">
                     {t("prepCycleTitle")}
                   </div>
-                  <div className="mt-0.5 text-xs text-zinc-500">
+                  <div className="mt-0.5 text-xs text-muted-foreground">
                     {t("prepCycleRange", { start: -prepWeeks, end: -1 })}
                   </div>
                   <div className="mt-4 grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
@@ -771,9 +771,9 @@ export function PlannerSeasonWizard({
                       return (
                         <div
                           key={`prep-week-${weekIndex}`}
-                          className="rounded-[8px] border border-sky-100 bg-white p-2"
+                          className="rounded-[8px] border border-sky-100 bg-card p-2"
                         >
-                          <div className="mb-1.5 flex items-center gap-1.5 text-[11px] font-semibold text-zinc-700">
+                          <div className="mb-1.5 flex items-center gap-1.5 text-[11px] font-semibold text-foreground">
                             <span className="h-2 w-2 rounded-full" style={{ background: dot }} />
                             {t("weekBadge", { n: weekIndex - prepWeeks })}
                           </div>
@@ -796,21 +796,21 @@ export function PlannerSeasonWizard({
                   return (
                     <li
                       key={m.id}
-                      className="rounded-[12px] border border-zinc-200 bg-white p-4"
+                      className="rounded-[12px] border border-border bg-card p-4"
                     >
                       <div className="flex items-start justify-between gap-3">
                         <div>
-                          <div className="text-[10px] font-semibold uppercase tracking-[0.1em] text-zinc-400">
+                          <div className="text-[10px] font-semibold uppercase tracking-[0.1em] text-muted-foreground">
                             {t("cycleNumber", { n: idx + 1 })}
                           </div>
-                          <div className="mt-0.5 text-xs text-zinc-500">
+                          <div className="mt-0.5 text-xs text-muted-foreground">
                             {t("cycleRange", { start: firstWeek, end: firstWeek + m.weeks - 1 })}
                           </div>
                         </div>
                         <button
                           type="button"
                           onClick={() => removeMeso(m.id)}
-                          className="rounded-[8px] p-2 text-zinc-400 transition hover:bg-zinc-50 hover:text-red-600"
+                          className="rounded-[8px] p-2 text-muted-foreground transition hover:bg-accent hover:text-destructive"
                           title={t("removeCycle")}
                         >
                           <Trash2 className="h-4 w-4" />
@@ -857,8 +857,8 @@ export function PlannerSeasonWizard({
                         />
                       </div>
 
-                      <div className="mt-4 border-t border-zinc-100 pt-3">
-                        <div className="mb-2 text-[10px] font-semibold uppercase tracking-[0.1em] text-zinc-400">
+                      <div className="mt-4 border-t border-border pt-3">
+                        <div className="mb-2 text-[10px] font-semibold uppercase tracking-[0.1em] text-muted-foreground">
                           {t("weeklyThemes")}
                         </div>
                         <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
@@ -869,9 +869,9 @@ export function PlannerSeasonWizard({
                             return (
                               <div
                                 key={`${m.id}-week-${weekIndex}`}
-                                className="rounded-[8px] border border-zinc-100 bg-zinc-50 p-2"
+                                className="rounded-[8px] border border-border bg-muted p-2"
                               >
-                                <div className="mb-1.5 flex items-center gap-1.5 text-[11px] font-semibold text-zinc-700">
+                                <div className="mb-1.5 flex items-center gap-1.5 text-[11px] font-semibold text-foreground">
                                   <span className="h-2 w-2 rounded-full" style={{ background: dot }} />
                                   {t("weekBadge", { n: firstWeek + weekIndex })}
                                 </div>
@@ -891,11 +891,11 @@ export function PlannerSeasonWizard({
                 })}
               </ul>
               {mesos.length === 0 ? (
-                <div className="rounded-[10px] border border-dashed border-zinc-300 px-4 py-5 text-center text-sm text-zinc-500">
+                <div className="rounded-[10px] border border-dashed border-border px-4 py-5 text-center text-sm text-muted-foreground">
                   {t("cyclesEmpty", { n: workWeeks })}
                 </div>
               ) : null}
-              <div className="mt-3 text-xs font-medium text-zinc-600">
+              <div className="mt-3 text-xs font-medium text-foreground">
                 {remainingWeeks > 0
                   ? t("weeksRemaining", { n: remainingWeeks })
                   : assignedWeeks > workWeeks
@@ -985,8 +985,8 @@ export function PlannerSeasonWizard({
                   onClick={() => switchFrame(seg)}
                   className={`h-7 border-b text-center text-[11px] font-semibold transition ${
                     segment === seg
-                      ? "border-red-500 text-zinc-950"
-                      : "border-zinc-200 text-zinc-500 hover:border-zinc-400 hover:text-zinc-900"
+                      ? "border-primary text-foreground"
+                      : "border-border text-muted-foreground hover:border-input hover:text-foreground"
                   }`}
                 >
                   {t(`segment.${seg}`)}
@@ -996,29 +996,29 @@ export function PlannerSeasonWizard({
 
             {/* Vue d'ensemble : une case par semaine */}
             <section>
-              <div className="mb-3 flex items-center justify-between border-b border-zinc-200 pb-2">
-                <div className="text-[11px] font-semibold uppercase tracking-[0.1em] text-zinc-400">
+              <div className="mb-3 flex items-center justify-between border-b border-border pb-2">
+                <div className="text-[11px] font-semibold uppercase tracking-[0.1em] text-muted-foreground">
                   {t("gridTitle")}
                 </div>
-                <div className="text-xs text-zinc-500">
+                <div className="text-xs text-muted-foreground">
                   {t("weekN", { n: weeks.length })} · {t(`segment.${segment}`)}
                 </div>
               </div>
               {weeks.length === 0 ? (
-                <p className="py-4 text-sm text-zinc-500">
+                <p className="py-4 text-sm text-muted-foreground">
                   {isFullAggregate ? t("fullAggregateEmpty") : t("gridEmpty")}
                 </p>
               ) : (
-                <div className="overflow-x-auto rounded-[10px] border border-zinc-200">
+                <div className="overflow-x-auto rounded-[10px] border border-border">
                   <table className="w-full border-collapse text-[12px]">
                     <thead>
-                      <tr className="bg-zinc-50 text-left text-[10px] font-semibold uppercase tracking-[0.06em] text-zinc-400">
-                        <th className="w-12 border-b border-zinc-200 px-2.5 py-2">{t("col.week")}</th>
-                        <th className="border-b border-l border-zinc-200 px-2.5 py-2">{t("col.date")}</th>
-                        <th className="border-b border-l border-zinc-200 px-2.5 py-2">{t("col.phase")}</th>
-                        <th className="border-b border-l border-zinc-200 px-2.5 py-2">{t("col.theme")}</th>
-                        <th className="border-b border-l border-zinc-200 px-2.5 py-2">{t("col.trainings")}</th>
-                        <th className="border-b border-l border-zinc-200 px-2.5 py-2">{t("col.match")}</th>
+                      <tr className="bg-muted text-left text-[10px] font-semibold uppercase tracking-[0.06em] text-muted-foreground">
+                        <th className="w-12 border-b border-border px-2.5 py-2">{t("col.week")}</th>
+                        <th className="border-b border-l border-border px-2.5 py-2">{t("col.date")}</th>
+                        <th className="border-b border-l border-border px-2.5 py-2">{t("col.phase")}</th>
+                        <th className="border-b border-l border-border px-2.5 py-2">{t("col.theme")}</th>
+                        <th className="border-b border-l border-border px-2.5 py-2">{t("col.trainings")}</th>
+                        <th className="border-b border-l border-border px-2.5 py-2">{t("col.match")}</th>
                       </tr>
                     </thead>
                     <tbody>
@@ -1041,7 +1041,7 @@ export function PlannerSeasonWizard({
                               <tr>
                                 <td
                                   colSpan={6}
-                                  className="border-y border-zinc-200 bg-zinc-100 px-2.5 py-1.5 text-[10px] font-bold uppercase tracking-[0.08em] text-zinc-600"
+                                  className="border-y border-border bg-muted px-2.5 py-1.5 text-[10px] font-bold uppercase tracking-[0.08em] text-foreground"
                                 >
                                   {t(`segment.${tour}`)}
                                 </td>
@@ -1069,7 +1069,7 @@ export function PlannerSeasonWizard({
 
             {/* Statistiques clés */}
             <section>
-              <div className="mb-3 text-[11px] font-semibold uppercase tracking-[0.1em] text-zinc-400">
+              <div className="mb-3 text-[11px] font-semibold uppercase tracking-[0.1em] text-muted-foreground">
                 {t("statsTitle")}
               </div>
               <div className="grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-5">
@@ -1082,7 +1082,7 @@ export function PlannerSeasonWizard({
             </section>
 
             {msg ? (
-              <p className={`text-sm ${msg.ok ? "text-emerald-700" : "text-red-600"}`}>
+              <p className={`text-sm ${msg.ok ? "text-emerald-700" : "text-destructive"}`}>
                 {msg.text}
               </p>
             ) : null}
@@ -1093,18 +1093,18 @@ export function PlannerSeasonWizard({
   })();
 
   return (
-    <div className="fixed inset-0 z-50 flex flex-col overflow-hidden bg-white text-zinc-900 dark:bg-black dark:text-zinc-100">
-      <header className="relative z-10 flex h-[52px] items-center justify-between border-b border-zinc-200 bg-white/95 px-5 backdrop-blur-md dark:border-zinc-800 dark:bg-black/95">
+    <div className="fixed inset-0 z-50 flex flex-col overflow-hidden bg-background text-foreground">
+      <header className="relative z-10 flex h-[52px] items-center justify-between border-b border-border bg-background/95 px-5 backdrop-blur-md">
         <div className="flex min-w-0 items-center gap-2.5">
           <button
             type="button"
             onClick={onClose ?? (() => router.back())}
-            className="flex items-center gap-1 border-0 bg-transparent text-[12px] font-medium text-zinc-500 transition hover:text-zinc-950 dark:text-zinc-400 dark:hover:text-white"
+            className="flex items-center gap-1 border-0 bg-transparent text-[12px] font-medium text-muted-foreground transition hover:text-foreground"
           >
             <ChevronLeft className="h-3.5 w-3.5" strokeWidth={2} />
             {t("back")}
           </button>
-          <span className="mx-3 h-[18px] w-px bg-zinc-200 dark:bg-zinc-800" />
+          <span className="mx-3 h-[18px] w-px bg-border" />
           <Image
             src="/documents/svg/grinta-icon.svg"
             alt=""
@@ -1114,21 +1114,21 @@ export function PlannerSeasonWizard({
             className="h-7 w-7 shrink-0"
           />
           <div className="min-w-0 leading-none">
-            <div className="flex items-center gap-2 text-[13px] font-semibold text-zinc-950 dark:text-white">
-              <CalendarDays className="h-3.5 w-3.5 text-red-500" />
+            <div className="flex items-center gap-2 text-[13px] font-semibold text-foreground">
+              <CalendarDays className="h-3.5 w-3.5 text-primary" />
               {t("title")}
             </div>
-            <div className="mt-0.5 truncate text-[10px] text-zinc-500">
+            <div className="mt-0.5 truncate text-[10px] text-muted-foreground">
               {t("subtitle")}
             </div>
           </div>
         </div>
         <div className="flex items-center gap-2">
-          <div className="mr-1 hidden items-center gap-2 rounded-lg bg-zinc-100 px-3 py-[5px] sm:flex dark:bg-zinc-900">
-            <div className="h-[3px] w-20 overflow-hidden rounded-full bg-zinc-200 dark:bg-zinc-700">
-              <div className="h-full rounded-full bg-zinc-950 dark:bg-zinc-100" style={{ width: `${pct}%` }} />
+          <div className="mr-1 hidden items-center gap-2 rounded-lg bg-muted px-3 py-[5px] sm:flex">
+            <div className="h-[3px] w-20 overflow-hidden rounded-full bg-border">
+              <div className="h-full rounded-full bg-primary" style={{ width: `${pct}%` }} />
             </div>
-            <span className="text-[11px] font-semibold text-zinc-500">{pct}%</span>
+            <span className="text-[11px] font-semibold text-muted-foreground">{pct}%</span>
           </div>
           {/* Les deux boutons enregistrent le plan réel : Saison et Hebdo lisent
               ensuite les mêmes microcycles. */}
@@ -1137,7 +1137,7 @@ export function PlannerSeasonWizard({
               type="button"
               onClick={generate}
               disabled={isPending || noMatchesForTour || !seasonStart || !seasonEnd}
-              className="inline-flex h-8 min-w-[112px] items-center justify-center gap-1.5 rounded-[8px] border border-zinc-200 bg-white px-3 text-[12px] font-medium text-zinc-900 shadow-[0_1px_2px_rgb(0_0_0/0.05)] transition hover:bg-zinc-50 active:scale-[0.98] disabled:opacity-60 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100 dark:hover:bg-zinc-800"
+              className="inline-flex h-8 min-w-[112px] items-center justify-center gap-1.5 rounded-[8px] border border-border bg-card px-3 text-[12px] font-medium text-foreground shadow-[0_1px_2px_rgb(0_0_0/0.05)] transition hover:bg-accent active:scale-[0.98] disabled:opacity-60"
             >
               {isPending ? (
                 t("savingDates")
@@ -1153,7 +1153,7 @@ export function PlannerSeasonWizard({
               type="button"
               onClick={generate}
               disabled={isPending || noMatchesForTour || !seasonStart || !seasonEnd}
-              className="inline-flex h-8 min-w-[112px] items-center justify-center gap-1.5 rounded-[8px] border border-zinc-200 bg-white px-3 text-[12px] font-medium text-zinc-900 shadow-[0_1px_2px_rgb(0_0_0/0.05)] transition hover:bg-zinc-50 active:scale-[0.98] disabled:opacity-60 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100 dark:hover:bg-zinc-800"
+              className="inline-flex h-8 min-w-[112px] items-center justify-center gap-1.5 rounded-[8px] border border-border bg-card px-3 text-[12px] font-medium text-foreground shadow-[0_1px_2px_rgb(0_0_0/0.05)] transition hover:bg-accent active:scale-[0.98] disabled:opacity-60"
             >
               {isPending ? (
                 t("savingDates")
@@ -1169,8 +1169,8 @@ export function PlannerSeasonWizard({
       </header>
 
       <div className="flex min-h-0 flex-1 overflow-hidden">
-        <aside className="hidden w-[232px] shrink-0 flex-col overflow-hidden border-r border-zinc-200 bg-white md:flex dark:border-zinc-800 dark:bg-black">
-          <div className="px-4 pb-2 pt-4 text-[9px] font-semibold uppercase tracking-[0.1em] text-zinc-400">
+        <aside className="hidden w-[232px] shrink-0 flex-col overflow-hidden border-r border-border bg-background md:flex">
+          <div className="px-4 pb-2 pt-4 text-[9px] font-semibold uppercase tracking-[0.1em] text-muted-foreground">
             {t("stepsLabel")}
           </div>
           <nav className="flex flex-1 flex-col gap-0.5 overflow-y-auto px-2 pb-2">
@@ -1184,21 +1184,21 @@ export function PlannerSeasonWizard({
                   onClick={() => goTo(i)}
                   aria-current={isActive ? "step" : undefined}
                   className={`group relative flex w-full items-center gap-2.5 rounded-[9px] px-2.5 py-2 text-left transition ${
-                    isActive ? "bg-zinc-50 dark:bg-zinc-900" : "hover:bg-zinc-50 dark:hover:bg-zinc-900"
+                    isActive ? "bg-muted" : "hover:bg-muted"
                   }`}
                 >
                   {isActive ? (
-                    <span className="absolute left-0 top-1/2 h-5 w-[3px] -translate-y-1/2 rounded-r-[3px] bg-red-500" />
+                    <span className="absolute left-0 top-1/2 h-5 w-[3px] -translate-y-1/2 rounded-r-[3px] bg-primary" />
                   ) : null}
                   <span
                     className={`flex h-[26px] w-[26px] shrink-0 items-center justify-center rounded-[7px] text-[11px] font-semibold ${
                       isActive
-                        ? "bg-zinc-950 text-white dark:bg-zinc-100 dark:text-black"
+                        ? "bg-primary text-primary-foreground"
                         : st === "complete"
                           ? "bg-emerald-50 text-emerald-600"
                           : st === "partial"
                             ? "bg-amber-50 text-amber-600"
-                            : "bg-zinc-100 text-zinc-400 dark:bg-zinc-800 dark:text-zinc-400"
+                            : "bg-muted text-muted-foreground"
                     }`}
                   >
                     {st === "complete" && !isActive ? (
@@ -1207,7 +1207,7 @@ export function PlannerSeasonWizard({
                       i + 1
                     )}
                   </span>
-                  <span className="min-w-0 flex-1 text-[12px] font-medium leading-tight text-zinc-600 group-hover:text-zinc-950 dark:text-zinc-400 dark:group-hover:text-white">
+                  <span className="min-w-0 flex-1 text-[12px] font-medium leading-tight text-muted-foreground group-hover:text-foreground">
                     {s.label}
                   </span>
                   {!isActive ? <span className={`h-[7px] w-[7px] rounded-full ${statusDot(st)}`} /> : null}
@@ -1218,7 +1218,7 @@ export function PlannerSeasonWizard({
         </aside>
 
         <section className="flex min-w-0 flex-1 flex-col overflow-hidden">
-          <div className="flex shrink-0 gap-1.5 overflow-x-auto border-b border-zinc-200 bg-white px-4 py-2.5 md:hidden dark:border-zinc-800 dark:bg-black">
+          <div className="flex shrink-0 gap-1.5 overflow-x-auto border-b border-border bg-background px-4 py-2.5 md:hidden">
             {steps.map((s, i) => (
               <button
                 key={s.label}
@@ -1226,8 +1226,8 @@ export function PlannerSeasonWizard({
                 onClick={() => goTo(i)}
                 className={`shrink-0 rounded-full border px-3 py-1 text-[11px] font-medium ${
                   step === i
-                    ? "border-zinc-900 bg-zinc-900 text-white dark:border-zinc-100 dark:bg-zinc-100 dark:text-black"
-                    : "border-zinc-200 bg-white text-zinc-700 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-300"
+                    ? "border-primary bg-primary text-primary-foreground"
+                    : "border-border bg-card text-foreground"
                 }`}
               >
                 {i + 1}. {s.label}
@@ -1236,7 +1236,7 @@ export function PlannerSeasonWizard({
           </div>
 
           <div className="flex shrink-0 items-center justify-between gap-4 px-7 pb-0 pt-2">
-            <div className="min-w-0 text-[10px] font-semibold uppercase tracking-[0.1em] text-zinc-400">
+            <div className="min-w-0 text-[10px] font-semibold uppercase tracking-[0.1em] text-muted-foreground">
               {steps[step].eyebrow}
             </div>
             <div className="flex shrink-0 items-center gap-2">
@@ -1244,7 +1244,7 @@ export function PlannerSeasonWizard({
                 type="button"
                 onClick={() => goTo(Math.max(0, step - 1))}
                 disabled={step === 0}
-                className="inline-flex h-8 items-center gap-1.5 rounded-[9px] border border-zinc-200 bg-white px-3 text-[12px] font-medium text-zinc-900 shadow-[0_1px_2px_rgb(0_0_0/0.05)] transition hover:bg-zinc-50 disabled:opacity-40 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100 dark:hover:bg-zinc-800"
+                className="inline-flex h-8 items-center gap-1.5 rounded-[9px] border border-border bg-card px-3 text-[12px] font-medium text-foreground shadow-[0_1px_2px_rgb(0_0_0/0.05)] transition hover:bg-accent disabled:opacity-40"
               >
                 <ChevronLeft className="h-3.5 w-3.5" />
                 {t("back")}
@@ -1253,7 +1253,7 @@ export function PlannerSeasonWizard({
                 type="button"
                 onClick={() => goTo(Math.min(steps.length - 1, step + 1))}
                 disabled={step === steps.length - 1}
-                className="inline-flex h-8 items-center gap-1.5 rounded-[9px] bg-[#0c0c0d] px-3 text-[12px] font-medium text-white shadow-[0_1px_3px_rgb(0_0_0/0.15)] transition hover:bg-[#1a1a1d] disabled:opacity-40 dark:bg-white dark:text-black dark:hover:bg-zinc-200"
+                className="inline-flex h-8 items-center gap-1.5 rounded-[9px] bg-primary px-3 text-[12px] font-medium text-primary-foreground shadow-[0_1px_3px_rgb(0_0_0/0.15)] transition hover:brightness-95 disabled:opacity-40"
               >
                 {t("next")}
                 <ChevronRight className="h-3.5 w-3.5" />
@@ -1262,7 +1262,7 @@ export function PlannerSeasonWizard({
           </div>
 
           {msg && step !== steps.length - 1 ? (
-            <div className={`shrink-0 border-b px-7 py-2.5 text-[12px] ${msg.ok ? "border-emerald-200 bg-emerald-50 text-emerald-700" : "border-red-200 bg-red-50 text-red-700"}`}>
+            <div className={`shrink-0 border-b px-7 py-2.5 text-[12px] ${msg.ok ? "border-emerald-200 bg-emerald-50 text-emerald-700" : "border-destructive/30 bg-destructive/10 text-destructive"}`}>
               {msg.text}
             </div>
           ) : noMatchesForTour ? (
@@ -1286,9 +1286,9 @@ export function PlannerSeasonWizard({
 
 function Stat({ label, value }: { label: string; value: number }) {
   return (
-    <div className="rounded-[10px] border border-zinc-200 bg-white px-3 py-2.5 dark:border-zinc-800 dark:bg-zinc-900">
-      <div className="text-2xl font-semibold tabular-nums leading-none text-zinc-950 dark:text-zinc-100">{value}</div>
-      <div className="mt-1.5 text-[10px] font-semibold uppercase tracking-[0.08em] text-zinc-400">
+    <div className="rounded-[10px] border border-border bg-card px-3 py-2.5">
+      <div className="text-2xl font-semibold tabular-nums leading-none text-foreground">{value}</div>
+      <div className="mt-1.5 text-[10px] font-semibold uppercase tracking-[0.08em] text-muted-foreground">
         {label}
       </div>
     </div>
@@ -1321,14 +1321,14 @@ function WeekRow({
     day: "2-digit",
     month: "short",
   });
-  const td = "border-b border-l border-zinc-100 px-2.5 py-1.5 align-middle";
+  const td = "border-b border-l border-border px-2.5 py-1.5 align-middle";
   return (
-    <tr className="text-zinc-700 odd:bg-white even:bg-zinc-50/50 hover:bg-red-50/40">
-      <td className="border-b border-zinc-100 px-2.5 py-1.5 align-middle font-semibold text-zinc-900">
+    <tr className="text-foreground odd:bg-card even:bg-muted/40 hover:bg-accent">
+      <td className="border-b border-border px-2.5 py-1.5 align-middle font-semibold text-foreground">
         {t("weekBadge", { n })}
       </td>
       <td className={`${td} whitespace-nowrap capitalize`}>{dateStr}</td>
-      <td className={`${td} whitespace-nowrap text-zinc-500`}>{phaseLabel}</td>
+      <td className={`${td} whitespace-nowrap text-muted-foreground`}>{phaseLabel}</td>
       <td className={td}>
         <span className="inline-flex min-w-0 items-center gap-1.5">
           <span className="h-2 w-2 shrink-0 rounded-full" style={{ background: dot }} />
@@ -1337,13 +1337,13 @@ function WeekRow({
       </td>
       <td className={td}>
         {sessions.length === 0 ? (
-          <span className="text-zinc-300">—</span>
+          <span className="text-muted-foreground">—</span>
         ) : (
           <span className="flex flex-wrap gap-1">
             {sessions.map((s, i) => (
               <span
                 key={`${s.date}-${i}`}
-                className="inline-flex items-center gap-1 rounded-[5px] bg-zinc-100 px-1.5 py-0.5 text-[10px] font-medium capitalize text-zinc-600"
+                className="inline-flex items-center gap-1 rounded-[5px] bg-muted px-1.5 py-0.5 text-[10px] font-medium capitalize text-muted-foreground"
               >
                 {new Date(`${s.date}T00:00:00`).toLocaleDateString(locale, { weekday: "short" })}
               </span>
@@ -1351,9 +1351,9 @@ function WeekRow({
           </span>
         )}
       </td>
-      <td className={`${td} ${matchName ? "font-medium text-red-600" : "text-zinc-300"}`}>
+      <td className={`${td} ${matchName ? "font-medium text-primary" : "text-muted-foreground"}`}>
         <span className="inline-flex min-w-0 items-center gap-1.5">
-          {matchName ? <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-red-500" /> : null}
+          {matchName ? <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-primary" /> : null}
           <span className="truncate">{matchName ?? "—"}</span>
         </span>
       </td>
