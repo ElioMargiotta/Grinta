@@ -119,14 +119,14 @@ export function MatchEventsTimeline({
   }
 
   return (
-    <section className="flex flex-col gap-3 border-t border-[var(--club-line)] pt-5">
-      <div className="flex items-center gap-2 text-base font-semibold text-zinc-900 dark:text-zinc-100">
-        <ArrowLeftRight className="h-4 w-4 text-[var(--club-primary)]" />
+    <section className="flex flex-col gap-3 border-t border-border pt-5">
+      <div className="flex items-center gap-2 text-base font-semibold text-foreground">
+        <ArrowLeftRight className="h-4 w-4 text-primary" />
         {t("title")}
       </div>
 
       {rows.length === 0 ? (
-        <p className="rounded-lg border border-dashed border-[var(--club-line)] bg-white/40 p-4 text-sm text-zinc-500 dark:bg-zinc-900/30">
+        <p className="rounded-lg border border-dashed border-border bg-muted/40 p-4 text-sm text-muted-foreground">
           {t("empty")}
         </p>
       ) : (
@@ -155,13 +155,13 @@ export function MatchEventsTimeline({
           {t("add")}
         </Button>
         {addOpen ? (
-          <div className="absolute z-10 mt-1 w-52 rounded-md border border-[var(--club-line)] bg-white p-1 shadow-lg dark:bg-zinc-900">
+          <div className="absolute z-10 mt-1 w-52 rounded-md border border-border bg-card p-1 shadow-lg">
             {ADD_TYPES.map((type) => (
               <button
                 key={type}
                 type="button"
                 onClick={() => add(type)}
-                className="flex w-full items-center gap-2 rounded px-2 py-1.5 text-left text-sm hover:bg-zinc-100 dark:hover:bg-zinc-800"
+                className="flex w-full items-center gap-2 rounded px-2 py-1.5 text-left text-sm hover:bg-accent"
               >
                 <span>{TYPE_ICON[type]}</span>
                 {t(`type.${type}`)}
@@ -181,7 +181,7 @@ export function MatchEventsTimeline({
           </span>
         ) : null}
         {error ? (
-          <span className="text-sm text-red-600 dark:text-red-400">{error}</span>
+          <span className="text-sm text-destructive">{error}</span>
         ) : null}
       </div>
     </section>
@@ -210,13 +210,13 @@ function EventRow({
         : t("player");
 
   return (
-    <li className="flex flex-wrap items-center gap-2 rounded-lg border border-[var(--club-line)] bg-white/50 px-3 py-2 dark:bg-zinc-900/30">
+    <li className="flex flex-wrap items-center gap-2 rounded-lg border border-border bg-card/50 px-3 py-2">
       <span className="text-base" title={t(`type.${row.type}`)}>
         {TYPE_ICON[row.type]}
       </span>
 
       {/* Minute */}
-      <label className="flex items-center gap-1 text-[11px] text-zinc-500 dark:text-zinc-400">
+      <label className="flex items-center gap-1 text-[11px] text-muted-foreground">
         {t("minuteShort")}
         <input
           type="number"
@@ -228,7 +228,7 @@ function EventRow({
               minute: e.target.value === "" ? null : Number(e.target.value),
             })
           }
-          className="w-12 rounded-md border border-zinc-200 bg-white px-1.5 py-1 text-xs tabular-nums focus:border-zinc-400 focus:outline-none dark:border-zinc-700 dark:bg-zinc-900"
+          className="w-12 rounded-md border border-border bg-card px-1.5 py-1 text-xs tabular-nums focus:border-ring focus:outline-none focus:ring-2 focus:ring-ring/15"
         />
       </label>
 
@@ -251,12 +251,12 @@ function EventRow({
             onChange={(v) => onPatch({ relatedPlayerId: v })}
             placeholder={t("noAssist")}
           />
-          <label className="flex items-center gap-1 text-[11px] text-zinc-500 dark:text-zinc-400">
+          <label className="flex items-center gap-1 text-[11px] text-muted-foreground">
             <input
               type="checkbox"
               checked={row.isPenalty}
               onChange={(e) => onPatch({ isPenalty: e.target.checked })}
-              className="h-3.5 w-3.5 accent-[var(--club-primary)]"
+              className="h-3.5 w-3.5 accent-primary"
             />
             {t("penalty")}
           </label>
@@ -279,14 +279,14 @@ function EventRow({
           value={row.note ?? ""}
           onChange={(e) => onPatch({ note: e.target.value })}
           placeholder={t("notePlaceholder")}
-          className="min-w-[12rem] flex-1 rounded-md border border-zinc-200 bg-white px-2 py-1 text-xs focus:border-zinc-400 focus:outline-none dark:border-zinc-700 dark:bg-zinc-900"
+          className="min-w-[12rem] flex-1 rounded-lg border border-border bg-card px-2 py-1 text-xs text-foreground focus:border-ring focus:outline-none focus:ring-2 focus:ring-ring/15"
         />
       ) : null}
 
       <button
         type="button"
         onClick={onRemove}
-        className="ml-auto text-zinc-400 transition hover:text-red-600"
+        className="ml-auto text-muted-foreground transition hover:text-destructive"
         aria-label={t("remove")}
       >
         <Trash2 className="h-4 w-4" />
@@ -309,12 +309,12 @@ function PlayerSelect({
   placeholder: string;
 }) {
   return (
-    <label className="flex items-center gap-1 text-[11px] text-zinc-500 dark:text-zinc-400">
+    <label className="flex items-center gap-1 text-[11px] text-muted-foreground">
       <span className="sr-only sm:not-sr-only">{label}</span>
       <select
         value={value ?? ""}
         onChange={(e) => onChange(e.target.value === "" ? null : e.target.value)}
-        className="max-w-[10rem] rounded-md border border-zinc-200 bg-white px-1.5 py-1 text-xs text-zinc-900 focus:border-zinc-400 focus:outline-none dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100"
+        className="max-w-[10rem] rounded-md border border-border bg-card px-1.5 py-1 text-xs text-foreground focus:border-ring focus:outline-none focus:ring-2 focus:ring-ring/15"
       >
         <option value="">{placeholder}</option>
         {roster.map((p) => (
