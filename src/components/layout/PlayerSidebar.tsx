@@ -25,7 +25,7 @@ export function PlayerSidebar({
   const logoUrl = currentMembership?.logo_url;
 
   return (
-    <aside className="sticky top-0 hidden h-screen w-16 shrink-0 border-r border-[var(--club-line)] bg-white md:flex md:flex-col lg:w-60 dark:border-zinc-800 dark:bg-zinc-950">
+    <aside className="sticky top-0 hidden h-screen w-16 shrink-0 border-r border-border bg-card md:flex md:flex-col lg:w-60">
       <div className="px-2 py-4 lg:px-4 lg:py-5">
         <Link
           href="/me"
@@ -49,7 +49,7 @@ export function PlayerSidebar({
             />
           )}
           <div className="hidden min-w-0 lg:block">
-            <div className="truncate text-sm font-semibold text-zinc-950 dark:text-zinc-100">
+            <div className="truncate text-sm font-semibold text-foreground">
               {currentMembership?.club_name ?? ts("fallbackOrgName")}
             </div>
             <Image
@@ -74,15 +74,15 @@ export function PlayerSidebar({
               aria-label={t(key)}
               className={`group relative flex items-center justify-center gap-3 rounded-lg px-2 py-2.5 text-xs font-medium transition-colors lg:justify-start lg:px-3 lg:py-2 lg:text-sm ${
                 active
-                  ? "bg-[var(--club-primary)] text-[var(--club-primary-foreground)] shadow-sm"
-                  : "text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 dark:text-zinc-400 dark:hover:bg-zinc-900 dark:hover:text-zinc-100"
+                  ? "bg-primary text-primary-foreground shadow-sm"
+                  : "text-muted-foreground hover:bg-accent hover:text-foreground"
               }`}
             >
               <Icon
                 className={`h-4 w-4 shrink-0 ${
                   active
                     ? ""
-                    : "text-zinc-400 group-hover:text-zinc-600 dark:group-hover:text-zinc-200"
+                    : "text-muted-foreground group-hover:text-foreground"
                 }`}
               />
               <span className="hidden lg:inline">{t(key)}</span>
@@ -90,7 +90,7 @@ export function PlayerSidebar({
           );
         })}
       </nav>
-      <div className="mt-auto hidden border-t border-[var(--club-line)] px-5 py-5 text-[11px] leading-relaxed text-zinc-500 lg:block dark:text-zinc-500">
+      <div className="mt-auto hidden border-t border-border px-5 py-5 text-[11px] leading-relaxed text-muted-foreground lg:block">
         <span className="font-medium text-[var(--club-primary)]">{ts("fallbackOrgName")}</span>{" "}
         {ts("footerText")}
       </div>
