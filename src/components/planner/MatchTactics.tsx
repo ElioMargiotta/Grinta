@@ -139,7 +139,7 @@ export function MatchTactics({
         <div className="flex flex-col gap-1">
           <label
             htmlFor="tactics-context"
-            className="text-sm font-medium text-zinc-700 dark:text-zinc-300"
+            className="text-sm font-medium text-foreground"
           >
             {t("matchContext")}
           </label>
@@ -149,13 +149,13 @@ export function MatchTactics({
             value={value.matchContext}
             onChange={(e) => onChange({ ...value, matchContext: e.target.value })}
             placeholder={t("matchContextPlaceholder")}
-            className="w-full rounded-lg border border-zinc-200 bg-white px-3 py-2 text-sm text-zinc-900 shadow-sm focus:border-zinc-400 focus:outline-none dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100"
+            className="w-full rounded-lg border border-border bg-card px-3 py-2 text-sm text-foreground shadow-sm focus:border-ring focus:outline-none focus:ring-2 focus:ring-ring/15"
           />
         </div>
         <div className="flex flex-col gap-1">
           <label
             htmlFor="tactics-structures"
-            className="text-sm font-medium text-zinc-700 dark:text-zinc-300"
+            className="text-sm font-medium text-foreground"
           >
             {t("structures")}
           </label>
@@ -165,7 +165,7 @@ export function MatchTactics({
             value={value.structures}
             onChange={(e) => onChange({ ...value, structures: e.target.value })}
             placeholder={t("structuresPlaceholder")}
-            className="w-full rounded-lg border border-zinc-200 bg-white px-3 py-2 text-sm text-zinc-900 shadow-sm focus:border-zinc-400 focus:outline-none dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100"
+            className="w-full rounded-lg border border-border bg-card px-3 py-2 text-sm text-foreground shadow-sm focus:border-ring focus:outline-none focus:ring-2 focus:ring-ring/15"
           />
         </div>
       </div>
@@ -173,7 +173,7 @@ export function MatchTactics({
       <div className="flex flex-col gap-1">
         <label
           htmlFor="tactics-coaches"
-          className="text-sm font-medium text-zinc-700 dark:text-zinc-300"
+          className="text-sm font-medium text-foreground"
         >
           {t("coaches")}
         </label>
@@ -183,7 +183,7 @@ export function MatchTactics({
           value={value.coaches}
           onChange={(e) => onChange({ ...value, coaches: e.target.value })}
           placeholder={t("coachesPlaceholder")}
-          className="w-full rounded-lg border border-zinc-200 bg-white px-3 py-2 text-sm text-zinc-900 shadow-sm focus:border-zinc-400 focus:outline-none dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100"
+          className="w-full rounded-lg border border-border bg-card px-3 py-2 text-sm text-foreground shadow-sm focus:border-ring focus:outline-none focus:ring-2 focus:ring-ring/15"
         />
       </div>
 
@@ -195,8 +195,8 @@ export function MatchTactics({
             onClick={() => setStep(i)}
             className={`inline-flex h-9 items-center gap-2 rounded-md border px-2.5 text-sm font-medium transition ${
               step === i
-                ? "border-[var(--club-primary)] bg-[var(--club-primary)] text-white"
-                : "border-[var(--club-line)] bg-white text-zinc-600 hover:bg-zinc-50 dark:bg-zinc-900 dark:text-zinc-300 dark:hover:bg-zinc-800/40"
+                ? "border-primary bg-primary text-primary-foreground"
+                : "border-border bg-card text-muted-foreground hover:bg-accent"
             }`}
           >
             <span className="tabular-nums">{i + 1}</span>
@@ -216,7 +216,7 @@ export function MatchTactics({
           <ClipboardList className="h-3.5 w-3.5" />
           {t("detectionTemplate")}
         </Button>
-        <span className="ml-auto text-xs font-medium tabular-nums text-zinc-500 dark:text-zinc-400">
+        <span className="ml-auto text-xs font-medium tabular-nums text-muted-foreground">
           {filled}/{STEPS.length}
         </span>
       </div>
@@ -225,7 +225,7 @@ export function MatchTactics({
         <div className="flex flex-col gap-1">
           <label
             htmlFor={`tactics-${current.key}`}
-            className="text-sm font-medium text-zinc-700 dark:text-zinc-300"
+            className="text-sm font-medium text-foreground"
           >
             {t(current.key)}
           </label>
@@ -235,7 +235,7 @@ export function MatchTactics({
             value={value[current.key]}
             onChange={(e) => patch(current.key, e.target.value)}
             placeholder={t(`${current.key}Placeholder`)}
-            className="w-full rounded-lg border border-zinc-200 bg-white px-3 py-2 text-sm text-zinc-900 shadow-sm focus:border-zinc-400 focus:outline-none dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100"
+            className="w-full rounded-lg border border-border bg-card px-3 py-2 text-sm text-foreground shadow-sm focus:border-ring focus:outline-none focus:ring-2 focus:ring-ring/15"
           />
         </div>
         {currentBoardKey ? (

@@ -150,13 +150,13 @@ export function LineupBoard({
       {/* Barre formation */}
       <div className="flex flex-wrap items-center gap-3">
         <label className="flex items-center gap-2 text-sm">
-          <span className="font-medium text-zinc-700 dark:text-zinc-300">
+          <span className="font-medium text-foreground">
             {t("formation")}
           </span>
           <select
             value={value.formation}
             onChange={(e) => applyFormation(e.target.value)}
-            className="rounded-md border border-zinc-200 bg-white px-2 py-1 text-sm text-zinc-900 focus:border-zinc-400 focus:outline-none dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100"
+            className="rounded-lg border border-border bg-card px-2 py-1 text-sm text-foreground focus:border-ring focus:outline-none focus:ring-2 focus:ring-ring/15"
           >
             {FORMATION_GROUPS.map((g) => (
               <optgroup key={g.label} label={t("defenders", { count: g.label })}>
@@ -169,14 +169,14 @@ export function LineupBoard({
             ))}
           </select>
         </label>
-        <span className="text-xs font-medium tabular-nums text-zinc-500 dark:text-zinc-400">
+        <span className="text-xs font-medium tabular-nums text-muted-foreground">
           {t("startersOf", { count: startersCount })}
         </span>
         <button
           type="button"
           onClick={resetLineup}
           disabled={startersCount === 0 && value.subs.length === 0}
-          className="ml-auto inline-flex items-center gap-1.5 rounded-md border border-[var(--club-line)] px-2.5 py-1 text-xs font-medium text-zinc-600 transition hover:bg-zinc-50 disabled:opacity-40 dark:text-zinc-300 dark:hover:bg-zinc-800/40"
+          className="ml-auto inline-flex items-center gap-1.5 rounded-md border border-border px-2.5 py-1 text-xs font-medium text-muted-foreground transition hover:bg-accent disabled:opacity-40"
         >
           <RotateCcw className="h-3.5 w-3.5" />
           {t("reset")}
@@ -260,11 +260,11 @@ export function LineupBoard({
 
       {/* Remplaçants */}
       <div className="flex flex-col gap-2">
-        <div className="text-sm font-semibold text-zinc-700 dark:text-zinc-300">
+        <div className="text-sm font-semibold text-foreground">
           {t("subsTitle")}
         </div>
         {value.subs.length === 0 ? (
-          <p className="text-sm text-zinc-500 dark:text-zinc-400">
+          <p className="text-sm text-muted-foreground">
             {t("subsEmpty")}
           </p>
         ) : (
@@ -276,19 +276,19 @@ export function LineupBoard({
               return (
                 <li
                   key={id}
-                  className="group inline-flex items-center gap-2 rounded-full border border-[var(--club-line)] bg-white py-1 pl-1.5 pr-2.5 text-sm dark:bg-zinc-900"
+                  className="group inline-flex items-center gap-2 rounded-full border border-border bg-card py-1 pl-1.5 pr-2.5 text-sm"
                 >
-                  <span className="inline-flex h-6 w-6 items-center justify-center rounded-full bg-zinc-100 text-[11px] font-semibold tabular-nums dark:bg-zinc-800">
+                  <span className="inline-flex h-6 w-6 items-center justify-center rounded-full bg-muted text-[11px] font-semibold tabular-nums">
                     {p.jerseyNumber ?? "—"}
                   </span>
-                  <span className="truncate text-zinc-900 dark:text-zinc-100">
+                  <span className="truncate text-foreground">
                     {lastName(p.fullName)}
                   </span>
                   {unav ? <span title={tKind(unav.kind)}>{KIND_BADGE[unav.kind]}</span> : null}
                   <button
                     type="button"
                     onClick={() => removeSub(id)}
-                    className="ml-0.5 text-zinc-400 transition hover:text-red-500"
+                    className="ml-0.5 text-muted-foreground transition hover:text-destructive"
                     aria-label={t("removeSub")}
                   >
                     <X className="h-3.5 w-3.5" />
@@ -302,7 +302,7 @@ export function LineupBoard({
           type="button"
           onClick={() => setPicker({ kind: "sub" })}
           disabled={available.length === 0}
-          className="w-fit rounded-md border border-dashed border-[var(--club-line)] px-3 py-1.5 text-sm font-medium text-zinc-600 transition hover:bg-zinc-50 disabled:opacity-40 dark:text-zinc-300 dark:hover:bg-zinc-800/40"
+          className="w-fit rounded-md border border-dashed border-border px-3 py-1.5 text-sm font-medium text-muted-foreground transition hover:bg-accent disabled:opacity-40"
         >
           + {t("addSub")}
         </button>
@@ -360,17 +360,17 @@ function PlayerPicker({
       onClick={onClose}
     >
       <div
-        className="flex max-h-[70vh] w-full max-w-sm flex-col overflow-hidden rounded-t-2xl bg-white shadow-xl dark:bg-zinc-900 sm:rounded-2xl"
+        className="flex max-h-[70vh] w-full max-w-sm flex-col overflow-hidden rounded-t-2xl bg-card shadow-xl sm:rounded-2xl"
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="flex items-center justify-between border-b border-[var(--club-line)] px-4 py-3">
-          <span className="text-sm font-semibold text-zinc-900 dark:text-zinc-100">
+        <div className="flex items-center justify-between border-b border-border px-4 py-3">
+          <span className="text-sm font-semibold text-foreground">
             {title}
           </span>
           <button
             type="button"
             onClick={onClose}
-            className="text-zinc-400 transition hover:text-zinc-700 dark:hover:text-zinc-200"
+            className="text-muted-foreground transition hover:text-foreground"
             aria-label="Close"
           >
             <X className="h-4 w-4" />
@@ -388,7 +388,7 @@ function PlayerPicker({
             </button>
           ) : null}
           {players.length === 0 ? (
-            <p className="px-3 py-4 text-center text-sm text-zinc-500 dark:text-zinc-400">
+            <p className="px-3 py-4 text-center text-sm text-muted-foreground">
               {emptyLabel}
             </p>
           ) : (
@@ -399,13 +399,13 @@ function PlayerPicker({
                   key={p.playerId}
                   type="button"
                   onClick={() => onPick(p.playerId)}
-                  className="flex w-full items-center gap-2.5 rounded px-3 py-2 text-left text-sm transition hover:bg-zinc-100 dark:hover:bg-zinc-800"
+                  className="flex w-full items-center gap-2.5 rounded px-3 py-2 text-left text-sm transition hover:bg-accent"
                 >
                   <span
                     className={`inline-flex h-6 w-6 shrink-0 items-center justify-center rounded text-[11px] font-semibold tabular-nums ${
                       unav
                         ? "bg-red-100 text-red-700 dark:bg-red-950/40 dark:text-red-300"
-                        : "bg-zinc-100 dark:bg-zinc-800"
+                        : "bg-muted"
                     }`}
                   >
                     {p.jerseyNumber ?? "—"}
@@ -414,7 +414,7 @@ function PlayerPicker({
                     className={`truncate ${
                       unav
                         ? "text-red-600 dark:text-red-400"
-                        : "text-zinc-900 dark:text-zinc-100"
+                        : "text-foreground"
                     }`}
                   >
                     {p.fullName}
