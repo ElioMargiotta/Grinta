@@ -80,19 +80,19 @@ export function MatchCallup({
   return (
     <section className="flex flex-col gap-3">
       <div className="flex flex-wrap items-center justify-between gap-2">
-        <div className="flex items-center gap-2 text-base font-semibold text-zinc-900 dark:text-zinc-100">
-          <UserCheck className="h-4 w-4 text-[var(--club-primary)]" />
+        <div className="flex items-center gap-2 text-base font-semibold text-foreground">
+          <UserCheck className="h-4 w-4 text-primary" />
           {t("title")}
         </div>
-        <div className="flex items-center gap-2 text-xs font-medium text-zinc-500 dark:text-zinc-400">
-          <span className="rounded bg-[var(--club-primary-soft)] px-2 py-0.5 text-[var(--club-primary)]">
+        <div className="flex items-center gap-2 text-xs font-medium text-muted-foreground">
+          <span className="rounded bg-accent px-2 py-0.5 text-primary">
             {t("convenedCount", { count })}
           </span>
           <span className="inline-flex items-center gap-1 text-emerald-600 dark:text-emerald-400">
             <Check className="h-3.5 w-3.5" />
             {responded.yes}
           </span>
-          <span className="inline-flex items-center gap-1 text-red-600 dark:text-red-400">
+          <span className="inline-flex items-center gap-1 text-destructive">
             <X className="h-3.5 w-3.5" />
             {responded.no}
           </span>
@@ -100,11 +100,11 @@ export function MatchCallup({
       </div>
 
       {roster.length === 0 ? (
-        <p className="rounded-lg border border-dashed border-[var(--club-line)] bg-white/40 p-4 text-sm text-zinc-500 dark:bg-zinc-900/30">
+        <p className="rounded-lg border border-dashed border-border bg-muted/40 p-4 text-sm text-muted-foreground">
           {t("emptyRoster")}
         </p>
       ) : (
-        <ul className="flex flex-col divide-y divide-[var(--club-line)] overflow-hidden rounded-lg border border-[var(--club-line)]">
+        <ul className="flex flex-col divide-y divide-border overflow-hidden rounded-lg border border-border">
           {roster.map((p) => {
             const isConvened = convened.has(p.playerId);
             const info = initial[p.playerId];
@@ -119,12 +119,12 @@ export function MatchCallup({
                     type="checkbox"
                     checked={isConvened}
                     onChange={() => toggle(p.playerId)}
-                    className="h-4 w-4 accent-[var(--club-primary)]"
+                    className="h-4 w-4 accent-primary"
                   />
-                  <span className="inline-flex h-6 w-6 shrink-0 items-center justify-center rounded bg-zinc-100 text-[11px] font-semibold tabular-nums dark:bg-zinc-800">
+                  <span className="inline-flex h-6 w-6 shrink-0 items-center justify-center rounded bg-muted text-[11px] font-semibold tabular-nums">
                     {p.jerseyNumber ?? "—"}
                   </span>
-                  <span className="truncate text-sm text-zinc-900 dark:text-zinc-100">
+                  <span className="truncate text-sm text-foreground">
                     {p.fullName}
                   </span>
                 </label>
@@ -144,7 +144,7 @@ export function MatchCallup({
                         {t("absent")}
                       </span>
                     ) : (
-                      <span className="inline-flex items-center gap-1 rounded bg-zinc-100 px-2 py-0.5 text-xs font-medium text-zinc-500 dark:bg-zinc-800 dark:text-zinc-400">
+                      <span className="inline-flex items-center gap-1 rounded bg-muted px-2 py-0.5 text-xs font-medium text-muted-foreground">
                         <Clock className="h-3 w-3" />
                         {t("pending")}
                       </span>
@@ -167,7 +167,7 @@ export function MatchCallup({
           </span>
         ) : null}
         {error ? (
-          <span className="text-sm text-red-600 dark:text-red-400">{error}</span>
+          <span className="text-sm text-destructive">{error}</span>
         ) : null}
       </div>
     </section>

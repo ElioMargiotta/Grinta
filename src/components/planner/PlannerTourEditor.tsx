@@ -85,7 +85,7 @@ export function PlannerTourEditor({
   };
 
   return (
-    <div className="border-b border-zinc-200 bg-zinc-50/40 px-4 py-4 dark:border-zinc-800 dark:bg-zinc-950/30">
+    <div className="border-b border-border bg-muted/40 px-4 py-4">
       <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
         <Input
           id={`edit-name-${macrocycle.id}`}
@@ -119,20 +119,20 @@ export function PlannerTourEditor({
       </div>
 
       <div className="mt-4">
-        <h4 className="text-xs font-semibold uppercase tracking-wider text-zinc-500 dark:text-zinc-400">
+        <h4 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
           {t("mesocycles")}
         </h4>
         <div className="mt-2 flex flex-col gap-2">
           {mesos.map((m) => (
             <div
               key={m.id}
-              className="flex flex-wrap items-end gap-2 rounded-lg border border-zinc-200 bg-white p-2.5 dark:border-zinc-800 dark:bg-zinc-900"
+              className="flex flex-wrap items-end gap-2 rounded-lg border border-border bg-card p-2.5"
             >
               <input
                 type="color"
                 value={m.color}
                 onChange={(e) => updateMeso(m.id, { color: e.target.value })}
-                className="h-9 w-9 cursor-pointer rounded-md border border-zinc-200 dark:border-zinc-700"
+                className="h-9 w-9 cursor-pointer rounded-md border border-border"
                 aria-label={tTour("colorAriaLabel")}
               />
               <Input
@@ -143,7 +143,7 @@ export function PlannerTourEditor({
                 className="min-w-[180px]"
               />
               <div className="flex flex-col gap-1.5">
-                <label className="text-sm font-medium text-zinc-900 dark:text-zinc-100">
+                <label className="text-sm font-medium text-foreground">
                   {t("mesoKind")}
                 </label>
                 <select
@@ -151,7 +151,7 @@ export function PlannerTourEditor({
                   onChange={(e) =>
                     updateMeso(m.id, { kind: e.target.value as MesoDraft["kind"] })
                   }
-                  className="h-10 rounded-lg border border-zinc-200 bg-white px-2 text-sm dark:border-zinc-700 dark:bg-zinc-900"
+                  className="h-10 rounded-lg border border-border bg-card px-2 text-sm text-foreground focus:border-ring focus:outline-none focus:ring-2 focus:ring-ring/15"
                 >
                   <option value="preparation">{t("kind.preparation")}</option>
                   <option value="competition">{t("kind.competition")}</option>
@@ -162,13 +162,13 @@ export function PlannerTourEditor({
             </div>
           ))}
         </div>
-        <p className="mt-2 text-[11px] text-zinc-500 dark:text-zinc-400">
+        <p className="mt-2 text-[11px] text-muted-foreground">
           {tEdit("mesoCountHint")}
         </p>
       </div>
 
       {error ? (
-        <p className="mt-3 text-sm text-red-600 dark:text-red-400">{error}</p>
+        <p className="mt-3 text-sm text-destructive">{error}</p>
       ) : null}
 
       <div className="mt-4 flex justify-end gap-2">

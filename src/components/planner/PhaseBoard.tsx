@@ -204,7 +204,7 @@ export function PhaseBoard({
           <ToolButton onClick={() => { setTokenTool("ball"); setArrowMode(false); }} icon={Circle} label={t("addBall")} active={tokenTool === "ball"} />
           <ToolButton onClick={() => { setTokenTool("cone"); setArrowMode(false); }} icon={Triangle} label={t("addCone")} active={tokenTool === "cone"} />
           <ToolButton onClick={() => { setTokenTool("goal-h"); setArrowMode(false); }} icon={Goal} label={t("addGoal")} active={tokenTool === "goal-h"} />
-          <span className="mx-1 h-5 w-px bg-[var(--club-line)]" />
+          <span className="mx-1 h-5 w-px bg-border" />
           <ToolButton
             onClick={() => {
               setTokenTool(null);
@@ -215,7 +215,7 @@ export function PhaseBoard({
             active={arrowMode}
           />
           {arrowMode ? (
-            <div className="inline-flex overflow-hidden rounded-md border border-[var(--club-line)] text-xs">
+            <div className="inline-flex overflow-hidden rounded-md border border-border text-xs">
               {(["run", "pass", "dribble", "long-ball"] as PhaseArrowKind[]).map((k) => (
                 <button
                   key={k}
@@ -223,8 +223,8 @@ export function PhaseBoard({
                   onClick={() => setArrowType(k)}
                   className={`inline-flex items-center gap-1 px-2 py-1 font-medium transition ${
                     arrowType === k
-                      ? "bg-[var(--club-primary)] text-white"
-                      : "bg-white text-zinc-600 hover:bg-zinc-50 dark:bg-zinc-900 dark:text-zinc-300"
+                      ? "bg-primary text-primary-foreground"
+                      : "bg-card text-muted-foreground hover:bg-accent"
                   }`}
                 >
                   <Spline className="h-3 w-3" />
@@ -343,7 +343,7 @@ export function PhaseBoard({
                   type="button"
                   onPointerDown={(e) => e.stopPropagation()}
                   onClick={() => removeToken(tk.id)}
-                  className="absolute z-10 flex h-5 w-5 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full bg-red-500 text-white shadow"
+                  className="absolute z-10 flex h-5 w-5 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full bg-destructive text-white shadow"
                   style={{
                     left: `calc(${pitchLeftPct(tk.x)}% + 12px)`,
                     top: `calc(${pitchTopPct(tk.y)}% - 14px)`,
@@ -365,7 +365,7 @@ export function PhaseBoard({
               key={a.id}
               type="button"
               onClick={() => removeArrow(a.id)}
-              className="inline-flex items-center gap-1 rounded-full border border-[var(--club-line)] bg-white px-2 py-0.5 text-xs text-zinc-600 transition hover:bg-red-50 hover:text-red-600 dark:bg-zinc-900 dark:text-zinc-300"
+              className="inline-flex items-center gap-1 rounded-full border border-border bg-card px-2 py-0.5 text-xs text-muted-foreground transition hover:bg-destructive/10 hover:text-destructive"
             >
               {t(`arrowKind.${a.kind}`)} {i + 1}
               <Trash2 className="h-3 w-3" />
@@ -433,8 +433,8 @@ function ToolButton({
       onClick={onClick}
       className={`inline-flex items-center gap-1.5 rounded-md border px-2.5 py-1 text-xs font-medium transition ${
         active
-          ? "border-[var(--club-primary)] bg-[var(--club-primary)] text-white"
-          : "border-[var(--club-line)] text-zinc-600 hover:bg-zinc-50 dark:text-zinc-300 dark:hover:bg-zinc-800/40"
+          ? "border-primary bg-primary text-primary-foreground"
+          : "border-border text-muted-foreground hover:bg-accent"
       }`}
     >
       <Icon className="h-3.5 w-3.5" />
