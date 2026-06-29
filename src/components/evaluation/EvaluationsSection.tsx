@@ -11,6 +11,8 @@ import { useTranslations } from "next-intl";
 import { useTransition } from "react";
 import { Link } from "@/i18n/navigation";
 import { Section, SectionHeader } from "@/components/ui/Section";
+import { Button } from "@/components/ui/Button";
+import { EmptyState } from "@/components/ui/EmptyState";
 import { useLoading } from "@/components/ui/LoadingProvider";
 import {
   createPlayerEvaluationAction,
@@ -71,44 +73,44 @@ export function EvaluationsSection({
         title={t("title")}
         description={t("subtitle")}
         action={
-          <button
+          <Button
             type="button"
+            variant="secondary"
+            size="sm"
             onClick={create}
-            disabled={isPending}
-            className="inline-flex h-9 items-center gap-1.5 rounded-md border border-[var(--club-line)] bg-white px-3 text-sm font-medium text-zinc-900 transition hover:bg-[var(--club-primary-soft)] disabled:opacity-60 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100 dark:hover:bg-zinc-800"
+            loading={isPending}
           >
             <Plus className="h-4 w-4" />
             {t("create")}
-          </button>
+          </Button>
         }
       />
 
       {evaluations.length === 0 ? (
-        <div className="mt-4 flex flex-col items-center justify-center gap-2 rounded-md border border-dashed border-[var(--club-line)] bg-zinc-50 p-6 text-center dark:border-zinc-800 dark:bg-zinc-900/40">
-          <ClipboardList className="h-5 w-5 text-zinc-400" />
-          <p className="text-[13px] text-zinc-600 dark:text-zinc-400">
-            {t("empty")}
-          </p>
-        </div>
+        <EmptyState
+          icon={ClipboardList}
+          title={t("empty")}
+          className="mt-4"
+        />
       ) : (
-        <ul className="mt-4 flex flex-col divide-y divide-zinc-100 overflow-hidden rounded-md border border-[var(--club-line)] dark:divide-zinc-800 dark:border-zinc-800">
+        <ul className="mt-4 flex flex-col divide-y divide-border overflow-hidden rounded-md border border-border">
           {evaluations.map((e) => (
             <li
               key={e.id}
-              className="flex items-center gap-2 transition hover:bg-[var(--club-primary-soft)]"
+              className="flex items-center gap-2 transition hover:bg-accent"
             >
               <Link
                 href={`/contingent/${playerId}/evaluations/${e.id}`}
                 className="flex min-w-0 flex-1 items-center gap-3 py-2.5 pl-3"
               >
                 <div className="min-w-0 flex-1">
-                  <div className="flex items-center gap-2 text-[13px] font-medium text-zinc-900 dark:text-zinc-100">
+                  <div className="flex items-center gap-2 text-[13px] font-medium text-foreground">
                     <span className="truncate">
                       {e.evaluation_date
                         ? new Date(e.evaluation_date).toLocaleDateString(locale)
                         : t("noDate")}
                       {e.season ? (
-                        <span className="ml-2 text-[11px] font-normal text-zinc-500">
+                        <span className="ml-2 text-[11px] font-normal text-muted-foreground">
                           · {e.season}
                         </span>
                       ) : null}
@@ -120,7 +122,7 @@ export function EvaluationsSection({
                       </span>
                     ) : null}
                   </div>
-                  <div className="mt-0.5 flex items-center gap-3 text-[11px] text-zinc-500 dark:text-zinc-400">
+                  <div className="mt-0.5 flex items-center gap-3 text-[11px] text-muted-foreground">
                     {e.appreciation.length > 0 ? (
                       <span>
                         {e.appreciation
@@ -135,7 +137,7 @@ export function EvaluationsSection({
                     ) : null}
                   </div>
                 </div>
-                <ChevronRight className="h-4 w-4 shrink-0 text-zinc-400" />
+                <ChevronRight className="h-4 w-4 shrink-0 text-muted-foreground" />
               </Link>
               {sharingAvailable ? (
                 <button
@@ -144,10 +146,10 @@ export function EvaluationsSection({
                   disabled={isSharing}
                   title={e.shared_with_player ? t("unshareHint") : t("shareHint")}
                   aria-pressed={e.shared_with_player}
-                  className={`mr-2 inline-flex h-8 shrink-0 items-center gap-1.5 rounded-md px-2.5 text-[12px] font-medium transition disabled:opacity-60 ${
+                  className={`mr-2 inline-flex h-8 shrink-0 items-center gap-1.5 rounded-md px-2.5 text-[12px] font-medium transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:opacity-60 ${
                     e.shared_with_player
                       ? "text-emerald-700 hover:bg-emerald-50 dark:text-emerald-300 dark:hover:bg-emerald-950/40"
-                      : "text-zinc-500 hover:bg-zinc-100 dark:text-zinc-400 dark:hover:bg-zinc-800"
+                      : "text-muted-foreground hover:bg-accent"
                   }`}
                 >
                   {e.shared_with_player ? (
