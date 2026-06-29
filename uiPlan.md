@@ -105,22 +105,35 @@ les contributeurs). Lier les deux.
 
 Pour chaque lot, remplacer les composants ad-hoc par les primitives et les
 classes brutes par les tokens, puis retirer les fallbacks dark devenus inutiles.
-Ordre proposé par impact/risque :
+Ordre par impact/risque :
 
-1. **Lot A — layout + dashboard + account/settings** (transverse, fort impact
-   visuel, peu de logique).
-2. **Lot B — auth + onboarding** (formulaires → primitives `Input`/`Button`/`Card`).
-3. **Lot C — teams + contingent** (tables/listes, wizards → `Dialog`/`Sheet`,
-   `EmptyState`).
-4. **Lot D — planner** (le plus gros, 30 fichiers : modales `MatchHub`,
-   `SystemEditor` → primitives).
-5. **Lot E — player + evaluation + physical + exercises + sheet** (en gardant la
-   logique print de `sheet/`/`prep-*` intacte, hors périmètre tokens).
-6. **Landing/marketing** : conserver sa palette propre (`--brand`, blobs, snake) —
-   non migré vers tokens app.
+1. ✅ **Lot A — layout + dashboard + account/settings**.
+2. ✅ **Lot B — auth + onboarding**.
+3. ✅ **Lot C — teams + contingent**.
+4. ✅ **Lot D — planner** (pièces terrain `LineupBoard`/`MatchTactics`/
+   `MatchPrintSheet` conservées par design).
+5. ✅ **Lot E — player + exercises + physical + evaluation** (+ `admin/`, ajouté
+   en cours de route, absent du cadrage initial).
+6. **Landing/marketing** : palette propre (`--brand`, blobs, snake) — hors périmètre.
 
 Chaque lot : migration → vérif visuelle → suppression des classes mortes →
 mise à jour du skill si un nouveau pattern émerge.
+
+### Décision de cadrage — éditeurs bespoke « sheet » hors périmètre tokens
+
+`sheet/PreparationSheet`, son atome `SheetField`, `sheet/SchemaEditor` et le
+tiroir `sheet/ExerciseLibraryPicker` forment un **système visuel bespoke façon
+papier/PDF** (encre `zinc-950`, accent `--g-green` = `GRINTA_GREEN` posé inline,
+gabarits calibrés au mm sur `Evaluation Xamax.pdf`). De même, le web form de
+`evaluation/EvaluationSheet` (zone `PDF EXPORT VIEW ⚠️ DO NOT MODIFY`). Comme la
+landing, ces surfaces **conservent leur palette propre et ne sont pas migrées
+vers les tokens** — décision validée avec l'utilisateur. `sheet/Pitch`
+(`FullPitch`) est une pièce terrain conservée (déjà couverte par le lot planner).
+
+Périmètre réellement migré du Lot E : `evaluation/EvaluationsSection`,
+`evaluation/PlayerEvaluationReport`, `player/*`, `exercises/*`, `physical/*`,
+`admin/*`. Le reste de `sheet/` et `evaluation/EvaluationSheet` est volontairement
+laissé intact.
 
 ---
 
