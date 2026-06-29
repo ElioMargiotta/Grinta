@@ -68,13 +68,13 @@ export function PendingInvitationsCard({
         {invitations.map((inv) => (
           <li
             key={inv.id}
-            className="flex flex-col gap-3 rounded-lg border border-zinc-200 bg-white p-3 dark:border-zinc-800 dark:bg-zinc-900 sm:flex-row sm:items-center sm:justify-between"
+            className="flex flex-col gap-3 rounded-lg border border-border bg-card p-3 sm:flex-row sm:items-center sm:justify-between"
           >
             <div className="min-w-0">
-              <div className="text-sm font-medium text-zinc-900 dark:text-zinc-100">
+              <div className="text-sm font-medium text-foreground">
                 {inv.clubName}
               </div>
-              <div className="text-xs text-zinc-500 dark:text-zinc-400">
+              <div className="text-xs text-muted-foreground">
                 {inv.kind === "player"
                   ? inv.teamName
                     ? t("playerWithTeam", { team: inv.teamName })
