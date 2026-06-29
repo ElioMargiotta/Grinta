@@ -1,13 +1,25 @@
 "use client";
 
-import { useTransition } from "react";
+import { useState, useTransition } from "react";
 import { useTranslations } from "next-intl";
-import { Mail, Check } from "lucide-react";
+import { Mail, Check, X } from "lucide-react";
 import { Button } from "@/components/ui/Button";
-import { acceptMyInvitationAction } from "@/app/[locale]/(app)/invitations-actions";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogFooter,
+} from "@/components/ui/Dialog";
+import {
+  acceptMyInvitationAction,
+  rejectMyInvitationAction,
+} from "@/app/[locale]/(app)/invitations-actions";
 
 type PendingInvitation = {
   invitation_id: string;
+  club_id: string;
   club_name: string;
   role_name: string;
   invited_by_name: string | null;
@@ -19,14 +31,37 @@ export function PendingInvitationsBanner({
   invitations: PendingInvitation[];
 }) {
   const t = useTranslations("onboarding.invitations");
-  const [isPending, startTransition] = useTransition();
+  const [isAccepting, startAccept] = useTransition();
+  const [isDeclining, startDecline] = useTransition();
+  const [pendingId, setPendingId] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  const [confirming, setConfirming] = useState<PendingInvitation | null>(null);
   if (invitations.length === 0) return null;
 
-  const accept = (id: string) => {
+  const busy = isAccepting || isDeclining;
+
+  const accept = (inv: PendingInvitation) => {
     const fd = new FormData();
-    fd.set("invitationId", id);
-    startTransition(async () => {
-      await acceptMyInvitationAction(fd);
+    fd.set("invitationId", inv.invitation_id);
+    fd.set("clubId", inv.club_id);
+    setError(null);
+    setPendingId(inv.invitation_id);
+    startAccept(async () => {
+      const res = await acceptMyInvitationAction(fd);
+      if (res && "error" in res && res.error) setError(res.error);
+      setPendingId(null);
+    });
+  };
+
+  const confirmDecline = () => {
+    if (!confirming) return;
+    const fd = new FormData();
+    fd.set("invitationId", confirming.invitation_id);
+    setError(null);
+    startDecline(async () => {
+      const res = await rejectMyInvitationAction(fd);
+      if (res && "error" in res && res.error) setError(res.error);
+      else setConfirming(null);
     });
   };
 
@@ -50,16 +85,68 @@ export function PendingInvitationsBanner({
               </div>
             </div>
           </div>
-          <Button
-            size="sm"
-            onClick={() => accept(inv.invitation_id)}
-            loading={isPending}
-          >
-            <Check className="h-4 w-4" />
-            {t("accept")}
-          </Button>
+          <div className="flex shrink-0 items-center gap-2">
+            <Button
+              variant="secondary"
+              size="sm"
+              onClick={() => setConfirming(inv)}
+              disabled={busy}
+            >
+              <X className="h-4 w-4" />
+              {t("decline")}
+            </Button>
+            <Button
+              size="sm"
+              onClick={() => accept(inv)}
+              loading={isAccepting && pendingId === inv.invitation_id}
+              disabled={busy}
+            >
+              <Check className="h-4 w-4" />
+              {t("accept")}
+            </Button>
+          </div>
         </div>
       ))}
+
+      {error && (
+        <p className="rounded-md border border-destructive/30 bg-destructive/10 px-3 py-2 text-sm text-destructive">
+          {error}
+        </p>
+      )}
+
+      <Dialog
+        open={confirming !== null}
+        onOpenChange={(open) => {
+          if (!open && !isDeclining) setConfirming(null);
+        }}
+      >
+        <DialogContent className="max-w-sm">
+          <DialogHeader>
+            <DialogTitle>{t("declineConfirmTitle")}</DialogTitle>
+            <DialogDescription>
+              {t("declineConfirmBody", { club: confirming?.club_name ?? "" })}
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => setConfirming(null)}
+              disabled={isDeclining}
+            >
+              {t("cancel")}
+            </Button>
+            <Button
+              variant="danger"
+              size="sm"
+              onClick={confirmDecline}
+              loading={isDeclining}
+            >
+              {t("declineConfirm")}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

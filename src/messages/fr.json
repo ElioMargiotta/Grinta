@@ -1963,7 +1963,12 @@
       "invitedTo": "Tu as été invité à <strong>{club}</strong>",
       "invitedBy": "par {name}",
       "proposedRole": "Rôle proposé : {role}",
-      "accept": "Accepter"
+      "accept": "Accepter",
+      "decline": "Refuser",
+      "declineConfirmTitle": "Refuser l'invitation ?",
+      "declineConfirmBody": "Tu vas refuser l'invitation à {club}. Cette action est définitive.",
+      "declineConfirm": "Refuser",
+      "cancel": "Annuler"
     },
     "acceptForm": {
       "accepting": "Acceptation…",
