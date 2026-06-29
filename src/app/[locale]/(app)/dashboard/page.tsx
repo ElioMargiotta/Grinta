@@ -19,6 +19,7 @@ import { WeekPanel } from "@/components/dashboard/WeekPanel";
 
 type PendingInvitation = {
   invitation_id: string;
+  club_id: string;
   club_name: string;
   role_name: string;
   invited_by_name: string | null;

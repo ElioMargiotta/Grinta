@@ -1957,7 +1957,12 @@
       "invitedTo": "Sei stato invitato a {club}",
       "invitedBy": "da {name}",
       "proposedRole": "Ruolo proposto: {role}",
-      "accept": "Accetta"
+      "accept": "Accetta",
+      "decline": "Rifiuta",
+      "declineConfirmTitle": "Rifiutare l'invito?",
+      "declineConfirmBody": "Stai per rifiutare l'invito a {club}. L'azione è definitiva.",
+      "declineConfirm": "Rifiuta",
+      "cancel": "Annulla"
     },
     "acceptForm": {
       "accepting": "Accettazione…",

@@ -1957,7 +1957,12 @@
       "invitedTo": "Du wurdest zu {club} eingeladen",
       "invitedBy": "von {name}",
       "proposedRole": "Vorgeschlagene Rolle: {role}",
-      "accept": "Annehmen"
+      "accept": "Annehmen",
+      "decline": "Ablehnen",
+      "declineConfirmTitle": "Einladung ablehnen?",
+      "declineConfirmBody": "Du lehnst die Einladung zu {club} ab. Dies kann nicht rückgängig gemacht werden.",
+      "declineConfirm": "Ablehnen",
+      "cancel": "Abbrechen"
     },
     "acceptForm": {
       "accepting": "Annehmen…",
