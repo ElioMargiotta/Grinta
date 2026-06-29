@@ -94,7 +94,7 @@ export default async function AccountPage({
         memberships={memberships}
         licenseUsage={licenseUsage}
         persona={persona}
-        contentClassName="mx-auto w-full max-w-2xl"
+        contentClassName="mx-auto w-full max-w-5xl"
       />
       <main className="flex-1 p-4 pb-24 md:p-5 lg:p-6">
         <div className="mx-auto flex w-full max-w-2xl flex-col gap-6">
