@@ -101,7 +101,7 @@ export function ExerciseForm({ initial }: { initial?: Initial }) {
           defaultValue={initial?.equipment?.join(", ") ?? ""}
         />
       </div>
-      {error && <p className="text-sm text-red-600">{error}</p>}
+      {error && <p className="text-sm text-destructive">{error}</p>}
       <Button type="submit" loading={isPending}>
         {t("form.submit")}
       </Button>
