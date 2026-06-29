@@ -4,6 +4,7 @@ import { LogOut, UserCog } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useTransition } from "react";
 import { Link } from "@/i18n/navigation";
+import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/Button";
 import { logoutAction } from "@/app/[locale]/(app)/actions";
 import { ClubSwitcher } from "./ClubSwitcher";
@@ -41,6 +42,7 @@ export function Topbar({
   currentSeason,
   seasons,
   notifications,
+  contentClassName,
 }: {
   userName: string;
   currentMembership: ClubMembership | null;
@@ -50,6 +52,13 @@ export function Topbar({
   currentSeason?: string | null;
   seasons?: string[];
   notifications?: TopbarNotifications | null;
+  /**
+   * Classes du conteneur interne. Par défaut la barre occupe toute la largeur
+   * (layouts app/player, avec sidebar). Pour une page autonome centrée (ex.
+   * /account), passer `mx-auto w-full max-w-2xl` pour aligner le contenu de la
+   * barre sur la colonne de la page.
+   */
+  contentClassName?: string;
 }) {
   const t = useTranslations("nav");
   const tp = useTranslations("topbar");
@@ -73,7 +82,13 @@ export function Topbar({
   }
 
   return (
-    <header className="sticky top-0 z-30 flex h-14 min-w-0 items-center justify-between gap-2 border-b border-border bg-card/95 px-3 backdrop-blur sm:px-4 lg:px-6">
+    <header className="sticky top-0 z-30 border-b border-border bg-card/95 backdrop-blur">
+      <div
+        className={cn(
+          "flex h-14 min-w-0 items-center justify-between gap-2 px-3 sm:px-4 lg:px-6",
+          contentClassName,
+        )}
+      >
       <div className="flex min-w-0 items-center gap-2 lg:gap-3">
         <span className="flex h-8 w-8 items-center justify-center rounded-full bg-primary text-xs font-semibold text-primary-foreground">
           {initials(userName)}
@@ -136,6 +151,7 @@ export function Topbar({
           <LogOut className="h-4 w-4" />
           <span className="hidden lg:inline">{t("logout")}</span>
         </Button>
+      </div>
       </div>
     </header>
   );
