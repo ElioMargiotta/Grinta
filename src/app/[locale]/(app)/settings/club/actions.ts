@@ -10,7 +10,15 @@ import { sendClubInvitationEmail } from "@/lib/email/invitations";
 import type { AccessLevel, ClubThemeMode } from "@/lib/club/types";
 
 type InviteResult =
-  | { ok: true; token: string; url: string; emailSent: boolean; emailError?: string }
+  | {
+      ok: true;
+      token: string | null;
+      url: string | null;
+      emailSent: boolean;
+      direct: boolean;
+      targetLabel?: string;
+      emailError?: string;
+    }
   | { error: string };
 
 const HEX_COLOR_RE = /^#[0-9a-fA-F]{6}$/;
@@ -89,11 +97,16 @@ export async function updateClubIdentityAction(formData: FormData) {
 
 export async function inviteMemberAction(formData: FormData): Promise<InviteResult> {
   const locale = String(formData.get("locale") ?? "fr");
-  const email = String(formData.get("email") ?? "").trim().toLowerCase();
+  const identifier = String(
+    formData.get("identifier") ?? formData.get("email") ?? "",
+  ).trim();
+  const isEmail = identifier.includes("@") && !identifier.startsWith("@");
+  const email = isEmail ? identifier.toLowerCase() : "";
   const roleId = String(formData.get("roleId") ?? "");
   const teamIdsRaw = formData.getAll("teamIds").map(String).filter(Boolean);
 
-  if (!email || !email.includes("@")) return { error: "Email invalide." };
+  if (!identifier) return { error: "Compte ou email requis." };
+  if (isEmail && !email.includes("@")) return { error: "Email invalide." };
   if (!roleId) return { error: "Rôle requis." };
 
   const membership = await resolveCurrentMembership();
@@ -103,6 +116,61 @@ export async function inviteMemberAction(formData: FormData): Promise<InviteResu
   }
 
   const supabase = await createClient();
+
+  const { data: resolvedTarget, error: resolveError } = await supabase
+    .rpc("resolve_invitation_target", { p_identifier: identifier })
+    .maybeSingle<{
+      user_id: string;
+      email: string | null;
+      username: string | null;
+      full_name: string | null;
+    }>();
+  if (resolveError) return { error: resolveError.message };
+  if (!isEmail && !resolvedTarget?.user_id) {
+    return { error: "Aucun compte ne correspond à ce nom d'utilisateur." };
+  }
+
+  if (resolvedTarget?.user_id) {
+    const { error: targetedError } = await supabase.rpc(
+      "create_targeted_staff_invitation",
+      {
+        p_club_id: membership.club_id,
+        p_target_user_id: resolvedTarget.user_id,
+        p_email: resolvedTarget.email,
+        p_role_id: roleId,
+        p_team_ids: teamIdsRaw,
+        p_ttl_hours: 168,
+      },
+    );
+    if (targetedError) {
+      if (targetedError.message?.includes("staff_quota_reached")) {
+        return {
+          error:
+            "Quota de membres du staff atteint pour la licence de ce club. Contacte l'administrateur pour l'étendre.",
+        };
+      }
+      return {
+        error: targetedError.message ?? "Échec de la création de l'invitation.",
+      };
+    }
+    await supabase
+      .from("profiles")
+      .update({ can_coach: true })
+      .eq("id", resolvedTarget.user_id);
+
+    revalidatePath("/settings/club");
+    return {
+      ok: true,
+      token: null,
+      url: null,
+      emailSent: false,
+      direct: true,
+      targetLabel: resolvedTarget.username
+        ? `@${resolvedTarget.username}`
+        : resolvedTarget.email ?? undefined,
+    };
+  }
+
   const { data: token, error } = await supabase.rpc("create_invitation", {
     p_club_id: membership.club_id,
     p_email: email,
@@ -140,6 +208,7 @@ export async function inviteMemberAction(formData: FormData): Promise<InviteResu
       token: plainToken,
       url,
       emailSent: false,
+      direct: false,
       emailError: "invitation_not_found_after_insert",
     };
   }
@@ -184,6 +253,7 @@ export async function inviteMemberAction(formData: FormData): Promise<InviteResu
     token: plainToken,
     url,
     emailSent: emailResult.ok,
+    direct: false,
     ...(emailResult.ok ? {} : { emailError: emailResult.reason }),
   };
 }

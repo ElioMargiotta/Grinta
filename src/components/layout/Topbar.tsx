@@ -96,9 +96,12 @@ export function Topbar({
             <SeasonSwitcher current={currentSeason} seasons={seasons ?? []} />
           </div>
         )}
-        {persona?.available === "dual" && (
+        {persona && persona.profiles.length > 1 && (
           <div className="hidden lg:ml-1 lg:block">
-            <PersonaSwitcher active={persona.active} />
+            <PersonaSwitcher
+              active={persona.activeProfile}
+              profiles={persona.profiles}
+            />
           </div>
         )}
       </div>

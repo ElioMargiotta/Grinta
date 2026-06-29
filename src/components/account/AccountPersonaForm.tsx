@@ -1,37 +1,48 @@
 "use client";
 
-import { useEffect, useState, useTransition } from "react";
+import { useMemo, useState, useTransition } from "react";
 import { Shield, UserCircle, Users } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/Button";
 import { updatePersonaPreferenceAction } from "@/app/[locale]/account/actions";
 
-type Preference = "staff" | "player" | "dual";
+export type AccountCapability = "staff" | "player" | "parent";
 
-const OPTIONS: { value: Preference; icon: typeof Shield; labelKey: string; descKey: string }[] = [
+const OPTIONS: { value: AccountCapability; icon: typeof Shield; labelKey: string; descKey: string }[] = [
   { value: "staff", icon: Shield, labelKey: "optionStaffLabel", descKey: "optionStaffDesc" },
   { value: "player", icon: UserCircle, labelKey: "optionPlayerLabel", descKey: "optionPlayerDesc" },
-  { value: "dual", icon: Users, labelKey: "optionDualLabel", descKey: "optionDualDesc" },
+  { value: "parent", icon: Users, labelKey: "optionParentLabel", descKey: "optionParentDesc" },
 ];
 
 export function AccountPersonaForm({
-  initialPreference,
+  initialCapabilities,
 }: {
-  initialPreference: Preference;
+  initialCapabilities: AccountCapability[];
 }) {
   const t = useTranslations("account");
-  const [preference, setPreference] = useState<Preference>(initialPreference);
+  const initialKey = useMemo(
+    () => [...initialCapabilities].sort().join("|"),
+    [initialCapabilities],
+  );
+  const [capabilities, setCapabilities] =
+    useState<AccountCapability[]>(initialCapabilities);
+  const [savedKey, setSavedKey] = useState(initialKey);
   const [error, setError] = useState<string | null>(null);
   const [saved, setSaved] = useState(false);
   const [isPending, startTransition] = useTransition();
 
-  // Sync local state with server-rendered preference after each save so the
-  // "saved" badge and dirty check stay coherent across multiple updates.
-  useEffect(() => {
-    setPreference(initialPreference);
-  }, [initialPreference]);
+  const currentKey = [...capabilities].sort().join("|");
+  const dirty = currentKey !== savedKey;
 
-  const dirty = preference !== initialPreference;
+  function toggle(value: AccountCapability) {
+    setSaved(false);
+    setCapabilities((current) => {
+      const next = current.includes(value)
+        ? current.filter((v) => v !== value)
+        : [...current, value];
+      return next.length > 0 ? next : current;
+    });
+  }
 
   return (
     <form
@@ -39,12 +50,15 @@ export function AccountPersonaForm({
       action={(formData) => {
         setError(null);
         setSaved(false);
-        formData.set("personaPreference", preference);
+        for (const capability of capabilities) {
+          formData.append("capabilities", capability);
+        }
         startTransition(async () => {
           const result = await updatePersonaPreferenceAction(formData);
           if (result?.error) {
             setError(t("saveError"));
           } else {
+            setSavedKey(currentKey);
             setSaved(true);
           }
         });
@@ -61,12 +75,12 @@ export function AccountPersonaForm({
 
       <div className="flex flex-col gap-2">
         {OPTIONS.map(({ value, icon: Icon, labelKey, descKey }) => {
-          const active = preference === value;
+          const active = capabilities.includes(value);
           return (
             <button
               key={value}
               type="button"
-              onClick={() => setPreference(value)}
+              onClick={() => toggle(value)}
               aria-pressed={active}
               className={`flex items-start gap-3 rounded-lg border p-3 text-left transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring ${
                 active

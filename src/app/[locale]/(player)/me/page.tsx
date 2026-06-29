@@ -2,6 +2,7 @@ import { getTranslations, setRequestLocale } from "next-intl/server";
 import { ClipboardList } from "lucide-react";
 import { Section, SectionHeader } from "@/components/ui/Section";
 import { requirePersona } from "@/lib/auth/getUser";
+import { getLinkedPlayers, resolveActivePlayer } from "@/lib/player/profiles";
 import {
   PendingInvitationsCard,
   type PendingInvitation,
@@ -38,11 +39,12 @@ type PlayerRow = {
 
 type InvitationRow = {
   id: string;
-  kind: "staff" | "player";
+  kind: "staff" | "player" | "guardian";
   expires_at: string;
   clubs: { name: string } | null;
   club_roles: { name: string } | null;
   teams: { name: string } | null;
+  players: { first_name: string | null; last_name: string | null } | null;
 };
 
 type SharedEvaluationRow = {
@@ -71,29 +73,40 @@ export default async function PlayerMePage({
 }) {
   const { locale } = await params;
   setRequestLocale(locale);
-  const { supabase, user } = await requirePersona(locale, "player");
+  const { supabase, persona } = await requirePersona(locale, "player");
   const t = await getTranslations("playerMe");
   const tInv = await getTranslations("invitations");
 
+  // Profil actif du portail (Lot E) : self ou enfant (tuteur), choisi via le
+  // sélecteur. La RLS autorise le tuteur à lire la fiche de son enfant.
+  const linkedPlayers = await getLinkedPlayers();
+  const activePlayer = await resolveActivePlayer(
+    linkedPlayers,
+    persona.activeProfile === "parent" ? "guardian" : "self",
+  );
+  const isParentProfile = persona.activeProfile === "parent";
+
   const [{ data: player }, { data: invitationRows }] = await Promise.all([
-    supabase
-      .from("players")
-      .select(
-        `id, club_id, first_name, last_name, birth_date, position, jersey_number,
+    activePlayer
+      ? supabase
+          .from("players")
+          .select(
+            `id, club_id, first_name, last_name, birth_date, position, jersey_number,
          strong_foot, license_number, js_number, email, phone, nationality,
          address, postal_code, city, canton, photo_url,
          dual_licence_club, dual_licence_level, dual_licence_team`,
-      )
-      .eq("user_id", user.id)
-      .limit(1)
-      .maybeSingle<PlayerRow>(),
+          )
+          .eq("id", activePlayer.playerId)
+          .maybeSingle<PlayerRow>()
+      : Promise.resolve({ data: null as PlayerRow | null }),
     supabase
       .from("club_invitations")
       .select(
         `id, kind, expires_at,
          clubs!inner(name),
          club_roles(name),
-         teams(name)`,
+         teams(name),
+         players(first_name, last_name)`,
       )
       .eq("status", "pending")
       .gt("expires_at", new Date().toISOString())
@@ -101,20 +114,27 @@ export default async function PlayerMePage({
       .returns<InvitationRow[]>(),
   ]);
 
-  const invitations: PendingInvitation[] = (invitationRows ?? []).map((r) => ({
-    id: r.id,
-    kind: r.kind,
-    clubName: r.clubs?.name ?? "—",
-    roleName: r.club_roles?.name ?? null,
-    teamName: r.teams?.name ?? null,
-    expiresAt: r.expires_at,
-  }));
+  const visibleInvitationKind = isParentProfile ? "guardian" : "player";
+  const invitations: PendingInvitation[] = (invitationRows ?? [])
+    .filter((r) => r.kind === visibleInvitationKind)
+    .map((r) => ({
+      id: r.id,
+      kind: r.kind,
+      clubName: r.clubs?.name ?? "—",
+      roleName: r.club_roles?.name ?? null,
+      teamName: r.teams?.name ?? null,
+      playerName: r.players
+        ? `${r.players.first_name ?? ""} ${r.players.last_name ?? ""}`.trim() ||
+          null
+        : null,
+      expiresAt: r.expires_at,
+    }));
 
   if (!player) {
     return (
       <div className="mx-auto flex w-full max-w-3xl flex-col gap-6">
         <h1 className="text-2xl font-semibold text-zinc-900 dark:text-zinc-100">
-          {t("title")}
+          {isParentProfile ? t("parentTitle") : t("title")}
         </h1>
 
         <Section>
@@ -125,7 +145,9 @@ export default async function PlayerMePage({
             <p className="text-sm text-zinc-600 dark:text-zinc-400">
               {invitations.length > 0
                 ? tInv("welcomeWithInvites")
-                : tInv("welcomeNoInvites")}
+                : isParentProfile
+                  ? tInv("welcomeNoChildInvites")
+                  : tInv("welcomeNoInvites")}
             </p>
           </div>
         </Section>

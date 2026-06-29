@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/Button";
 import { fieldVariants } from "@/components/ui/field";
 import { cn } from "@/lib/utils";
 import { inviteClubOwnerAction } from "@/app/[locale]/(admin)/admin/actions";
+import { AccountDirectoryInput } from "@/components/account/AccountDirectoryInput";
 
 type State = { ok?: true; error?: string } | null;
 
@@ -22,12 +23,13 @@ export function InviteOwnerForm({ clubId, locale }: { clubId: string; locale: st
       <input type="hidden" name="locale" value={locale} />
       <input type="hidden" name="clubId" value={clubId} />
       <div className="flex gap-2">
-        <input
-          name="email"
-          type="email"
+        <AccountDirectoryInput
+          name="identifier"
+          label={t("owner.identifier")}
           required
           placeholder={t("owner.placeholder")}
-          className={cn(fieldVariants(), "px-3 py-2")}
+          inputClassName={cn(fieldVariants(), "px-3 py-2")}
+          className="min-w-0 flex-1"
         />
         <Button type="submit" loading={pending} className="shrink-0">
           <Mail className="h-4 w-4" />

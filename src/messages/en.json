@@ -433,6 +433,8 @@
     "contingent": "Squad",
     "physical": "Player tracking",
     "playerMe": "My profile",
+    "parentChild": "My child",
+    "parentChildren": "My children",
     "playerTeam": "My teams",
     "playerSchedule": "My schedule",
     "admin": "Admin",
@@ -516,12 +518,31 @@
     "exportCsv": "Export CSV"
   },
   "auth": {
+    "mfa": {
+      "title": "Two-factor authentication",
+      "subtitle": "Enter the code from your authenticator app.",
+      "codeLabel": "6-digit code",
+      "verify": "Verify",
+      "verifying": "Verifying…",
+      "invalidCode": "Invalid or expired code.",
+      "noFactor": "No authentication factor found.",
+      "hint": "The code refreshes every 30 seconds.",
+      "recovery": {
+        "subtitle": "Enter one of your recovery codes.",
+        "label": "Recovery code",
+        "submit": "Submit code",
+        "invalid": "Invalid recovery code.",
+        "use": "Use a recovery code",
+        "back": "Back to authenticator code"
+      },
+      "genericError": "Something went wrong. Try again."
+    },
     "tabLogin": "Log in",
     "tabSignup": "Sign up",
     "loginTitle": "Welcome back",
     "loginSubtitle": "Log in to plan your team's training.",
-    "signupTitle": "Create your trainer account",
-    "signupSubtitle": "Set up your account in 30 seconds.",
+    "signupTitle": "Create your account",
+    "signupSubtitle": "Create your account with email, Google or Apple — and get started.",
     "fullName": "Full name",
     "fullNameHelp": "Shown in the app and on your team pages.",
     "email": "Email",
@@ -580,7 +601,36 @@
     "resetSuccessCta": "Continue",
     "resetInvalidTitle": "Invalid or expired link",
     "resetInvalidBody": "This reset link is no longer valid. Request a new one.",
-    "resetRequestAgain": "Request a new link"
+    "resetRequestAgain": "Request a new link",
+    "continueWithGoogle": "Continue with Google",
+    "continueWithApple": "Continue with Apple",
+    "orSeparator": "or",
+    "firstName": "First name",
+    "firstNamePlaceholder": "Jane",
+    "lastName": "Last name",
+    "lastNamePlaceholder": "Doe",
+    "birthDate": "Date of birth",
+    "phone": "Phone",
+    "phonePlaceholder": "+41 79 123 45 67",
+    "username": "Username",
+    "usernameHelp": "Your unique public handle — others can find and invite you by it.",
+    "usernamePlaceholder": "jane.doe",
+    "usernameTaken": "This username is already taken.",
+    "invalidUsername": "3–30 characters: a–z, 0–9, dot, underscore, hyphen.",
+    "passwordPolicyHint": "At least 12 characters, with upper- and lowercase, a number and a special character.",
+    "weakPassword": "Password too weak: min 12 chars with upper/lowercase, a number and a special character.",
+    "missingFields": "Please fill in all required fields.",
+    "emailExists": "An account already exists for this email.",
+    "accountTypeLabel": "Account type",
+    "accountTypeHelp": "You can adjust this later in your account settings.",
+    "accountTypePrompt": "You're joining Grinta as",
+    "authAsidePitch": "Sessions, assessments, call-ups and fitness tracking — your whole club, in one place.",
+    "accountTypeStaff": "Coach",
+    "accountTypeStaffDesc": "Coach, owner, sporting director, fitness staff — run teams, sessions and assessments.",
+    "accountTypePlayer": "Player",
+    "accountTypePlayerDesc": "Track your stats, assessments and call-ups, and follow your progress.",
+    "accountTypeParent": "Parent",
+    "accountTypeParentDesc": "Follow your child's journey and stay up to date with the club."
   },
   "dashboard": {
     "title": "Dashboard",
@@ -1943,17 +1993,26 @@
       },
       "invite": {
         "title": "Invite a member",
-        "description": "The invitee will see the invitation on their dashboard the next time they sign in with this email.",
+        "description": "Search an existing account by name or @username, or enter an email. Existing accounts see the invitation on their dashboard; unknown emails receive a link to create an account and join the club.",
         "email": "Email",
         "emailPlaceholder": "coach@example.com",
+        "identifier": "@username or email",
+        "identifierPlaceholder": "@elio-margiotta or coach@example.com",
+        "identifierHint": "Type a name to open the account directory, or enter an email.",
         "role": "Role",
         "assignedTeams": "Assigned teams",
         "noTeamsInClub": "No team in this club yet. Create a team first.",
         "savedFor": "Invitation saved for <strong>{email}</strong>. It will appear on their dashboard at the next login.",
         "sending": "Sending…",
         "send": "Send invitation",
+        "directSaved": "Invitation sent to <strong>{target}</strong>. It will appear directly on their dashboard.",
         "emailSent": "Invitation email sent to <strong>{email}</strong>.",
-        "emailFailed": "Invitation created for <strong>{email}</strong>, but the email failed to send. Share the link manually."
+        "emailFailed": "Invitation created for <strong>{email}</strong>, but the email failed to send. Share the link manually.",
+        "linkReady": "Invitation link",
+        "shareLink": "Share link",
+        "copyLink": "Copy link",
+        "copied": "Copied",
+        "whatsappMessage": "Join our club on Grinta — create your account or accept the invitation here:"
       },
       "pendingInvitations": {
         "title": "Pending invitations ({n})",
@@ -2045,7 +2104,10 @@
         "extended": "Extended access (all teams)",
         "team": "Assigned team access",
         "team_readonly": "Read-only on assigned team"
-      }
+      },
+      "confirmIdentity": "You are signed in as <strong>{account}</strong>. Confirm to link this account to the profile above.",
+      "confirmIdentityEmailNote": "This invitation was addressed to a different email — that’s fine, the link works for any signed-in account.",
+      "invitedAsGuardian": "as the <strong>parent/guardian</strong> of <strong>{name}</strong> ({team})"
     }
   },
   "invitations": {
@@ -2053,8 +2115,11 @@
     "welcomeTitle": "Welcome to Grinta",
     "welcomeWithInvites": "You haven't joined a club yet. Accept an invitation below to get started.",
     "welcomeNoInvites": "You haven't joined a club yet. When a coach invites you by email, the invitation will appear here.",
+    "welcomeNoChildInvites": "No child is linked to your account yet. When a coach invites you as a parent, the invitation will appear here.",
     "playerWithTeam": "Player — team: {team}",
     "playerNoTeam": "Player",
+    "childInvitation": "Your child {name} has been invited to join team {team}.",
+    "childFallback": "your child",
     "staffAs": "Staff — {role}",
     "accept": "Accept",
     "decline": "Decline",
@@ -2068,14 +2133,18 @@
       "club_inactive": "This club is currently inactive.",
       "rpc_error": "Couldn't process the invitation. Please try again.",
       "missing_id": "Missing invitation id.",
-      "already_linked_to_other_player": "Your account is already linked to another player profile in this club. Ask the coach to merge the profiles."
+      "already_linked_to_other_player": "Your account is already linked to another player profile in this club. Ask the coach to merge the profiles.",
+      "too_many_guardians": "This player already has the maximum number of linked parents."
     }
   },
   "invitePlayer": {
     "title": "Invite this player",
-    "description": "Send a link the player can use to claim this profile and access their schedule.",
+    "description": "Invite by @username or email. If the account exists, the invitation appears in their portal; otherwise a link lets them create an account and join the club.",
     "emailLabel": "Player email",
     "emailPlaceholder": "player@example.com",
+    "identifierLabel": "@username or email",
+    "identifierPlaceholder": "@marie.dupont or player@example.com",
+    "identifierHint": "Optional — leave empty to share a claim link via WhatsApp.",
     "teamLabel": "Optional team",
     "teamNone": "No team",
     "generate": "Generate invite link",
@@ -2090,6 +2159,7 @@
     "errors": {
       "missing_fields": "Email is required.",
       "invalid_email": "Enter a valid email address.",
+      "username_not_found": "No account matches this username.",
       "player_not_in_club": "This player doesn't belong to the current club.",
       "db_error": "Couldn't create the invitation. Please try again.",
       "rate_limited": "Too many recent invitations for this email. Try again in an hour.",
@@ -2106,7 +2176,34 @@
     "pendingEmailOpened": "Email opened",
     "pendingEmailBounced": "Email bounced",
     "pendingEmailFailed": "Send failed",
-    "pendingEmailPending": "Sending"
+    "pendingEmailPending": "Sending",
+    "emailOptionalHint": "Optional — leave empty to share a claim link via WhatsApp.",
+    "directInviteSaved": "Invitation sent to {target}. It will appear directly on their dashboard.",
+    "shareWhatsApp": "Share on WhatsApp",
+    "whatsappMessage": "Join our club on Grinta — tap the link to link your account:",
+    "claimLinkLabel": "Claim link (no email)",
+    "descriptionGuardian": "Invite a parent to link this child profile to their account. They will see the invitation in their Parent profile.",
+    "targetPlayer": "The player",
+    "targetGuardian": "A parent",
+    "unlink": "Unlink",
+    "unlinkConfirm": "Unlink this account from the player profile?",
+    "status": {
+      "active": "Active",
+      "inactive": "Inactive",
+      "left": "Left",
+      "archived": "Archived"
+    },
+    "lifecycle": {
+      "title": "Status & access",
+      "statusLabel": "Profile status",
+      "guardiansTitle": "Linked parents",
+      "noGuardians": "No parent linked yet.",
+      "guardianUnnamed": "Linked account",
+      "removeGuardian": "Remove",
+      "removeGuardianConfirm": "Remove this parent link?",
+      "confirm_left": "Mark this player as having left the club? Their history is kept.",
+      "confirm_archived": "Archive this profile? It will be hidden from the roster."
+    }
   },
   "libraries": {
     "noDiagram": "No diagram",
@@ -2165,6 +2262,7 @@
     "fallbackName": "Coach",
     "personaCoach": "Coach",
     "personaPlayer": "Player",
+    "personaParent": "Parent",
     "personaSwitchAria": "Switch view",
     "useDarkTheme": "Enable dark mode",
     "useLightTheme": "Enable light mode"
@@ -2189,8 +2287,9 @@
     },
     "owner": {
       "title": "Club owner",
-      "description": "Send (or re-send) an invitation email to the owner. Useful if the club was created without an email, or the first send failed.",
-      "placeholder": "email@owner.ch",
+      "description": "Invite the owner by existing account or email.",
+      "identifier": "@username or email",
+      "placeholder": "@elio-margiotta or email@owner.ch",
       "send": "Send invitation",
       "sending": "Sending…",
       "sent": "Invitation sent."
@@ -2262,8 +2361,8 @@
       "usage": "Usage (tm · pl · staff)",
       "created": "Created",
       "empty": "No clubs yet.",
-      "ownerEmail": "Owner email",
-      "ownerEmailHint": "An invitation will be sent for them to join the club.",
+      "ownerEmail": "Owner",
+      "ownerEmailHint": "Existing account by @username or email. If the account does not exist, a signup link will be sent.",
       "create": "Create club",
       "members": "Members",
       "noMembers": "No members yet.",
@@ -2603,10 +2702,17 @@
     "account": {
       "linkedTitle": "Linked account — receives notifications",
       "notLinkedTitle": "No linked account — not notified"
+    },
+    "status": {
+      "active": "Active",
+      "inactive": "Inactive",
+      "left": "Left",
+      "archived": "Archived"
     }
   },
   "playerMe": {
     "title": "My profile",
+    "parentTitle": "My children",
     "readOnlyHint": "Read-only view — contact staff for changes.",
     "empty": "No player record is linked to your account.",
     "sectionIdentity": "Identity",
@@ -2774,22 +2880,115 @@
     }
   },
   "account": {
+    "security": {
+      "label": "Security",
+      "desc": "Add app-based two-factor authentication (2FA) to protect your account.",
+      "enable": "Enable two-factor authentication",
+      "enabled": "Two-factor authentication enabled",
+      "recovery": {
+        "title": "Recovery codes",
+        "remaining": "{count, plural, one {# code left} other {# codes left}}",
+        "none": "No recovery codes. Generate them so you aren't locked out if you lose your phone.",
+        "generate": "Generate codes",
+        "regenerate": "Regenerate",
+        "warning": "Save these codes now: they won't be shown again. Each code works only once.",
+        "copy": "Copy",
+        "copied": "Copied",
+        "acknowledge": "I saved my codes",
+        "codeLabel": "Code from your authenticator app",
+        "confirm": "Confirm",
+        "cancel": "Cancel",
+        "invalidCode": "Invalid code.",
+        "genericError": "Something went wrong. Try again."
+      },
+      "disable": "Disable",
+      "disableConfirm": "Enter a code from your authenticator app — or a recovery code if you no longer have your phone — to disable 2FA.",
+      "disableConfirmCta": "Disable 2FA",
+      "disableCodePlaceholder": "123456 or XXXXX-XXXXX",
+      "scanHint": "Scan this QR code with your authenticator app (Google Authenticator, Authy…).",
+      "manualHint": "Or enter this key manually:",
+      "codeLabel": "Verification code",
+      "confirm": "Confirm",
+      "cancel": "Cancel",
+      "invalidCode": "Invalid code. Try again.",
+      "genericError": "Something went wrong. Try again."
+    },
+    "password": {
+      "label": "Password",
+      "desc": "Change your password. Your current password (and a 2FA code if enabled) is required.",
+      "cta": "Change password",
+      "current": "Current password",
+      "new": "New password",
+      "confirm": "Confirm new password",
+      "totp": "Authenticator app code",
+      "policyHint": "At least 12 characters, with upper, lower, a digit and a symbol.",
+      "submit": "Update",
+      "submitting": "Updating…",
+      "cancel": "Cancel",
+      "success": "Password updated.",
+      "weakPassword": "Password too weak.",
+      "mismatch": "Passwords don't match.",
+      "wrongPassword": "Current password is incorrect.",
+      "mfaRequired": "2FA verification required.",
+      "invalidCode": "Invalid code.",
+      "genericError": "Something went wrong. Try again."
+    },
+    "changeEmail": {
+      "label": "Email address",
+      "desc": "Current address: {email}. Changing it requires double confirmation (old + new inbox).",
+      "cta": "Change email address",
+      "new": "New email address",
+      "newPlaceholder": "new@example.com",
+      "current": "Current password",
+      "totp": "Authenticator app code",
+      "submit": "Send confirmation",
+      "submitting": "Sending…",
+      "cancel": "Cancel",
+      "sent": "Check both inboxes (old and new) and click both links to confirm the change.",
+      "wrongPassword": "Current password is incorrect.",
+      "mfaRequired": "2FA verification required.",
+      "invalidEmail": "Invalid email address.",
+      "sameEmail": "That's already your current address.",
+      "invalidCode": "Invalid code.",
+      "genericError": "Something went wrong. Try again."
+    },
     "title": "My account",
-    "subtitle": "Choose how you use Grinta.",
+    "subtitle": "Review your information and choose how you use Grinta.",
     "back": "Back",
     "identityLabel": "Signed in as",
+    "profileInfoTitle": "Profile information",
+    "profileInfoHelp": "You can edit this information. The username remains generated automatically.",
+    "firstName": "First name",
+    "lastName": "Last name",
+    "email": "Email",
+    "phone": "Phone",
+    "birthDate": "Date of birth",
     "personaLabel": "Account type",
-    "personaHelp": "Controls which views are available in Grinta. You can switch anytime.",
+    "personaHelp": "Select one or more profiles. Club and team affiliations stay separate.",
     "optionStaffLabel": "Coach",
     "optionStaffDesc": "Plan seasons and sessions for one or more teams.",
     "optionPlayerLabel": "Player",
     "optionPlayerDesc": "View your profile, teams and schedule.",
-    "optionDualLabel": "Both",
-    "optionDualDesc": "Switch between coach and player views from the top bar.",
+    "optionParentLabel": "Parent",
+    "optionParentDesc": "Use the player portal to manage your children’s records.",
     "save": "Save",
     "saving": "Saving…",
     "saved": "Preference saved.",
-    "saveError": "Could not save your preference."
+    "saveError": "Could not save your preference.",
+    "usernameLabel": "Username",
+    "usernameHelp": "Your public handle (3–30 chars: letters, numbers, . _ -). Used for mentions.",
+    "usernameReadonlyHelp": "The username is generated automatically from your first and last name. It cannot be edited directly.",
+    "usernameChangeWarning": "Changing your first or last name may change your public @username. Your clubs, invitations and profiles stay linked to your account.",
+    "identitySaved": "Information saved.",
+    "identityErrors": {
+      "missing_name": "First and last name are required.",
+      "invalid_birth_date": "Invalid date of birth.",
+      "unauthorized": "Session expired. Sign in again.",
+      "db_error": "Could not save your information."
+    },
+    "usernamePlaceholder": "e.g. coach.martin",
+    "usernameTaken": "This username is already taken.",
+    "usernameInvalid": "Invalid username (3–30 chars: a–z, 0–9, . _ -)."
   },
   "evaluation": {
     "header": "Player evaluation",
@@ -3133,5 +3332,13 @@
     "convocationBody": "{opponent} · {date}",
     "convocationBodyNoOpponent": "{date}",
     "viewAll": "Open"
+  },
+  "playerPortal": {
+    "childTag": "(child)",
+    "status": {
+      "inactive": "inactive",
+      "left": "left",
+      "archived": "archived"
+    }
   }
 }

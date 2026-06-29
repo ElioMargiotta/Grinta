@@ -433,6 +433,8 @@
     "contingent": "Rosa",
     "physical": "Monitoraggio giocatori",
     "playerMe": "La mia scheda",
+    "parentChild": "Mio figlio",
+    "parentChildren": "I miei figli",
     "playerTeam": "Le mie squadre",
     "playerSchedule": "Il mio calendario",
     "admin": "Admin",
@@ -516,12 +518,31 @@
     "exportCsv": "Esporta CSV"
   },
   "auth": {
+    "mfa": {
+      "title": "Autenticazione a due fattori",
+      "subtitle": "Inserisci il codice dalla tua app di autenticazione.",
+      "codeLabel": "Codice a 6 cifre",
+      "verify": "Verifica",
+      "verifying": "Verifica in corso…",
+      "invalidCode": "Codice non valido o scaduto.",
+      "noFactor": "Nessun fattore di autenticazione trovato.",
+      "hint": "Il codice si rinnova ogni 30 secondi.",
+      "recovery": {
+        "subtitle": "Inserisci uno dei tuoi codici di recupero.",
+        "label": "Codice di recupero",
+        "submit": "Conferma codice",
+        "invalid": "Codice di recupero non valido.",
+        "use": "Usa un codice di recupero",
+        "back": "Torna al codice dell'app"
+      },
+      "genericError": "Qualcosa è andato storto. Riprova."
+    },
     "tabLogin": "Accedi",
     "tabSignup": "Crea un account",
     "loginTitle": "Bentornato",
     "loginSubtitle": "Accedi per pianificare gli allenamenti della tua squadra.",
     "signupTitle": "Crea un account",
-    "signupSubtitle": "Crea il tuo account in 30 secondi.",
+    "signupSubtitle": "Crea il tuo account con e-mail, Google o Apple — e parti.",
     "fullName": "Nome completo",
     "fullNameHelp": "Mostrato nell'app e nelle pagine della tua squadra.",
     "email": "Email",
@@ -574,7 +595,36 @@
     "resetSuccessCta": "Continua",
     "resetInvalidTitle": "Link non valido o scaduto",
     "resetInvalidBody": "Questo link di reimpostazione non è più valido. Richiedine uno nuovo.",
-    "resetRequestAgain": "Richiedi un nuovo link"
+    "resetRequestAgain": "Richiedi un nuovo link",
+    "continueWithGoogle": "Continua con Google",
+    "continueWithApple": "Continua con Apple",
+    "orSeparator": "o",
+    "firstName": "Nome",
+    "firstNamePlaceholder": "Maria",
+    "lastName": "Cognome",
+    "lastNamePlaceholder": "Rossi",
+    "birthDate": "Data di nascita",
+    "phone": "Telefono",
+    "phonePlaceholder": "+41 79 123 45 67",
+    "username": "Nome utente",
+    "usernameHelp": "Il tuo handle pubblico unico — gli altri ti trovano e ti invitano con questo.",
+    "usernamePlaceholder": "maria.rossi",
+    "usernameTaken": "Questo nome utente è già in uso.",
+    "invalidUsername": "3–30 caratteri: a–z, 0–9, punto, underscore, trattino.",
+    "passwordPolicyHint": "Almeno 12 caratteri, con maiuscole e minuscole, un numero e un carattere speciale.",
+    "weakPassword": "Password troppo debole: min 12 caratteri con maiuscole/minuscole, un numero e un carattere speciale.",
+    "missingFields": "Compila tutti i campi obbligatori.",
+    "emailExists": "Esiste già un account per questa email.",
+    "accountTypeLabel": "Tipo di account",
+    "accountTypeHelp": "Modificabile in seguito nelle impostazioni account.",
+    "accountTypePrompt": "Ti unisci a Grinta come",
+    "authAsidePitch": "Sedute, valutazioni, convocazioni e monitoraggio — tutto il club in un unico posto.",
+    "accountTypeStaff": "Allenatore",
+    "accountTypeStaffDesc": "Allenatore, proprietario, direttore sportivo, preparatore — gestisci squadre, sedute e valutazioni.",
+    "accountTypePlayer": "Giocatore",
+    "accountTypePlayerDesc": "Consulta statistiche, valutazioni e convocazioni e segui i tuoi progressi.",
+    "accountTypeParent": "Genitore",
+    "accountTypeParentDesc": "Segui il percorso di tuo figlio e resta aggiornato sul club."
   },
   "dashboard": {
     "title": "Dashboard",
@@ -1937,17 +1987,26 @@
       },
       "invite": {
         "title": "Invita un membro",
-        "description": "L'invitato vedrà l'invito sul proprio cruscotto al prossimo accesso con questa email.",
+        "description": "Cerca un account esistente per nome o @username, oppure inserisci un'email. Gli account esistenti vedono l'invito nella dashboard; le email sconosciute ricevono un link per creare un account e unirsi al club.",
         "email": "Email",
         "emailPlaceholder": "coach@esempio.com",
+        "identifier": "@username o email",
+        "identifierPlaceholder": "@elio-margiotta o coach@esempio.com",
+        "identifierHint": "Digita un nome per aprire la rubrica account, oppure inserisci un'email.",
         "role": "Ruolo",
         "assignedTeams": "Squadre assegnate",
         "noTeamsInClub": "Nessuna squadra in questo club. Crea prima una squadra.",
         "savedFor": "Invito salvato per <strong>{email}</strong>. Sarà visibile sul suo cruscotto al prossimo accesso.",
         "sending": "Invio…",
         "send": "Invia l'invito",
+        "directSaved": "Invito inviato a <strong>{target}</strong>. Apparirà direttamente nella dashboard.",
         "emailSent": "Email d'invito inviata a <strong>{email}</strong>.",
-        "emailFailed": "Invito creato per <strong>{email}</strong>, ma l'email non è stata inviata. Condividi il link manualmente."
+        "emailFailed": "Invito creato per <strong>{email}</strong>, ma l'email non è stata inviata. Condividi il link manualmente.",
+        "linkReady": "Link d'invito",
+        "shareLink": "Condividi link",
+        "copyLink": "Copia link",
+        "copied": "Copiato",
+        "whatsappMessage": "Unisciti al nostro club su Grinta — crea il tuo account o accetta l'invito qui:"
       },
       "pendingInvitations": {
         "title": "Inviti in sospeso ({n})",
@@ -2039,7 +2098,10 @@
         "extended": "Accesso esteso (tutte le squadre)",
         "team": "Accesso alla squadra assegnata",
         "team_readonly": "Sola lettura sulla squadra assegnata"
-      }
+      },
+      "confirmIdentity": "Hai effettuato l’accesso come <strong>{account}</strong>. Conferma per collegare questo account al profilo qui sopra.",
+      "confirmIdentityEmailNote": "Questo invito era indirizzato a un’altra email — va bene, il link funziona per qualsiasi account connesso.",
+      "invitedAsGuardian": "come <strong>genitore/tutore</strong> di <strong>{name}</strong> ({team})"
     }
   },
   "invitations": {
@@ -2047,8 +2109,11 @@
     "welcomeTitle": "Benvenuto su Grinta",
     "welcomeWithInvites": "Non hai ancora un club. Accetta un invito qui sotto per iniziare.",
     "welcomeNoInvites": "Non hai ancora un club. Quando un allenatore ti invita via email, l'invito apparirà qui.",
+    "welcomeNoChildInvites": "Nessun figlio è ancora collegato al tuo account. Quando un coach ti invita come genitore, l invito apparirà qui.",
     "playerWithTeam": "Giocatore — squadra: {team}",
     "playerNoTeam": "Giocatore",
+    "childInvitation": "Tuo figlio {name} è stato invitato a unirsi alla squadra {team}.",
+    "childFallback": "tuo figlio",
     "staffAs": "Staff — {role}",
     "accept": "Accetta",
     "decline": "Rifiuta",
@@ -2062,14 +2127,18 @@
       "club_inactive": "Questo club è attualmente inattivo.",
       "rpc_error": "Impossibile elaborare l'invito. Riprova.",
       "missing_id": "ID invito mancante.",
-      "already_linked_to_other_player": "Il tuo account è già collegato a un altro profilo giocatore in questo club. Chiedi al coach di unire i profili."
+      "already_linked_to_other_player": "Il tuo account è già collegato a un altro profilo giocatore in questo club. Chiedi al coach di unire i profili.",
+      "too_many_guardians": "Questo giocatore ha già il numero massimo di genitori collegati."
     }
   },
   "invitePlayer": {
     "title": "Invita questo giocatore",
-    "description": "Invia un link che il giocatore potrà usare per reclamare il profilo e accedere al suo calendario.",
+    "description": "Invita tramite @username o email. Se l'account esiste, l'invito appare nel portale; altrimenti un link permette di creare un account e unirsi al club.",
     "emailLabel": "Email del giocatore",
     "emailPlaceholder": "giocatore@example.com",
+    "identifierLabel": "@username o email",
+    "identifierPlaceholder": "@marie.dupont o giocatore@example.com",
+    "identifierHint": "Facoltativo — lascia vuoto per condividere un link da riscattare via WhatsApp.",
     "teamLabel": "Squadra (opzionale)",
     "teamNone": "Nessuna squadra",
     "generate": "Genera link d'invito",
@@ -2084,6 +2153,7 @@
     "errors": {
       "missing_fields": "L'email è obbligatoria.",
       "invalid_email": "Inserisci un indirizzo email valido.",
+      "username_not_found": "Nessun account corrisponde a questo nome utente.",
       "player_not_in_club": "Questo giocatore non appartiene al club corrente.",
       "db_error": "Impossibile creare l'invito. Riprova.",
       "rate_limited": "Troppi inviti recenti per questa email. Riprova tra un'ora.",
@@ -2100,7 +2170,34 @@
     "pendingEmailOpened": "Email aperta",
     "pendingEmailBounced": "Email respinta",
     "pendingEmailFailed": "Invio fallito",
-    "pendingEmailPending": "In invio"
+    "pendingEmailPending": "In invio",
+    "emailOptionalHint": "Facoltativo — lascia vuoto per condividere un link da riscattare via WhatsApp.",
+    "directInviteSaved": "Invito inviato a {target}. Apparirà direttamente nella dashboard.",
+    "shareWhatsApp": "Condividi su WhatsApp",
+    "whatsappMessage": "Unisciti al nostro club su Grinta — tocca il link per collegare il tuo account:",
+    "claimLinkLabel": "Link da riscattare (senza email)",
+    "descriptionGuardian": "Invita un genitore per collegare questa scheda figlio al suo account. Vedrà l invito nel profilo Genitore.",
+    "targetPlayer": "Il giocatore",
+    "targetGuardian": "Un genitore",
+    "unlink": "Scollega",
+    "unlinkConfirm": "Scollegare questo account dalla scheda giocatore?",
+    "status": {
+      "active": "Attivo",
+      "inactive": "Inattivo",
+      "left": "Andato",
+      "archived": "Archiviato"
+    },
+    "lifecycle": {
+      "title": "Stato e accesso",
+      "statusLabel": "Stato della scheda",
+      "guardiansTitle": "Genitori collegati",
+      "noGuardians": "Nessun genitore ancora collegato.",
+      "guardianUnnamed": "Account collegato",
+      "removeGuardian": "Rimuovi",
+      "removeGuardianConfirm": "Rimuovere questo collegamento genitore?",
+      "confirm_left": "Segnare questo giocatore come uscito dal club? La cronologia è conservata.",
+      "confirm_archived": "Archiviare questa scheda? Sarà nascosta dalla rosa."
+    }
   },
   "libraries": {
     "noDiagram": "Nessun diagramma",
@@ -2159,6 +2256,7 @@
     "fallbackName": "Coach",
     "personaCoach": "Allenatore",
     "personaPlayer": "Giocatore",
+    "personaParent": "Genitore",
     "personaSwitchAria": "Cambia vista",
     "useDarkTheme": "Attiva modalità scura",
     "useLightTheme": "Attiva modalità chiara"
@@ -2183,8 +2281,9 @@
     },
     "owner": {
       "title": "Proprietario del club",
-      "description": "Invia (o reinvia) un'email di invito al proprietario. Utile se il club è stato creato senza email, o se il primo invio è fallito.",
-      "placeholder": "email@proprietario.ch",
+      "description": "Invita il proprietario tramite account esistente o email.",
+      "identifier": "@username o email",
+      "placeholder": "@elio-margiotta o email@proprietario.ch",
       "send": "Invia l'invito",
       "sending": "Invio…",
       "sent": "Invito inviato."
@@ -2256,8 +2355,8 @@
       "usage": "Utilizzo (sq · gc · staff)",
       "created": "Creato il",
       "empty": "Nessun club al momento.",
-      "ownerEmail": "Email del proprietario",
-      "ownerEmailHint": "Verrà inviato un invito per unirsi al club.",
+      "ownerEmail": "Proprietario",
+      "ownerEmailHint": "Account esistente tramite @username o email. Se l'account non esiste, verrà inviato un link di registrazione.",
       "create": "Crea club",
       "members": "Membri",
       "noMembers": "Nessun membro al momento.",
@@ -2597,10 +2696,17 @@
     "account": {
       "linkedTitle": "Account collegato — riceve le notifiche",
       "notLinkedTitle": "Nessun account collegato — non notificato"
+    },
+    "status": {
+      "active": "Attivo",
+      "inactive": "Inattivo",
+      "left": "Andato",
+      "archived": "Archiviato"
     }
   },
   "playerMe": {
     "title": "La mia scheda",
+    "parentTitle": "I miei figli",
     "readOnlyHint": "Vista in sola lettura — contatta lo staff per qualsiasi modifica.",
     "empty": "Nessuna scheda giocatore è collegata al tuo account.",
     "sectionIdentity": "Identità",
@@ -2768,22 +2874,115 @@
     }
   },
   "account": {
+    "security": {
+      "label": "Sicurezza",
+      "desc": "Aggiungi l'autenticazione a due fattori (2FA) tramite app per proteggere il tuo account.",
+      "enable": "Attiva l'autenticazione a due fattori",
+      "enabled": "Autenticazione a due fattori attiva",
+      "recovery": {
+        "title": "Codici di recupero",
+        "remaining": "{count, plural, one {# codice rimasto} other {# codici rimasti}}",
+        "none": "Nessun codice di recupero. Generali per non restare bloccato se perdi il telefono.",
+        "generate": "Genera codici",
+        "regenerate": "Rigenera",
+        "warning": "Salva questi codici ora: non verranno più mostrati. Ogni codice funziona una sola volta.",
+        "copy": "Copia",
+        "copied": "Copiato",
+        "acknowledge": "Ho salvato i miei codici",
+        "codeLabel": "Codice dalla tua app di autenticazione",
+        "confirm": "Conferma",
+        "cancel": "Annulla",
+        "invalidCode": "Codice non valido.",
+        "genericError": "Qualcosa è andato storto. Riprova."
+      },
+      "disable": "Disattiva",
+      "disableConfirm": "Inserisci un codice dalla tua app — o un codice di recupero se non hai più il telefono — per disattivare la 2FA.",
+      "disableConfirmCta": "Disattiva la 2FA",
+      "disableCodePlaceholder": "123456 o XXXXX-XXXXX",
+      "scanHint": "Scansiona questo codice QR con la tua app di autenticazione (Google Authenticator, Authy…).",
+      "manualHint": "Oppure inserisci questa chiave manualmente:",
+      "codeLabel": "Codice di verifica",
+      "confirm": "Conferma",
+      "cancel": "Annulla",
+      "invalidCode": "Codice non valido. Riprova.",
+      "genericError": "Qualcosa è andato storto. Riprova."
+    },
+    "password": {
+      "label": "Password",
+      "desc": "Cambia la tua password. Sono richiesti la password attuale (e un codice 2FA se attiva).",
+      "cta": "Cambia password",
+      "current": "Password attuale",
+      "new": "Nuova password",
+      "confirm": "Conferma nuova password",
+      "totp": "Codice dell'app di autenticazione",
+      "policyHint": "Almeno 12 caratteri, con maiuscola, minuscola, una cifra e un simbolo.",
+      "submit": "Aggiorna",
+      "submitting": "Aggiornamento…",
+      "cancel": "Annulla",
+      "success": "Password aggiornata.",
+      "weakPassword": "Password troppo debole.",
+      "mismatch": "Le password non coincidono.",
+      "wrongPassword": "La password attuale non è corretta.",
+      "mfaRequired": "Verifica 2FA richiesta.",
+      "invalidCode": "Codice non valido.",
+      "genericError": "Qualcosa è andato storto. Riprova."
+    },
+    "changeEmail": {
+      "label": "Indirizzo e-mail",
+      "desc": "Indirizzo attuale: {email}. La modifica richiede una doppia conferma (vecchia + nuova casella).",
+      "cta": "Cambia indirizzo e-mail",
+      "new": "Nuovo indirizzo e-mail",
+      "newPlaceholder": "nuovo@esempio.com",
+      "current": "Password attuale",
+      "totp": "Codice dell'app di autenticazione",
+      "submit": "Invia conferma",
+      "submitting": "Invio…",
+      "cancel": "Annulla",
+      "sent": "Controlla entrambe le caselle (vecchia e nuova) e clicca entrambi i link per confermare la modifica.",
+      "wrongPassword": "La password attuale non è corretta.",
+      "mfaRequired": "Verifica 2FA richiesta.",
+      "invalidEmail": "Indirizzo e-mail non valido.",
+      "sameEmail": "È già il tuo indirizzo attuale.",
+      "invalidCode": "Codice non valido.",
+      "genericError": "Qualcosa è andato storto. Riprova."
+    },
     "title": "Il mio account",
-    "subtitle": "Scegli come utilizzi Grinta.",
+    "subtitle": "Controlla le tue informazioni e scegli come utilizzi Grinta.",
     "back": "Indietro",
     "identityLabel": "Connesso come",
+    "profileInfoTitle": "Informazioni del profilo",
+    "profileInfoHelp": "Puoi modificare queste informazioni. Il nome utente resta generato automaticamente.",
+    "firstName": "Nome",
+    "lastName": "Cognome",
+    "email": "Email",
+    "phone": "Telefono",
+    "birthDate": "Data di nascita",
     "personaLabel": "Tipo di account",
-    "personaHelp": "Determina quali viste sono disponibili in Grinta. Puoi cambiare in qualsiasi momento.",
+    "personaHelp": "Seleziona uno o più profili. Le affiliazioni a club e squadre restano separate.",
     "optionStaffLabel": "Allenatore",
     "optionStaffDesc": "Pianifica stagioni e sedute per una o più squadre.",
     "optionPlayerLabel": "Giocatore",
     "optionPlayerDesc": "Consulta la tua scheda, le tue squadre e il tuo calendario.",
-    "optionDualLabel": "Entrambi",
-    "optionDualDesc": "Passa dalla vista allenatore a quella giocatore dalla barra superiore.",
+    "optionParentLabel": "Genitore",
+    "optionParentDesc": "Usa il portale giocatore per gestire le schede dei tuoi figli.",
     "save": "Salva",
     "saving": "Salvataggio…",
     "saved": "Preferenza salvata.",
-    "saveError": "Impossibile salvare la preferenza."
+    "saveError": "Impossibile salvare la preferenza.",
+    "usernameLabel": "Nome utente",
+    "usernameHelp": "Il tuo handle pubblico (3–30 caratteri: lettere, numeri, . _ -). Usato per le menzioni.",
+    "usernameReadonlyHelp": "Il nome utente viene generato automaticamente da nome e cognome. Non può essere modificato direttamente.",
+    "usernameChangeWarning": "Modificare nome o cognome può cambiare il tuo @username pubblico. Club, inviti e profili restano collegati al tuo account.",
+    "identitySaved": "Informazioni salvate.",
+    "identityErrors": {
+      "missing_name": "Nome e cognome sono obbligatori.",
+      "invalid_birth_date": "Data di nascita non valida.",
+      "unauthorized": "Sessione scaduta. Accedi di nuovo.",
+      "db_error": "Impossibile salvare le informazioni."
+    },
+    "usernamePlaceholder": "es. coach.martin",
+    "usernameTaken": "Questo nome utente è già in uso.",
+    "usernameInvalid": "Nome utente non valido (3–30 caratteri: a–z, 0–9, . _ -)."
   },
   "evaluation": {
     "header": "Valutazione giocatore",
@@ -3127,5 +3326,13 @@
     "convocationBody": "{opponent} · {date}",
     "convocationBodyNoOpponent": "{date}",
     "viewAll": "Apri"
+  },
+  "playerPortal": {
+    "childTag": "(figlio)",
+    "status": {
+      "inactive": "inattivo",
+      "left": "andato",
+      "archived": "archiviato"
+    }
   }
 }

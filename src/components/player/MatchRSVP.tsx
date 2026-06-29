@@ -25,11 +25,12 @@ function translateError(t: (key: string) => string, code: string): string {
 
 type Props = {
   matchId: string;
+  playerId: string;
   initialStatus: "available" | "unavailable" | null;
   initialReason: string | null;
 };
 
-export function MatchRSVP({ matchId, initialStatus, initialReason }: Props) {
+export function MatchRSVP({ matchId, playerId, initialStatus, initialReason }: Props) {
   const t = useTranslations("matchRsvp");
   const locale = useLocale();
   const [status, setStatus] = useState(initialStatus);
@@ -43,6 +44,7 @@ export function MatchRSVP({ matchId, initialStatus, initialReason }: Props) {
     startTransition(async () => {
       const result = await respondToMatchAction({
         matchId,
+        playerId,
         status: next,
         reason: justification,
         locale,
