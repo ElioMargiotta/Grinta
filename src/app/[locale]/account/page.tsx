@@ -85,7 +85,7 @@ export default async function AccountPage({
 
   return (
     <div
-      className="flex min-h-screen flex-1 flex-col bg-[var(--club-page-bg)]"
+      className="flex min-h-screen min-h-dvh flex-1 flex-col bg-[var(--club-page-bg-light)] dark:bg-[var(--club-page-bg-dark)]"
       style={clubThemeStyle(membership)}
     >
       <Topbar
@@ -95,7 +95,7 @@ export default async function AccountPage({
         licenseUsage={licenseUsage}
         persona={persona}
       />
-      <main className="flex-1 px-4 py-8 sm:py-12">
+      <main className="flex-1 p-4 pb-24 md:p-5 lg:p-6">
         <div className="mx-auto flex w-full max-w-2xl flex-col gap-6">
           <Link
             href={backHref}
