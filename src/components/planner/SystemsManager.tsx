@@ -57,7 +57,7 @@ export function SystemsManager({
   return (
     <div className="flex flex-col gap-4">
       <div className="flex items-center justify-between gap-2">
-        <p className="text-sm text-zinc-500 dark:text-zinc-400">{t("intro")}</p>
+        <p className="text-sm text-muted-foreground">{t("intro")}</p>
         <Button
           type="button"
           size="sm"
@@ -69,7 +69,7 @@ export function SystemsManager({
       </div>
 
       {systems.length === 0 ? (
-        <p className="rounded-lg border border-dashed border-[var(--club-line)] bg-white/40 p-6 text-center text-sm text-zinc-500 dark:bg-zinc-900/30">
+        <p className="rounded-lg border border-dashed border-border bg-muted/40 p-6 text-center text-sm text-muted-foreground">
           {t("empty")}
         </p>
       ) : (
@@ -77,7 +77,7 @@ export function SystemsManager({
           {systems.map((s) => (
             <li
               key={s.id}
-              className="group flex flex-col gap-3 rounded-lg border border-[var(--club-line)] bg-white/[0.78] p-4 transition hover:border-[var(--club-primary)] dark:bg-zinc-900/40"
+              className="group flex flex-col gap-3 rounded-lg border border-border bg-card/[0.78] p-4 transition hover:border-primary"
             >
               <button
                 type="button"
@@ -85,11 +85,11 @@ export function SystemsManager({
                 className="flex items-start justify-between gap-2 text-left"
               >
                 <div className="min-w-0">
-                  <div className="truncate text-sm font-semibold text-zinc-900 dark:text-zinc-100">
+                  <div className="truncate text-sm font-semibold text-foreground">
                     {s.name}
                   </div>
-                  <div className="mt-1 flex flex-wrap items-center gap-1.5 text-xs text-zinc-500 dark:text-zinc-400">
-                    <span className="rounded bg-[var(--club-primary-soft)] px-1.5 py-0.5 font-medium text-[var(--club-primary)]">
+                  <div className="mt-1 flex flex-wrap items-center gap-1.5 text-xs text-muted-foreground">
+                    <span className="rounded bg-accent px-1.5 py-0.5 font-medium text-primary">
                       {s.formation}
                     </span>
                     <span>{t("playerCount", { count: s.playerCount })}</span>
@@ -97,14 +97,14 @@ export function SystemsManager({
                     <span>{t("phaseCount", { count: s.phaseCount })}</span>
                   </div>
                 </div>
-                <ChevronRight className="h-5 w-5 shrink-0 text-zinc-400 transition group-hover:text-[var(--club-primary)]" />
+                <ChevronRight className="h-5 w-5 shrink-0 text-muted-foreground transition group-hover:text-primary" />
               </button>
-              <div className="flex items-center gap-2 border-t border-[var(--club-line)] pt-2">
+              <div className="flex items-center gap-2 border-t border-border pt-2">
                 <button
                   type="button"
                   onClick={() => duplicate(s.id)}
                   disabled={isPending}
-                  className="inline-flex items-center gap-1 text-xs font-medium text-zinc-500 transition hover:text-zinc-900 disabled:opacity-50 dark:text-zinc-400 dark:hover:text-zinc-100"
+                  className="inline-flex items-center gap-1 text-xs font-medium text-muted-foreground transition hover:text-foreground disabled:opacity-50"
                 >
                   <Copy className="h-3.5 w-3.5" />
                   {t("duplicate")}
@@ -113,7 +113,7 @@ export function SystemsManager({
                   type="button"
                   onClick={() => remove(s.id)}
                   disabled={isPending}
-                  className="inline-flex items-center gap-1 text-xs font-medium text-zinc-500 transition hover:text-red-600 disabled:opacity-50 dark:text-zinc-400"
+                  className="inline-flex items-center gap-1 text-xs font-medium text-muted-foreground transition hover:text-destructive disabled:opacity-50"
                 >
                   <Trash2 className="h-3.5 w-3.5" />
                   {t("delete")}

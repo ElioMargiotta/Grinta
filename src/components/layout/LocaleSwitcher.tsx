@@ -35,7 +35,7 @@ export function LocaleSwitcher({ variant = "ghost" }: { variant?: Variant }) {
     "relative inline-flex items-center gap-1.5 rounded-md px-2 py-1.5 text-[12px] font-medium transition-colors";
   const tone =
     variant === "subtle"
-      ? "text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100"
+      ? "text-muted-foreground hover:text-foreground"
       : "text-[var(--ink-2)] hover:text-[var(--ink)]";
 
   return (

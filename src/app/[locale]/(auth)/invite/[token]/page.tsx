@@ -4,6 +4,7 @@ import { Link } from "@/i18n/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { AcceptInvitationForm } from "@/components/onboarding/AcceptInvitationForm";
 import { AuthShell } from "@/components/auth/AuthShell";
+import { buttonVariants } from "@/components/ui/Button";
 
 type InvitationPreview = {
   id: string;
@@ -111,12 +112,12 @@ export default async function AcceptInvitePage({
       return (
         <div className="flex flex-col gap-6">
           <div>
-            <h1 className="text-xl font-semibold text-zinc-900">
+            <h1 className="text-xl font-semibold text-foreground">
               {t("joinClub", { club: preview.club_name })}
             </h1>
-            <p className="mt-1 text-sm text-zinc-600">{detail}</p>
+            <p className="mt-1 text-sm text-muted-foreground">{detail}</p>
             {preview.email && (
-              <p className="mt-1 text-sm text-zinc-600">
+              <p className="mt-1 text-sm text-muted-foreground">
                 {t.rich("invitationSentTo", {
                   email: preview.email,
                   strong: (chunks) => <strong>{chunks}</strong>,
@@ -124,18 +125,18 @@ export default async function AcceptInvitePage({
               </p>
             )}
           </div>
-          <div className="rounded-md border border-zinc-200 bg-white p-4">
-            <p className="text-sm text-zinc-700">{t("connectOrCreate")}</p>
+          <div className="rounded-md border border-border bg-card p-4">
+            <p className="text-sm text-foreground">{t("connectOrCreate")}</p>
             <div className="mt-3 flex gap-2">
               <Link
                 href={`/login?next=${encodeURIComponent(`/invite/${token}`)}`}
-                className="rounded-md bg-zinc-900 px-3 py-1.5 text-sm font-medium text-white hover:bg-zinc-800"
+                className={buttonVariants({ size: "sm" })}
               >
                 {t("login")}
               </Link>
               <Link
                 href={`/signup?next=${encodeURIComponent(`/invite/${token}`)}`}
-                className="rounded-md border border-zinc-300 bg-white px-3 py-1.5 text-sm font-medium text-zinc-900 hover:bg-zinc-50"
+                className={buttonVariants({ variant: "secondary", size: "sm" })}
               >
                 {t("createAccount")}
               </Link>
@@ -157,13 +158,13 @@ export default async function AcceptInvitePage({
     return (
       <div className="flex flex-col gap-6">
         <div>
-          <h1 className="text-xl font-semibold text-zinc-900">
+          <h1 className="text-xl font-semibold text-foreground">
             {t("joinClub", { club: preview.club_name })}
           </h1>
-          <p className="mt-1 text-sm text-zinc-600">{detail}</p>
+          <p className="mt-1 text-sm text-muted-foreground">{detail}</p>
         </div>
 
-        <div className="rounded-md border border-zinc-200 bg-zinc-50 p-4 text-sm text-zinc-700">
+        <div className="rounded-md border border-border bg-muted p-4 text-sm text-foreground">
           <p>
             {t.rich("confirmIdentity", {
               account: user.email ?? "",

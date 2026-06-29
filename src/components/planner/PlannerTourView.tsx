@@ -102,16 +102,16 @@ export function PlannerTourView({
 
   return (
     <div className="flex flex-col gap-4">
-      <div className="flex flex-wrap items-end justify-between gap-3 rounded-xl border border-zinc-200 bg-white px-4 py-3 shadow-sm dark:border-zinc-800 dark:bg-zinc-900">
+      <div className="flex flex-wrap items-end justify-between gap-3 rounded-xl border border-border bg-card px-4 py-3 shadow-sm">
         <div>
-          <div className="text-[10px] font-semibold uppercase tracking-[0.12em] text-zinc-400 dark:text-zinc-500">
+          <div className="text-[10px] font-semibold uppercase tracking-[0.12em] text-muted-foreground">
             {t("season")}
           </div>
-          <div className="text-base font-semibold text-zinc-900 dark:text-zinc-100">
+          <div className="text-base font-semibold text-foreground">
             {season ?? t("seasonUnset")}
           </div>
         </div>
-        <div className="flex items-center gap-1.5 rounded-lg border border-zinc-200 bg-zinc-50 p-1 dark:border-zinc-800 dark:bg-zinc-950/50">
+        <div className="flex items-center gap-1.5 rounded-lg border border-border bg-muted p-1">
           {macrocycles.map((m) => {
             const isActive = m.id === selectedMacroId;
             return (
@@ -124,8 +124,8 @@ export function PlannerTourView({
                 }}
                 className={`rounded-md px-3 py-1.5 text-xs font-semibold transition-colors ${
                   isActive
-                    ? "bg-zinc-900 text-white shadow-sm dark:bg-zinc-100 dark:text-zinc-900"
-                    : "text-zinc-600 hover:bg-white hover:text-zinc-900 dark:text-zinc-300 dark:hover:bg-zinc-900 dark:hover:text-zinc-100"
+                    ? "bg-primary text-primary-foreground shadow-sm"
+                    : "text-muted-foreground hover:bg-card hover:text-foreground"
                 }`}
               >
                 {m.name}
@@ -140,8 +140,8 @@ export function PlannerTourView({
             }}
             className={`flex items-center gap-1 rounded-md border border-dashed px-3 py-1.5 text-xs font-semibold transition-colors ${
               creatingTour
-                ? "border-zinc-900 text-zinc-900 dark:border-zinc-100 dark:text-zinc-100"
-                : "border-zinc-300 text-zinc-500 hover:border-zinc-400 hover:text-zinc-800 dark:border-zinc-700 dark:text-zinc-400 dark:hover:border-zinc-600 dark:hover:text-zinc-100"
+                ? "border-primary text-primary"
+                : "border-border text-muted-foreground hover:border-input hover:text-foreground"
             }`}
           >
             <span className="text-sm leading-none">+</span>
@@ -151,7 +151,7 @@ export function PlannerTourView({
       </div>
 
       {creatingTour ? (
-        <div className="rounded-xl border border-zinc-200 bg-white p-4 shadow-sm dark:border-zinc-800 dark:bg-zinc-900">
+        <div className="rounded-xl border border-border bg-card p-4 shadow-sm">
           <PlannerSetupWizard teamId={teamId} defaultName={teamName} />
           <div className="mt-3 flex justify-end">
             <Button
@@ -224,13 +224,13 @@ function TourPanel({
   isKnownTheme,
 }: TourPanelProps) {
   return (
-    <div className="overflow-hidden rounded-xl border border-zinc-200 bg-white shadow-sm dark:border-zinc-800 dark:bg-zinc-900">
-      <div className="flex flex-wrap items-center justify-between gap-3 border-b border-zinc-200 bg-zinc-50/70 px-4 py-3 dark:border-zinc-800 dark:bg-zinc-950/40">
+    <div className="overflow-hidden rounded-xl border border-border bg-card shadow-sm">
+      <div className="flex flex-wrap items-center justify-between gap-3 border-b border-border bg-muted/70 px-4 py-3">
         <div>
-          <h3 className="text-sm font-semibold tracking-tight text-zinc-900 dark:text-zinc-100">
+          <h3 className="text-sm font-semibold tracking-tight text-foreground">
             {macro.name}
           </h3>
-          <p className="text-[11px] text-zinc-500 dark:text-zinc-400">
+          <p className="text-[11px] text-muted-foreground">
             {formatDate(macro.preseason_start_date, locale)} →{" "}
             {formatDate(macro.end_date, locale)} · {tTour("firstMatch")}{" "}
             {formatDate(macro.first_match_date, locale)}
@@ -322,11 +322,11 @@ function MesoRow({
   return (
     <div className="flex items-stretch gap-2">
       <div
-        className="flex w-44 shrink-0 flex-col justify-center rounded-lg border-l-4 bg-zinc-50/70 px-3 py-2 dark:bg-zinc-950/40"
+        className="flex w-44 shrink-0 flex-col justify-center rounded-lg border-l-4 bg-muted/70 px-3 py-2"
         style={{ borderLeftColor: meso.color ?? "#94a3b8" }}
       >
         <div className="flex items-center justify-between gap-1">
-          <span className="text-[10px] font-semibold uppercase tracking-wider text-zinc-500 dark:text-zinc-400">
+          <span className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
             {tTour(`mesoKind.${meso.kind}`)}
           </span>
           {canRemove ? (
@@ -335,17 +335,17 @@ function MesoRow({
               onClick={handleRemove}
               disabled={isPending}
               title={tTour("removeCycle")}
-              className="text-zinc-400 hover:text-red-600 disabled:opacity-40 dark:text-zinc-500 dark:hover:text-red-400"
+              className="text-muted-foreground hover:text-destructive disabled:opacity-40"
               aria-label={tTour("removeCycle")}
             >
               ✕
             </button>
           ) : null}
         </div>
-        <span className="text-sm font-semibold text-zinc-900 dark:text-zinc-100">
+        <span className="text-sm font-semibold text-foreground">
           {meso.name}
         </span>
-        <span className="text-[11px] text-zinc-500 dark:text-zinc-400">
+        <span className="text-[11px] text-muted-foreground">
           {tTour("weeksCount", { n: meso.microcycles.length })}
         </span>
       </div>
@@ -356,8 +356,8 @@ function MesoRow({
           const colors = themeKey
             ? THEME_COLORS[themeKey]
             : {
-                bg: "bg-white dark:bg-zinc-900",
-                border: "border-l-zinc-200 dark:border-l-zinc-700",
+                bg: "bg-card",
+                border: "border-l-border",
                 dot: "#cbd5e1",
               };
           const isOpen = openMicroId === micro.id;
@@ -366,35 +366,35 @@ function MesoRow({
               <button
                 type="button"
                 onClick={() => setOpenMicroId(isOpen ? null : micro.id)}
-                className={`flex h-[88px] w-32 flex-col items-start justify-between rounded-lg border border-zinc-200 border-l-4 px-2.5 py-2 text-left transition-shadow hover:shadow-sm dark:border-zinc-700 ${colors.bg} ${colors.border}`}
+                className={`flex h-[88px] w-32 flex-col items-start justify-between rounded-lg border border-border border-l-4 px-2.5 py-2 text-left transition-shadow hover:shadow-sm ${colors.bg} ${colors.border}`}
               >
                 <div className="flex w-full items-baseline justify-between gap-1">
-                  <span className="text-[11px] font-bold tabular-nums text-zinc-900 dark:text-zinc-100">
+                  <span className="text-[11px] font-bold tabular-nums text-foreground">
                     {formatWeekLabel(micro.week_number)}
                   </span>
-                  <span className="text-[10px] tabular-nums text-zinc-400 dark:text-zinc-500">
+                  <span className="text-[10px] tabular-nums text-muted-foreground">
                     {formatDate(micro.start_date, locale)}
                   </span>
                 </div>
-                <div className="line-clamp-2 text-[10px] font-medium leading-tight text-zinc-700 dark:text-zinc-200">
+                <div className="line-clamp-2 text-[10px] font-medium leading-tight text-foreground">
                   {themeKey ? (
                     tTheme(`option.${themeKey}`)
                   ) : micro.theme ? (
                     micro.theme
                   ) : (
-                    <span className="text-zinc-400 dark:text-zinc-500">
+                    <span className="text-muted-foreground">
                       + {tTour("setTheme")}
                     </span>
                   )}
                 </div>
-                <div className="flex w-full items-center justify-between gap-1 text-[10px] text-zinc-500 dark:text-zinc-400">
+                <div className="flex w-full items-center justify-between gap-1 text-[10px] text-muted-foreground">
                   <span className="truncate">
                     {micro.format === "1v1_2v2" || micro.format === "3v3_5v5"
                       ? tTheme(`formatOption.${micro.format}`)
                       : (micro.format ?? "")}
                   </span>
                   {micro.session_count > 0 ? (
-                    <span className="rounded bg-zinc-100 px-1 text-[9px] font-semibold tabular-nums text-zinc-600 dark:bg-zinc-800 dark:text-zinc-300">
+                    <span className="rounded bg-muted px-1 text-[9px] font-semibold tabular-nums text-muted-foreground">
                       {micro.session_count}
                     </span>
                   ) : null}
@@ -444,7 +444,7 @@ function AddCycleRow({
       <button
         type="button"
         onClick={() => setOpen(true)}
-        className="flex w-44 shrink-0 items-center justify-center gap-1.5 rounded-lg border border-dashed border-zinc-300 px-3 py-2.5 text-xs font-semibold text-zinc-500 transition-colors hover:border-zinc-400 hover:bg-zinc-50 hover:text-zinc-800 dark:border-zinc-700 dark:text-zinc-400 dark:hover:border-zinc-600 dark:hover:bg-zinc-900 dark:hover:text-zinc-100"
+        className="flex w-44 shrink-0 items-center justify-center gap-1.5 rounded-lg border border-dashed border-border px-3 py-2.5 text-xs font-semibold text-muted-foreground transition-colors hover:border-input hover:bg-accent hover:text-foreground"
       >
         <span className="text-sm leading-none">+</span>
         {tTour("addCycle")}
@@ -480,12 +480,12 @@ function AddCycleRow({
   };
 
   return (
-    <div className="flex flex-wrap items-end gap-2 rounded-lg border border-zinc-200 bg-zinc-50/40 p-2.5 dark:border-zinc-800 dark:bg-zinc-950/30">
+    <div className="flex flex-wrap items-end gap-2 rounded-lg border border-border bg-muted/40 p-2.5">
       <input
         type="color"
         value={color}
         onChange={(e) => setColor(e.target.value)}
-        className="h-9 w-9 cursor-pointer rounded-md border border-zinc-200 dark:border-zinc-700"
+        className="h-9 w-9 cursor-pointer rounded-md border border-border"
         aria-label={tTour("colorAriaLabel")}
       />
       <Input
@@ -496,13 +496,13 @@ function AddCycleRow({
         className="min-w-[160px]"
       />
       <div className="flex flex-col gap-1.5">
-        <label className="text-sm font-medium text-zinc-900 dark:text-zinc-100">
+        <label className="text-sm font-medium text-foreground">
           {tTour("cycleKind")}
         </label>
         <select
           value={kind}
           onChange={(e) => setKind(e.target.value as typeof kind)}
-          className="h-10 rounded-lg border border-zinc-200 bg-white px-2 text-sm dark:border-zinc-700 dark:bg-zinc-900"
+          className="h-10 rounded-lg border border-border bg-card px-2 text-sm text-foreground focus:border-ring focus:outline-none focus:ring-2 focus:ring-ring/15"
         >
           <option value="preparation">{tTour("mesoKind.preparation")}</option>
           <option value="competition">{tTour("mesoKind.competition")}</option>
@@ -538,7 +538,7 @@ function AddCycleRow({
         </Button>
       </div>
       {error ? (
-        <p className="basis-full text-sm text-red-600 dark:text-red-400">{error}</p>
+        <p className="basis-full text-sm text-destructive">{error}</p>
       ) : null}
     </div>
   );

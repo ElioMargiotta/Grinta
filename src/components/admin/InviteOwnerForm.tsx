@@ -3,6 +3,9 @@
 import { useActionState } from "react";
 import { useTranslations } from "next-intl";
 import { Mail } from "lucide-react";
+import { Button } from "@/components/ui/Button";
+import { fieldVariants } from "@/components/ui/field";
+import { cn } from "@/lib/utils";
 import { inviteClubOwnerAction } from "@/app/[locale]/(admin)/admin/actions";
 import { AccountDirectoryInput } from "@/components/account/AccountDirectoryInput";
 
@@ -25,20 +28,16 @@ export function InviteOwnerForm({ clubId, locale }: { clubId: string; locale: st
           label={t("owner.identifier")}
           required
           placeholder={t("owner.placeholder")}
-          inputClassName="w-full rounded-lg border border-zinc-300 bg-white px-3 py-2 text-sm text-zinc-900 outline-none focus:border-zinc-500 dark:border-zinc-700 dark:bg-zinc-950 dark:text-zinc-100"
+          inputClassName={cn(fieldVariants(), "px-3 py-2")}
           className="min-w-0 flex-1"
         />
-        <button
-          type="submit"
-          disabled={pending}
-          className="inline-flex shrink-0 items-center gap-1.5 rounded-lg bg-zinc-900 px-3.5 py-2 text-sm font-medium text-white transition-colors hover:bg-zinc-700 disabled:opacity-50 dark:bg-zinc-100 dark:text-zinc-900 dark:hover:bg-zinc-300"
-        >
+        <Button type="submit" loading={pending} className="shrink-0">
           <Mail className="h-4 w-4" />
           {pending ? t("owner.sending") : t("owner.send")}
-        </button>
+        </Button>
       </div>
       {state?.error && (
-        <p className="rounded-lg bg-rose-50 px-3 py-2 text-xs text-rose-700 dark:bg-rose-900/20 dark:text-rose-400">
+        <p className="rounded-lg border border-destructive/30 bg-destructive/10 px-3 py-2 text-xs text-destructive">
           {state.error}
         </p>
       )}

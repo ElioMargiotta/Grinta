@@ -157,7 +157,7 @@ export function SystemEditor({
       <button
         type="button"
         onClick={() => router.push(`/systems/${teamId}`)}
-        className="flex w-fit items-center gap-1.5 text-sm font-medium text-zinc-500 transition hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100"
+        className="flex w-fit items-center gap-1.5 text-sm font-medium text-muted-foreground transition hover:text-foreground"
       >
         <ArrowLeft className="h-4 w-4" />
         {t("backToList")}
@@ -203,17 +203,17 @@ export function SystemEditor({
       </div>
 
       {error ? (
-        <span className="text-sm text-red-600 dark:text-red-400">
+        <span className="text-sm text-destructive">
           {t.has(`err.${error}`) ? t(`err.${error}`) : error}
         </span>
       ) : null}
 
       <section className="flex flex-col gap-3">
-        <h2 className="text-base font-semibold text-zinc-900 dark:text-zinc-100">
+        <h2 className="text-base font-semibold text-foreground">
           {t("compoTitle")}
         </h2>
         {roster.length === 0 ? (
-          <p className="rounded-lg border border-dashed border-[var(--club-line)] bg-white/40 p-4 text-sm text-zinc-500 dark:bg-zinc-900/30">
+          <p className="rounded-lg border border-dashed border-border bg-muted/40 p-4 text-sm text-muted-foreground">
             {t("emptyRoster")}
           </p>
         ) : (
@@ -226,16 +226,16 @@ export function SystemEditor({
         )}
       </section>
 
-      <section className="flex flex-col gap-2 border-t border-[var(--club-line)] pt-5">
-        <h2 className="text-base font-semibold text-zinc-900 dark:text-zinc-100">
+      <section className="flex flex-col gap-2 border-t border-border pt-5">
+        <h2 className="text-base font-semibold text-foreground">
           {t("tacticsTitle")}
         </h2>
         <MatchTactics value={tactics} onChange={setTactics} />
       </section>
 
-      <section className="flex flex-col gap-3 border-t border-[var(--club-line)] pt-5">
+      <section className="flex flex-col gap-3 border-t border-border pt-5">
         <div className="flex items-center justify-between gap-2">
-          <h2 className="text-base font-semibold text-zinc-900 dark:text-zinc-100">
+          <h2 className="text-base font-semibold text-foreground">
             {t("phasesTitle")}
           </h2>
           <Button type="button" variant="secondary" size="sm" onClick={addPhase}>
@@ -244,7 +244,7 @@ export function SystemEditor({
           </Button>
         </div>
         {phases.length === 0 ? (
-          <p className="rounded-lg border border-dashed border-[var(--club-line)] bg-white/40 p-4 text-sm text-zinc-500 dark:bg-zinc-900/30">
+          <p className="rounded-lg border border-dashed border-border bg-muted/40 p-4 text-sm text-muted-foreground">
             {t("phasesEmpty")}
           </p>
         ) : (
@@ -252,7 +252,7 @@ export function SystemEditor({
             {phases.map((ph) => (
               <div
                 key={ph.id}
-                className="flex flex-col gap-3 rounded-lg border border-[var(--club-line)] p-3"
+                className="flex flex-col gap-3 rounded-lg border border-border p-3"
               >
                 <div className="flex flex-wrap items-center gap-2">
                   <select
@@ -260,7 +260,7 @@ export function SystemEditor({
                     onChange={(e) =>
                       patchPhase(ph.id, { kind: e.target.value as PhaseKind })
                     }
-                    className="rounded-md border border-zinc-200 bg-white px-2 py-1 text-sm text-zinc-900 focus:border-zinc-400 focus:outline-none dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100"
+                    className="rounded-lg border border-border bg-card px-2 py-1 text-sm text-foreground focus:border-ring focus:outline-none focus:ring-2 focus:ring-ring/15"
                   >
                     {PHASE_KINDS.map((k) => (
                       <option key={k} value={k}>
@@ -272,12 +272,12 @@ export function SystemEditor({
                     value={ph.name}
                     onChange={(e) => patchPhase(ph.id, { name: e.target.value })}
                     placeholder={t("phaseNamePlaceholder")}
-                    className="min-w-0 flex-1 rounded-md border border-zinc-200 bg-white px-2 py-1 text-sm text-zinc-900 focus:border-zinc-400 focus:outline-none dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100"
+                    className="min-w-0 flex-1 rounded-lg border border-border bg-card px-2 py-1 text-sm text-foreground focus:border-ring focus:outline-none focus:ring-2 focus:ring-ring/15"
                   />
                   <button
                     type="button"
                     onClick={() => removePhase(ph.id)}
-                    className="text-zinc-400 transition hover:text-red-500"
+                    className="text-muted-foreground transition hover:text-destructive"
                     aria-label={t("removePhase")}
                   >
                     <Trash2 className="h-4 w-4" />

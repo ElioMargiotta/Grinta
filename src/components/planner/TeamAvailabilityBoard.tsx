@@ -80,7 +80,7 @@ function Cell({ state }: { state: CellState }) {
       );
     default:
       return (
-        <span className={`${base} text-zinc-300 dark:text-zinc-600`}>
+        <span className={`${base} text-muted-foreground`}>
           <Minus className="h-3.5 w-3.5" />
         </span>
       );
@@ -113,7 +113,7 @@ export async function TeamAvailabilityBoard({
 
   if (sessions.length === 0 || players.length === 0) {
     return (
-      <div className="rounded-md border border-dashed border-[var(--club-line)] p-10 text-center text-sm text-zinc-500 dark:text-zinc-400">
+      <div className="rounded-md border border-dashed border-border p-10 text-center text-sm text-muted-foreground">
         {t("empty")}
       </div>
     );
@@ -121,11 +121,11 @@ export async function TeamAvailabilityBoard({
 
   return (
     <div className="flex flex-col gap-3">
-      <div className="overflow-x-auto rounded-xl border border-zinc-200 dark:border-zinc-800">
+      <div className="overflow-x-auto rounded-xl border border-border">
         <table className="w-full border-collapse text-sm">
           <thead>
-            <tr className="border-b border-zinc-200 bg-zinc-50 text-left dark:border-zinc-800 dark:bg-zinc-900">
-              <th className="sticky left-0 z-10 bg-zinc-50 px-3 py-2 text-[11px] font-medium uppercase tracking-wide text-zinc-500 dark:bg-zinc-900">
+            <tr className="border-b border-border bg-muted text-left">
+              <th className="sticky left-0 z-10 bg-muted px-3 py-2 text-[11px] font-medium uppercase tracking-wide text-muted-foreground">
                 {t("player")}
               </th>
               {sessions.map((s) => (
@@ -136,34 +136,34 @@ export async function TeamAvailabilityBoard({
                         ? `/planner/${teamId}/sessions/${s.id}/test`
                         : `/planner/${teamId}/sessions/${s.id}/attendance`
                     }
-                    className="flex flex-col items-center gap-0.5 text-[11px] font-mono font-medium text-zinc-500 hover:text-[var(--club-primary)]"
+                    className="flex flex-col items-center gap-0.5 text-[11px] font-mono font-medium text-muted-foreground hover:text-primary"
                   >
                     <span>{formatDay(s.date)}</span>
                     <span
                       className={`h-1.5 w-1.5 rounded-full ${
                         s.kind === "physical_eval"
-                          ? "bg-[var(--club-primary)]"
-                          : "bg-zinc-300 dark:bg-zinc-600"
+                          ? "bg-primary"
+                          : "bg-muted-foreground"
                       }`}
                     />
                   </Link>
                 </th>
               ))}
-              <th className="px-3 py-2 text-right text-[11px] font-medium uppercase tracking-wide text-zinc-500">
+              <th className="px-3 py-2 text-right text-[11px] font-medium uppercase tracking-wide text-muted-foreground">
                 {t("presence")}
               </th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-zinc-200 dark:divide-zinc-800">
+          <tbody className="divide-y divide-border">
             {players.map((p) => (
-              <tr key={p.playerId} className="bg-white dark:bg-zinc-950">
-                <td className="sticky left-0 z-10 bg-white px-3 py-2 dark:bg-zinc-950">
+              <tr key={p.playerId} className="bg-card">
+                <td className="sticky left-0 z-10 bg-card px-3 py-2">
                   <Link
                     href={`/contingent/${p.playerId}`}
-                    className="flex items-center gap-2 font-medium text-zinc-900 hover:text-[var(--club-primary)] dark:text-zinc-100"
+                    className="flex items-center gap-2 font-medium text-foreground hover:text-primary"
                   >
                     {p.jerseyNumber !== null ? (
-                      <span className="flex h-6 w-6 items-center justify-center rounded-full bg-[var(--club-primary-soft)] text-[11px] font-semibold text-[var(--club-primary)]">
+                      <span className="flex h-6 w-6 items-center justify-center rounded-full bg-accent text-[11px] font-semibold text-primary">
                         {p.jerseyNumber}
                       </span>
                     ) : null}
@@ -175,7 +175,7 @@ export async function TeamAvailabilityBoard({
                     <Cell state={cellFor(p.playerId, s, attendanceMap, unavailByPlayer)} />
                   </td>
                 ))}
-                <td className="px-3 py-1.5 text-right font-mono text-[12px] tabular-nums text-zinc-600 dark:text-zinc-300">
+                <td className="px-3 py-1.5 text-right font-mono text-[12px] tabular-nums text-muted-foreground">
                   {p.presenceRate === null ? "—" : `${Math.round(p.presenceRate * 100)}%`}
                 </td>
               </tr>
@@ -185,7 +185,7 @@ export async function TeamAvailabilityBoard({
       </div>
 
       {/* Légende */}
-      <div className="flex flex-wrap items-center gap-3 text-[11px] text-zinc-500 dark:text-zinc-400">
+      <div className="flex flex-wrap items-center gap-3 text-[11px] text-muted-foreground">
         <span className="flex items-center gap-1"><Cell state="present" /> {t("legend.present")}</span>
         <span className="flex items-center gap-1"><Cell state="absent" /> {t("legend.absent")}</span>
         <span className="flex items-center gap-1"><Cell state="announced_present" /> {t("legend.announced")}</span>

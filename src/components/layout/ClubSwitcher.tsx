@@ -52,10 +52,10 @@ export function ClubSwitcher({
 
   if (memberships.length <= 1) {
     return (
-      <div className="flex max-w-52 items-center gap-1.5 rounded-md border border-[var(--club-line)] bg-white px-2 py-1.5 text-xs text-zinc-900 lg:max-w-64 lg:gap-2 lg:px-3 lg:text-sm dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-100">
+      <div className="flex max-w-52 items-center gap-1.5 rounded-lg border border-border bg-card px-2 py-1.5 text-xs text-foreground lg:max-w-64 lg:gap-2 lg:px-3 lg:text-sm">
         <ClubMark membership={current} />
         <span className="truncate font-medium">{current.club_name}</span>
-        <span className="hidden shrink-0 text-xs text-zinc-500 xl:inline">· {current.role_name}</span>
+        <span className="hidden shrink-0 text-xs text-muted-foreground xl:inline">· {current.role_name}</span>
       </div>
     );
   }
@@ -66,17 +66,17 @@ export function ClubSwitcher({
         type="button"
         disabled={isPending}
         onClick={() => setOpen((v) => !v)}
-        className="flex max-w-52 items-center gap-1.5 rounded-md border border-[var(--club-line)] bg-white px-2 py-1.5 text-xs text-zinc-900 hover:bg-[var(--club-primary-soft)] lg:max-w-64 lg:gap-2 lg:px-3 lg:text-sm dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-100 dark:hover:bg-zinc-800"
+        className="flex max-w-52 items-center gap-1.5 rounded-lg border border-border bg-card px-2 py-1.5 text-xs text-foreground hover:bg-accent lg:max-w-64 lg:gap-2 lg:px-3 lg:text-sm"
       >
         <ClubMark membership={current} />
         <span className="truncate font-medium">{current.club_name}</span>
-        <span className="hidden shrink-0 text-xs text-zinc-500 xl:inline">· {current.role_name}</span>
-        <ChevronDown className="h-4 w-4 text-zinc-400" />
+        <span className="hidden shrink-0 text-xs text-muted-foreground xl:inline">· {current.role_name}</span>
+        <ChevronDown className="h-4 w-4 text-muted-foreground" />
       </button>
 
       {open && (
         <div
-          className="absolute left-0 z-40 mt-1 w-72 overflow-hidden rounded-md border border-[var(--club-line)] bg-white shadow-lg dark:border-zinc-800 dark:bg-zinc-900"
+          className="absolute left-0 z-40 mt-1 w-72 overflow-hidden rounded-lg border border-border bg-card shadow-lg"
           onMouseLeave={() => setOpen(false)}
         >
           <ul className="max-h-80 overflow-y-auto py-1">
@@ -87,15 +87,15 @@ export function ClubSwitcher({
                   <button
                     type="button"
                     onClick={() => handleSelect(m.club_id)}
-                    className="flex w-full items-center justify-between gap-3 px-3 py-2 text-left text-sm hover:bg-[var(--club-primary-soft)] dark:hover:bg-zinc-800"
+                    className="flex w-full items-center justify-between gap-3 px-3 py-2 text-left text-sm hover:bg-accent"
                   >
                     <div className="flex min-w-0 items-center gap-2">
                       <ClubMark membership={m} />
                       <div className="flex min-w-0 flex-col">
-                        <span className="truncate font-medium text-zinc-900 dark:text-zinc-100">
+                        <span className="truncate font-medium text-foreground">
                           {m.club_name}
                         </span>
-                        <span className="truncate text-xs text-zinc-500">
+                        <span className="truncate text-xs text-muted-foreground">
                           {m.role_name}
                         </span>
                       </div>

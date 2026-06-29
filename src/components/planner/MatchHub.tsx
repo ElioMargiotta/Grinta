@@ -333,7 +333,7 @@ export function MatchHub({
       ? "bg-emerald-100 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-300"
       : outcome === "loss"
         ? "bg-red-100 text-red-700 dark:bg-red-950/40 dark:text-red-300"
-        : "bg-zinc-100 text-zinc-600 dark:bg-zinc-800 dark:text-zinc-300";
+        : "bg-muted text-muted-foreground";
 
   // Données pour la feuille imprimable.
   const byId = new Map(roster.map((p) => [p.playerId, p]));
@@ -387,20 +387,20 @@ export function MatchHub({
       <button
         type="button"
         onClick={() => router.push(`/planner/${teamId}`)}
-        className="prep-no-print flex w-fit items-center gap-1.5 text-sm font-medium text-zinc-500 transition hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100"
+        className="prep-no-print flex w-fit items-center gap-1.5 text-sm font-medium text-muted-foreground transition hover:text-foreground"
       >
         <CalendarDays className="h-4 w-4" />
         {t("backToPlanning")}
       </button>
 
       {/* En-tête match */}
-      <header className="prep-no-print flex flex-col gap-3 border-b border-[var(--club-line)] pb-5">
+      <header className="prep-no-print flex flex-col gap-3 border-b border-border pb-5">
         <div className="flex flex-wrap items-center gap-2">
-          <span className="rounded bg-[var(--club-primary-soft)] px-2 py-0.5 text-xs font-medium text-[var(--club-primary)]">
+          <span className="rounded bg-accent px-2 py-0.5 text-xs font-medium text-primary">
             {tCal(`kindOption.${kind}`)}
           </span>
           {match.home_away ? (
-            <span className="rounded bg-zinc-100 px-2 py-0.5 text-xs font-medium uppercase text-zinc-500 dark:bg-zinc-800">
+            <span className="rounded bg-muted px-2 py-0.5 text-xs font-medium uppercase text-muted-foreground">
               {tCal(match.home_away)}
             </span>
           ) : (
@@ -411,17 +411,17 @@ export function MatchHub({
           <span
             className={`rounded px-2 py-0.5 text-xs font-medium ${
               isPast
-                ? "bg-zinc-100 text-zinc-500 dark:bg-zinc-800 dark:text-zinc-400"
+                ? "bg-muted text-muted-foreground"
                 : "bg-amber-100 text-amber-700 dark:bg-amber-950/40 dark:text-amber-300"
             }`}
           >
             {isPast ? t("statusPlayed") : t("statusUpcoming")}
           </span>
         </div>
-        <h1 className="text-2xl font-semibold tracking-tight text-zinc-900 dark:text-zinc-100">
+        <h1 className="text-2xl font-semibold tracking-tight text-foreground">
           {title}
         </h1>
-        <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-zinc-500 dark:text-zinc-400">
+        <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-muted-foreground">
           <span className="capitalize">
             {dateStr} · {timeStr}
           </span>
@@ -472,7 +472,7 @@ export function MatchHub({
       </header>
 
       {/* Onglets */}
-      <div className="prep-no-print flex gap-1 border-b border-[var(--club-line)]">
+      <div className="prep-no-print flex gap-1 border-b border-border">
         {(["prematch", "result"] as Tab[]).map((tabKey) => (
           <button
             key={tabKey}
@@ -480,8 +480,8 @@ export function MatchHub({
             onClick={() => selectTab(tabKey)}
             className={`-mb-px border-b-2 px-3 py-2 text-sm font-medium transition ${
               tab === tabKey
-                ? "border-[var(--club-primary)] text-[var(--club-primary)]"
-                : "border-transparent text-zinc-500 hover:text-zinc-800 dark:text-zinc-400 dark:hover:text-zinc-200"
+                ? "border-primary text-primary"
+                : "border-transparent text-muted-foreground hover:text-foreground"
             }`}
           >
             {t(`tab.${tabKey}`)}
@@ -493,8 +493,8 @@ export function MatchHub({
         <div className="prep-no-print flex flex-col gap-8">
           <section className="flex flex-col gap-4">
             <div className="flex flex-wrap items-center justify-between gap-2">
-              <div className="flex items-center gap-2 text-base font-semibold text-zinc-900 dark:text-zinc-100">
-                <ClipboardList className="h-4 w-4 text-[var(--club-primary)]" />
+              <div className="flex items-center gap-2 text-base font-semibold text-foreground">
+                <ClipboardList className="h-4 w-4 text-primary" />
                 {t("prematch.lineupTitle")}
               </div>
               <div className="flex items-center gap-2">
@@ -505,7 +505,7 @@ export function MatchHub({
                       if (e.target.value) importSystem(e.target.value);
                       e.target.value = "";
                     }}
-                    className="rounded-md border border-zinc-200 bg-white px-2 py-1.5 text-sm text-zinc-700 focus:border-zinc-400 focus:outline-none dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-300"
+                    className="rounded-lg border border-border bg-card px-2 py-1.5 text-sm text-foreground focus:border-ring focus:outline-none focus:ring-2 focus:ring-ring/15"
                   >
                     <option value="" disabled>
                       {t("prematch.importSystem")}
@@ -539,7 +539,7 @@ export function MatchHub({
             </div>
 
             {roster.length === 0 ? (
-              <p className="rounded-lg border border-dashed border-[var(--club-line)] bg-white/40 p-4 text-sm text-zinc-500 dark:bg-zinc-900/30">
+              <p className="rounded-lg border border-dashed border-border bg-muted/40 p-4 text-sm text-muted-foreground">
                 {t("prematch.emptyRoster")}
               </p>
             ) : (
@@ -560,17 +560,17 @@ export function MatchHub({
 
           {roster.length > 0 ? (
             <div className="flex flex-col gap-4">
-              <div className="flex flex-col gap-3 rounded-lg border border-[var(--club-line)] bg-white/60 p-4 dark:bg-zinc-900/40 sm:flex-row sm:items-center sm:justify-between">
+              <div className="flex flex-col gap-3 rounded-lg border border-border bg-card/60 p-4 sm:flex-row sm:items-center sm:justify-between">
                 <div className="flex items-start gap-2.5">
                   <Send
                     className={`mt-0.5 h-4 w-4 shrink-0 ${
                       convocationSentAt
                         ? "text-emerald-600 dark:text-emerald-400"
-                        : "text-zinc-400"
+                        : "text-muted-foreground"
                     }`}
                   />
                   <div className="flex flex-col">
-                    <span className="text-sm font-semibold text-zinc-900 dark:text-zinc-100">
+                    <span className="text-sm font-semibold text-foreground">
                       {convocationSentAt
                         ? t("prematch.convocation.statusSent", {
                             date: new Date(convocationSentAt).toLocaleString(
@@ -585,7 +585,7 @@ export function MatchHub({
                           })
                         : t("prematch.convocation.statusNotSent")}
                     </span>
-                    <span className="text-xs text-zinc-500 dark:text-zinc-400">
+                    <span className="text-xs text-muted-foreground">
                       {convocationSentAt
                         ? t("prematch.convocation.hintSent")
                         : t("prematch.convocation.hintNotSent")}
@@ -633,8 +633,8 @@ export function MatchHub({
             </div>
           ) : null}
 
-          <section className="flex flex-col gap-2 border-t border-[var(--club-line)] pt-5">
-            <div className="text-base font-semibold text-zinc-900 dark:text-zinc-100">
+          <section className="flex flex-col gap-2 border-t border-border pt-5">
+            <div className="text-base font-semibold text-foreground">
               {t("prematch.tacticsTitle")}
             </div>
             <MatchTactics value={tactics} onChange={setTactics} />
@@ -659,14 +659,14 @@ export function MatchHub({
         <div className="prep-no-print flex flex-col gap-6">
           {/* Résultat / score */}
           <section className="flex flex-col gap-4">
-            <div className="flex items-center gap-2 text-base font-semibold text-zinc-900 dark:text-zinc-100">
-              <Trophy className="h-4 w-4 text-[var(--club-primary)]" />
+            <div className="flex items-center gap-2 text-base font-semibold text-foreground">
+              <Trophy className="h-4 w-4 text-primary" />
               {t("resultTitle")}
             </div>
 
             {outcome ? (
               <div className="flex items-center gap-3">
-                <span className="text-3xl font-bold tabular-nums tracking-tight text-zinc-900 dark:text-zinc-100">
+                <span className="text-3xl font-bold tabular-nums tracking-tight text-foreground">
                   {match.home_score} – {match.away_score}
                 </span>
                 <span
@@ -700,7 +700,7 @@ export function MatchHub({
             <div className="max-w-2xl">
               <label
                 htmlFor="result-note"
-                className="mb-1 block text-sm font-medium text-zinc-700 dark:text-zinc-300"
+                className="mb-1 block text-sm font-medium text-foreground"
               >
                 {t("resultNote")}
               </label>
@@ -710,7 +710,7 @@ export function MatchHub({
                 onChange={(e) => setNote(e.target.value)}
                 rows={3}
                 placeholder={t("resultNotePlaceholder")}
-                className="w-full rounded-lg border border-zinc-200 bg-white px-3 py-2 text-sm text-zinc-900 shadow-sm focus:border-zinc-400 focus:outline-none dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100"
+                className="w-full rounded-lg border border-border bg-card px-3 py-2 text-sm text-foreground shadow-sm focus:border-ring focus:outline-none focus:ring-2 focus:ring-ring/15"
               />
             </div>
             <div className="flex items-center gap-3">
@@ -723,7 +723,7 @@ export function MatchHub({
                 </span>
               ) : null}
               {error ? (
-                <span className="text-sm text-red-600 dark:text-red-400">{error}</span>
+                <span className="text-sm text-destructive">{error}</span>
               ) : null}
             </div>
           </section>
@@ -786,17 +786,17 @@ function WeekSessionsSection({
   router: ReturnType<typeof useRouter>;
 }) {
   return (
-    <section className="flex flex-col gap-3 border-t border-[var(--club-line)] pt-5">
-      <div className="flex items-center gap-2 text-base font-semibold text-zinc-900 dark:text-zinc-100">
-        <ClipboardList className="h-4 w-4 text-[var(--club-primary)]" />
+    <section className="flex flex-col gap-3 border-t border-border pt-5">
+      <div className="flex items-center gap-2 text-base font-semibold text-foreground">
+        <ClipboardList className="h-4 w-4 text-primary" />
         {t("weekTitle")}
       </div>
       {weekSessions.length === 0 ? (
-        <p className="rounded-lg border border-dashed border-[var(--club-line)] bg-white/40 p-4 text-sm text-zinc-500 dark:bg-zinc-900/30">
+        <p className="rounded-lg border border-dashed border-border bg-muted/40 p-4 text-sm text-muted-foreground">
           {t("weekEmpty")}
         </p>
       ) : (
-        <ul className="flex flex-col divide-y divide-[var(--club-line)] overflow-hidden rounded-lg border border-[var(--club-line)]">
+        <ul className="flex flex-col divide-y divide-border overflow-hidden rounded-lg border border-border">
           {weekSessions.map((s) => (
             <li key={s.id}>
               <button
@@ -804,19 +804,19 @@ function WeekSessionsSection({
                 onClick={() =>
                   router.push(`/planner/${teamId}/sessions/${s.id}/preparation`)
                 }
-                className="flex w-full items-center justify-between gap-3 px-4 py-3 text-left transition hover:bg-zinc-50 dark:hover:bg-zinc-800/40"
+                className="flex w-full items-center justify-between gap-3 px-4 py-3 text-left transition hover:bg-accent"
               >
                 <span className="flex min-w-0 items-center gap-3">
                   {s.mdOffset !== null ? (
-                    <span className="shrink-0 rounded bg-zinc-900 px-1.5 py-0.5 text-[10px] font-semibold text-white dark:bg-zinc-100 dark:text-zinc-900">
+                    <span className="shrink-0 rounded bg-foreground px-1.5 py-0.5 text-[10px] font-semibold text-background">
                       {formatMdOffset(s.mdOffset)}
                     </span>
                   ) : null}
-                  <span className="truncate text-sm text-zinc-900 dark:text-zinc-100">
+                  <span className="truncate text-sm text-foreground">
                     {s.theme || t("sessionFallback")}
                   </span>
                 </span>
-                <span className="shrink-0 text-xs tabular-nums text-zinc-500 dark:text-zinc-400">
+                <span className="shrink-0 text-xs tabular-nums text-muted-foreground">
                   {new Date(`${s.date}T00:00:00`).toLocaleDateString(locale, {
                     weekday: "short",
                     day: "2-digit",

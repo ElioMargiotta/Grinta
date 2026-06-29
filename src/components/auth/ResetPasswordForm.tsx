@@ -2,7 +2,7 @@
 
 import { useEffect, useState, useTransition } from "react";
 import { CheckCircle2 } from "lucide-react";
-import { useTranslations, useLocale } from "next-intl";
+import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/Button";
 import { AuthField } from "@/components/auth/AuthField";
 import { PasswordInput } from "@/components/auth/PasswordInput";
@@ -13,7 +13,6 @@ const REDIRECT_SECONDS = 4;
 
 export function ResetPasswordForm() {
   const t = useTranslations("auth");
-  const locale = useLocale();
   const router = useRouter();
   const [error, setError] = useState<string | null>(null);
   const [done, setDone] = useState(false);
@@ -32,19 +31,15 @@ export function ResetPasswordForm() {
           <CheckCircle2 className="h-8 w-8 text-emerald-600" />
         </span>
         <div>
-          <h1 className="text-xl font-semibold text-zinc-900">
+          <h1 className="text-xl font-semibold text-foreground">
             {t("resetSuccessTitle")}
           </h1>
-          <p className="mt-2 text-sm text-zinc-600">{t("resetSuccessBody")}</p>
+          <p className="mt-2 text-sm text-muted-foreground">{t("resetSuccessBody")}</p>
         </div>
-        <p className="text-sm text-zinc-500">{t("resetSuccessRedirect")}</p>
-        <button
-          type="button"
-          onClick={() => router.replace("/login")}
-          className="inline-flex items-center justify-center rounded-lg bg-zinc-900 px-5 py-2.5 text-sm font-medium text-white transition-colors hover:bg-zinc-800"
-        >
+        <p className="text-sm text-muted-foreground">{t("resetSuccessRedirect")}</p>
+        <Button type="button" onClick={() => router.replace("/login")}>
           {t("resetSuccessCta")}
-        </button>
+        </Button>
       </div>
     );
   }
@@ -52,8 +47,8 @@ export function ResetPasswordForm() {
   return (
     <div className="flex flex-col gap-6">
       <div>
-        <h1 className="text-xl font-semibold text-zinc-900">{t("resetTitle")}</h1>
-        <p className="mt-1 text-sm text-zinc-600">{t("resetSubtitle")}</p>
+        <h1 className="text-xl font-semibold text-foreground">{t("resetTitle")}</h1>
+        <p className="mt-1 text-sm text-muted-foreground">{t("resetSubtitle")}</p>
       </div>
 
       <form
@@ -110,7 +105,7 @@ export function ResetPasswordForm() {
         </AuthField>
 
         {error && (
-          <div className="rounded-md border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700">
+          <div className="rounded-md border border-destructive/30 bg-destructive/10 px-3 py-2 text-sm text-destructive">
             {error}
           </div>
         )}

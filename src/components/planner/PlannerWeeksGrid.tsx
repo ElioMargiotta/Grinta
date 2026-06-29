@@ -619,9 +619,9 @@ export function PlannerWeeksGrid({
       return (
         <div
           key={ymd(weekStart)}
-          className="col-span-full flex items-center gap-3 border-b border-dashed border-zinc-300 px-4 py-2 text-[11px] text-zinc-400 dark:border-zinc-700 dark:text-zinc-500"
+          className="col-span-full flex items-center gap-3 border-b border-dashed border-border px-4 py-2 text-[11px] text-muted-foreground"
         >
-          <span className="h-px flex-1 border-t border-dashed border-zinc-200 dark:border-zinc-800" />
+          <span className="h-px flex-1 border-t border-dashed border-border" />
           <span className="tabular-nums">
             {weekStart.toLocaleDateString(locale, {
               month: "short",
@@ -633,7 +633,7 @@ export function PlannerWeeksGrid({
               day: "numeric",
             })}
           </span>
-          <span className="h-px flex-1 border-t border-dashed border-zinc-200 dark:border-zinc-800" />
+          <span className="h-px flex-1 border-t border-dashed border-border" />
         </div>
       );
     }
@@ -679,23 +679,23 @@ export function PlannerWeeksGrid({
     return (
       <div key={ymd(weekStart)} className="contents">
         <div
-          className={`flex flex-col justify-between gap-2 border-b border-r border-l-[5px] border-zinc-200 px-3.5 py-3 dark:border-zinc-800 ${themeColors?.bg ?? "bg-zinc-50/70 dark:bg-zinc-950/50"} ${pastWeekClass}`}
+          className={`flex flex-col justify-between gap-2 border-b border-r border-l-[5px] border-border px-3.5 py-3 ${themeColors?.bg ?? "bg-muted/70"} ${pastWeekClass}`}
           style={{ borderLeftColor: themeDot }}
         >
           <div>
             <div className="flex items-center justify-between gap-2">
               <div className="flex items-baseline gap-2">
-                <span className="text-[13px] font-bold tracking-tight text-zinc-900 dark:text-zinc-100">
+                <span className="text-[13px] font-bold tracking-tight text-foreground">
                   {weekLabelText}
                 </span>
                 {isCurrentWeek ? (
-                  <span className="text-[9px] font-semibold uppercase tracking-[0.12em] text-zinc-500 dark:text-zinc-400">
+                  <span className="text-[9px] font-semibold uppercase tracking-[0.12em] text-muted-foreground">
                     {t("tag.current")}
                   </span>
                 ) : null}
               </div>
             </div>
-            <div className="mt-0.5 text-[11px] text-zinc-500 dark:text-zinc-400">
+            <div className="mt-0.5 text-[11px] text-muted-foreground">
               {weekStart.toLocaleDateString(locale, {
                 month: "short",
                 day: "numeric",
@@ -714,8 +714,8 @@ export function PlannerWeeksGrid({
                 }
                 className={`flex w-full items-start gap-2 rounded-md border px-2 py-1.5 text-left transition-colors ${
                   themeLabel
-                    ? "border-zinc-200/80 bg-white/80 hover:bg-white dark:border-zinc-700/70 dark:bg-zinc-900/70 dark:hover:bg-zinc-900"
-                    : "border-dashed border-zinc-300 bg-white/40 hover:bg-white/80 dark:border-zinc-700 dark:bg-zinc-900/40 dark:hover:bg-zinc-900/70"
+                    ? "border-border bg-card/80 hover:bg-card"
+                    : "border-dashed border-border bg-muted/40 hover:bg-muted/80"
                 }`}
                 title={themeLabel ?? tTour("setTheme")}
                 aria-haspopup="dialog"
@@ -725,11 +725,11 @@ export function PlannerWeeksGrid({
                   className="mt-0.5 inline-block h-2.5 w-2.5 shrink-0 rounded-full"
                   style={{ background: themeDot }}
                 />
-                <span className="flex-1 text-[11px] font-semibold leading-tight text-zinc-800 dark:text-zinc-100">
+                <span className="flex-1 text-[11px] font-semibold leading-tight text-foreground">
                   {themeLabel ? (
                     <span className="line-clamp-2">{themeLabel}</span>
                   ) : (
-                    <span className="text-zinc-400 dark:text-zinc-500">
+                    <span className="text-muted-foreground">
                       + {tTour("setTheme")}
                     </span>
                   )}
@@ -748,7 +748,7 @@ export function PlannerWeeksGrid({
               ) : null}
             </div>
             {formatLabel ? (
-              <div className="mt-1 text-[10px] text-zinc-400 dark:text-zinc-500">
+              <div className="mt-1 text-[10px] text-muted-foreground">
                 {formatLabel}
               </div>
             ) : null}
@@ -784,8 +784,8 @@ export function PlannerWeeksGrid({
           const baseBg = isToday
             ? "bg-amber-50/60 dark:bg-amber-950/20"
             : isWeekend
-              ? "bg-zinc-50/70 dark:bg-zinc-950/40"
-              : "bg-white dark:bg-zinc-900";
+              ? "bg-muted/70"
+              : "bg-card";
 
           const renderSlot = (
             slot: Slot,
@@ -804,10 +804,10 @@ export function PlannerWeeksGrid({
 	                    setDraggingSessionId(session.id);
 	                  }}
 	                  onDragEnd={() => setDraggingSessionId(null)}
-                  className={`group/session relative flex w-full flex-col overflow-hidden rounded-lg border bg-zinc-50/70 text-left text-zinc-800 shadow-sm transition-all duration-150 hover:-translate-y-px hover:border-zinc-300 hover:bg-white hover:shadow-md active:scale-[0.99] dark:bg-zinc-800/70 dark:text-zinc-100 dark:hover:border-zinc-600 dark:hover:bg-zinc-800 ${
+                  className={`group/session relative flex w-full flex-col overflow-hidden rounded-lg border bg-muted/70 text-left text-foreground shadow-sm transition-all duration-150 hover:-translate-y-px hover:border-input hover:bg-card hover:shadow-md active:scale-[0.99] ${
 	                      isCopied
-	                        ? "border-zinc-900 ring-2 ring-zinc-900/10 dark:border-zinc-100 dark:ring-zinc-100/10"
-	                        : "border-zinc-200 dark:border-zinc-700/80"
+	                        ? "border-primary ring-2 ring-ring/20"
+	                        : "border-border"
 	                    } ${draggingSessionId === session.id ? "opacity-50" : ""}`}
 	                  >
 	                  <span
@@ -827,21 +827,21 @@ export function PlannerWeeksGrid({
                       className="flex min-w-0 flex-1 flex-col gap-0.5 py-1.5 pl-3 pr-2 text-left"
 	                  >
 	                    <span className="flex items-center justify-between gap-2">
-	                      <span className="text-[10px] font-semibold tabular-nums text-zinc-500 dark:text-zinc-400">
+	                      <span className="text-[10px] font-semibold tabular-nums text-muted-foreground">
 	                        {time ?? ""}
 	                      </span>
 	                      {session.durationMinutes ? (
-	                        <span className="text-[10px] font-medium tabular-nums text-zinc-400 dark:text-zinc-500">
+	                        <span className="text-[10px] font-medium tabular-nums text-muted-foreground">
 	                          {session.durationMinutes}&apos;
 	                        </span>
 	                      ) : null}
 	                    </span>
-	                    <span className="truncate text-[11px] font-semibold leading-tight text-zinc-900 dark:text-zinc-100">
+	                    <span className="truncate text-[11px] font-semibold leading-tight text-foreground">
 	                      {session.types.includes("match") ? "⚽ " : ""}
 	                      {session.title}
 	                    </span>
 	                  </button>
-                  <div className="flex w-full items-center border-t border-zinc-200 pl-2 dark:border-zinc-700">
+                  <div className="flex w-full items-center border-t border-border pl-2">
                     <button
                       type="button"
                       title={tAtt("openLink")}
@@ -852,7 +852,7 @@ export function PlannerWeeksGrid({
                           `/planner/${teamId}/sessions/${session.id}/attendance`,
                         );
                       }}
-                      className="inline-flex h-6 min-w-0 flex-1 items-center justify-center rounded-md text-zinc-600 transition hover:bg-zinc-100 hover:text-zinc-950 dark:text-zinc-300 dark:hover:bg-zinc-700"
+                      className="inline-flex h-6 min-w-0 flex-1 items-center justify-center rounded-md text-muted-foreground transition hover:bg-accent hover:text-foreground"
                     >
                       <Users size={13} strokeWidth={2.2} />
                     </button>
@@ -869,8 +869,8 @@ export function PlannerWeeksGrid({
 	                        }}
                       className={`inline-flex h-6 w-6 items-center justify-center rounded-md transition-all duration-150 active:scale-[0.98] disabled:pointer-events-none disabled:opacity-40 ${
                         isCopied
-                          ? "bg-zinc-900 text-white shadow-sm dark:bg-zinc-100 dark:text-zinc-900"
-                          : "text-zinc-500 hover:bg-zinc-100 hover:text-zinc-900 dark:text-zinc-400 dark:hover:bg-zinc-800 dark:hover:text-zinc-100"
+                          ? "bg-primary text-primary-foreground shadow-sm"
+                          : "text-muted-foreground hover:bg-accent hover:text-foreground"
                       }`}
 	                    >
 	                      <Copy size={12} strokeWidth={2.2} />
@@ -891,7 +891,7 @@ export function PlannerWeeksGrid({
 	                          }),
 	                        );
 	                      }}
-                      className="inline-flex h-6 w-6 items-center justify-center rounded-md text-red-500 transition hover:bg-red-50 hover:text-red-700 disabled:pointer-events-none disabled:opacity-40 dark:text-red-400 dark:hover:bg-red-950/40"
+                      className="inline-flex h-6 w-6 items-center justify-center rounded-md text-destructive transition hover:bg-destructive/10 disabled:pointer-events-none disabled:opacity-40"
 	                    >
 	                      <Trash2 size={12} strokeWidth={2.2} />
 	                    </button>
@@ -923,10 +923,10 @@ export function PlannerWeeksGrid({
 	                  e.dataTransfer.dropEffect = "move";
 	                }}
 	                onDrop={(e) => dropOnSlot(e, dateStr, slot)}
-                className={`flex h-8 w-full items-center justify-between gap-1 rounded-lg border border-dashed px-2 text-[11px] font-medium transition-all duration-150 active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-zinc-300 ${
+                className={`flex h-8 w-full items-center justify-between gap-1 rounded-lg border border-dashed px-2 text-[11px] font-medium transition-all duration-150 active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring ${
                   copiedSessionId
-                    ? "border-zinc-300 bg-white text-zinc-900 shadow-sm hover:bg-zinc-50 dark:border-zinc-600 dark:bg-zinc-900 dark:text-zinc-100 dark:hover:bg-zinc-800"
-                    : "border-zinc-200 bg-transparent text-zinc-400 hover:border-zinc-300 hover:bg-zinc-50 hover:text-zinc-700 dark:border-zinc-700 dark:text-zinc-500 dark:hover:border-zinc-600 dark:hover:bg-zinc-800/60 dark:hover:text-zinc-300"
+                    ? "border-input bg-card text-foreground shadow-sm hover:bg-accent"
+                    : "border-border bg-transparent text-muted-foreground hover:border-input hover:bg-accent hover:text-foreground"
                 } ${
 		                  draggingSessionId || copiedSessionId
 		                    ? "opacity-100"
@@ -945,9 +945,9 @@ export function PlannerWeeksGrid({
             <div
               key={dateStr}
               onClick={canPlaceEval ? () => setWizardDate(dateStr) : undefined}
-              className={`group relative flex min-h-[112px] flex-col gap-1 border-b border-r border-zinc-200 p-1.5 text-left transition-colors dark:border-zinc-800 ${baseBg} ${pastWeekClass} ${
+              className={`group relative flex min-h-[112px] flex-col gap-1 border-b border-r border-border p-1.5 text-left transition-colors ${baseBg} ${pastWeekClass} ${
                 canPlaceEval
-                  ? "cursor-pointer ring-1 ring-inset ring-transparent hover:ring-[var(--club-primary)] hover:bg-[var(--club-primary-soft)]/40"
+                  ? "cursor-pointer ring-1 ring-inset ring-transparent hover:ring-primary hover:bg-accent/40"
                   : ""
               }`}
             >
@@ -955,14 +955,14 @@ export function PlannerWeeksGrid({
                 <span
                   className={`text-[10px] tabular-nums ${
                     isToday
-                      ? "rounded bg-zinc-900 px-1 py-px font-semibold text-white dark:bg-zinc-100 dark:text-zinc-900"
-                      : "text-zinc-400 dark:text-zinc-500"
+                      ? "rounded bg-foreground px-1 py-px font-semibold text-background"
+                      : "text-muted-foreground"
                   }`}
                 >
                   {cellDate.getDate()}
                 </span>
                 {canPlaceEval ? (
-                  <span className="rounded bg-[var(--club-primary)] px-1 py-px text-[9px] font-semibold uppercase tracking-wide text-[var(--club-primary-foreground)] opacity-0 group-hover:opacity-100">
+                  <span className="rounded bg-primary px-1 py-px text-[9px] font-semibold uppercase tracking-wide text-primary-foreground opacity-0 group-hover:opacity-100">
                     + {t("physicalTest.badge")}
                   </span>
                 ) : null}
@@ -1000,8 +1000,8 @@ export function PlannerWeeksGrid({
                   }}
                   className={`flex min-h-[56px] w-full flex-col items-start justify-between gap-1 rounded-md border px-2 py-1.5 text-left transition hover:brightness-105 ${
                     isStructuringKind(cellMatch.kind)
-                      ? "border-[var(--club-primary)] bg-[var(--club-primary)] text-[var(--club-primary-foreground)]"
-                      : "border-[var(--club-primary)]/30 bg-[var(--club-primary-soft)] text-[var(--club-primary)]"
+                      ? "border-primary bg-primary text-primary-foreground"
+                      : "border-primary/30 bg-accent text-primary"
                   }`}
                 >
                   <span className="flex items-center gap-1 text-[10px] font-bold uppercase tracking-wide opacity-80">
@@ -1025,21 +1025,21 @@ export function PlannerWeeksGrid({
         })}
 
         <div
-          className={`flex flex-col gap-2 border-b border-l border-zinc-200 bg-zinc-50/60 px-3 py-3 text-[11px] dark:border-zinc-800 dark:bg-zinc-950/50 ${pastWeekClass}`}
+          className={`flex flex-col gap-2 border-b border-l border-border bg-muted/60 px-3 py-3 text-[11px] ${pastWeekClass}`}
         >
-          <div className="flex items-center justify-between text-zinc-500 dark:text-zinc-400">
+          <div className="flex items-center justify-between text-muted-foreground">
             <span>{t("sessions")}</span>
-            <strong className="font-semibold tabular-nums text-zinc-900 dark:text-zinc-100">
+            <strong className="font-semibold tabular-nums text-foreground">
               {sessionCount}
             </strong>
           </div>
-          <div className="flex items-center justify-between text-zinc-500 dark:text-zinc-400">
+          <div className="flex items-center justify-between text-muted-foreground">
             <span>{t("totalTime")}</span>
-            <strong className="font-semibold tabular-nums text-zinc-900 dark:text-zinc-100">
+            <strong className="font-semibold tabular-nums text-foreground">
               {Math.floor(weekTotal / 60)}h {weekTotal % 60}m
             </strong>
           </div>
-          <div className="flex h-1.5 overflow-hidden rounded-full bg-zinc-200 dark:bg-zinc-800">
+          <div className="flex h-1.5 overflow-hidden rounded-full bg-border">
             {weekTotal > 0
               ? [...weekByType.entries()].map(([type, min]) => (
 	                <span
@@ -1062,30 +1062,30 @@ export function PlannerWeeksGrid({
   return (
     <div className="flex flex-col gap-3">
       {placeEval ? (
-        <div className="flex items-center gap-2 rounded-lg border border-[var(--club-primary)] bg-[var(--club-primary-soft)]/60 px-3 py-2 text-[13px] font-medium text-[var(--club-primary)]">
+        <div className="flex items-center gap-2 rounded-lg border border-primary bg-accent/60 px-3 py-2 text-[13px] font-medium text-primary">
           <Activity className="h-4 w-4 shrink-0" />
           {t("physicalTest.placementHint")}
         </div>
       ) : null}
-      <div className="flex flex-wrap items-center gap-3 rounded-lg border border-zinc-200 bg-zinc-50/60 p-3 dark:border-zinc-800 dark:bg-zinc-950/40">
+      <div className="flex flex-wrap items-center gap-3 rounded-lg border border-border bg-muted/60 p-3">
         <div className="flex items-center gap-2 px-1">
           <button
             type="button"
             onClick={() => shiftMonth(-1)}
             disabled={!canPrev}
-            className="inline-flex h-8 w-8 items-center justify-center rounded-lg border border-zinc-200 bg-white text-sm font-medium text-zinc-700 shadow-sm transition-all duration-150 hover:bg-zinc-50 hover:text-zinc-900 active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-zinc-300 disabled:cursor-not-allowed disabled:opacity-40 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-300 dark:hover:bg-zinc-800 dark:hover:text-zinc-100"
+            className="inline-flex h-8 w-8 items-center justify-center rounded-lg border border-border bg-card text-sm font-medium text-muted-foreground shadow-sm transition-all duration-150 hover:bg-accent hover:text-foreground active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-40"
             aria-label={t("prev")}
           >
             ‹
           </button>
-          <span className="min-w-[140px] text-center text-sm font-semibold tracking-tight capitalize text-zinc-900 dark:text-zinc-100">
+          <span className="min-w-[140px] text-center text-sm font-semibold tracking-tight capitalize text-foreground">
             {monthLabel}
           </span>
           <button
             type="button"
             onClick={() => shiftMonth(1)}
             disabled={!canNext}
-            className="inline-flex h-8 w-8 items-center justify-center rounded-lg border border-zinc-200 bg-white text-sm font-medium text-zinc-700 shadow-sm transition-all duration-150 hover:bg-zinc-50 hover:text-zinc-900 active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-zinc-300 disabled:cursor-not-allowed disabled:opacity-40 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-300 dark:hover:bg-zinc-800 dark:hover:text-zinc-100"
+            className="inline-flex h-8 w-8 items-center justify-center rounded-lg border border-border bg-card text-sm font-medium text-muted-foreground shadow-sm transition-all duration-150 hover:bg-accent hover:text-foreground active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-40"
             aria-label={t("next")}
           >
             ›
@@ -1093,7 +1093,7 @@ export function PlannerWeeksGrid({
           <button
             type="button"
             onClick={jumpToToday}
-            className="ml-1 inline-flex h-8 items-center justify-center rounded-lg border border-zinc-200 bg-white px-3 text-sm font-medium text-zinc-900 shadow-sm transition-all duration-150 hover:bg-zinc-50 hover:ring-1 hover:ring-zinc-300 active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-zinc-300 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100 dark:hover:bg-zinc-800"
+            className="ml-1 inline-flex h-8 items-center justify-center rounded-lg border border-border bg-card px-3 text-sm font-medium text-foreground shadow-sm transition-all duration-150 hover:bg-accent hover:ring-1 hover:ring-border active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
           >
             {t("today")}
           </button>
@@ -1107,10 +1107,10 @@ export function PlannerWeeksGrid({
                 key={type}
                 type="button"
                 onClick={() => toggleType(type)}
-                className={`inline-flex h-8 items-center gap-1.5 rounded-lg border px-3 text-xs font-medium transition-all duration-150 active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-zinc-300 ${
+                className={`inline-flex h-8 items-center gap-1.5 rounded-lg border px-3 text-xs font-medium transition-all duration-150 active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring ${
                   on
-                    ? "border-zinc-200 bg-white text-zinc-900 shadow-sm dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100"
-                    : "border-transparent bg-transparent text-zinc-400 hover:bg-zinc-100 hover:text-zinc-700 dark:text-zinc-500 dark:hover:bg-zinc-800 dark:hover:text-zinc-300"
+                    ? "border-border bg-card text-foreground shadow-sm"
+                    : "border-transparent bg-transparent text-muted-foreground hover:bg-accent hover:text-foreground"
                 }`}
               >
                 <span
@@ -1126,7 +1126,7 @@ export function PlannerWeeksGrid({
               type="button"
               onClick={clearSeason}
               disabled={isClearing}
-              className="ml-1 inline-flex h-8 items-center gap-1.5 rounded-lg border border-red-200 bg-white px-3 text-xs font-medium text-red-600 transition-all duration-150 hover:bg-red-50 active:scale-[0.98] disabled:opacity-60 dark:border-red-900/50 dark:bg-zinc-900 dark:text-red-400 dark:hover:bg-red-950/40"
+              className="ml-1 inline-flex h-8 items-center gap-1.5 rounded-lg border border-destructive/30 bg-card px-3 text-xs font-medium text-destructive transition-all duration-150 hover:bg-destructive/10 active:scale-[0.98] disabled:opacity-60"
             >
               <Trash2 className="h-3.5 w-3.5" />
               {isClearing ? t("clearing") : t("clearSeason")}
@@ -1136,7 +1136,7 @@ export function PlannerWeeksGrid({
       </div>
 
       {!monthHasPeriodization ? (
-        <div className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-dashed border-zinc-300 bg-zinc-50/60 px-4 py-3 text-sm text-zinc-600 dark:border-zinc-700 dark:bg-zinc-900/40 dark:text-zinc-300">
+        <div className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-dashed border-border bg-muted/60 px-4 py-3 text-sm text-muted-foreground">
           <span>{t("emptyMonth")}</span>
           <button
             type="button"
@@ -1146,27 +1146,27 @@ export function PlannerWeeksGrid({
                 query: { view: "tour" },
               })
             }
-            className="rounded-md border border-zinc-200 bg-white px-2.5 py-1 text-xs font-semibold text-zinc-700 hover:bg-zinc-50 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-200 dark:hover:bg-zinc-800"
+            className="rounded-md border border-border bg-card px-2.5 py-1 text-xs font-semibold text-foreground hover:bg-accent"
           >
             {t("emptyMonthCta")}
           </button>
         </div>
       ) : null}
 
-      <div className="overflow-x-auto rounded-xl border border-zinc-200 bg-white shadow-sm dark:border-zinc-800 dark:bg-zinc-900">
+      <div className="overflow-x-auto rounded-xl border border-border bg-card shadow-sm">
         <div className="grid min-w-[1080px] grid-cols-[200px_repeat(7,minmax(0,1fr))_200px]">
-          <div className="border-b border-r border-zinc-200 bg-zinc-50 px-3 py-2.5 text-[11px] font-semibold uppercase tracking-wider text-zinc-500 dark:border-zinc-800 dark:bg-zinc-950 dark:text-zinc-400">
+          <div className="border-b border-r border-border bg-muted px-3 py-2.5 text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
             {t("week")}
           </div>
           {DAYS.map((d) => (
             <div
               key={d}
-              className="border-b border-r border-zinc-200 bg-zinc-50 px-3 py-2.5 text-[11px] font-semibold uppercase tracking-wider text-zinc-500 dark:border-zinc-800 dark:bg-zinc-950 dark:text-zinc-400"
+              className="border-b border-r border-border bg-muted px-3 py-2.5 text-[11px] font-semibold uppercase tracking-wider text-muted-foreground"
             >
               {t(`day.${d}`)}
             </div>
           ))}
-          <div className="border-b border-zinc-200 bg-zinc-50 px-3 py-2.5 text-[11px] font-semibold uppercase tracking-wider text-zinc-500 dark:border-zinc-800 dark:bg-zinc-950 dark:text-zinc-400">
+          <div className="border-b border-border bg-muted px-3 py-2.5 text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
             {t("summary")}
           </div>
 
@@ -1181,7 +1181,7 @@ export function PlannerWeeksGrid({
                 rows.push(
                   <div
                     key={`meso-${meso.id}-${wi}`}
-                    className="col-span-full grid grid-cols-[200px_1fr_200px] border-b border-zinc-900 bg-zinc-900 text-[11px] font-semibold uppercase tracking-wider text-zinc-100 dark:border-zinc-700 dark:bg-zinc-950"
+                    className="col-span-full grid grid-cols-[200px_1fr_200px] border-b border-border bg-foreground text-[11px] font-semibold uppercase tracking-wider text-background"
                   >
                     <div className="flex items-center gap-2 px-3.5 py-1.5">
                       <span
@@ -1201,7 +1201,7 @@ export function PlannerWeeksGrid({
                         {t("weekN", { n: meso.lastWeekNumber })}
                       </span>
                     </div>
-                    <div className="px-3 py-1.5 text-right normal-case tracking-normal text-zinc-400">
+                    <div className="px-3 py-1.5 text-right normal-case tracking-normal text-background/60">
                       {tTour("weeksCount", { n: meso.weekCount })}
                     </div>
                   </div>
@@ -1215,42 +1215,42 @@ export function PlannerWeeksGrid({
         </div>
       </div>
 
-      <div className="flex flex-wrap items-center gap-6 rounded-lg border border-zinc-200 bg-zinc-50/70 px-4 py-3 dark:border-zinc-800 dark:bg-zinc-900/60">
+      <div className="flex flex-wrap items-center gap-6 rounded-lg border border-border bg-muted/70 px-4 py-3">
         <div className="flex flex-col gap-0.5">
-          <span className="text-[10px] font-semibold uppercase tracking-wider text-zinc-400 dark:text-zinc-500">
+          <span className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
             {t("sessions")}
           </span>
-          <span className="text-lg font-bold tabular-nums tracking-tight text-zinc-900 dark:text-zinc-100">
+          <span className="text-lg font-bold tabular-nums tracking-tight text-foreground">
             {stats.totalSessions}
           </span>
         </div>
         <div className="flex flex-col gap-0.5">
-          <span className="text-[10px] font-semibold uppercase tracking-wider text-zinc-400 dark:text-zinc-500">
+          <span className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
             {t("totalTime")}
           </span>
-          <span className="text-lg font-bold tabular-nums tracking-tight text-zinc-900 dark:text-zinc-100">
+          <span className="text-lg font-bold tabular-nums tracking-tight text-foreground">
             {totalHours}
-            <span className="ml-0.5 text-xs font-medium text-zinc-500 dark:text-zinc-400">
+            <span className="ml-0.5 text-xs font-medium text-muted-foreground">
               h {totalRem}m
             </span>
           </span>
         </div>
         <div className="flex flex-col gap-0.5">
-          <span className="text-[10px] font-semibold uppercase tracking-wider text-zinc-400 dark:text-zinc-500">
+          <span className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
             {t("avgPerWeek")}
           </span>
-          <span className="text-lg font-bold tabular-nums tracking-tight text-zinc-900 dark:text-zinc-100">
+          <span className="text-lg font-bold tabular-nums tracking-tight text-foreground">
             {avgPerWeekHours}
-            <span className="ml-0.5 text-xs font-medium text-zinc-500 dark:text-zinc-400">
+            <span className="ml-0.5 text-xs font-medium text-muted-foreground">
               h
             </span>
           </span>
         </div>
         <div className="flex max-w-[420px] flex-1 flex-col gap-1.5">
-          <span className="text-[10px] font-semibold uppercase tracking-wider text-zinc-400 dark:text-zinc-500">
+          <span className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
             {t("typeDistribution")}
           </span>
-          <div className="flex h-1.5 overflow-hidden rounded-full bg-zinc-200 dark:bg-zinc-800">
+          <div className="flex h-1.5 overflow-hidden rounded-full bg-border">
             {stats.totalMin > 0
               ? sortedByType.map(([type, min]) => (
 	                  <span
@@ -1265,7 +1265,7 @@ export function PlannerWeeksGrid({
                 ))
               : null}
           </div>
-          <div className="flex flex-wrap gap-2.5 text-[10px] text-zinc-500 dark:text-zinc-400">
+          <div className="flex flex-wrap gap-2.5 text-[10px] text-muted-foreground">
             {sortedByType.map(([type, min]) => (
               <span key={type} className="inline-flex items-center gap-1">
                 <span
@@ -1285,35 +1285,35 @@ export function PlannerWeeksGrid({
           onClick={() => setWizardDate(null)}
         >
           <div
-            className="w-full max-w-md rounded-lg border border-zinc-200 bg-white p-5 shadow-xl dark:border-zinc-800 dark:bg-zinc-900"
+            className="w-full max-w-md rounded-lg border border-border bg-card p-5 shadow-xl"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="mb-1 flex items-start justify-between gap-3">
-              <h3 className="flex items-center gap-2 text-base font-semibold text-zinc-900 dark:text-zinc-100">
-                <Activity className="h-4 w-4 text-[var(--club-primary)]" />
+              <h3 className="flex items-center gap-2 text-base font-semibold text-foreground">
+                <Activity className="h-4 w-4 text-primary" />
                 {t("physicalTest.wizardTitle")}
               </h3>
               <button
                 type="button"
                 onClick={() => setWizardDate(null)}
-                className="rounded-md p-1 text-zinc-400 hover:bg-zinc-100 hover:text-zinc-700 dark:hover:bg-zinc-800"
+                className="rounded-md p-1 text-muted-foreground hover:bg-accent hover:text-foreground"
                 aria-label={t("physicalTest.close")}
               >
                 <X className="h-5 w-5" />
               </button>
             </div>
-            <p className="mb-3 text-[13px] text-zinc-500 dark:text-zinc-400">
+            <p className="mb-3 text-[13px] text-muted-foreground">
               {t("physicalTest.wizardSubtitle", { date: wizardDate })}
             </p>
 
             {evalError ? (
-              <div className="mb-3 rounded-md border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700 dark:border-red-900/50 dark:bg-red-950/30 dark:text-red-300">
+              <div className="mb-3 rounded-md border border-destructive/30 bg-destructive/10 px-3 py-2 text-sm text-destructive">
                 {evalError}
               </div>
             ) : null}
 
             {evalMetrics.length === 0 ? (
-              <p className="rounded-md border border-dashed border-zinc-300 p-4 text-center text-sm text-zinc-500 dark:border-zinc-700 dark:text-zinc-400">
+              <p className="rounded-md border border-dashed border-border p-4 text-center text-sm text-muted-foreground">
                 {t("physicalTest.noTests")}
               </p>
             ) : (
@@ -1322,18 +1322,18 @@ export function PlannerWeeksGrid({
                   const checked = evalSelected.has(m.id);
                   return (
                     <li key={m.id}>
-                      <label className="flex cursor-pointer items-center gap-2 rounded-md border border-zinc-200 px-3 py-2 text-sm hover:bg-zinc-50 dark:border-zinc-800 dark:hover:bg-zinc-800/50">
+                      <label className="flex cursor-pointer items-center gap-2 rounded-md border border-border px-3 py-2 text-sm hover:bg-accent">
                         <input
                           type="checkbox"
                           checked={checked}
                           onChange={() => toggleEvalMetric(m.id)}
-                          className="h-4 w-4 rounded border-zinc-300"
+                          className="h-4 w-4 rounded border-input accent-primary"
                         />
-                        <span className="font-medium text-zinc-900 dark:text-zinc-100">
+                        <span className="font-medium text-foreground">
                           {m.name}
                         </span>
                         {(m.category || m.unit) && (
-                          <span className="text-[11px] text-zinc-400">
+                          <span className="text-[11px] text-muted-foreground">
                             {[m.category, m.unit].filter(Boolean).join(" · ")}
                           </span>
                         )}
@@ -1348,7 +1348,7 @@ export function PlannerWeeksGrid({
               <button
                 type="button"
                 onClick={() => router.push("/tracking")}
-                className="text-[13px] font-medium text-[var(--club-primary)] hover:underline"
+                className="text-[13px] font-medium text-primary hover:underline"
               >
                 {t("physicalTest.createTest")}
               </button>
@@ -1356,7 +1356,7 @@ export function PlannerWeeksGrid({
                 type="button"
                 disabled={evalPending || evalSelected.size === 0}
                 onClick={submitEval}
-                className="inline-flex items-center gap-2 rounded-md bg-[var(--club-primary)] px-3 py-1.5 text-[13px] font-semibold text-[var(--club-primary-foreground)] disabled:opacity-50"
+                className="inline-flex items-center gap-2 rounded-md bg-primary px-3 py-1.5 text-[13px] font-semibold text-primary-foreground disabled:opacity-50"
               >
                 {t("physicalTest.confirm")}
               </button>

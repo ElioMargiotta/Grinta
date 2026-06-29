@@ -66,7 +66,7 @@ type Data = {
 type Tab = "general" | "staff" | "roles";
 
 const inputClass =
-  "h-10 w-full rounded-md border border-zinc-300 bg-white px-3 text-sm text-zinc-900 placeholder:text-zinc-400 focus:border-zinc-900 focus:outline-none focus:ring-2 focus:ring-zinc-900/10 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100 dark:focus:border-zinc-500";
+  "h-10 w-full rounded-lg border border-border bg-card px-3 text-sm text-foreground placeholder:text-muted-foreground focus:border-ring focus:outline-none focus:ring-2 focus:ring-ring/15";
 
 // Pastille colorée par niveau d'accès — reprend la sémantique du reste de l'app
 // (rouge = plein accès, dégradé jusqu'au gris = lecture seule).
@@ -74,7 +74,7 @@ const ACCESS_BADGE: Record<AccessLevel, string> = {
   full: "bg-red-50 text-red-700 dark:bg-red-950/40 dark:text-red-300",
   extended: "bg-amber-50 text-amber-700 dark:bg-amber-950/40 dark:text-amber-300",
   team: "bg-sky-50 text-sky-700 dark:bg-sky-950/40 dark:text-sky-300",
-  team_readonly: "bg-zinc-100 text-zinc-600 dark:bg-zinc-800 dark:text-zinc-300",
+  team_readonly: "bg-muted text-muted-foreground",
 };
 
 function initials(name: string | null): string {
@@ -145,7 +145,7 @@ export function ClubSettings({ data }: { data: Data }) {
   return (
     <div className="flex flex-col gap-6">
       {/* Sous-onglets façon sélecteur de tour du wizard (soulignés) */}
-      <div className="flex gap-1 overflow-x-auto border-b border-zinc-200 dark:border-zinc-800">
+      <div className="flex gap-1 overflow-x-auto border-b border-border">
         {tabs.map(({ key, label }) => {
           const isActive = tab === key;
           return (
@@ -156,8 +156,8 @@ export function ClubSettings({ data }: { data: Data }) {
               aria-current={isActive ? "page" : undefined}
               className={`-mb-px shrink-0 border-b-2 px-3 pb-2.5 text-[13px] font-semibold transition ${
                 isActive
-                  ? "border-[var(--club-primary)] text-zinc-950 dark:text-zinc-100"
-                  : "border-transparent text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100"
+                  ? "border-primary text-foreground"
+                  : "border-transparent text-muted-foreground hover:text-foreground"
               }`}
             >
               {label}
@@ -186,10 +186,10 @@ export function ClubSettings({ data }: { data: Data }) {
                 <img
                   src={shownLogo}
                   alt={data.clubIdentity.name}
-                  className="h-20 w-20 rounded-2xl object-contain ring-1 ring-[var(--club-line)]"
+                  className="h-20 w-20 rounded-2xl object-contain ring-1 ring-border"
                 />
               ) : (
-                <div className="flex h-20 w-20 items-center justify-center rounded-2xl bg-[var(--club-primary)] text-2xl font-bold text-[var(--club-primary-foreground)]">
+                <div className="flex h-20 w-20 items-center justify-center rounded-2xl bg-primary text-2xl font-bold text-primary-foreground">
                   {initials(data.clubIdentity.name)}
                 </div>
               )}
@@ -220,7 +220,7 @@ export function ClubSettings({ data }: { data: Data }) {
                     </Button>
                   )}
                 </div>
-                <span className="text-xs text-zinc-500">{t("identity.logoHint")}</span>
+                <span className="text-xs text-muted-foreground">{t("identity.logoHint")}</span>
               </div>
               <input
                 ref={logoInputRef}
@@ -239,7 +239,7 @@ export function ClubSettings({ data }: { data: Data }) {
             </div>
 
             <label className="flex max-w-md flex-col gap-1 text-sm">
-              <span className="font-medium text-zinc-700 dark:text-zinc-300">
+              <span className="font-medium text-foreground">
                 {t("identity.clubName")}
               </span>
               <input
@@ -254,12 +254,12 @@ export function ClubSettings({ data }: { data: Data }) {
           </section>
 
           {/* Couleurs */}
-          <section className="flex flex-col gap-5 border-t border-[var(--club-line)] pt-8">
+          <section className="flex flex-col gap-5 border-t border-border pt-8">
             <div className="max-w-xl">
-              <h2 className="text-lg font-semibold text-zinc-900 dark:text-zinc-100">
+              <h2 className="text-lg font-semibold text-foreground">
                 {t("identity.title")}
               </h2>
-              <p className="mt-1 text-sm text-zinc-600 dark:text-zinc-300">
+              <p className="mt-1 text-sm text-muted-foreground">
                 {t("identity.description")}
               </p>
             </div>
@@ -287,12 +287,12 @@ export function ClubSettings({ data }: { data: Data }) {
           {/* MEMBERS grouped by role, avec filtres rôle / équipe */}
           <section>
             <div className="flex flex-wrap items-end justify-between gap-3">
-              <h2 className="text-lg font-semibold text-zinc-900">
+              <h2 className="text-lg font-semibold text-foreground">
                 {t("members.title", { n: data.members.length })}
               </h2>
               <div className="flex flex-wrap items-end gap-3">
                 <label className="flex flex-col gap-1 text-xs">
-                  <span className="font-medium text-zinc-600">
+                  <span className="font-medium text-muted-foreground">
                     {t("members.filterRole")}
                   </span>
                   <select
@@ -309,7 +309,7 @@ export function ClubSettings({ data }: { data: Data }) {
                   </select>
                 </label>
                 <label className="flex flex-col gap-1 text-xs">
-                  <span className="font-medium text-zinc-600">
+                  <span className="font-medium text-muted-foreground">
                     {t("members.filterTeam")}
                   </span>
                   <select
@@ -329,7 +329,7 @@ export function ClubSettings({ data }: { data: Data }) {
             </div>
 
             {(filterRoleId || filterTeamId) && (
-              <p className="mt-2 text-xs text-zinc-500">
+              <p className="mt-2 text-xs text-muted-foreground">
                 {t("members.filteredCount", { n: filteredMemberCount })}
               </p>
             )}
@@ -338,7 +338,7 @@ export function ClubSettings({ data }: { data: Data }) {
               {groups.map(({ role, members }) => (
                 <div key={role.id}>
                   <div className="flex items-center gap-2 px-1 pb-2">
-                    <span className="text-sm font-semibold text-zinc-900">
+                    <span className="text-sm font-semibold text-foreground">
                       {role.name}
                     </span>
                     <span
@@ -346,14 +346,14 @@ export function ClubSettings({ data }: { data: Data }) {
                     >
                       {accessLabel(role.access_level)}
                     </span>
-                    <span className="text-xs text-zinc-400">{members.length}</span>
+                    <span className="text-xs text-muted-foreground">{members.length}</span>
                   </div>
                   {members.length === 0 ? (
-                    <p className="border-y border-[var(--club-line)] bg-white/70 px-4 py-3 text-sm text-zinc-400">
+                    <p className="border-y border-border bg-card/70 px-4 py-3 text-sm text-muted-foreground">
                       {t("members.emptyRole")}
                     </p>
                   ) : (
-                    <div className="overflow-hidden border-y border-[var(--club-line)] bg-white/[0.72]">
+                    <div className="overflow-hidden border-y border-border bg-card/[0.72]">
                       {members.map((m) => {
                         const teamScoped =
                           role.access_level === "team" ||
@@ -365,21 +365,21 @@ export function ClubSettings({ data }: { data: Data }) {
                         return (
                           <div
                             key={m.id}
-                            className="border-b border-zinc-100 px-4 py-3 last:border-b-0"
+                            className="border-b border-border px-4 py-3 last:border-b-0"
                           >
                             <div className="grid gap-3 md:grid-cols-[1fr_auto] md:items-center">
                               <div className="flex min-w-0 items-center gap-3">
-                                <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[var(--club-primary-soft)] text-xs font-semibold text-[var(--club-primary)]">
+                                <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-accent text-xs font-semibold text-primary">
                                   {initials(m.profiles?.full_name ?? null)}
                                 </span>
                                 <div className="min-w-0">
-                                  <div className="truncate text-sm font-medium text-zinc-900">
+                                  <div className="truncate text-sm font-medium text-foreground">
                                     {m.profiles?.full_name?.trim() || t("members.unnamed")}
                                   </div>
-                                  <div className="truncate text-xs text-zinc-500">
+                                  <div className="truncate text-xs text-muted-foreground">
                                     {role.name}
                                     {teamScoped && teamNames && (
-                                      <span className="text-zinc-400"> · {teamNames}</span>
+                                      <span className="text-muted-foreground"> · {teamNames}</span>
                                     )}
                                   </div>
                                 </div>
@@ -437,11 +437,11 @@ export function ClubSettings({ data }: { data: Data }) {
       {tab === "roles" && (
         <div className="flex flex-col gap-8">
         {/* INVITE */}
-        <section className="rounded-lg border border-zinc-200 bg-white p-6">
-          <h2 className="text-lg font-semibold text-zinc-900">
+        <section className="rounded-xl border border-border bg-card p-6">
+          <h2 className="text-lg font-semibold text-foreground">
             {t("invite.title")}
           </h2>
-          <p className="mt-1 text-sm text-zinc-600">{t("invite.description")}</p>
+          <p className="mt-1 text-sm text-muted-foreground">{t("invite.description")}</p>
 
           <form
             className="mt-4 flex flex-col gap-4"
@@ -476,7 +476,7 @@ export function ClubSettings({ data }: { data: Data }) {
                 inputClassName={inputClass}
               />
               <label className="flex flex-col gap-1 text-sm">
-                <span className="font-medium text-zinc-700">{t("invite.role")}</span>
+                <span className="font-medium text-foreground">{t("invite.role")}</span>
                 <select
                   name="roleId"
                   value={selectedRoleId}
@@ -494,7 +494,7 @@ export function ClubSettings({ data }: { data: Data }) {
 
             {needsTeams && (
               <div className="flex flex-col gap-1 text-sm">
-                <span className="font-medium text-zinc-700">
+                <span className="font-medium text-foreground">
                   {t("invite.assignedTeams")}
                 </span>
                 {data.teams.length === 0 ? (
@@ -506,7 +506,7 @@ export function ClubSettings({ data }: { data: Data }) {
                     {data.teams.map((team) => (
                       <label
                         key={team.id}
-                        className="flex items-center gap-2 rounded-md border border-zinc-200 px-2 py-1 text-xs"
+                        className="flex items-center gap-2 rounded-md border border-border px-2 py-1 text-xs"
                       >
                         <input type="checkbox" name="teamIds" value={team.id} />
                         <span>{team.name}</span>
@@ -518,7 +518,7 @@ export function ClubSettings({ data }: { data: Data }) {
             )}
 
             {inviteError && (
-              <div className="rounded-md border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700">
+              <div className="rounded-md border border-destructive/30 bg-destructive/10 px-3 py-2 text-sm text-destructive">
                 {inviteError}
               </div>
             )}
@@ -541,7 +541,7 @@ export function ClubSettings({ data }: { data: Data }) {
                   strong: (chunks) => <strong>{chunks}</strong>,
                     })}
                 {!inviteDirect && inviteLinkFallback && (
-                  <div className="mt-3 rounded-md border border-zinc-200 bg-white/70 p-3 text-xs text-zinc-800">
+                  <div className="mt-3 rounded-md border border-border bg-card p-3 text-xs text-foreground">
                     <div className="mb-1 font-medium">
                       {t("invite.linkReady")}
                     </div>
@@ -565,7 +565,7 @@ export function ClubSettings({ data }: { data: Data }) {
                           setInviteCopied(true);
                           window.setTimeout(() => setInviteCopied(false), 1500);
                         }}
-                        className="inline-flex items-center gap-1 rounded-md border border-zinc-200 bg-white px-2.5 py-1.5 text-[11px] font-medium text-zinc-700 hover:bg-zinc-50"
+                        className="inline-flex items-center gap-1 rounded-md border border-border bg-card px-2.5 py-1.5 text-[11px] font-medium text-foreground hover:bg-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
                       >
                         {inviteCopied ? (
                           <Check className="h-3.5 w-3.5" />
@@ -593,21 +593,21 @@ export function ClubSettings({ data }: { data: Data }) {
 
         {/* PENDING INVITATIONS */}
         {data.invitations.length > 0 && (
-          <section className="rounded-lg border border-zinc-200 bg-white p-6">
-            <h2 className="text-lg font-semibold text-zinc-900">
+          <section className="rounded-xl border border-border bg-card p-6">
+            <h2 className="text-lg font-semibold text-foreground">
               {t("pendingInvitations.title", { n: data.invitations.length })}
             </h2>
-            <ul className="mt-4 divide-y divide-zinc-100">
+            <ul className="mt-4 divide-y divide-border">
               {data.invitations.map((inv) => (
                 <li
                   key={inv.id}
                   className="flex items-center justify-between gap-3 py-3 text-sm"
                 >
                   <div className="flex min-w-0 flex-col">
-                    <span className="truncate font-medium text-zinc-900">
+                    <span className="truncate font-medium text-foreground">
                       {inv.email}
                     </span>
-                    <span className="text-xs text-zinc-500">
+                    <span className="text-xs text-muted-foreground">
                       {inv.club_roles?.name} ·{" "}
                       {t("pendingInvitations.expiresOn", {
                         date: new Date(inv.expires_at).toLocaleDateString(locale),
@@ -635,10 +635,10 @@ export function ClubSettings({ data }: { data: Data }) {
 
         {/* ROLES */}
         <section>
-          <h2 className="text-lg font-semibold text-zinc-900">
+          <h2 className="text-lg font-semibold text-foreground">
             {t("roles.title")}
           </h2>
-          <p className="mt-1 text-sm text-zinc-600">{t("roles.description")}</p>
+          <p className="mt-1 text-sm text-muted-foreground">{t("roles.description")}</p>
 
           <form
             className="mt-4 flex flex-wrap items-end gap-3"
@@ -649,7 +649,7 @@ export function ClubSettings({ data }: { data: Data }) {
             }
           >
             <label className="flex min-w-[200px] flex-col gap-1 text-sm">
-              <span className="font-medium text-zinc-700">{t("roles.label")}</span>
+              <span className="font-medium text-foreground">{t("roles.label")}</span>
               <input
                 name="name"
                 required
@@ -659,7 +659,7 @@ export function ClubSettings({ data }: { data: Data }) {
               />
             </label>
             <label className="flex min-w-[200px] flex-col gap-1 text-sm">
-              <span className="font-medium text-zinc-700">
+              <span className="font-medium text-foreground">
                 {t("roles.accessLevel")}
               </span>
               <select
@@ -686,21 +686,21 @@ export function ClubSettings({ data }: { data: Data }) {
             </Button>
           </form>
 
-          <ul className="mt-6 divide-y divide-zinc-100">
+          <ul className="mt-6 divide-y divide-border">
             {data.roles.map((r) => (
               <li
                 key={r.id}
                 className="flex items-center justify-between gap-3 py-3 text-sm"
               >
                 <div className="flex items-center gap-2">
-                  <span className="font-medium text-zinc-900">{r.name}</span>
+                  <span className="font-medium text-foreground">{r.name}</span>
                   <span
                     className={`rounded px-1.5 py-0.5 text-[10px] font-medium uppercase tracking-wide ${ACCESS_BADGE[r.access_level]}`}
                   >
                     {accessLabel(r.access_level)}
                   </span>
                   {r.is_system && (
-                    <span className="text-xs text-zinc-400">
+                    <span className="text-xs text-muted-foreground">
                       {t("roles.system")}
                     </span>
                   )}
@@ -752,7 +752,7 @@ function MemberEditor({
 
   return (
     <form
-      className="mt-3 flex flex-col gap-3 rounded-md border border-zinc-200 bg-white/70 p-3 dark:border-zinc-700 dark:bg-zinc-900/40"
+      className="mt-3 flex flex-col gap-3 rounded-md border border-border bg-muted/40 p-3"
       action={(formData) => {
         setError(null);
         formData.set("membershipId", member.id);
@@ -764,7 +764,7 @@ function MemberEditor({
       }}
     >
       <label className="flex flex-col gap-1 text-sm">
-        <span className="font-medium text-zinc-700">{t("members.editRole")}</span>
+        <span className="font-medium text-foreground">{t("members.editRole")}</span>
         <select
           name="roleId"
           value={roleId}
@@ -781,7 +781,7 @@ function MemberEditor({
 
       {needsTeams && (
         <div className="flex flex-col gap-1 text-sm">
-          <span className="font-medium text-zinc-700">{t("members.editTeams")}</span>
+          <span className="font-medium text-foreground">{t("members.editTeams")}</span>
           {teams.length === 0 ? (
             <p className="text-xs text-amber-700">{t("invite.noTeamsInClub")}</p>
           ) : (
@@ -789,7 +789,7 @@ function MemberEditor({
               {teams.map((team) => (
                 <label
                   key={team.id}
-                  className="flex items-center gap-2 rounded-md border border-zinc-200 px-2 py-1 text-xs"
+                  className="flex items-center gap-2 rounded-md border border-border px-2 py-1 text-xs"
                 >
                   <input
                     type="checkbox"
@@ -806,7 +806,7 @@ function MemberEditor({
       )}
 
       {error && (
-        <p className="rounded-md border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700">
+        <p className="rounded-md border border-destructive/30 bg-destructive/10 px-3 py-2 text-sm text-destructive">
           {error}
         </p>
       )}
@@ -843,19 +843,19 @@ function ColorField({
     <label className="flex flex-col gap-1 text-sm">
       <span
         className={
-          inverse ? "font-medium text-zinc-200" : "font-medium text-zinc-700"
+          inverse ? "font-medium text-background" : "font-medium text-foreground"
         }
       >
         {label}
       </span>
-      <span className="flex h-10 overflow-hidden rounded-md border border-zinc-300 bg-white dark:border-zinc-700 dark:bg-zinc-900">
+      <span className="flex h-10 overflow-hidden rounded-lg border border-border bg-card">
         <input
           type="color"
           name={name}
           defaultValue={defaultValue}
           className="h-10 w-12 shrink-0 cursor-pointer border-0 bg-transparent p-1"
         />
-        <span className="flex flex-1 items-center px-3 font-mono text-xs text-zinc-500">
+        <span className="flex flex-1 items-center px-3 font-mono text-xs text-muted-foreground">
           {defaultValue}
         </span>
       </span>

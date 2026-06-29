@@ -109,7 +109,7 @@ export function PlayerOverviewSection({
               {active ? (
                 <div className="flex items-center gap-2">
                   <KindBadge kind={active.kind} label={tMed(`kind.${active.kind}`)} />
-                  <span className="text-[13px] text-zinc-500 dark:text-zinc-400">
+                  <span className="text-[13px] text-muted-foreground">
                     {t("status.since", { date: formatDay(active.startDate) })}
                     {active.endDate
                       ? ` · ${t("status.until", { date: formatDay(active.endDate) })}`
@@ -145,15 +145,15 @@ export function PlayerOverviewSection({
         >
           {nextSession ? (
             <div>
-              <div className="font-medium text-zinc-900 dark:text-zinc-100">
+              <div className="font-medium text-foreground">
                 {formatDay(nextSession.date)}
               </div>
-              <div className="text-[12px] text-zinc-500">
+              <div className="text-[12px] text-muted-foreground">
                 {[nextSession.teamName, nextSession.theme].filter(Boolean).join(" · ") || "—"}
               </div>
             </div>
           ) : (
-            <span className="text-[13px] text-zinc-400">{t("card.nextSessionEmpty")}</span>
+            <span className="text-[13px] text-muted-foreground">{t("card.nextSessionEmpty")}</span>
           )}
         </OverviewCard>
 
@@ -163,11 +163,11 @@ export function PlayerOverviewSection({
           onClick={() => onOpenTab("physical")}
         >
           {lastTestDate ? (
-            <span className="font-medium text-zinc-900 dark:text-zinc-100">
+            <span className="font-medium text-foreground">
               {formatDay(lastTestDate)}
             </span>
           ) : (
-            <span className="text-[13px] text-zinc-400">{t("card.lastTestEmpty")}</span>
+            <span className="text-[13px] text-muted-foreground">{t("card.lastTestEmpty")}</span>
           )}
         </OverviewCard>
 
@@ -178,19 +178,19 @@ export function PlayerOverviewSection({
         >
           {lastReport ? (
             <div>
-              <div className="font-medium text-zinc-900 dark:text-zinc-100">
+              <div className="font-medium text-foreground">
                 {lastReport.evaluation_date
                   ? formatDay(lastReport.evaluation_date)
                   : t("card.lastReportEmpty")}
               </div>
               {lastReport.average !== null ? (
-                <div className="text-[12px] text-zinc-500">
+                <div className="text-[12px] text-muted-foreground">
                   {t("card.average", { value: lastReport.average.toFixed(2) })}
                 </div>
               ) : null}
             </div>
           ) : (
-            <span className="text-[13px] text-zinc-400">{t("card.lastReportEmpty")}</span>
+            <span className="text-[13px] text-muted-foreground">{t("card.lastReportEmpty")}</span>
           )}
         </OverviewCard>
 
@@ -200,7 +200,7 @@ export function PlayerOverviewSection({
           onClick={() => onOpenTab("availability")}
         >
           {ongoing.length === 0 ? (
-            <span className="text-[13px] text-zinc-400">{t("card.injuriesNone")}</span>
+            <span className="text-[13px] text-muted-foreground">{t("card.injuriesNone")}</span>
           ) : (
             <div className="flex flex-wrap gap-1.5">
               {ongoing.map((u) => (
@@ -214,25 +214,25 @@ export function PlayerOverviewSection({
       {/* Timeline */}
       <Section className="!p-4">
         <div className="mb-3 flex items-center gap-2">
-          <TrendingUp className="h-4 w-4 text-[var(--club-primary)]" />
-          <h3 className="text-sm font-semibold text-zinc-900 dark:text-zinc-100">
+          <TrendingUp className="h-4 w-4 text-primary" />
+          <h3 className="text-sm font-semibold text-foreground">
             {t("timeline.title")}
           </h3>
         </div>
         {timeline.length === 0 ? (
-          <p className="py-6 text-center text-[13px] text-zinc-400">{t("timeline.empty")}</p>
+          <p className="py-6 text-center text-[13px] text-muted-foreground">{t("timeline.empty")}</p>
         ) : (
           <ul className="flex flex-col gap-2">
             {timeline.map((ev, i) => (
               <li key={i} className="flex items-center gap-3 text-[13px]">
-                <span className="w-20 shrink-0 font-mono text-[11px] text-zinc-400">
+                <span className="w-20 shrink-0 font-mono text-[11px] text-muted-foreground">
                   {formatDay(ev.date)}
                 </span>
                 <span
                   className={`flex h-6 w-6 shrink-0 items-center justify-center rounded-full ${
                     ev.icon === "injury"
                       ? "bg-red-50 text-red-500 dark:bg-red-950/30"
-                      : "bg-[var(--club-primary-soft)] text-[var(--club-primary)]"
+                      : "bg-accent text-primary"
                   }`}
                 >
                   {ev.icon === "injury" ? (
@@ -241,7 +241,7 @@ export function PlayerOverviewSection({
                     <ClipboardList className="h-3.5 w-3.5" />
                   )}
                 </span>
-                <span className="text-zinc-700 dark:text-zinc-300">{ev.label}</span>
+                <span className="text-foreground">{ev.label}</span>
               </li>
             ))}
           </ul>
@@ -253,9 +253,9 @@ export function PlayerOverviewSection({
 
 function Kpi({ label, value }: { label: string; value: string }) {
   return (
-    <div className="rounded-lg border border-[var(--club-line)] bg-white p-3 dark:border-zinc-800 dark:bg-zinc-900">
-      <div className="text-[11px] font-medium uppercase tracking-wide text-zinc-400">{label}</div>
-      <div className="mt-1 font-mono text-xl font-semibold tabular-nums text-zinc-900 dark:text-zinc-100">
+    <div className="rounded-lg border border-border bg-card p-3">
+      <div className="text-[11px] font-medium uppercase tracking-wide text-muted-foreground">{label}</div>
+      <div className="mt-1 font-mono text-xl font-semibold tabular-nums text-foreground">
         {value}
       </div>
     </div>
@@ -277,9 +277,9 @@ function OverviewCard({
     <button
       type="button"
       onClick={onClick}
-      className="flex flex-col gap-2 rounded-lg border border-[var(--club-line)] bg-white p-4 text-left transition hover:border-[var(--club-primary)] dark:border-zinc-800 dark:bg-zinc-900"
+      className="flex flex-col gap-2 rounded-lg border border-border bg-card p-4 text-left transition hover:border-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
     >
-      <div className="flex items-center gap-2 text-[11px] font-medium uppercase tracking-wide text-zinc-400">
+      <div className="flex items-center gap-2 text-[11px] font-medium uppercase tracking-wide text-muted-foreground">
         <Icon className="h-3.5 w-3.5" />
         {title}
       </div>

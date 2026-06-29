@@ -151,7 +151,7 @@ export function SignupForm({ persona }: { persona: PersonaChoice }) {
       <TurnstileWidget ref={turnstileRef} />
 
       {error && (
-        <div className="rounded-md border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700">
+        <div className="rounded-md border border-destructive/30 bg-destructive/10 px-3 py-2 text-sm text-destructive">
           {error}
         </div>
       )}

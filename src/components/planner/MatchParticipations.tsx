@@ -129,28 +129,28 @@ export function MatchParticipations({
   }
 
   return (
-    <section className="flex flex-col gap-4 border-t border-[var(--club-line)] pt-5">
+    <section className="flex flex-col gap-4 border-t border-border pt-5">
       <div className="flex flex-wrap items-center justify-between gap-2">
-        <div className="flex items-center gap-2 text-base font-semibold text-zinc-900 dark:text-zinc-100">
-          <Users className="h-4 w-4 text-[var(--club-primary)]" />
+        <div className="flex items-center gap-2 text-base font-semibold text-foreground">
+          <Users className="h-4 w-4 text-primary" />
           {t("title")}
         </div>
-        <div className="flex items-center gap-2 text-xs font-medium text-zinc-500 dark:text-zinc-400">
-          <span className="rounded bg-[var(--club-primary-soft)] px-2 py-0.5 text-[var(--club-primary)]">
+        <div className="flex items-center gap-2 text-xs font-medium text-muted-foreground">
+          <span className="rounded bg-accent px-2 py-0.5 text-primary">
             {t("startersCount", { count: counts.starters })}
           </span>
-          <span className="rounded bg-zinc-100 px-2 py-0.5 dark:bg-zinc-800">
+          <span className="rounded bg-muted px-2 py-0.5">
             {t("subsCount", { count: counts.subs })}
           </span>
         </div>
       </div>
 
       {roster.length === 0 ? (
-        <p className="rounded-lg border border-dashed border-[var(--club-line)] bg-white/40 p-4 text-sm text-zinc-500 dark:bg-zinc-900/30">
+        <p className="rounded-lg border border-dashed border-border bg-muted/40 p-4 text-sm text-muted-foreground">
           {t("emptyRoster")}
         </p>
       ) : (
-        <ul className="flex flex-col divide-y divide-[var(--club-line)] overflow-hidden rounded-lg border border-[var(--club-line)]">
+        <ul className="flex flex-col divide-y divide-border overflow-hidden rounded-lg border border-border">
           {roster.map((p) => {
             const state = selected[p.playerId] ?? null;
             const playing =
@@ -161,10 +161,10 @@ export function MatchParticipations({
                 className="flex flex-col gap-2 px-3 py-2.5 sm:flex-row sm:items-center sm:gap-3"
               >
                 <span className="flex min-w-0 flex-1 items-center gap-2.5">
-                  <span className="inline-flex h-6 w-6 shrink-0 items-center justify-center rounded bg-zinc-100 text-[11px] font-semibold tabular-nums text-zinc-600 dark:bg-zinc-800 dark:text-zinc-300">
+                  <span className="inline-flex h-6 w-6 shrink-0 items-center justify-center rounded bg-muted text-[11px] font-semibold tabular-nums text-muted-foreground">
                     {p.jerseyNumber ?? "—"}
                   </span>
-                  <span className="truncate text-sm text-zinc-900 dark:text-zinc-100">
+                  <span className="truncate text-sm text-foreground">
                     {p.fullName}
                   </span>
                 </span>
@@ -180,7 +180,7 @@ export function MatchParticipations({
                           : (e.target.value as ParticipationStatus),
                       )
                     }
-                    className="rounded-md border border-zinc-200 bg-white px-2 py-1 text-xs text-zinc-900 focus:border-zinc-400 focus:outline-none dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100"
+                    className="rounded-lg border border-border bg-card px-2 py-1 text-xs text-foreground focus:border-ring focus:outline-none focus:ring-2 focus:ring-ring/15"
                   >
                     {STATUS_ORDER.map((s) => (
                       <option key={s ?? "none"} value={s ?? ""}>
@@ -191,7 +191,7 @@ export function MatchParticipations({
 
                   {playing ? (
                     <div className="flex items-center gap-1.5">
-                      <label className="flex items-center gap-1 text-[11px] text-zinc-500 dark:text-zinc-400">
+                      <label className="flex items-center gap-1 text-[11px] text-muted-foreground">
                         {t("min")}
                         <input
                           type="number"
@@ -206,10 +206,10 @@ export function MatchParticipations({
                                   : Number(e.target.value),
                             })
                           }
-                          className="w-12 rounded-md border border-zinc-200 bg-white px-1.5 py-1 text-xs tabular-nums text-zinc-900 focus:border-zinc-400 focus:outline-none dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100"
+                          className="w-12 rounded-lg border border-border bg-card px-1.5 py-1 text-xs tabular-nums text-foreground focus:border-ring focus:outline-none focus:ring-2 focus:ring-ring/15"
                         />
                       </label>
-                      <label className="flex items-center gap-1 text-[11px] text-zinc-500 dark:text-zinc-400">
+                      <label className="flex items-center gap-1 text-[11px] text-muted-foreground">
                         ⚽
                         <input
                           type="number"
@@ -221,7 +221,7 @@ export function MatchParticipations({
                               goals: Math.max(0, Number(e.target.value) || 0),
                             })
                           }
-                          className="w-11 rounded-md border border-zinc-200 bg-white px-1.5 py-1 text-xs tabular-nums text-zinc-900 focus:border-zinc-400 focus:outline-none dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100"
+                          className="w-11 rounded-lg border border-border bg-card px-1.5 py-1 text-xs tabular-nums text-foreground focus:border-ring focus:outline-none focus:ring-2 focus:ring-ring/15"
                         />
                       </label>
                       <button
@@ -235,7 +235,7 @@ export function MatchParticipations({
                         className={`flex h-6 w-6 items-center justify-center rounded text-[11px] font-semibold tabular-nums transition ${
                           (state?.yellowCards ?? 0) > 0
                             ? "bg-amber-400 text-amber-950"
-                            : "bg-zinc-100 text-zinc-400 dark:bg-zinc-800"
+                            : "bg-muted text-muted-foreground"
                         }`}
                       >
                         {state?.yellowCards ? state.yellowCards : "🟨"}
@@ -249,7 +249,7 @@ export function MatchParticipations({
                         className={`flex h-6 w-6 items-center justify-center rounded text-[11px] transition ${
                           state?.redCard
                             ? "bg-red-500 text-white"
-                            : "bg-zinc-100 text-zinc-400 dark:bg-zinc-800"
+                            : "bg-muted text-muted-foreground"
                         }`}
                       >
                         🟥
@@ -279,7 +279,7 @@ export function MatchParticipations({
           </span>
         ) : null}
         {error ? (
-          <span className="text-sm text-red-600 dark:text-red-400">
+          <span className="text-sm text-destructive">
             {t.has(`err.${error}`) ? t(`err.${error}`) : error}
           </span>
         ) : null}

@@ -109,9 +109,9 @@ export function MatchEditor({
   };
 
   return (
-    <div className="flex flex-col gap-3 rounded-lg border border-[var(--club-line)] bg-white/70 p-4 dark:bg-zinc-900/40">
+    <div className="flex flex-col gap-3 rounded-lg border border-border bg-card/70 p-4">
       {!isManual ? (
-        <p className="text-xs text-zinc-500 dark:text-zinc-400">{t("icsHint")}</p>
+        <p className="text-xs text-muted-foreground">{t("icsHint")}</p>
       ) : null}
 
       {isManual ? (
@@ -179,7 +179,7 @@ export function MatchEditor({
       </div>
 
       {error ? (
-        <p className="text-sm text-red-600 dark:text-red-400">{error}</p>
+        <p className="text-sm text-destructive">{error}</p>
       ) : null}
 
       <div className="flex justify-end gap-2">

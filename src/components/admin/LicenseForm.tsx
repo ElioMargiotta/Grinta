@@ -2,6 +2,9 @@
 
 import { useActionState } from "react";
 import { useTranslations } from "next-intl";
+import { Button } from "@/components/ui/Button";
+import { fieldVariants } from "@/components/ui/field";
+import { cn } from "@/lib/utils";
 import { updateLicenseAction } from "@/app/[locale]/(admin)/admin/actions";
 import { LicensePriceEstimate } from "@/components/admin/LicensePriceEstimate";
 import type { LicenseStatus } from "@/lib/license/types";
@@ -74,7 +77,7 @@ export function LicenseForm({
         </Field>
       </div>
 
-      <label className="flex items-center gap-2 text-sm text-zinc-700 dark:text-zinc-300">
+      <label className="flex items-center gap-2 text-sm text-foreground">
         <input name="autoRenew" type="checkbox" defaultChecked={values.auto_renew} className="h-4 w-4" />
         {t("license.autoRenew")}
       </label>
@@ -87,7 +90,7 @@ export function LicenseForm({
       </Field>
 
       {state?.error && (
-        <p className="rounded-lg bg-rose-50 px-3 py-2 text-sm text-rose-700 dark:bg-rose-900/20 dark:text-rose-400">
+        <p className="rounded-lg border border-destructive/30 bg-destructive/10 px-3 py-2 text-sm text-destructive">
           {state.error}
         </p>
       )}
@@ -97,19 +100,14 @@ export function LicenseForm({
         </p>
       )}
 
-      <button
-        type="submit"
-        disabled={pending}
-        className="self-start rounded-lg bg-zinc-900 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-zinc-700 disabled:opacity-50 dark:bg-zinc-100 dark:text-zinc-900 dark:hover:bg-zinc-300"
-      >
+      <Button type="submit" loading={pending} className="self-start">
         {pending ? t("common.saving") : t("common.save")}
-      </button>
+      </Button>
     </form>
   );
 }
 
-const inputCls =
-  "w-full rounded-lg border border-zinc-300 bg-white px-3 py-2 text-sm text-zinc-900 outline-none focus:border-zinc-500 dark:border-zinc-700 dark:bg-zinc-950 dark:text-zinc-100";
+const inputCls = cn(fieldVariants(), "px-3 py-2");
 
 function Field({
   label,
@@ -122,9 +120,9 @@ function Field({
 }) {
   return (
     <label className="flex flex-col gap-1">
-      <span className="text-xs font-medium text-zinc-700 dark:text-zinc-300">{label}</span>
+      <span className="text-xs font-medium text-foreground">{label}</span>
       {children}
-      {hint && <span className="text-[11px] text-zinc-400">{hint}</span>}
+      {hint && <span className="text-[11px] text-muted-foreground">{hint}</span>}
     </label>
   );
 }

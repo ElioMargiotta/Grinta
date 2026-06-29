@@ -5,6 +5,9 @@ import { useTranslations } from "next-intl";
 import { Activity, ChevronDown, ChevronRight, Download, LineChart as LineChartIcon, Plus, Settings2, Trash2, X } from "lucide-react";
 import { Link } from "@/i18n/navigation";
 import { Section, SectionHeader } from "@/components/ui/Section";
+import { Button, buttonVariants } from "@/components/ui/Button";
+import { Dialog, DialogContent } from "@/components/ui/Dialog";
+import { cn } from "@/lib/utils";
 import { formatDay } from "@/lib/contingent/week";
 import {
   MetricChart,
@@ -251,19 +254,19 @@ export function PhysicalHubView({
 
   // Couleur de la valeur selon le seuil d'alerte (prioritaire) puis vs moyenne.
   function valueClass(value: number): string {
-    if (!metric) return "text-zinc-900 dark:text-zinc-100";
+    if (!metric) return "text-foreground";
     const thr = metric.alert_threshold;
     if (thr !== null && thr !== undefined) {
       const beyond = metric.higher_is_better ? value < thr : value > thr;
-      if (beyond) return "text-red-600 dark:text-red-400";
+      if (beyond) return "text-destructive";
     }
     if (stats) {
       const better = metric.higher_is_better ? value >= stats.avg : value <= stats.avg;
       return better
         ? "text-emerald-600 dark:text-emerald-400"
-        : "text-zinc-500 dark:text-zinc-400";
+        : "text-muted-foreground";
     }
-    return "text-zinc-900 dark:text-zinc-100";
+    return "text-foreground";
   }
 
   function exportCsv() {
@@ -294,24 +297,24 @@ export function PhysicalHubView({
   }
 
   const selectClass =
-    "rounded-md border border-[var(--club-line)] bg-white px-2.5 py-1.5 text-[13px] text-zinc-900 dark:bg-zinc-900 dark:text-zinc-100";
+    "rounded-md border border-border bg-card px-2.5 py-1.5 text-[13px] text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring";
 
   // -- État vide : aucun test ------------------------------------------------
   if (activeMetrics.length === 0) {
     return (
       <Section>
-        <div className="rounded-md border border-dashed border-[var(--club-line)] p-10 text-center">
-          <Activity className="mx-auto mb-3 h-8 w-8 text-zinc-300" />
-          <p className="text-sm text-zinc-500 dark:text-zinc-400">{t("emptyMetrics")}</p>
+        <div className="rounded-md border border-dashed border-border p-10 text-center">
+          <Activity className="mx-auto mb-3 h-8 w-8 text-muted-foreground/60" />
+          <p className="text-sm text-muted-foreground">{t("emptyMetrics")}</p>
           {canManageMetrics ? (
-            <button
-              type="button"
+            <Button
+              size="sm"
               onClick={() => setManagerOpen(true)}
-              className="mt-4 inline-flex items-center gap-2 rounded-md bg-[var(--club-primary)] px-3 py-1.5 text-[13px] font-semibold text-[var(--club-primary-foreground)]"
+              className="mt-4"
             >
               <Settings2 className="h-4 w-4" />
               {t("createFirst")}
-            </button>
+            </Button>
           ) : null}
         </div>
         {managerOpen ? (
@@ -332,7 +335,7 @@ export function PhysicalHubView({
   return (
     <div className="flex flex-col gap-6">
       {error ? (
-        <div className="rounded-md border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700 dark:border-red-900/50 dark:bg-red-950/30 dark:text-red-300">
+        <div className="rounded-md border border-destructive/30 bg-destructive/10 px-3 py-2 text-sm text-destructive">
           {error}
         </div>
       ) : null}
@@ -340,7 +343,7 @@ export function PhysicalHubView({
       {/* ---- Barre de filtres ---- */}
       <Section className="!p-4">
         <div className="flex flex-wrap items-end gap-3">
-          <label className="flex flex-col gap-1 text-[11px] font-medium uppercase tracking-wide text-zinc-500">
+          <label className="flex flex-col gap-1 text-[11px] font-medium uppercase tracking-wide text-muted-foreground">
             {t("filter.test")}
             <select
               value={effectiveMetricId}
@@ -356,7 +359,7 @@ export function PhysicalHubView({
             </select>
           </label>
 
-          <label className="flex flex-col gap-1 text-[11px] font-medium uppercase tracking-wide text-zinc-500">
+          <label className="flex flex-col gap-1 text-[11px] font-medium uppercase tracking-wide text-muted-foreground">
             {t("filter.team")}
             <select
               value={teamFilter}
@@ -373,7 +376,7 @@ export function PhysicalHubView({
           </label>
 
           {categories.length > 0 ? (
-            <label className="flex flex-col gap-1 text-[11px] font-medium uppercase tracking-wide text-zinc-500">
+            <label className="flex flex-col gap-1 text-[11px] font-medium uppercase tracking-wide text-muted-foreground">
               {t("filter.category")}
               <select
                 value={categoryFilter}
@@ -390,7 +393,7 @@ export function PhysicalHubView({
             </label>
           ) : null}
 
-          <label className="flex flex-col gap-1 text-[11px] font-medium uppercase tracking-wide text-zinc-500">
+          <label className="flex flex-col gap-1 text-[11px] font-medium uppercase tracking-wide text-muted-foreground">
             {t("filter.period")}
             <select
               value={period}
@@ -406,55 +409,51 @@ export function PhysicalHubView({
 
           <div className="ml-auto flex items-center gap-2">
             {canManageMetrics && teams.length > 0 ? (
-              <button
-                type="button"
-                onClick={() => setCreateEvalOpen(true)}
-                className="inline-flex items-center gap-2 rounded-md bg-[var(--club-primary)] px-3 py-1.5 text-[13px] font-semibold text-[var(--club-primary-foreground)]"
-              >
+              <Button size="sm" onClick={() => setCreateEvalOpen(true)}>
                 <Plus className="h-4 w-4" />
                 {t("createEval")}
-              </button>
+              </Button>
             ) : null}
             {canManageMetrics ? (
-              <button
-                type="button"
+              <Button
+                variant="secondary"
+                size="sm"
                 onClick={() => setManagerOpen(true)}
-                className="inline-flex items-center gap-2 rounded-md border border-[var(--club-line)] px-3 py-1.5 text-[13px] font-semibold text-zinc-700 hover:bg-zinc-50 dark:border-zinc-800 dark:text-zinc-200 dark:hover:bg-zinc-800/50"
               >
                 <Settings2 className="h-4 w-4" />
                 {t("manageTests")}
-              </button>
+              </Button>
             ) : null}
           </div>
         </div>
       </Section>
 
       {evals.length > 0 ? (
-        <div className="overflow-hidden rounded-xl border border-zinc-200 bg-white shadow-sm dark:border-zinc-800 dark:bg-zinc-900">
-          <div className="border-b border-zinc-200 bg-zinc-50/70 px-4 py-2.5 dark:border-zinc-800 dark:bg-zinc-950/40">
-            <h3 className="text-sm font-semibold tracking-tight text-zinc-900 dark:text-zinc-100">
+        <div className="overflow-hidden rounded-xl border border-border bg-card shadow-sm">
+          <div className="border-b border-border bg-muted/50 px-4 py-2.5">
+            <h3 className="text-sm font-semibold tracking-tight text-foreground">
               {t("evals.title")}
             </h3>
           </div>
-          <ul className="divide-y divide-zinc-200 dark:divide-zinc-800">
+          <ul className="divide-y divide-border">
             {evals.map((e) => (
               <li
                 key={e.id}
-                className="flex items-center gap-1 pr-2 hover:bg-zinc-50 dark:hover:bg-zinc-900/60"
+                className="flex items-center gap-1 pr-2 hover:bg-muted/50"
               >
                 <Link
                   href={`/planner/${e.teamId}/sessions/${e.id}/test`}
                   className="flex flex-1 items-center justify-between gap-3 px-4 py-2.5"
                 >
                   <span className="flex items-center gap-2">
-                    <Activity className="h-4 w-4 text-[var(--club-primary)]" />
-                    <span className="font-medium text-zinc-900 dark:text-zinc-100">
+                    <Activity className="h-4 w-4 text-primary" />
+                    <span className="font-medium text-foreground">
                       {e.teamName}
                     </span>
-                    <span className="text-[12px] text-zinc-400">{formatDay(e.date)}</span>
+                    <span className="text-[12px] text-muted-foreground">{formatDay(e.date)}</span>
                   </span>
                   <span className="flex items-center gap-3">
-                    <span className="text-[12px] text-zinc-500">
+                    <span className="text-[12px] text-muted-foreground">
                       {t("evals.testCount", { count: e.testCount })}
                     </span>
                     <span
@@ -463,12 +462,12 @@ export function PhysicalHubView({
                           ? "bg-emerald-50 text-emerald-700 dark:bg-emerald-950/30 dark:text-emerald-300"
                           : e.completion > 0
                             ? "bg-amber-50 text-amber-700 dark:bg-amber-950/30 dark:text-amber-300"
-                            : "bg-zinc-100 text-zinc-500 dark:bg-zinc-800 dark:text-zinc-400"
+                            : "bg-muted text-muted-foreground"
                       }`}
                     >
                       {Math.round(e.completion * 100)}%
                     </span>
-                    <span className="text-[12px] font-semibold text-[var(--club-primary)]">
+                    <span className="text-[12px] font-semibold text-primary">
                       {e.completion >= 1 ? t("evals.view") : t("evals.enter")}
                     </span>
                   </span>
@@ -480,7 +479,7 @@ export function PhysicalHubView({
                     onClick={() => deleteEval(e.id)}
                     title={t("evals.delete")}
                     aria-label={t("evals.delete")}
-                    className="rounded-md p-1.5 text-zinc-400 hover:bg-red-50 hover:text-red-600 dark:hover:bg-red-950/30"
+                    className="rounded-md p-1.5 text-muted-foreground hover:bg-destructive/10 hover:text-destructive focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
                   >
                     <Trash2 className="h-4 w-4" />
                   </button>
@@ -501,10 +500,10 @@ export function PhysicalHubView({
                 <>
                   {metric.name}
                   {metric.unit ? (
-                    <span className="ml-2 text-sm font-normal text-zinc-400">{metric.unit}</span>
+                    <span className="ml-2 text-sm font-normal text-muted-foreground">{metric.unit}</span>
                   ) : null}
                   {metric.category ? (
-                    <span className="ml-2 rounded bg-zinc-100 px-1.5 py-0.5 align-middle text-[10px] font-semibold uppercase tracking-wide text-zinc-500 dark:bg-zinc-800 dark:text-zinc-400">
+                    <span className="ml-2 rounded bg-muted px-1.5 py-0.5 align-middle text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">
                       {categoryLabel(metric.category)}
                       {metric.subcategory ? ` · ${metric.subcategory.replace(/_/g, " ")}` : ""}
                     </span>
@@ -535,7 +534,7 @@ export function PhysicalHubView({
             </dl>
 
             {metric.validity_conditions ? (
-              <p className="mt-3 text-[12px] text-zinc-500 dark:text-zinc-400">
+              <p className="mt-3 text-[12px] text-muted-foreground">
                 <span className="font-semibold">{t("meta.validity")} : </span>
                 {metric.validity_conditions}
               </p>
@@ -546,7 +545,7 @@ export function PhysicalHubView({
                 <button
                   type="button"
                   onClick={() => setProtocolOpen((v) => !v)}
-                  className="inline-flex items-center gap-1 text-[12px] font-medium text-zinc-500 hover:text-zinc-800 dark:hover:text-zinc-200"
+                  className="inline-flex items-center gap-1 text-[12px] font-medium text-muted-foreground hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring rounded"
                 >
                   {protocolOpen ? (
                     <ChevronDown className="h-3.5 w-3.5" />
@@ -556,7 +555,7 @@ export function PhysicalHubView({
                   {tm("field.protocol")}
                 </button>
                 {protocolOpen ? (
-                  <p className="mt-2 whitespace-pre-wrap rounded-md border border-[var(--club-line)] bg-zinc-50/60 p-3 text-[13px] text-zinc-700 dark:bg-zinc-800/30 dark:text-zinc-300">
+                  <p className="mt-2 whitespace-pre-wrap rounded-md border border-border bg-muted/50 p-3 text-[13px] text-foreground">
                     {metric.protocol}
                   </p>
                 ) : null}
@@ -566,7 +565,7 @@ export function PhysicalHubView({
 
           {ranking.length === 0 ? (
             <Section>
-              <p className="py-10 text-center text-sm text-zinc-400">{t("noData")}</p>
+              <p className="py-10 text-center text-sm text-muted-foreground">{t("noData")}</p>
             </Section>
           ) : (
             <>
@@ -590,28 +589,24 @@ export function PhysicalHubView({
               ) : null}
 
               {/* ---- Classement (tableau propre, graphe par joueur au clic) ---- */}
-              <div className="overflow-hidden rounded-xl border border-zinc-200 bg-white shadow-sm dark:border-zinc-800 dark:bg-zinc-900">
-                <div className="flex items-center justify-between gap-3 border-b border-zinc-200 bg-zinc-50/70 px-4 py-2.5 dark:border-zinc-800 dark:bg-zinc-950/40">
-                  <h3 className="text-sm font-semibold tracking-tight text-zinc-900 dark:text-zinc-100">
+              <div className="overflow-hidden rounded-xl border border-border bg-card shadow-sm">
+                <div className="flex items-center justify-between gap-3 border-b border-border bg-muted/50 px-4 py-2.5">
+                  <h3 className="text-sm font-semibold tracking-tight text-foreground">
                     {t("ranking")}
                   </h3>
                   <div className="flex items-center gap-3">
-                    <span className="hidden text-[11px] text-zinc-400 sm:inline">
+                    <span className="hidden text-[11px] text-muted-foreground sm:inline">
                       {t("clickRowHint")}
                     </span>
-                    <button
-                      type="button"
-                      onClick={exportCsv}
-                      className="inline-flex items-center gap-1.5 rounded-md border border-[var(--club-line)] px-2.5 py-1 text-[12px] font-semibold text-zinc-600 hover:bg-zinc-50 dark:border-zinc-700 dark:text-zinc-300 dark:hover:bg-zinc-800"
-                    >
+                    <Button variant="secondary" size="sm" onClick={exportCsv} className="h-7 px-2.5 text-[12px]">
                       <Download className="h-3.5 w-3.5" />
                       {t("exportCsv")}
-                    </button>
+                    </Button>
                   </div>
                 </div>
                 <div className="overflow-x-auto">
                   <table className="w-full text-sm">
-                    <thead className="bg-zinc-50 text-left text-[11px] uppercase tracking-widest text-zinc-500 dark:bg-zinc-900 dark:text-zinc-400">
+                    <thead className="bg-muted text-left text-[11px] uppercase tracking-widest text-muted-foreground">
                       <tr>
                         <th className="px-3 py-2 font-medium">#</th>
                         <th className="px-3 py-2 font-medium">{t("col.player")}</th>
@@ -622,15 +617,15 @@ export function PhysicalHubView({
                         <th className="px-2 py-2" />
                       </tr>
                     </thead>
-                    <tbody className="divide-y divide-zinc-200 dark:divide-zinc-800">
+                    <tbody className="divide-y divide-border">
                       {ranking.map((r, i) => (
                         <tr
                           key={r.playerId}
                           onClick={() => setChartPlayerId(r.playerId)}
-                          className="cursor-pointer bg-white transition-colors hover:bg-zinc-50 dark:bg-zinc-950 dark:hover:bg-zinc-900/60"
+                          className="cursor-pointer bg-card transition-colors hover:bg-muted/50"
                         >
-                          <td className="px-3 py-2 font-mono text-zinc-400">{i + 1}</td>
-                          <td className="px-3 py-2 font-medium text-zinc-900 dark:text-zinc-100">
+                          <td className="px-3 py-2 font-mono text-muted-foreground">{i + 1}</td>
+                          <td className="px-3 py-2 font-medium text-foreground">
                             {r.name}
                           </td>
                           <td
@@ -642,21 +637,21 @@ export function PhysicalHubView({
                             <div className="flex items-center justify-end gap-1">
                               <TrendArrow trend={r.trend} />
                               {r.delta !== null && r.delta !== 0 ? (
-                                <span className="font-mono text-[12px] tabular-nums text-zinc-500">
+                                <span className="font-mono text-[12px] tabular-nums text-muted-foreground">
                                   {r.delta > 0 ? "+" : ""}
                                   {r.delta}
                                 </span>
                               ) : null}
                             </div>
                           </td>
-                          <td className="px-3 py-2 text-right font-mono text-[12px] text-zinc-400">
+                          <td className="px-3 py-2 text-right font-mono text-[12px] text-muted-foreground">
                             {formatDay(r.latestDate)}
                           </td>
-                          <td className="px-3 py-2 text-right font-mono text-[12px] text-zinc-400">
+                          <td className="px-3 py-2 text-right font-mono text-[12px] text-muted-foreground">
                             {r.count}
                           </td>
                           <td className="px-2 py-2 text-right">
-                            <LineChartIcon className="ml-auto h-3.5 w-3.5 text-zinc-300" />
+                            <LineChartIcon className="ml-auto h-3.5 w-3.5 text-muted-foreground/60" />
                           </td>
                         </tr>
                       ))}
@@ -742,35 +737,21 @@ function EvalCreateModal({
   const canSubmit = teamId && date && selected.size > 0 && !pending;
 
   return (
-    <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4"
-      onClick={onClose}
-    >
-      <div
-        className="max-h-[90vh] w-full max-w-md overflow-y-auto rounded-lg border border-[var(--club-line)] bg-white p-5 shadow-xl dark:border-zinc-800 dark:bg-zinc-900"
-        onClick={(e) => e.stopPropagation()}
-      >
+    <Dialog open onOpenChange={(o) => { if (!o) onClose(); }}>
+      <DialogContent className="max-h-[90vh] max-w-md overflow-y-auto">
         <div className="mb-4 flex items-center justify-between">
-          <h3 className="text-base font-semibold text-zinc-900 dark:text-zinc-100">
+          <h3 className="text-base font-semibold text-foreground">
             {t("createEval")}
           </h3>
-          <button
-            type="button"
-            onClick={onClose}
-            className="rounded-md p-1 text-zinc-400 hover:bg-zinc-100 hover:text-zinc-700 dark:hover:bg-zinc-800"
-            aria-label={t("evalForm.cancel")}
-          >
-            <X className="h-5 w-5" />
-          </button>
         </div>
 
         <div className="flex flex-col gap-3">
-          <label className="flex flex-col gap-1 text-[11px] font-medium uppercase tracking-wide text-zinc-500">
+          <label className="flex flex-col gap-1 text-[11px] font-medium uppercase tracking-wide text-muted-foreground">
             {t("pickTeam")}
             <select
               value={teamId}
               onChange={(e) => setTeamId(e.target.value)}
-              className="rounded-md border border-[var(--club-line)] bg-white px-2.5 py-1.5 text-[13px] text-zinc-900 dark:bg-zinc-900 dark:text-zinc-100"
+              className="rounded-md border border-border bg-card px-2.5 py-1.5 text-[13px] text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
             >
               {teams.map((tm2) => (
                 <option key={tm2.id} value={tm2.id}>
@@ -780,28 +761,28 @@ function EvalCreateModal({
             </select>
           </label>
 
-          <label className="flex flex-col gap-1 text-[11px] font-medium uppercase tracking-wide text-zinc-500">
+          <label className="flex flex-col gap-1 text-[11px] font-medium uppercase tracking-wide text-muted-foreground">
             {t("evalForm.date")}
             <input
               type="date"
               value={date}
               onChange={(e) => setDate(e.target.value)}
-              className="rounded-md border border-[var(--club-line)] bg-white px-2.5 py-1.5 text-[13px] text-zinc-900 dark:bg-zinc-900 dark:text-zinc-100"
+              className="rounded-md border border-border bg-card px-2.5 py-1.5 text-[13px] text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
             />
           </label>
 
           <div className="flex flex-col gap-1">
-            <span className="text-[11px] font-medium uppercase tracking-wide text-zinc-500">
+            <span className="text-[11px] font-medium uppercase tracking-wide text-muted-foreground">
               {t("evalForm.tests")} ({selected.size})
             </span>
-            <div className="max-h-48 overflow-y-auto rounded-md border border-[var(--club-line)] p-1">
+            <div className="max-h-48 overflow-y-auto rounded-md border border-border p-1">
               {metrics.length === 0 ? (
-                <p className="p-2 text-[12px] text-zinc-400">{t("emptyMetrics")}</p>
+                <p className="p-2 text-[12px] text-muted-foreground">{t("emptyMetrics")}</p>
               ) : (
                 metrics.map((m) => (
                   <label
                     key={m.id}
-                    className="flex items-center gap-2 rounded px-2 py-1.5 text-[13px] text-zinc-700 hover:bg-zinc-50 dark:text-zinc-200 dark:hover:bg-zinc-800/50"
+                    className="flex items-center gap-2 rounded px-2 py-1.5 text-[13px] text-foreground hover:bg-muted/50"
                   >
                     <input
                       type="checkbox"
@@ -810,7 +791,7 @@ function EvalCreateModal({
                     />
                     {m.name}
                     {m.unit ? (
-                      <span className="text-zinc-400">({m.unit})</span>
+                      <span className="text-muted-foreground">({m.unit})</span>
                     ) : null}
                   </label>
                 ))
@@ -820,24 +801,19 @@ function EvalCreateModal({
         </div>
 
         <div className="mt-5 flex justify-end gap-2">
-          <button
-            type="button"
-            onClick={onClose}
-            className="rounded-md border border-[var(--club-line)] px-3 py-1.5 text-[13px] font-semibold text-zinc-700 hover:bg-zinc-50 dark:text-zinc-200 dark:hover:bg-zinc-800/50"
-          >
+          <Button variant="secondary" size="sm" onClick={onClose}>
             {t("evalForm.cancel")}
-          </button>
-          <button
-            type="button"
+          </Button>
+          <Button
+            size="sm"
             disabled={!canSubmit}
             onClick={() => onSubmit(teamId, date, Array.from(selected))}
-            className="rounded-md bg-[var(--club-primary)] px-3 py-1.5 text-[13px] font-semibold text-[var(--club-primary-foreground)] disabled:opacity-50"
           >
             {t("evalForm.submit")}
-          </button>
+          </Button>
         </div>
-      </div>
-    </div>
+      </DialogContent>
+    </Dialog>
   );
 }
 
@@ -864,23 +840,20 @@ function PlayerChartModal({
 }) {
   void locale;
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4" onClick={onClose}>
-      <div
-        className="w-full max-w-2xl rounded-lg border border-[var(--club-line)] bg-white p-5 shadow-xl dark:border-zinc-800 dark:bg-zinc-900"
-        onClick={(e) => e.stopPropagation()}
-      >
+    <Dialog open onOpenChange={(o) => { if (!o) onClose(); }}>
+      <DialogContent showClose={false} className="max-w-2xl">
         <div className="mb-4 flex items-start justify-between gap-3">
           <div className="min-w-0">
-            <h3 className="text-base font-semibold text-zinc-900 dark:text-zinc-100">{playerName}</h3>
-            <p className="mt-0.5 text-[13px] text-zinc-500 dark:text-zinc-400">
+            <h3 className="text-base font-semibold text-foreground">{playerName}</h3>
+            <p className="mt-0.5 text-[13px] text-muted-foreground">
               {metric.name}
-              {metric.unit ? <span className="ml-1.5 text-zinc-400">{metric.unit}</span> : null}
+              {metric.unit ? <span className="ml-1.5 text-muted-foreground">{metric.unit}</span> : null}
             </p>
           </div>
           <button
             type="button"
             onClick={onClose}
-            className="rounded-md p-1 text-zinc-400 hover:bg-zinc-100 hover:text-zinc-700 dark:hover:bg-zinc-800"
+            className="rounded-md p-1 text-muted-foreground hover:bg-accent hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
             aria-label={closeLabel}
           >
             <X className="h-5 w-5" />
@@ -888,7 +861,7 @@ function PlayerChartModal({
         </div>
 
         {points.length === 0 ? (
-          <p className="py-10 text-center text-sm text-zinc-400">{noDataLabel}</p>
+          <p className="py-10 text-center text-sm text-muted-foreground">{noDataLabel}</p>
         ) : (
           <MetricChart points={points} unit={metric.unit} higherIsBetter={metric.higher_is_better} />
         )}
@@ -896,13 +869,13 @@ function PlayerChartModal({
         <div className="mt-4 flex justify-end">
           <Link
             href={`/contingent/${playerId}`}
-            className="inline-flex items-center gap-1.5 rounded-md border border-[var(--club-line)] px-3 py-1.5 text-[13px] font-semibold text-zinc-700 hover:bg-zinc-50 dark:border-zinc-800 dark:text-zinc-200 dark:hover:bg-zinc-800/50"
+            className={cn(buttonVariants({ variant: "secondary", size: "sm" }))}
           >
             {viewProfileLabel}
           </Link>
         </div>
-      </div>
-    </div>
+      </DialogContent>
+    </Dialog>
   );
 }
 
@@ -917,12 +890,12 @@ function MetaItem({
 }) {
   return (
     <div>
-      <dt className="text-[10px] font-medium uppercase tracking-wide text-zinc-400">{label}</dt>
+      <dt className="text-[10px] font-medium uppercase tracking-wide text-muted-foreground">{label}</dt>
       <dd
         className={`text-[12px] ${
           alert
             ? "font-semibold text-amber-600 dark:text-amber-400"
-            : "text-zinc-700 dark:text-zinc-300"
+            : "text-foreground"
         }`}
       >
         {value}
@@ -933,9 +906,9 @@ function MetaItem({
 
 function StatCard({ label, value }: { label: string; value: string }) {
   return (
-    <div className="rounded-lg border border-[var(--club-line)] bg-white p-3 dark:border-zinc-800 dark:bg-zinc-900">
-      <div className="text-[11px] font-medium uppercase tracking-wide text-zinc-400">{label}</div>
-      <div className="mt-1 font-mono text-lg font-semibold tabular-nums text-zinc-900 dark:text-zinc-100">
+    <div className="rounded-lg border border-border bg-card p-3">
+      <div className="text-[11px] font-medium uppercase tracking-wide text-muted-foreground">{label}</div>
+      <div className="mt-1 font-mono text-lg font-semibold tabular-nums text-foreground">
         {value}
       </div>
     </div>

@@ -84,12 +84,12 @@ export function PlannerTimeField({
   const colBtn = (active: boolean) =>
     [
       "w-full rounded-[7px] px-2 py-1.5 text-center text-[13px] font-medium tabular-nums transition",
-      active ? "bg-red-500 text-white" : "text-zinc-700 hover:bg-zinc-100",
+      active ? "bg-primary text-primary-foreground" : "text-foreground hover:bg-accent",
     ].join(" ");
 
   return (
     <div className="flex flex-col gap-1.5" ref={rootRef}>
-      <label htmlFor={id} className="text-sm font-medium text-zinc-900">
+      <label htmlFor={id} className="text-sm font-medium text-foreground">
         {label}
       </label>
       <div className="relative">
@@ -99,18 +99,18 @@ export function PlannerTimeField({
           onClick={() => setOpen((v) => !v)}
           aria-haspopup="dialog"
           aria-expanded={open}
-          className={`flex h-10 w-full items-center justify-between gap-2 rounded-lg border bg-white px-3 text-left text-sm text-zinc-900 shadow-sm transition hover:border-zinc-300 focus:outline-none focus:ring-2 focus:ring-zinc-900/10 ${
-            open ? "border-zinc-900 ring-2 ring-zinc-900/10" : "border-zinc-200"
+          className={`flex h-10 w-full items-center justify-between gap-2 rounded-lg border bg-card px-3 text-left text-sm text-foreground shadow-sm transition hover:border-input focus:outline-none focus:ring-2 focus:ring-ring/15 ${
+            open ? "border-ring ring-2 ring-ring/15" : "border-border"
           }`}
         >
-          <span className={value ? "tabular-nums" : "text-zinc-400"}>{value || "—"}</span>
-          <Clock className="h-4 w-4 shrink-0 text-zinc-400" />
+          <span className={value ? "tabular-nums" : "text-muted-foreground"}>{value || "—"}</span>
+          <Clock className="h-4 w-4 shrink-0 text-muted-foreground" />
         </button>
         {open ? (
-          <div className="absolute left-0 z-30 mt-2 w-[200px] rounded-[12px] border border-zinc-200 bg-white shadow-[0_12px_32px_rgb(0_0_0/0.12)]">
+          <div className="absolute left-0 z-30 mt-2 w-[200px] rounded-[12px] border border-border bg-card shadow-[0_12px_32px_rgb(0_0_0/0.12)]">
             <div className="grid grid-cols-2">
-              <div className="border-r border-zinc-200">
-                <div className="border-b border-zinc-200 px-3 py-2 text-center text-[10px] font-semibold uppercase tracking-[0.08em] text-zinc-400">
+              <div className="border-r border-border">
+                <div className="border-b border-border px-3 py-2 text-center text-[10px] font-semibold uppercase tracking-[0.08em] text-muted-foreground">
                   {t("timeHours")}
                 </div>
                 <div
@@ -131,7 +131,7 @@ export function PlannerTimeField({
                 </div>
               </div>
               <div>
-                <div className="border-b border-zinc-200 px-3 py-2 text-center text-[10px] font-semibold uppercase tracking-[0.08em] text-zinc-400">
+                <div className="border-b border-border px-3 py-2 text-center text-[10px] font-semibold uppercase tracking-[0.08em] text-muted-foreground">
                   {t("timeMinutes")}
                 </div>
                 <div
@@ -155,7 +155,7 @@ export function PlannerTimeField({
           </div>
         ) : null}
       </div>
-      {hint ? <span className="text-xs text-zinc-500">{hint}</span> : null}
+      {hint ? <span className="text-xs text-muted-foreground">{hint}</span> : null}
     </div>
   );
 }

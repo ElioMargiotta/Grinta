@@ -67,7 +67,7 @@ export function TeamAssignmentsBlock({
 
       {currentTeams.length > 0 && (
         <div className="mb-4 flex flex-col gap-2">
-          <span className="text-xs font-medium uppercase tracking-wider text-zinc-500 dark:text-zinc-400">
+          <span className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
             {t("currentLabel")}
           </span>
           <div className="flex flex-wrap gap-2">
@@ -76,13 +76,13 @@ export function TeamAssignmentsBlock({
               return (
                 <span
                   key={tm.id}
-                  className={`inline-flex items-center gap-1.5 rounded-full border border-[var(--club-primary)] bg-[var(--club-primary-soft)] px-3 py-1 text-xs font-medium text-[var(--club-primary)] ${
+                  className={`inline-flex items-center gap-1.5 rounded-full border border-primary bg-accent px-3 py-1 text-xs font-medium text-primary ${
                     isBusy ? "opacity-60" : ""
                   }`}
                 >
                   <span>{tm.name}</span>
                   {tm.age_group && (
-                    <span className="text-[10px] uppercase tracking-wider text-zinc-500">
+                    <span className="text-[10px] uppercase tracking-wider text-muted-foreground">
                       {tm.age_group}
                     </span>
                   )}
@@ -91,7 +91,7 @@ export function TeamAssignmentsBlock({
                     onClick={() => removeTeam(tm.id)}
                     disabled={isRemoving}
                     aria-label={t("removeFromTeam", { team: tm.name })}
-                    className="-mr-1 inline-flex h-4 w-4 items-center justify-center rounded-full text-[var(--club-primary)] transition hover:bg-[var(--club-primary)] hover:text-[var(--club-primary-foreground)] disabled:cursor-not-allowed disabled:opacity-50"
+                    className="-mr-1 inline-flex h-4 w-4 items-center justify-center rounded-full text-primary transition hover:bg-primary hover:text-primary-foreground disabled:cursor-not-allowed disabled:opacity-50"
                   >
                     <X className="h-3 w-3" />
                   </button>
@@ -128,11 +128,11 @@ export function TeamAssignmentsBlock({
           emptyHint={t("noTeamsYet")}
         />
         {teams.length > 0 && (
-          <p className="text-xs text-zinc-500 dark:text-zinc-400">
+          <p className="text-xs text-muted-foreground">
             {t("helper")}
           </p>
         )}
-        {error && <p className="text-sm text-red-600">{error}</p>}
+        {error && <p className="text-sm text-destructive">{error}</p>}
         {saved && !error && (
           <p className="text-sm text-emerald-700 dark:text-emerald-300">
             {t("saved")}

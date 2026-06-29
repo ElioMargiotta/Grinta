@@ -2401,7 +2401,6 @@ function Step6({
  * ============================================================ */
 
 type PreparationStep = { label: string; eyebrow: string; desc: string };
-const STEP_COUNT = 6;
 
 export function PreparationSheet({
   teamId,

@@ -45,11 +45,11 @@ export function TeamMultiSelect({
     return (
       <div className="flex flex-col gap-1">
         {label && (
-          <span className="text-sm font-medium text-zinc-700 dark:text-zinc-300">
+          <span className="text-sm font-medium text-foreground">
             {label}
           </span>
         )}
-        <p className="text-xs italic text-zinc-500 dark:text-zinc-400">
+        <p className="text-xs italic text-muted-foreground">
           {emptyHint ?? "—"}
         </p>
       </div>
@@ -59,7 +59,7 @@ export function TeamMultiSelect({
   return (
     <div className="flex flex-col gap-2">
       {label && (
-        <span className="text-sm font-medium text-zinc-700 dark:text-zinc-300">
+        <span className="text-sm font-medium text-foreground">
           {label}
         </span>
       )}
@@ -72,16 +72,16 @@ export function TeamMultiSelect({
               key={team.id}
               onClick={() => toggle(team.id)}
               aria-pressed={isOn}
-              className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-medium transition ${
+              className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-medium transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring ${
                 isOn
-                  ? "border-[var(--club-primary)] bg-[var(--club-primary-soft)] text-[var(--club-primary)]"
-                  : "border-zinc-200 bg-white text-zinc-700 hover:border-zinc-300 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-300"
+                  ? "border-primary bg-accent text-primary"
+                  : "border-border bg-card text-foreground hover:border-input"
               }`}
             >
               {isOn && <Check className="h-3 w-3" />}
               <span>{team.name}</span>
               {team.age_group && (
-                <span className="text-[10px] uppercase tracking-wider text-zinc-500">
+                <span className="text-[10px] uppercase tracking-wider text-muted-foreground">
                   {team.age_group}
                 </span>
               )}

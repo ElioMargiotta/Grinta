@@ -69,16 +69,16 @@ export function ArchivedTeamCard({ team }: { team: ArchivedTeam }) {
   };
 
   return (
-    <div className="flex flex-col gap-3 rounded-2xl border border-zinc-200 bg-white p-5 shadow-sm dark:border-zinc-800 dark:bg-zinc-900">
+    <div className="flex flex-col gap-3 rounded-2xl border border-border bg-card p-5 shadow-sm">
       <div className="flex items-start justify-between gap-4">
         <div>
-          <div className="text-base font-semibold text-zinc-900 dark:text-zinc-100">
+          <div className="text-base font-semibold text-foreground">
             {team.name}
           </div>
-          <div className="mt-0.5 text-sm text-zinc-500 dark:text-zinc-400">
+          <div className="mt-0.5 text-sm text-muted-foreground">
             {[team.age_group, team.season].filter(Boolean).join(" · ") || "—"}
           </div>
-          <div className="mt-2 text-xs text-zinc-500 dark:text-zinc-400">
+          <div className="mt-2 text-xs text-muted-foreground">
             {t("archivedOn", { date: archivedDate })}
           </div>
         </div>
@@ -98,7 +98,7 @@ export function ArchivedTeamCard({ team }: { team: ArchivedTeam }) {
               size="sm"
               onClick={() => setPurging(true)}
               disabled={isPending}
-              className="text-red-600 hover:text-red-700"
+              className="text-destructive hover:text-destructive"
             >
               <Trash2 className="h-4 w-4" />
               {t("deletePermanently")}
@@ -108,14 +108,14 @@ export function ArchivedTeamCard({ team }: { team: ArchivedTeam }) {
       </div>
 
       {purging && (
-        <div className="rounded-md border border-red-200 bg-red-50 p-4 text-sm dark:border-red-500/30 dark:bg-red-950/30">
-          <div className="font-medium text-red-900 dark:text-red-100">
+        <div className="rounded-md border border-destructive/30 bg-destructive/5 p-4 text-sm">
+          <div className="font-medium text-destructive">
             {t("purgeTitle")}
           </div>
-          <p className="mt-1 text-red-800 dark:text-red-300">
+          <p className="mt-1 text-destructive">
             {t("purgeWarning")}
           </p>
-          <label className="mt-3 flex flex-col gap-1 text-zinc-900 dark:text-zinc-100">
+          <label className="mt-3 flex flex-col gap-1 text-foreground">
             <span>
               {t.rich("typeNameToConfirm", {
                 name: team.name,
@@ -126,11 +126,11 @@ export function ArchivedTeamCard({ team }: { team: ArchivedTeam }) {
               type="text"
               value={typed}
               onChange={(e) => setTyped(e.target.value)}
-              className="h-9 rounded-md border border-zinc-300 bg-white px-3 text-sm focus:border-red-500 focus:outline-none focus:ring-2 focus:ring-red-500/15 dark:border-zinc-700 dark:bg-zinc-900"
+              className="h-9 rounded-lg border border-border bg-card px-3 text-sm text-foreground focus:border-destructive focus:outline-none focus:ring-2 focus:ring-destructive/15"
               autoFocus
             />
           </label>
-          {error && <p className="mt-2 text-sm text-red-600">{error}</p>}
+          {error && <p className="mt-2 text-sm text-destructive">{error}</p>}
           <div className="mt-3 flex items-center gap-2">
             <Button
               variant="danger"

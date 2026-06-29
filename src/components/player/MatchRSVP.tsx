@@ -82,7 +82,7 @@ export function MatchRSVP({ matchId, playerId, initialStatus, initialReason }: P
           maxLength={500}
           required
         />
-        {error && <p className="text-[12px] text-red-600">{error}</p>}
+        {error && <p className="text-[12px] text-destructive">{error}</p>}
         <div className="flex gap-2">
           <Button type="submit" size="sm" loading={isPending}>
             {t("confirmAbsent")}
@@ -128,17 +128,17 @@ export function MatchRSVP({ matchId, playerId, initialStatus, initialReason }: P
           {t("absent")}
         </Button>
         {status && !isPending && (
-          <span className="ml-auto text-[11px] text-zinc-500 dark:text-zinc-400">
+          <span className="ml-auto text-[11px] text-muted-foreground">
             {status === "available" ? t("answeredPresent") : t("answeredAbsent")}
           </span>
         )}
       </div>
       {status === "unavailable" && reason && (
-        <p className="text-[12px] italic text-zinc-500 dark:text-zinc-400">
+        <p className="text-[12px] italic text-muted-foreground">
           « {reason} »
         </p>
       )}
-      {error && <p className="text-[12px] text-red-600">{error}</p>}
+      {error && <p className="text-[12px] text-destructive">{error}</p>}
     </div>
   );
 }

@@ -48,19 +48,19 @@ export function SeasonSwitcher({
         disabled={isPending}
         onClick={() => setOpen((v) => !v)}
         title={t("label")}
-        className="flex items-center gap-1.5 rounded-md border border-[var(--club-line)] bg-white px-2 py-1.5 text-xs text-zinc-900 hover:bg-[var(--club-primary-soft)] lg:gap-2 lg:px-3 lg:text-sm dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-100 dark:hover:bg-zinc-800"
+        className="flex items-center gap-1.5 rounded-lg border border-border bg-card px-2 py-1.5 text-xs text-foreground hover:bg-accent lg:gap-2 lg:px-3 lg:text-sm"
       >
         <CalendarRange className="h-4 w-4 shrink-0 text-[var(--club-primary)]" />
         <span className="font-medium tabular-nums">{current}</span>
-        {options.length > 1 ? <ChevronDown className="h-4 w-4 text-zinc-400" /> : null}
+        {options.length > 1 ? <ChevronDown className="h-4 w-4 text-muted-foreground" /> : null}
       </button>
 
       {open && options.length > 1 && (
         <div
-          className="absolute left-0 z-40 mt-1 w-48 overflow-hidden rounded-md border border-[var(--club-line)] bg-white shadow-lg dark:border-zinc-800 dark:bg-zinc-900"
+          className="absolute left-0 z-40 mt-1 w-48 overflow-hidden rounded-lg border border-border bg-card shadow-lg"
           onMouseLeave={() => setOpen(false)}
         >
-          <div className="px-3 pt-2 pb-1 text-[10px] font-semibold uppercase tracking-wider text-zinc-400">
+          <div className="px-3 pt-2 pb-1 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
             {t("label")}
           </div>
           <ul className="max-h-80 overflow-y-auto py-1">
@@ -71,9 +71,9 @@ export function SeasonSwitcher({
                   <button
                     type="button"
                     onClick={() => handleSelect(s)}
-                    className="flex w-full items-center justify-between gap-3 px-3 py-2 text-left text-sm hover:bg-[var(--club-primary-soft)] dark:hover:bg-zinc-800"
+                    className="flex w-full items-center justify-between gap-3 px-3 py-2 text-left text-sm hover:bg-accent"
                   >
-                    <span className="font-medium tabular-nums text-zinc-900 dark:text-zinc-100">
+                    <span className="font-medium tabular-nums text-foreground">
                       {s}
                     </span>
                     {active && <Check className="h-4 w-4 text-[var(--club-primary)]" />}

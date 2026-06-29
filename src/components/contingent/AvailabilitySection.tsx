@@ -4,6 +4,7 @@ import { useMemo, useState, useTransition } from "react";
 import { useTranslations } from "next-intl";
 import { HeartPulse, Pencil, Plus, Trash2, X } from "lucide-react";
 import { Section, SectionHeader } from "@/components/ui/Section";
+import { EmptyState } from "@/components/ui/EmptyState";
 import { formatDay, todayISO } from "@/lib/contingent/week";
 import {
   UNAVAILABILITY_KINDS,
@@ -118,7 +119,7 @@ export function AvailabilitySection({
           <button
             type="button"
             onClick={() => setDraft(emptyDraft())}
-            className="inline-flex shrink-0 items-center gap-1.5 rounded-md bg-[var(--club-primary)] px-3 py-1.5 text-[13px] font-semibold text-[var(--club-primary-foreground)]"
+            className="inline-flex shrink-0 items-center gap-1.5 rounded-md bg-primary px-3 py-1.5 text-[13px] font-semibold text-primary-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
           >
             <Plus className="h-4 w-4" />
             {t("add")}
@@ -127,7 +128,7 @@ export function AvailabilitySection({
       </div>
 
       {error ? (
-        <div className="mb-3 rounded-md border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700 dark:border-red-900/50 dark:bg-red-950/30 dark:text-red-300">
+        <div className="mb-3 rounded-md border border-destructive/30 bg-destructive/10 px-3 py-2 text-sm text-destructive">
           {error}
         </div>
       ) : null}
@@ -144,9 +145,7 @@ export function AvailabilitySection({
       ) : null}
 
       {sorted.length === 0 ? (
-        <div className="rounded-md border border-dashed border-[var(--club-line)] p-8 text-center text-sm text-zinc-500 dark:text-zinc-400">
-          {t("empty")}
-        </div>
+        <EmptyState title={t("empty")} />
       ) : (
         <ul className="flex flex-col gap-2">
           {sorted.map((u) => {
@@ -154,7 +153,7 @@ export function AvailabilitySection({
             return (
               <li
                 key={u.id}
-                className="flex items-start justify-between gap-3 rounded-md border border-[var(--club-line)] bg-white p-3 dark:bg-zinc-900"
+                className="flex items-start justify-between gap-3 rounded-md border border-border bg-card p-3"
               >
                 <div className="min-w-0">
                   <div className="flex flex-wrap items-center gap-2">
@@ -165,12 +164,12 @@ export function AvailabilitySection({
                       </span>
                     ) : null}
                   </div>
-                  <div className="mt-1 text-[13px] text-zinc-600 dark:text-zinc-300">
+                  <div className="mt-1 text-[13px] text-muted-foreground">
                     {formatDay(u.startDate)} →{" "}
                     {u.endDate ? formatDay(u.endDate) : t("openEnd")}
                   </div>
                   {u.reason ? (
-                    <p className="mt-1 text-[12px] italic text-zinc-500 dark:text-zinc-400">
+                    <p className="mt-1 text-[12px] italic text-muted-foreground">
                       {u.reason}
                     </p>
                   ) : null}
@@ -193,7 +192,7 @@ export function AvailabilitySection({
                       onClick={() => setDraft(draftFrom(u))}
                       title={t("edit")}
                       aria-label={t("edit")}
-                      className="rounded-md p-1 text-zinc-400 hover:bg-zinc-100 hover:text-zinc-700 dark:hover:bg-zinc-800"
+                      className="rounded-md p-1 text-muted-foreground hover:bg-accent hover:text-foreground"
                     >
                       <Pencil className="h-4 w-4" />
                     </button>
@@ -203,7 +202,7 @@ export function AvailabilitySection({
                       onClick={() => remove(u.id)}
                       title={t("delete")}
                       aria-label={t("delete")}
-                      className="rounded-md p-1 text-zinc-400 hover:bg-red-50 hover:text-red-600 dark:hover:bg-red-950/30"
+                      className="rounded-md p-1 text-muted-foreground hover:bg-destructive/10 hover:text-destructive"
                     >
                       <Trash2 className="h-4 w-4" />
                     </button>
@@ -229,7 +228,7 @@ export function KindBadge({
     injury: "bg-red-100 text-red-700 dark:bg-red-950/40 dark:text-red-300",
     illness: "bg-orange-100 text-orange-700 dark:bg-orange-950/40 dark:text-orange-300",
     suspension: "bg-violet-100 text-violet-700 dark:bg-violet-950/40 dark:text-violet-300",
-    other: "bg-zinc-100 text-zinc-600 dark:bg-zinc-800 dark:text-zinc-300",
+    other: "bg-muted text-muted-foreground",
   };
   return (
     <span
@@ -256,20 +255,20 @@ function UnavailabilityForm({
   onSubmit: () => void;
 }) {
   const inputClass =
-    "rounded-md border border-[var(--club-line)] bg-white px-2.5 py-1.5 text-[13px] text-zinc-900 dark:bg-zinc-900 dark:text-zinc-100";
+    "rounded-lg border border-border bg-card px-2.5 py-1.5 text-[13px] text-foreground focus:border-ring focus:outline-none focus:ring-2 focus:ring-ring/15";
 
   const canSubmit = draft.startDate && (!draft.endDate || draft.endDate >= draft.startDate);
 
   return (
-    <div className="mb-4 rounded-md border border-[var(--club-line)] bg-zinc-50/60 p-4 dark:bg-zinc-800/30">
+    <div className="mb-4 rounded-md border border-border bg-muted/60 p-4">
       <div className="mb-3 flex items-center justify-between">
-        <h4 className="text-[13px] font-semibold text-zinc-900 dark:text-zinc-100">
+        <h4 className="text-[13px] font-semibold text-foreground">
           {draft.id ? t("editTitle") : t("addTitle")}
         </h4>
         <button
           type="button"
           onClick={onCancel}
-          className="rounded-md p-1 text-zinc-400 hover:bg-zinc-100 hover:text-zinc-700 dark:hover:bg-zinc-800"
+          className="rounded-md p-1 text-muted-foreground hover:bg-accent hover:text-foreground"
           aria-label={t("cancel")}
         >
           <X className="h-4 w-4" />
@@ -277,7 +276,7 @@ function UnavailabilityForm({
       </div>
 
       <div className="grid gap-3 sm:grid-cols-3">
-        <label className="flex flex-col gap-1 text-[11px] font-medium uppercase tracking-wide text-zinc-500">
+        <label className="flex flex-col gap-1 text-[11px] font-medium uppercase tracking-wide text-muted-foreground">
           {t("field.kind")}
           <select
             value={draft.kind}
@@ -293,7 +292,7 @@ function UnavailabilityForm({
             ))}
           </select>
         </label>
-        <label className="flex flex-col gap-1 text-[11px] font-medium uppercase tracking-wide text-zinc-500">
+        <label className="flex flex-col gap-1 text-[11px] font-medium uppercase tracking-wide text-muted-foreground">
           {t("field.startDate")}
           <input
             type="date"
@@ -302,7 +301,7 @@ function UnavailabilityForm({
             className={inputClass}
           />
         </label>
-        <label className="flex flex-col gap-1 text-[11px] font-medium uppercase tracking-wide text-zinc-500">
+        <label className="flex flex-col gap-1 text-[11px] font-medium uppercase tracking-wide text-muted-foreground">
           {t("field.endDate")}
           <input
             type="date"
@@ -314,7 +313,7 @@ function UnavailabilityForm({
         </label>
       </div>
 
-      <label className="mt-3 flex flex-col gap-1 text-[11px] font-medium uppercase tracking-wide text-zinc-500">
+      <label className="mt-3 flex flex-col gap-1 text-[11px] font-medium uppercase tracking-wide text-muted-foreground">
         {t("field.reason")}
         <input
           type="text"
@@ -330,7 +329,7 @@ function UnavailabilityForm({
         <button
           type="button"
           onClick={onCancel}
-          className="rounded-md border border-[var(--club-line)] px-3 py-1.5 text-[13px] font-semibold text-zinc-700 hover:bg-zinc-50 dark:text-zinc-200 dark:hover:bg-zinc-800/50"
+          className="rounded-md border border-border px-3 py-1.5 text-[13px] font-semibold text-foreground hover:bg-accent"
         >
           {t("cancel")}
         </button>
@@ -338,7 +337,7 @@ function UnavailabilityForm({
           type="button"
           disabled={pending || !canSubmit}
           onClick={onSubmit}
-          className="rounded-md bg-[var(--club-primary)] px-3 py-1.5 text-[13px] font-semibold text-[var(--club-primary-foreground)] disabled:opacity-50"
+          className="rounded-md bg-primary px-3 py-1.5 text-[13px] font-semibold text-primary-foreground disabled:opacity-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
         >
           {t("save")}
         </button>

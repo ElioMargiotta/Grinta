@@ -11,6 +11,8 @@ import {
   X,
 } from "lucide-react";
 import { Section, SectionHeader } from "@/components/ui/Section";
+import { Dialog, DialogContent } from "@/components/ui/Dialog";
+import { EmptyState } from "@/components/ui/EmptyState";
 import { formatDay, todayISO } from "@/lib/contingent/week";
 import {
   fmt,
@@ -204,32 +206,30 @@ export function PhysicalTrackingSection({
         <SectionHeader icon={Activity} title={t("title")} />
       </div>
 
-      <p className="mb-4 text-sm text-zinc-500 dark:text-zinc-400">{t("intro")}</p>
+      <p className="mb-4 text-sm text-muted-foreground">{t("intro")}</p>
 
       {activeMetrics.length === 0 ? (
-        <div className="rounded-md border border-dashed border-[var(--club-line)] p-8 text-center">
-          <p className="text-sm text-zinc-500 dark:text-zinc-400">{t("empty")}</p>
-        </div>
+        <EmptyState title={t("empty")} />
       ) : (
         <div className="overflow-x-auto">
           <table className="w-full border-collapse text-sm">
             <thead>
-              <tr className="border-b border-[var(--club-line)] text-left">
-                <th className="sticky left-0 z-10 bg-white py-2 pr-3 dark:bg-zinc-900" />
+              <tr className="border-b border-border text-left">
+                <th className="sticky left-0 z-10 bg-card py-2 pr-3" />
                 {dates.map((d) => {
                   const isToday = d === today;
                   return (
                     <th
                       key={d}
                       className={`px-2 py-2 text-center text-[11px] font-mono font-medium uppercase tracking-wide ${
-                        isToday ? "text-[var(--club-primary)]" : "text-zinc-500"
+                        isToday ? "text-primary" : "text-muted-foreground"
                       }`}
                     >
                       {formatDay(d)}
                     </th>
                   );
                 })}
-                <th className="px-2 py-2 text-center text-[11px] font-medium uppercase tracking-wide text-zinc-400">
+                <th className="px-2 py-2 text-center text-[11px] font-medium uppercase tracking-wide text-muted-foreground">
                   {t("trend")}
                 </th>
               </tr>
@@ -238,21 +238,21 @@ export function PhysicalTrackingSection({
               {activeMetrics.map((metric) => {
                 const series = seriesByMetric.get(metric.id) ?? [];
                 return (
-                  <tr key={metric.id} className="border-b border-[var(--club-line)]/60">
-                    <td className="sticky left-0 z-10 bg-white py-2 pr-3 dark:bg-zinc-900">
+                  <tr key={metric.id} className="border-b border-border/60">
+                    <td className="sticky left-0 z-10 bg-card py-2 pr-3">
                       <button
                         type="button"
                         onClick={() => setChartMetric(metric)}
                         title={t("viewChart")}
                         className="group flex items-center gap-1.5 text-left"
                       >
-                        <span className="font-medium text-zinc-900 group-hover:text-[var(--club-primary)] dark:text-zinc-100">
+                        <span className="font-medium text-foreground group-hover:text-primary">
                           {metric.name}
                         </span>
-                        <LineChartIcon className="h-3.5 w-3.5 text-zinc-300 group-hover:text-[var(--club-primary)]" />
+                        <LineChartIcon className="h-3.5 w-3.5 text-muted-foreground group-hover:text-primary" />
                       </button>
                       {(metric.unit || metric.category) && (
-                        <div className="text-[11px] text-zinc-400">
+                        <div className="text-[11px] text-muted-foreground">
                           {[metric.category, metric.unit].filter(Boolean).join(" · ")}
                         </div>
                       )}
@@ -264,9 +264,9 @@ export function PhysicalTrackingSection({
                       return (
                         <td
                           key={d}
-                          className={`px-1 py-1 text-center ${isToday ? "bg-[var(--club-primary)]/5" : ""}`}
+                          className={`px-1 py-1 text-center ${isToday ? "bg-primary/5" : ""}`}
                         >
-                          <span className="font-mono tabular-nums text-zinc-700 dark:text-zinc-300">
+                          <span className="font-mono tabular-nums text-foreground">
                             {fmt(val) || "—"}
                           </span>
                         </td>
@@ -315,24 +315,21 @@ function ChartModal({
     : { trend: "flat" as Trend };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4" onClick={onClose}>
-      <div
-        className="w-full max-w-2xl rounded-lg border border-[var(--club-line)] bg-white p-5 shadow-xl dark:border-zinc-800 dark:bg-zinc-900"
-        onClick={(e) => e.stopPropagation()}
-      >
+    <Dialog open onOpenChange={(o) => { if (!o) onClose(); }}>
+      <DialogContent showClose={false} className="max-w-2xl">
         <div className="mb-4 flex items-start justify-between gap-3">
           <div className="min-w-0">
-            <h3 className="text-base font-semibold text-zinc-900 dark:text-zinc-100">
+            <h3 className="text-base font-semibold text-foreground">
               {metric.name}
               {metric.unit ? (
-                <span className="ml-2 text-sm font-normal text-zinc-400">{metric.unit}</span>
+                <span className="ml-2 text-sm font-normal text-muted-foreground">{metric.unit}</span>
               ) : null}
             </h3>
             {metric.description ? (
-              <p className="mt-0.5 text-[13px] text-zinc-500 dark:text-zinc-400">{metric.description}</p>
+              <p className="mt-0.5 text-[13px] text-muted-foreground">{metric.description}</p>
             ) : null}
             {hasEnough ? (
-              <div className="mt-1 flex items-center gap-1.5 text-sm text-zinc-500 dark:text-zinc-400">
+              <div className="mt-1 flex items-center gap-1.5 text-sm text-muted-foreground">
                 <TrendArrow trend={trend} className="h-4 w-4" />
                 <span className="font-mono tabular-nums">
                   {delta > 0 ? "+" : ""}
@@ -345,7 +342,7 @@ function ChartModal({
           <button
             type="button"
             onClick={onClose}
-            className="rounded-md p-1 text-zinc-400 hover:bg-zinc-100 hover:text-zinc-700 dark:hover:bg-zinc-800"
+            className="rounded-md p-1 text-muted-foreground hover:bg-accent hover:text-foreground"
             aria-label={t("close")}
           >
             <X className="h-5 w-5" />
@@ -353,30 +350,30 @@ function ChartModal({
         </div>
 
         {points.length === 0 ? (
-          <p className="py-10 text-center text-sm text-zinc-400">{t("noData")}</p>
+          <p className="py-10 text-center text-sm text-muted-foreground">{t("noData")}</p>
         ) : (
           <MetricChart points={points} unit={metric.unit} higherIsBetter={metric.higher_is_better} />
         )}
 
         {metric.protocol ? (
-          <div className="mt-4 rounded-md border border-[var(--club-line)] bg-zinc-50/60 p-3 dark:bg-zinc-800/30">
-            <div className="mb-1 text-[11px] font-mono uppercase tracking-widest text-zinc-500">
+          <div className="mt-4 rounded-md border border-border bg-muted/60 p-3">
+            <div className="mb-1 text-[11px] font-mono uppercase tracking-widest text-muted-foreground">
               {t("field.protocol")}
             </div>
-            <p className="whitespace-pre-wrap text-[13px] text-zinc-700 dark:text-zinc-300">
+            <p className="whitespace-pre-wrap text-[13px] text-foreground">
               {metric.protocol}
             </p>
           </div>
         ) : null}
-      </div>
-    </div>
+      </DialogContent>
+    </Dialog>
   );
 }
 
 const FORM_FIELD =
-  "rounded-md border border-[var(--club-line)] bg-white px-2 py-1.5 text-sm text-zinc-900 dark:bg-zinc-900 dark:text-zinc-100";
+  "rounded-lg border border-border bg-card px-2 py-1.5 text-sm text-foreground focus:border-ring focus:outline-none focus:ring-2 focus:ring-ring/15";
 const FORM_LABEL =
-  "flex flex-col gap-1 text-xs font-medium text-zinc-600 dark:text-zinc-300";
+  "flex flex-col gap-1 text-xs font-medium text-muted-foreground";
 
 export function MetricManager({
   t,
@@ -415,17 +412,20 @@ export function MetricManager({
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
-      <div className="max-h-[90vh] w-full max-w-2xl overflow-y-auto rounded-lg border border-[var(--club-line)] bg-white p-5 shadow-xl dark:border-zinc-800 dark:bg-zinc-900">
+    <Dialog open onOpenChange={(o) => { if (!o) onClose(); }}>
+      <DialogContent
+        showClose={false}
+        className="max-h-[90vh] max-w-2xl overflow-y-auto"
+      >
         <div className="mb-4 flex items-center justify-between">
-          <h3 className="text-base font-semibold text-zinc-900 dark:text-zinc-100">
+          <h3 className="text-base font-semibold text-foreground">
             {t("manage")}
           </h3>
           <div className="flex items-center gap-2">
             <button
               type="button"
               onClick={() => setDraft(emptyDraft())}
-              className="inline-flex items-center gap-1.5 rounded-md bg-[var(--club-primary)] px-2.5 py-1.5 text-[12px] font-semibold text-[var(--club-primary-foreground)]"
+              className="inline-flex items-center gap-1.5 rounded-md bg-primary px-2.5 py-1.5 text-[12px] font-semibold text-primary-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
             >
               <Plus className="h-3.5 w-3.5" />
               {t("newMetric")}
@@ -433,7 +433,7 @@ export function MetricManager({
             <button
               type="button"
               onClick={onClose}
-              className="rounded-md p-1 text-zinc-400 hover:bg-zinc-100 hover:text-zinc-700 dark:hover:bg-zinc-800"
+              className="rounded-md p-1 text-muted-foreground hover:bg-accent hover:text-foreground"
               aria-label={t("close")}
             >
               <X className="h-5 w-5" />
@@ -457,9 +457,9 @@ export function MetricManager({
         ) : null}
 
         {/* ---- Tableau compact des tests ---- */}
-        <div className="overflow-hidden rounded-md border border-[var(--club-line)]">
+        <div className="overflow-hidden rounded-md border border-border">
           <table className="w-full text-sm">
-            <thead className="bg-zinc-50 text-left text-[10px] uppercase tracking-wider text-zinc-500 dark:bg-zinc-950 dark:text-zinc-400">
+            <thead className="bg-muted text-left text-[10px] uppercase tracking-wider text-muted-foreground">
               <tr>
                 <th className="px-3 py-2 font-medium">{t("table.name")}</th>
                 <th className="px-3 py-2 font-medium">{t("table.category")}</th>
@@ -467,29 +467,29 @@ export function MetricManager({
                 <th className="px-2 py-2" />
               </tr>
             </thead>
-            <tbody className="divide-y divide-[var(--club-line)]">
+            <tbody className="divide-y divide-border">
               {sorted.map((m) => (
                 <tr
                   key={m.id}
-                  className={m.archived ? "opacity-50" : "bg-white dark:bg-zinc-900"}
+                  className={m.archived ? "opacity-50" : "bg-card"}
                 >
                   <td className="px-3 py-1.5">
                     <button
                       type="button"
                       onClick={() => setDraft(draftFromMetric(m))}
-                      className="text-left font-medium text-zinc-900 hover:text-[var(--club-primary)] dark:text-zinc-100"
+                      className="text-left font-medium text-foreground hover:text-primary"
                     >
                       {m.name}
                     </button>
                   </td>
-                  <td className="px-3 py-1.5 text-[12px] text-zinc-500">
+                  <td className="px-3 py-1.5 text-[12px] text-muted-foreground">
                     {m.category
                       ? (CATEGORY_OPTIONS as readonly string[]).includes(m.category)
                         ? t(`field.categoryOption.${m.category}`)
                         : m.category
                       : "—"}
                   </td>
-                  <td className="px-3 py-1.5 text-[12px] text-zinc-500">{m.unit || "—"}</td>
+                  <td className="px-3 py-1.5 text-[12px] text-muted-foreground">{m.unit || "—"}</td>
                   <td className="px-2 py-1.5">
                     <div className="flex items-center justify-end gap-1">
                       {m.archived ? (
@@ -497,7 +497,7 @@ export function MetricManager({
                           type="button"
                           disabled={pending}
                           onClick={() => onArchive(m.id, false)}
-                          className="rounded-md px-2 py-1 text-[12px] font-semibold text-[var(--club-primary)] hover:bg-zinc-50 dark:hover:bg-zinc-800/50"
+                          className="rounded-md px-2 py-1 text-[12px] font-semibold text-primary hover:bg-accent"
                         >
                           {t("restore")}
                         </button>
@@ -508,7 +508,7 @@ export function MetricManager({
                           onClick={() => onArchive(m.id, true)}
                           title={t("archive")}
                           aria-label={t("archive")}
-                          className="rounded-md p-1 text-zinc-400 hover:bg-amber-50 hover:text-amber-600 dark:hover:bg-amber-950/30"
+                          className="rounded-md p-1 text-muted-foreground hover:bg-amber-50 hover:text-amber-600 dark:hover:bg-amber-950/30"
                         >
                           <Archive className="h-4 w-4" />
                         </button>
@@ -523,7 +523,7 @@ export function MetricManager({
                           }}
                           title={t("delete")}
                           aria-label={t("delete")}
-                          className="rounded-md p-1 text-zinc-400 hover:bg-red-50 hover:text-red-600 dark:hover:bg-red-950/30"
+                          className="rounded-md p-1 text-muted-foreground hover:bg-destructive/10 hover:text-destructive"
                         >
                           <Trash2 className="h-4 w-4" />
                         </button>
@@ -534,7 +534,7 @@ export function MetricManager({
               ))}
               {sorted.length === 0 ? (
                 <tr>
-                  <td colSpan={4} className="px-3 py-6 text-center text-sm text-zinc-400">
+                  <td colSpan={4} className="px-3 py-6 text-center text-sm text-muted-foreground">
                     {t("empty")}
                   </td>
                 </tr>
@@ -542,8 +542,8 @@ export function MetricManager({
             </tbody>
           </table>
         </div>
-      </div>
-    </div>
+      </DialogContent>
+    </Dialog>
   );
 }
 
@@ -563,8 +563,8 @@ function MetricForm({
   onSubmit: () => void;
 }) {
   return (
-    <div className="mb-4 rounded-md border border-[var(--club-line)] bg-zinc-50/60 p-3 dark:bg-zinc-800/30">
-      <div className="mb-3 text-[11px] font-mono uppercase tracking-widest text-zinc-500">
+    <div className="mb-4 rounded-md border border-border bg-muted/60 p-3">
+      <div className="mb-3 text-[11px] font-mono uppercase tracking-widest text-muted-foreground">
         {draft.id ? t("editMetric") : t("newMetric")}
       </div>
       <div className="grid grid-cols-2 gap-3">
@@ -721,7 +721,7 @@ function MetricForm({
         <button
           type="button"
           onClick={onCancel}
-          className="rounded-md px-3 py-1.5 text-[13px] font-semibold text-zinc-500 hover:text-zinc-800 dark:hover:text-zinc-200"
+          className="rounded-md px-3 py-1.5 text-[13px] font-semibold text-muted-foreground hover:text-foreground"
         >
           {t("cancelEdit")}
         </button>
@@ -729,7 +729,7 @@ function MetricForm({
           type="button"
           disabled={pending || !draft.name.trim()}
           onClick={onSubmit}
-          className="inline-flex items-center gap-2 rounded-md bg-[var(--club-primary)] px-3 py-1.5 text-[13px] font-semibold text-[var(--club-primary-foreground)] disabled:opacity-50"
+          className="inline-flex items-center gap-2 rounded-md bg-primary px-3 py-1.5 text-[13px] font-semibold text-primary-foreground disabled:opacity-50"
         >
           <Plus className="h-4 w-4" />
           {draft.id ? t("save") : t("add")}

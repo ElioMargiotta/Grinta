@@ -71,8 +71,8 @@ export function MatchSquadSummary({
 
   return (
     <section className="flex flex-col gap-4">
-      <div className="flex items-center gap-2 text-base font-semibold text-zinc-900 dark:text-zinc-100">
-        <UserCheck className="h-4 w-4 text-[var(--club-primary)]" />
+      <div className="flex items-center gap-2 text-base font-semibold text-foreground">
+        <UserCheck className="h-4 w-4 text-primary" />
         {t("title")}
       </div>
 
@@ -82,13 +82,13 @@ export function MatchSquadSummary({
           {starterPlayers.map((p) => (
             <li
               key={p.playerId}
-              className="flex items-center justify-between gap-2 rounded-lg border border-[var(--club-line)] bg-white px-2.5 py-1.5 dark:bg-zinc-900"
+              className="flex items-center justify-between gap-2 rounded-lg border border-border bg-card px-2.5 py-1.5"
             >
               <span className="flex min-w-0 items-center gap-2">
-                <span className="inline-flex h-6 w-6 shrink-0 items-center justify-center rounded bg-[var(--club-primary-soft)] text-[11px] font-bold tabular-nums text-[var(--club-primary)]">
+                <span className="inline-flex h-6 w-6 shrink-0 items-center justify-center rounded bg-accent text-[11px] font-bold tabular-nums text-primary">
                   {p.jerseyNumber ?? "—"}
                 </span>
-                <span className="truncate text-sm text-zinc-900 dark:text-zinc-100">
+                <span className="truncate text-sm text-foreground">
                   {p.fullName}
                 </span>
               </span>
@@ -143,13 +143,13 @@ function Group({
         <span
           className={`text-sm font-semibold ${
             muted
-              ? "text-zinc-500 dark:text-zinc-400"
-              : "text-zinc-700 dark:text-zinc-300"
+              ? "text-muted-foreground"
+              : "text-foreground"
           }`}
         >
           {label}
         </span>
-        <span className="rounded bg-zinc-100 px-1.5 py-0.5 text-[11px] font-medium tabular-nums text-zinc-500 dark:bg-zinc-800 dark:text-zinc-400">
+        <span className="rounded bg-muted px-1.5 py-0.5 text-[11px] font-medium tabular-nums text-muted-foreground">
           {count}
         </span>
       </div>
@@ -185,15 +185,15 @@ function Chips({
               danger
                 ? "border-red-200 bg-red-50 text-red-700 dark:border-red-900/50 dark:bg-red-950/30 dark:text-red-300"
                 : muted
-                  ? "border-[var(--club-line)] bg-zinc-50 text-zinc-500 dark:bg-zinc-900/40 dark:text-zinc-400"
-                  : "border-[var(--club-line)] bg-white text-zinc-900 dark:bg-zinc-900 dark:text-zinc-100"
+                  ? "border-border bg-muted text-muted-foreground"
+                  : "border-border bg-card text-foreground"
             }`}
           >
             <span
               className={`inline-flex h-5 w-5 items-center justify-center rounded-full text-[10px] font-semibold tabular-nums ${
                 danger
                   ? "bg-red-100 text-red-700 dark:bg-red-950/50 dark:text-red-300"
-                  : "bg-zinc-100 dark:bg-zinc-800"
+                  : "bg-muted"
               }`}
             >
               {p.jerseyNumber ?? "—"}
@@ -236,7 +236,7 @@ function RsvpBadge({
     );
   }
   return (
-    <span className="inline-flex shrink-0 items-center gap-1 rounded bg-zinc-100 px-1.5 py-0.5 text-[11px] font-medium text-zinc-500 dark:bg-zinc-800 dark:text-zinc-400">
+    <span className="inline-flex shrink-0 items-center gap-1 rounded bg-muted px-1.5 py-0.5 text-[11px] font-medium text-muted-foreground">
       <Clock className="h-3 w-3" />
       {compact ? null : t("pending")}
     </span>

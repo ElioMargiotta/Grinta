@@ -98,15 +98,15 @@ export function ImportClubCornerWizard({
         htmlFor="clubcorner-csv"
         className={`flex cursor-pointer flex-col items-center justify-center gap-2 rounded-2xl border-2 border-dashed px-6 py-8 text-center transition ${
           stage === "pick"
-            ? "border-zinc-300 bg-zinc-50/50 hover:border-[var(--club-primary)] hover:bg-[var(--club-primary-soft)] dark:border-zinc-700 dark:bg-zinc-900/40"
-            : "border-zinc-200 bg-white dark:border-zinc-800 dark:bg-zinc-950"
+            ? "border-input bg-muted/50 hover:border-primary hover:bg-accent"
+            : "border-border bg-card"
         }`}
       >
-        <FileUp className="h-6 w-6 text-zinc-500" />
-        <div className="text-sm font-medium text-zinc-900 dark:text-zinc-100">
+        <FileUp className="h-6 w-6 text-muted-foreground" />
+        <div className="text-sm font-medium text-foreground">
           {fileName ?? t("dropHint")}
         </div>
-        <p className="text-xs text-zinc-500 dark:text-zinc-400">
+        <p className="text-xs text-muted-foreground">
           {t("formatHint")}
         </p>
         <input
@@ -124,15 +124,15 @@ export function ImportClubCornerWizard({
 
       {/* Step 2 — preview */}
       {stage === "preview" && parsed && (
-        <div className="flex flex-col gap-3 rounded-xl border border-zinc-200 bg-white p-4 dark:border-zinc-800 dark:bg-zinc-950">
+        <div className="flex flex-col gap-3 rounded-xl border border-border bg-card p-4">
           {parsed.fatalError ? (
-            <p className="text-sm text-red-600">
+            <p className="text-sm text-destructive">
               {t("fatalError", { error: parsed.fatalError })}
             </p>
           ) : (
             <>
               <div className="flex flex-wrap items-center gap-4 text-sm">
-                <span className="font-medium text-zinc-900 dark:text-zinc-100">
+                <span className="font-medium text-foreground">
                   {t("rowsDetected", { n: parsed.rows.length })}
                 </span>
                 <span className="text-emerald-700 dark:text-emerald-300">
@@ -145,9 +145,9 @@ export function ImportClubCornerWizard({
                 )}
               </div>
 
-              <div className="max-h-64 overflow-auto rounded-md border border-zinc-100 dark:border-zinc-800">
+              <div className="max-h-64 overflow-auto rounded-md border border-border">
                 <table className="w-full text-xs">
-                  <thead className="bg-zinc-50 text-left text-zinc-500 dark:bg-zinc-900 dark:text-zinc-400">
+                  <thead className="bg-muted text-left text-muted-foreground">
                     <tr>
                       <th className="px-3 py-1.5">#</th>
                       <th className="px-3 py-1.5">{t("colName")}</th>
@@ -161,21 +161,21 @@ export function ImportClubCornerWizard({
                     {parsed.rows.slice(0, 10).map((r) => (
                       <tr
                         key={r.rowIndex}
-                        className="border-t border-zinc-100 dark:border-zinc-800"
+                        className="border-t border-border"
                       >
-                        <td className="px-3 py-1.5 text-zinc-400">
+                        <td className="px-3 py-1.5 text-muted-foreground">
                           {r.rowIndex}
                         </td>
                         <td className="px-3 py-1.5">
                           {r.player.first_name} {r.player.last_name}
                         </td>
-                        <td className="px-3 py-1.5 text-zinc-500">
+                        <td className="px-3 py-1.5 text-muted-foreground">
                           {r.player.birth_date ?? "—"}
                         </td>
-                        <td className="px-3 py-1.5 text-zinc-500">
+                        <td className="px-3 py-1.5 text-muted-foreground">
                           {r.player.license_number ?? "—"}
                         </td>
-                        <td className="px-3 py-1.5 text-zinc-500">
+                        <td className="px-3 py-1.5 text-muted-foreground">
                           {r.player.jersey_number ?? "—"}
                         </td>
                         <td className="px-3 py-1.5">
@@ -196,7 +196,7 @@ export function ImportClubCornerWizard({
                   </tbody>
                 </table>
                 {parsed.rows.length > 10 && (
-                  <p className="px-3 py-2 text-xs text-zinc-500">
+                  <p className="px-3 py-2 text-xs text-muted-foreground">
                     {t("previewTruncated", { n: parsed.rows.length - 10 })}
                   </p>
                 )}
@@ -206,7 +206,7 @@ export function ImportClubCornerWizard({
                 <div className="flex flex-col gap-1">
                   <label
                     htmlFor="import-target-team"
-                    className="text-sm font-medium text-zinc-700 dark:text-zinc-300"
+                    className="text-sm font-medium text-foreground"
                   >
                     {t("targetTeamLabel")}
                   </label>
@@ -224,7 +224,7 @@ export function ImportClubCornerWizard({
                       </option>
                     ))}
                   </Select>
-                  <p className="text-xs text-zinc-500 dark:text-zinc-400">
+                  <p className="text-xs text-muted-foreground">
                     {targetTeamId
                       ? t("targetTeamHint")
                       : t("noTargetTeamHint")}
@@ -232,7 +232,7 @@ export function ImportClubCornerWizard({
                 </div>
               )}
 
-              {error && <p className="text-sm text-red-600">{error}</p>}
+              {error && <p className="text-sm text-destructive">{error}</p>}
 
               <div className="flex flex-wrap items-center gap-2">
                 <Button
@@ -257,14 +257,14 @@ export function ImportClubCornerWizard({
       {stage === "done" && summary && (
         <div className="flex flex-col gap-3 rounded-xl border border-emerald-200 bg-emerald-50/60 p-4 dark:border-emerald-500/30 dark:bg-emerald-950/20">
           {summary.fatalError ? (
-            <p className="text-sm text-red-600">{summary.fatalError}</p>
+            <p className="text-sm text-destructive">{summary.fatalError}</p>
           ) : (
             <>
               <div className="flex flex-wrap items-center gap-4 text-sm font-medium">
                 <span className="text-emerald-800 dark:text-emerald-200">
                   {t("doneCreated", { n: summary.created })}
                 </span>
-                <span className="text-zinc-700 dark:text-zinc-300">
+                <span className="text-foreground">
                   {t("doneUpdated", { n: summary.updated })}
                 </span>
                 {summary.skipped > 0 && (
@@ -280,7 +280,7 @@ export function ImportClubCornerWizard({
               </div>
 
               {(summary.skipped > 0 || summary.errors > 0) && (
-                <details className="text-xs text-zinc-700 dark:text-zinc-300">
+                <details className="text-xs text-foreground">
                   <summary className="cursor-pointer">{t("detailsToggle")}</summary>
                   <ul className="mt-2 space-y-1">
                     {summary.outcomes

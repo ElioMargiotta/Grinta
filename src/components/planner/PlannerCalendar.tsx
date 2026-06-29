@@ -95,7 +95,7 @@ export function PlannerCalendar({
   return (
     <div className="flex flex-col gap-4">
       <div className="flex flex-wrap items-center justify-between gap-3">
-        <div className="inline-flex w-fit gap-1 rounded-lg border border-zinc-200 bg-white p-1 shadow-sm dark:border-zinc-800 dark:bg-zinc-900">
+        <div className="inline-flex w-fit gap-1 rounded-lg border border-border bg-card p-1 shadow-sm">
           {VIEW_ORDER.map((v) => (
             <Button
               key={v}

@@ -177,13 +177,13 @@ export function NotificationBell({
         type="button"
         onClick={() => setOpen((v) => !v)}
         aria-label={t("bellAria")}
-        className="relative inline-flex h-8 w-8 items-center justify-center rounded-md text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 dark:text-zinc-400 dark:hover:bg-zinc-800 dark:hover:text-zinc-100"
+        className="relative inline-flex h-8 w-8 items-center justify-center rounded-md text-muted-foreground hover:bg-accent hover:text-foreground"
       >
         <Bell className="h-4 w-4" />
         {unread > 0 && (
           <span
             aria-label={t("unreadAria", { count: unread })}
-            className="absolute -top-0.5 -right-0.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-[var(--club-primary)] px-1 text-[10px] font-semibold text-[var(--club-primary-foreground)]"
+            className="absolute -top-0.5 -right-0.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-primary px-1 text-[10px] font-semibold text-primary-foreground"
           >
             {unread > 9 ? "9+" : unread}
           </span>
@@ -191,23 +191,23 @@ export function NotificationBell({
       </button>
 
       {open && (
-        <div className="absolute right-0 z-40 mt-1 w-80 overflow-hidden rounded-md border border-[var(--club-line)] bg-white shadow-lg dark:border-zinc-800 dark:bg-zinc-900">
-          <div className="flex items-center justify-between border-b border-[var(--club-line)] px-3 py-2 dark:border-zinc-800">
-            <span className="text-sm font-medium text-zinc-900 dark:text-zinc-100">
+        <div className="absolute right-0 z-40 mt-1 w-80 overflow-hidden rounded-lg border border-border bg-card shadow-lg">
+          <div className="flex items-center justify-between border-b border-border px-3 py-2">
+            <span className="text-sm font-medium text-foreground">
               {t("title")}
             </span>
             {unread > 0 && (
               <button
                 type="button"
                 onClick={markAllRead}
-                className="text-xs text-[var(--club-primary)] hover:underline"
+                className="text-xs text-primary hover:underline"
               >
                 {t("markAllRead")}
               </button>
             )}
           </div>
 
-          <div className="flex gap-1 border-b border-[var(--club-line)] px-2 py-1.5 dark:border-zinc-800">
+          <div className="flex gap-1 border-b border-border px-2 py-1.5">
             {(["unread", "all"] as const).map((f) => (
               <button
                 key={f}
@@ -215,8 +215,8 @@ export function NotificationBell({
                 onClick={() => setFilter(f)}
                 className={`rounded px-2 py-1 text-xs font-medium transition-colors ${
                   filter === f
-                    ? "bg-[var(--club-primary-soft)] text-[var(--club-primary)]"
-                    : "text-zinc-500 hover:text-zinc-800 dark:hover:text-zinc-200"
+                    ? "bg-accent text-primary"
+                    : "text-muted-foreground hover:text-foreground"
                 }`}
               >
                 {f === "unread" ? t("tabUnread", { count: unread }) : t("tabAll")}
@@ -225,7 +225,7 @@ export function NotificationBell({
           </div>
 
           {visibleItems.length === 0 ? (
-            <p className="px-3 py-8 text-center text-sm text-zinc-500">
+            <p className="px-3 py-8 text-center text-sm text-muted-foreground">
               {filter === "unread" ? t("noUnread") : t("empty")}
             </p>
           ) : (
@@ -237,7 +237,7 @@ export function NotificationBell({
                 return (
                   <li
                     key={n.id}
-                    className="group relative flex items-stretch hover:bg-[var(--club-primary-soft)] dark:hover:bg-zinc-800"
+                    className="group relative flex items-stretch hover:bg-accent"
                   >
                     <button
                       type="button"
@@ -247,19 +247,19 @@ export function NotificationBell({
                       <span className="relative mt-0.5 shrink-0">
                         <Icon
                           className={`h-4 w-4 ${
-                            isRead ? "text-zinc-400" : "text-[var(--club-primary)]"
+                            isRead ? "text-muted-foreground" : "text-primary"
                           }`}
                         />
                         {!isRead && (
-                          <span className="absolute -top-1 -right-1 h-2 w-2 rounded-full bg-[var(--club-primary)]" />
+                          <span className="absolute -top-1 -right-1 h-2 w-2 rounded-full bg-primary" />
                         )}
                       </span>
                       <span className="min-w-0 flex-1">
                         <span
                           className={`block truncate text-sm ${
                             isRead
-                              ? "font-normal text-zinc-500 dark:text-zinc-400"
-                              : "font-medium text-zinc-900 dark:text-zinc-100"
+                              ? "font-normal text-muted-foreground"
+                              : "font-medium text-foreground"
                           }`}
                         >
                           {pres.title}
@@ -267,7 +267,7 @@ export function NotificationBell({
                         {pres.body && (
                           <span
                             className={`block truncate text-xs ${
-                              isRead ? "text-zinc-400" : "text-zinc-500"
+                              isRead ? "text-muted-foreground" : "text-muted-foreground"
                             }`}
                           >
                             {pres.body}
@@ -279,7 +279,7 @@ export function NotificationBell({
                       type="button"
                       onClick={() => void dismiss(n)}
                       aria-label={t("dismissAria")}
-                      className="absolute top-1.5 right-1.5 inline-flex h-6 w-6 items-center justify-center rounded text-zinc-400 opacity-0 transition-opacity hover:bg-zinc-100 hover:text-zinc-700 group-hover:opacity-100 focus:opacity-100 dark:hover:bg-zinc-700 dark:hover:text-zinc-200"
+                      className="absolute top-1.5 right-1.5 inline-flex h-6 w-6 items-center justify-center rounded text-muted-foreground opacity-0 transition-opacity hover:bg-accent hover:text-foreground group-hover:opacity-100 focus:opacity-100"
                     >
                       <X className="h-3.5 w-3.5" />
                     </button>

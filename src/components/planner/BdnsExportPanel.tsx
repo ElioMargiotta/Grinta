@@ -91,24 +91,24 @@ export function BdnsExportPanel({
       </div>
 
       <fieldset className="flex flex-col gap-2">
-        <legend className="text-sm font-medium text-zinc-900 dark:text-zinc-100">
+        <legend className="text-sm font-medium text-foreground">
           {t("activities")}
         </legend>
-        <label className="flex items-center gap-2 text-sm text-zinc-700 dark:text-zinc-300">
+        <label className="flex items-center gap-2 text-sm text-foreground">
           <input
             type="checkbox"
             checked={includeTrainings}
             onChange={(e) => setIncludeTrainings(e.target.checked)}
-            className="h-4 w-4 rounded border-zinc-300"
+            className="h-4 w-4 rounded border-input accent-primary"
           />
           {t("includeTrainings")}
         </label>
-        <label className="flex items-center gap-2 text-sm text-zinc-700 dark:text-zinc-300">
+        <label className="flex items-center gap-2 text-sm text-foreground">
           <input
             type="checkbox"
             checked={includeMatches}
             onChange={(e) => setIncludeMatches(e.target.checked)}
-            className="h-4 w-4 rounded border-zinc-300"
+            className="h-4 w-4 rounded border-input accent-primary"
           />
           {t("includeMatches")}
         </label>
@@ -123,7 +123,7 @@ export function BdnsExportPanel({
         onChange={(e) => setFallbackLocation(e.target.value)}
       />
 
-      {error && <p className="text-sm text-red-600">{error}</p>}
+      {error && <p className="text-sm text-destructive">{error}</p>}
 
       <div>
         <Button onClick={run} loading={isPending}>
@@ -133,7 +133,7 @@ export function BdnsExportPanel({
       </div>
 
       {result && !result.error && (
-        <div className="flex flex-col gap-3 rounded-xl border border-zinc-200 bg-white p-4 dark:border-zinc-800 dark:bg-zinc-950">
+        <div className="flex flex-col gap-3 rounded-xl border border-border bg-card p-4">
           <p className="inline-flex items-center gap-2 text-sm font-medium text-emerald-700 dark:text-emerald-300">
             <CheckCircle2 className="h-4 w-4" />
             {t("done", { n: result.count ?? 0 })}

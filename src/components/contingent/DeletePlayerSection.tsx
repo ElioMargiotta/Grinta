@@ -31,14 +31,14 @@ export function DeletePlayerSection({
   };
 
   return (
-    <div className="rounded-lg border border-red-200 bg-red-50/50 p-6 dark:border-red-500/30 dark:bg-red-950/20">
+    <div className="rounded-lg border border-destructive/30 bg-destructive/5 p-6">
       <div className="flex items-start gap-3">
-        <AlertTriangle className="mt-0.5 h-5 w-5 shrink-0 text-red-600 dark:text-red-400" />
+        <AlertTriangle className="mt-0.5 h-5 w-5 shrink-0 text-destructive" />
         <div className="flex-1">
-          <div className="text-base font-semibold text-red-900 dark:text-red-100">
+          <div className="text-base font-semibold text-destructive">
             {t("title")}
           </div>
-          <p className="mt-1 text-sm text-red-800 dark:text-red-300">
+          <p className="mt-1 text-sm text-destructive">
             {t.rich("description", {
               name: playerName,
               strong: (chunks) => <strong>{chunks}</strong>,
@@ -79,7 +79,7 @@ export function DeletePlayerSection({
               </Button>
             </div>
           )}
-          {error && <p className="mt-3 text-sm text-red-600">{error}</p>}
+          {error && <p className="mt-3 text-sm text-destructive">{error}</p>}
         </div>
       </div>
     </div>

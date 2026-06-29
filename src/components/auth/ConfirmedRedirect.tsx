@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { useTranslations } from "next-intl";
 import { Link, useRouter } from "@/i18n/navigation";
+import { buttonVariants } from "@/components/ui/Button";
 
 const REDIRECT_SECONDS = 10;
 
@@ -40,20 +41,17 @@ export function ConfirmedRedirect() {
       </span>
 
       <div>
-        <h1 className="text-xl font-semibold text-zinc-900">
+        <h1 className="text-xl font-semibold text-foreground">
           {t("confirmedTitle")}
         </h1>
-        <p className="mt-2 text-sm text-zinc-600">{t("confirmedBody")}</p>
+        <p className="mt-2 text-sm text-muted-foreground">{t("confirmedBody")}</p>
       </div>
 
-      <p className="text-sm text-zinc-500">
+      <p className="text-sm text-muted-foreground">
         {t("confirmedRedirect")} ({seconds})
       </p>
 
-      <Link
-        href="/login"
-        className="inline-flex items-center justify-center rounded-lg bg-zinc-900 px-5 py-2.5 text-sm font-medium text-white transition-colors hover:bg-zinc-800"
-      >
+      <Link href="/login" className={buttonVariants()}>
         {t("confirmedCta")}
       </Link>
     </div>

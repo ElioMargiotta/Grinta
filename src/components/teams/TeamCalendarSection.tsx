@@ -19,6 +19,7 @@ import {
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 import { Select } from "@/components/ui/Select";
+import { EmptyState } from "@/components/ui/EmptyState";
 import { MatchEditor, type EditableMatch } from "@/components/teams/MatchEditor";
 import { PeriodizationSettingsForm } from "@/components/teams/PeriodizationSettingsForm";
 import {
@@ -135,18 +136,18 @@ export function TeamCalendarSection({
 
   const sectionClass =
     variant === "plain"
-      ? "border-t border-zinc-200 pt-5"
-      : "border-y border-[var(--club-line)] bg-white/[0.78] p-5 md:p-6";
+      ? "border-t border-border pt-5"
+      : "border-y border-border bg-card/[0.78] p-5 md:p-6";
 
   return (
     <section className={sectionClass}>
       {activeSlot ? null : (
         <div className="mb-5">
-          <div className="flex items-center gap-2 text-base font-semibold text-zinc-900 dark:text-zinc-100">
-            <CalendarDays className="h-4 w-4 text-[var(--club-primary)]" />
+          <div className="flex items-center gap-2 text-base font-semibold text-foreground">
+            <CalendarDays className="h-4 w-4 text-primary" />
             {t("title")}
           </div>
-          <p className="mt-1 max-w-2xl text-sm text-zinc-600 dark:text-zinc-400">
+          <p className="mt-1 max-w-2xl text-sm text-muted-foreground">
             {t("subtitle")}
           </p>
         </div>
@@ -168,7 +169,7 @@ export function TeamCalendarSection({
       />
 
       {error ? (
-        <p className="mt-3 text-sm text-red-600 dark:text-red-400">
+        <p className="mt-3 text-sm text-destructive">
           {t.has(`err.${error}`) ? t(`err.${error}`) : error}
         </p>
       ) : null}
@@ -178,7 +179,7 @@ export function TeamCalendarSection({
           selon sa date (comme un flux ICS). Les onglets ne sont qu'un filtre
           visuel pour consulter les confrontations d'un tour. */}
       <div className="mt-6 flex flex-wrap items-center justify-between gap-2">
-        <div className="text-sm font-semibold text-zinc-900 dark:text-zinc-100">
+        <div className="text-sm font-semibold text-foreground">
           {t("matchesTitle", { n: visibleMatches.length })}
         </div>
         <Button
@@ -200,7 +201,7 @@ export function TeamCalendarSection({
             onDone={closeEditorAndRefresh}
             onCancel={() => setEditing(null)}
           />
-          <p className="mt-1.5 text-xs text-zinc-500">{t("match.autoTourHint")}</p>
+          <p className="mt-1.5 text-xs text-muted-foreground">{t("match.autoTourHint")}</p>
         </div>
       ) : null}
 
@@ -214,8 +215,8 @@ export function TeamCalendarSection({
                 onClick={() => onSwitchFrame(s)}
                 className={`h-7 border-b text-center text-[11px] font-semibold transition ${
                   activeSlot === s
-                    ? "border-red-500 text-zinc-950"
-                    : "border-zinc-200 text-zinc-500 hover:border-zinc-400 hover:text-zinc-900"
+                    ? "border-primary text-foreground"
+                    : "border-border text-muted-foreground hover:border-input hover:text-foreground"
                 }`}
               >
                 {t(`slot.${s}`)}
@@ -227,11 +228,9 @@ export function TeamCalendarSection({
 
       <div className="mt-4">
         {visibleMatches.length === 0 && editing !== "new" ? (
-          <p className="rounded-lg border border-dashed border-[var(--club-line)] bg-white/40 p-4 text-sm text-zinc-500">
-            {t("matchesEmpty")}
-          </p>
+          <EmptyState title={t("matchesEmpty")} />
         ) : (
-          <ul className="flex flex-col divide-y divide-[var(--club-line)] border-y border-[var(--club-line)]">
+          <ul className="flex flex-col divide-y divide-border border-y border-border">
             {visibleMatches.map((m) =>
               editing === m.id ? (
                 <li key={m.id} className="py-3">
@@ -263,15 +262,15 @@ export function TeamCalendarSection({
           <button
             type="button"
             onClick={() => setShowHistory((v) => !v)}
-            className="flex items-center gap-1.5 text-sm font-semibold text-zinc-700 transition hover:text-zinc-950 dark:text-zinc-300"
+            className="flex items-center gap-1.5 text-sm font-semibold text-foreground transition hover:text-foreground"
           >
             <History className="h-3.5 w-3.5" />
             {showHistory ? t("historyHide") : t("historyShow", { n: archivedMatches.length })}
           </button>
           {showHistory ? (
             <>
-              <p className="mt-1 text-xs text-zinc-500">{t("historyHint")}</p>
-              <ul className="mt-2 flex flex-col divide-y divide-[var(--club-line)] border-y border-[var(--club-line)]">
+              <p className="mt-1 text-xs text-muted-foreground">{t("historyHint")}</p>
+              <ul className="mt-2 flex flex-col divide-y divide-border border-y border-border">
                 {archivedMatches.map((m) => (
                   <ArchivedRow
                     key={m.id}
@@ -343,7 +342,7 @@ function CalendarIdentityPrompt({
   if (importedMatches.length === 0 || candidates.length < 2) return null;
 
   return (
-    <div className="mt-3 rounded-[10px] border border-zinc-200 bg-zinc-50 p-3 sm:max-w-xl">
+    <div className="mt-3 rounded-[10px] border border-border bg-muted p-3 sm:max-w-xl">
       <Select
         id="existing-calendar-team-identity"
         label={t("teamIdentityQuestion")}
@@ -354,7 +353,7 @@ function CalendarIdentityPrompt({
           <option key={candidate} value={candidate}>{candidate}</option>
         ))}
       </Select>
-      <p className="mt-1 text-xs text-zinc-600">
+      <p className="mt-1 text-xs text-muted-foreground">
         {t("teamIdentityBulkHint", { n: importedMatches.length })}
       </p>
       <Button
@@ -378,7 +377,7 @@ function CalendarIdentityPrompt({
       >
         {t("applyTeamIdentity")}
       </Button>
-      {error ? <p className="mt-2 text-xs text-red-600">{error}</p> : null}
+      {error ? <p className="mt-2 text-xs text-destructive">{error}</p> : null}
     </div>
   );
 }
@@ -446,8 +445,8 @@ function CalendarImporter({
   };
 
   return (
-    <div className="rounded-lg border border-zinc-200 bg-white/60 p-3 dark:border-zinc-800 dark:bg-zinc-900/40 sm:max-w-xl">
-      <div className="mb-2 text-sm font-semibold text-zinc-900 dark:text-zinc-100">
+    <div className="rounded-lg border border-border bg-card/60 p-3 sm:max-w-xl">
+      <div className="mb-2 text-sm font-semibold text-foreground">
         {t("addCalendar")}
       </div>
       <Input
@@ -529,7 +528,7 @@ function CalendarImporter({
         ) : null}
       </div>
       {error ? (
-        <p className="mt-2 text-xs text-red-600 dark:text-red-400">
+        <p className="mt-2 text-xs text-destructive">
           {t.has(`err.${error}`) ? t(`err.${error}`) : error}
         </p>
       ) : null}
@@ -558,7 +557,7 @@ function IcsLinksPanel({
       <button
         type="button"
         onClick={() => setOpen((v) => !v)}
-        className="flex items-center gap-1.5 text-sm font-semibold text-zinc-700 transition hover:text-zinc-950 dark:text-zinc-300"
+        className="flex items-center gap-1.5 text-sm font-semibold text-foreground transition hover:text-foreground"
       >
         {open ? (
           <ChevronDown className="h-3.5 w-3.5" />
@@ -574,10 +573,10 @@ function IcsLinksPanel({
             if (subs.length === 0) return null;
             return (
               <div key={slot}>
-                <div className="mb-1 text-[10px] font-semibold uppercase tracking-wider text-zinc-400">
+                <div className="mb-1 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
                   {t(`slot.${slot}`)}
                 </div>
-                <ul className="flex flex-col divide-y divide-[var(--club-line)] border-y border-[var(--club-line)]">
+                <ul className="flex flex-col divide-y divide-border border-y border-border">
                   {subs.map((sub) => (
                     <IcsLinkRow
                       key={sub.id}
@@ -689,7 +688,7 @@ function IcsLinkRow({
         </div>
       ) : (
         <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-          <span className="min-w-0 truncate text-xs text-zinc-500">
+          <span className="min-w-0 truncate text-xs text-muted-foreground">
             {maskCalendarUrl(subscription.ics_url)}
           </span>
           <div className="flex shrink-0 flex-wrap items-center gap-2">
@@ -722,7 +721,7 @@ function IcsLinkRow({
         </div>
       )}
       {error ? (
-        <p className="text-xs text-red-600 dark:text-red-400">
+        <p className="text-xs text-destructive">
           {t.has(`err.${error}`) ? t(`err.${error}`) : error}
         </p>
       ) : null}
@@ -751,13 +750,13 @@ function ArchivedRow({
   return (
     <li className="flex items-center justify-between gap-3 py-2.5 text-sm">
       <div className="flex min-w-0 items-center gap-3">
-        <span className="w-28 shrink-0 text-xs font-medium uppercase tracking-wider text-zinc-400">
+        <span className="w-28 shrink-0 text-xs font-medium uppercase tracking-wider text-muted-foreground">
           {dateStr}
         </span>
         <div className="min-w-0">
           <div className="flex items-center gap-2">
-            <span className="truncate font-medium text-zinc-700 dark:text-zinc-200">{title}</span>
-            <span className="rounded bg-zinc-100 px-1.5 py-0.5 text-[10px] text-zinc-500 dark:bg-zinc-800">
+            <span className="truncate font-medium text-foreground">{title}</span>
+            <span className="rounded bg-muted px-1.5 py-0.5 text-[10px] text-muted-foreground">
               {t(`match.kindOption.${match.kind ?? "league"}`)}
             </span>
           </div>
@@ -765,7 +764,7 @@ function ArchivedRow({
       </div>
       <div className="flex shrink-0 items-center gap-2">
         {match.home_away ? (
-          <span className="rounded bg-zinc-100 px-1.5 py-0.5 text-[10px] font-medium uppercase text-zinc-500 dark:bg-zinc-800">
+          <span className="rounded bg-muted px-1.5 py-0.5 text-[10px] font-medium uppercase text-muted-foreground">
             {t(`match.${match.home_away}`)}
           </span>
         ) : (
@@ -774,7 +773,7 @@ function ArchivedRow({
           </span>
         )}
         {match.home_score != null && match.away_score != null ? (
-          <span className="rounded bg-zinc-900 px-2 py-1 text-xs font-semibold tabular-nums text-white dark:bg-zinc-100 dark:text-zinc-900">
+          <span className="rounded bg-foreground px-2 py-1 text-xs font-semibold tabular-nums text-background">
             {match.home_score}–{match.away_score}
           </span>
         ) : (
@@ -806,7 +805,7 @@ function SyncStatus({
       ? "border-emerald-300 bg-emerald-50 text-emerald-700"
       : lastStatus === "error"
         ? "border-amber-300 bg-amber-50 text-amber-700"
-        : "border-zinc-200 bg-zinc-50 text-zinc-600";
+        : "border-border bg-muted text-muted-foreground";
   return (
     <div
       className={`flex flex-col items-end gap-0.5 rounded-md border px-3 py-2 text-xs ${tone}`}
@@ -874,9 +873,9 @@ function MatchRow({
   return (
     <li className="flex flex-col gap-2 py-3 md:flex-row md:items-center md:justify-between">
       <div className="flex min-w-0 items-center gap-3">
-        <div className="w-24 shrink-0 text-xs font-semibold uppercase tracking-wider text-[var(--club-primary)]">
+        <div className="w-24 shrink-0 text-xs font-semibold uppercase tracking-wider text-primary">
           {dateStr}
-          <div className="text-sm font-medium normal-case tracking-normal text-zinc-900 dark:text-zinc-100">
+          <div className="text-sm font-medium normal-case tracking-normal text-foreground">
             {timeStr}
           </div>
         </div>
@@ -885,19 +884,19 @@ function MatchRow({
             {isStructuringKind(match.kind) ? (
               <span
                 title={t(`match.kindOption.${kind}`)}
-                className="inline-block h-2 w-2 shrink-0 rounded-full bg-[var(--club-primary)]"
+                className="inline-block h-2 w-2 shrink-0 rounded-full bg-primary"
               />
             ) : (
               <span
                 title={t(`match.kindOption.${kind}`)}
-                className="inline-block h-2 w-2 shrink-0 rounded-full border border-zinc-300"
+                className="inline-block h-2 w-2 shrink-0 rounded-full border border-input"
               />
             )}
-            <span className="truncate text-sm text-zinc-900 dark:text-zinc-100">
+            <span className="truncate text-sm text-foreground">
               {title}
             </span>
             {match.home_away ? (
-              <span className="rounded bg-zinc-100 px-1.5 py-0.5 text-[10px] font-medium uppercase text-zinc-500 dark:bg-zinc-800">
+              <span className="rounded bg-muted px-1.5 py-0.5 text-[10px] font-medium uppercase text-muted-foreground">
                 {t(`match.${match.home_away}`)}
               </span>
             ) : (
@@ -905,17 +904,17 @@ function MatchRow({
                 {t("match.homeAwayUnknown")}
               </span>
             )}
-            <span className="rounded bg-[var(--club-primary-soft)] px-1.5 py-0.5 text-[10px] font-medium text-[var(--club-primary)]">
+            <span className="rounded bg-accent px-1.5 py-0.5 text-[10px] font-medium text-primary">
               {t(`match.kindOption.${kind}`)}
             </span>
             {match.source === "manual" ? (
-              <span className="rounded bg-zinc-100 px-1.5 py-0.5 text-[10px] font-medium text-zinc-500 dark:bg-zinc-800">
+              <span className="rounded bg-muted px-1.5 py-0.5 text-[10px] font-medium text-muted-foreground">
                 {t("match.manual")}
               </span>
             ) : null}
           </div>
           {match.location ? (
-            <div className="mt-0.5 flex items-center gap-1 truncate text-xs text-zinc-500">
+            <div className="mt-0.5 flex items-center gap-1 truncate text-xs text-muted-foreground">
               <MapPin className="h-3 w-3 shrink-0" />
               {match.location}
             </div>
@@ -937,7 +936,7 @@ function MatchRow({
             href={match.match_url}
             target="_blank"
             rel="noreferrer noopener"
-            className="px-1 text-xs font-medium text-[var(--club-primary)] hover:underline"
+            className="px-1 text-xs font-medium text-primary hover:underline"
           >
             ↗
           </a>

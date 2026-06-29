@@ -30,7 +30,7 @@ export function StaffAttendanceRoster({ sessionId, teamId, staff }: Props) {
 
   if (staff.length === 0) {
     return (
-      <p className="text-[12px] text-zinc-500 dark:text-zinc-400">
+      <p className="text-[12px] text-muted-foreground">
         {t("empty")}
       </p>
     );
@@ -38,20 +38,20 @@ export function StaffAttendanceRoster({ sessionId, teamId, staff }: Props) {
 
   return (
     <div className="flex flex-col gap-2">
-      <h2 className="text-sm font-semibold text-zinc-900 dark:text-zinc-100">
+      <h2 className="text-sm font-semibold text-foreground">
         {t("title")}
       </h2>
-      <p className="text-[11px] text-zinc-500 dark:text-zinc-400">{t("hint")}</p>
-      <div className="overflow-hidden rounded-md border border-zinc-200 dark:border-zinc-800">
+      <p className="text-[11px] text-muted-foreground">{t("hint")}</p>
+      <div className="overflow-hidden rounded-md border border-border">
         <table className="w-full text-sm">
-          <thead className="bg-zinc-50 text-left text-[11px] uppercase tracking-widest text-zinc-500 dark:bg-zinc-900 dark:text-zinc-400">
+          <thead className="bg-muted text-left text-[11px] uppercase tracking-widest text-muted-foreground">
             <tr>
               <th className="px-3 py-2">{t("colName")}</th>
               <th className="px-3 py-2">{t("colJsNumber")}</th>
               <th className="px-3 py-2">{t("colPresence")}</th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-zinc-200 dark:divide-zinc-800">
+          <tbody className="divide-y divide-border">
             {staff.map((entry) => (
               <StaffRow
                 key={entry.membershipId}
@@ -121,8 +121,8 @@ function StaffRow({
   };
 
   return (
-    <tr className="bg-white dark:bg-zinc-950">
-      <td className="px-3 py-3 font-medium text-zinc-900 dark:text-zinc-100">
+    <tr className="bg-card">
+      <td className="px-3 py-3 font-medium text-foreground">
         {entry.fullName || t("unnamed")}
       </td>
       <td className="px-3 py-3">
@@ -175,7 +175,7 @@ function StaffRow({
             <Minus className="h-3.5 w-3.5" />
           </Toggle>
         </div>
-        {error && <span className="text-[11px] text-red-600">{error}</span>}
+        {error && <span className="text-[11px] text-destructive">{error}</span>}
       </td>
     </tr>
   );
@@ -199,13 +199,13 @@ function Toggle({
   const toneStyles = {
     positive: active
       ? "bg-emerald-600 text-white border-emerald-600"
-      : "border-zinc-300 text-zinc-500 hover:bg-emerald-50 hover:text-emerald-700 dark:border-zinc-700",
+      : "border-input text-muted-foreground hover:bg-emerald-50 hover:text-emerald-700",
     negative: active
       ? "bg-red-600 text-white border-red-600"
-      : "border-zinc-300 text-zinc-500 hover:bg-red-50 hover:text-red-700 dark:border-zinc-700",
+      : "border-input text-muted-foreground hover:bg-red-50 hover:text-red-700",
     neutral: active
-      ? "bg-zinc-700 text-white border-zinc-700"
-      : "border-zinc-300 text-zinc-500 hover:bg-zinc-100 dark:border-zinc-700",
+      ? "bg-foreground text-background border-foreground"
+      : "border-input text-muted-foreground hover:bg-accent",
   } as const;
 
   return (

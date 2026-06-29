@@ -1,17 +1,29 @@
 import type { HTMLAttributes, ReactNode } from "react";
 import type { LucideIcon } from "lucide-react";
+import { cva, type VariantProps } from "class-variance-authority";
 import { cn } from "@/lib/utils";
 
-export function Section({
-  className,
-  ...props
-}: HTMLAttributes<HTMLElement>) {
+export const sectionVariants = cva(
+  "rounded-xl border border-border bg-card text-card-foreground",
+  {
+    variants: {
+      padding: {
+        sm: "p-4",
+        md: "p-6",
+      },
+    },
+    defaultVariants: { padding: "md" },
+  },
+);
+
+export interface SectionProps
+  extends HTMLAttributes<HTMLElement>,
+    VariantProps<typeof sectionVariants> {}
+
+export function Section({ className, padding, ...props }: SectionProps) {
   return (
     <section
-      className={cn(
-        "rounded-lg border border-border bg-card p-6 text-card-foreground",
-        className,
-      )}
+      className={cn(sectionVariants({ padding }), className)}
       {...props}
     />
   );

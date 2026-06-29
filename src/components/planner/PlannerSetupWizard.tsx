@@ -137,11 +137,11 @@ export function PlannerSetupWizard({
   };
 
   return (
-    <div className="mx-auto w-full max-w-3xl rounded-xl border border-zinc-200 bg-white p-6 shadow-sm dark:border-zinc-800 dark:bg-zinc-900">
-      <h2 className="text-lg font-semibold text-zinc-900 dark:text-zinc-100">
+    <div className="mx-auto w-full max-w-3xl rounded-xl border border-border bg-card p-6 shadow-sm">
+      <h2 className="text-lg font-semibold text-foreground">
         {t("title")}
       </h2>
-      <p className="mt-1 text-sm text-zinc-500 dark:text-zinc-400">{t("subtitle")}</p>
+      <p className="mt-1 text-sm text-muted-foreground">{t("subtitle")}</p>
 
       <div className="mt-6 grid grid-cols-1 gap-4 md:grid-cols-2">
         <Input
@@ -180,13 +180,13 @@ export function PlannerSetupWizard({
 
       <div className="mt-8">
         <div className="flex items-center justify-between">
-          <h3 className="text-sm font-semibold text-zinc-900 dark:text-zinc-100">
+          <h3 className="text-sm font-semibold text-foreground">
             {t("mesocycles")}
           </h3>
           <span
             className={`text-xs font-medium tabular-nums ${
               totalWeeks === null
-                ? "text-zinc-400"
+                ? "text-muted-foreground"
                 : weekDelta === 0
                   ? "text-emerald-600 dark:text-emerald-400"
                   : "text-amber-600 dark:text-amber-400"
@@ -202,13 +202,13 @@ export function PlannerSetupWizard({
           {mesos.map((m) => (
             <div
               key={m.id}
-              className="flex flex-wrap items-end gap-2 rounded-lg border border-zinc-200 bg-zinc-50/60 p-3 dark:border-zinc-800 dark:bg-zinc-950/40"
+              className="flex flex-wrap items-end gap-2 rounded-lg border border-border bg-muted/60 p-3"
             >
               <input
                 type="color"
                 value={m.color}
                 onChange={(e) => updateMeso(m.id, { color: e.target.value })}
-                className="h-10 w-10 cursor-pointer rounded-md border border-zinc-200 bg-transparent dark:border-zinc-700"
+                className="h-10 w-10 cursor-pointer rounded-md border border-border bg-transparent"
                 aria-label={tPlannerTour("colorAriaLabel")}
               />
               <Input
@@ -219,7 +219,7 @@ export function PlannerSetupWizard({
                 className="min-w-[180px]"
               />
               <div className="flex flex-col gap-1.5">
-                <label className="text-sm font-medium text-zinc-900 dark:text-zinc-100">
+                <label className="text-sm font-medium text-foreground">
                   {t("mesoKind")}
                 </label>
                 <select
@@ -227,7 +227,7 @@ export function PlannerSetupWizard({
                   onChange={(e) =>
                     updateMeso(m.id, { kind: e.target.value as MesocycleDraft["kind"] })
                   }
-                  className="h-10 rounded-lg border border-zinc-200 bg-white px-2 text-sm dark:border-zinc-700 dark:bg-zinc-900"
+                  className="h-10 rounded-lg border border-border bg-card px-2 text-sm text-foreground focus:border-ring focus:outline-none focus:ring-2 focus:ring-ring/15"
                 >
                   <option value="preparation">{t("kind.preparation")}</option>
                   <option value="competition">{t("kind.competition")}</option>
@@ -271,7 +271,7 @@ export function PlannerSetupWizard({
       </div>
 
       {error ? (
-        <p className="mt-4 text-sm text-red-600 dark:text-red-400">{error}</p>
+        <p className="mt-4 text-sm text-destructive">{error}</p>
       ) : null}
 
       <div className="mt-6 flex justify-end">

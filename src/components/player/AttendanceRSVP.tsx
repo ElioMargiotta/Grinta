@@ -70,7 +70,7 @@ export function AttendanceRSVP({
 
   if (deadlinePassed) {
     return (
-      <div className="flex items-center gap-2 rounded-md bg-zinc-100 px-3 py-2 text-[12px] text-zinc-600 dark:bg-zinc-900 dark:text-zinc-400">
+      <div className="flex items-center gap-2 rounded-md bg-muted px-3 py-2 text-[12px] text-muted-foreground">
         <AlertCircle className="h-3.5 w-3.5" />
         <span>{t("deadlinePassed")}</span>
         {status && (
@@ -105,7 +105,7 @@ export function AttendanceRSVP({
           maxLength={500}
           required
         />
-        {error && <p className="text-[12px] text-red-600">{error}</p>}
+        {error && <p className="text-[12px] text-destructive">{error}</p>}
         <div className="flex gap-2">
           <Button type="submit" size="sm" loading={isPending}>
             {t("confirmAbsent")}
@@ -151,17 +151,17 @@ export function AttendanceRSVP({
           {t("absent")}
         </Button>
         {status && !isPending && (
-          <span className="ml-auto text-[11px] text-zinc-500 dark:text-zinc-400">
+          <span className="ml-auto text-[11px] text-muted-foreground">
             {status === "present" ? t("answeredPresent") : t("answeredAbsent")}
           </span>
         )}
       </div>
       {status === "absent" && reason && (
-        <p className="text-[12px] italic text-zinc-500 dark:text-zinc-400">
+        <p className="text-[12px] italic text-muted-foreground">
           « {reason} »
         </p>
       )}
-      {error && <p className="text-[12px] text-red-600">{error}</p>}
+      {error && <p className="text-[12px] text-destructive">{error}</p>}
     </div>
   );
 }

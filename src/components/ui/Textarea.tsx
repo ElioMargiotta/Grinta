@@ -1,5 +1,6 @@
 import { forwardRef, type TextareaHTMLAttributes } from "react";
 import { cn } from "@/lib/utils";
+import { fieldVariants } from "@/components/ui/field";
 
 export interface TextareaProps
   extends TextareaHTMLAttributes<HTMLTextAreaElement> {
@@ -17,10 +18,7 @@ export const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
       <textarea
         ref={ref}
         id={id}
-        className={cn(
-          "min-h-[80px] rounded-md border border-border bg-card px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:border-ring focus:outline-none focus:ring-2 focus:ring-ring/15",
-          className,
-        )}
+        className={cn(fieldVariants(), "min-h-[80px] px-3 py-2", className)}
         {...props}
       />
     </div>

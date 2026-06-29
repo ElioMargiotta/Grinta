@@ -1,5 +1,6 @@
 import { forwardRef, type InputHTMLAttributes } from "react";
 import { cn } from "@/lib/utils";
+import { fieldVariants } from "@/components/ui/field";
 
 export interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
   label?: string;
@@ -20,10 +21,8 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
         id={id}
         aria-invalid={error ? true : undefined}
         className={cn(
-          "h-10 rounded-lg border bg-card px-3 text-sm text-foreground shadow-sm transition placeholder:text-muted-foreground focus:outline-none focus:ring-2",
-          error
-            ? "border-destructive focus:border-destructive focus:ring-destructive/15"
-            : "border-border hover:border-input focus:border-ring focus:ring-ring/15",
+          fieldVariants({ invalid: error ? true : false }),
+          "h-10 px-3",
           className,
         )}
         {...props}

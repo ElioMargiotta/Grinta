@@ -58,16 +58,16 @@ export function PeriodizationSettingsForm({
   };
 
   return (
-    <div className="mt-6 rounded-lg border border-[var(--club-line)] bg-white/40 p-4">
-      <div className="flex items-center gap-2 text-sm font-semibold text-zinc-900 dark:text-zinc-100">
-        <SlidersHorizontal className="h-4 w-4 text-[var(--club-primary)]" />
+    <div className="mt-6 rounded-lg border border-border bg-card/40 p-4">
+      <div className="flex items-center gap-2 text-sm font-semibold text-foreground">
+        <SlidersHorizontal className="h-4 w-4 text-primary" />
         {t("title")}
       </div>
-      <p className="mt-1 text-xs text-zinc-500 dark:text-zinc-400">{t("subtitle")}</p>
+      <p className="mt-1 text-xs text-muted-foreground">{t("subtitle")}</p>
 
       <div className="mt-4 flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
         <div>
-          <div className="mb-1.5 text-sm font-medium text-zinc-900 dark:text-zinc-100">
+          <div className="mb-1.5 text-sm font-medium text-foreground">
             {t("trainingDays")}
           </div>
           <div className="flex flex-wrap gap-1.5">
@@ -79,10 +79,10 @@ export function PeriodizationSettingsForm({
                   type="button"
                   onClick={() => toggleDay(d)}
                   aria-pressed={active}
-                  className={`h-9 w-11 rounded-md border text-xs font-medium transition ${
+                  className={`h-9 w-11 rounded-md border text-xs font-medium transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring ${
                     active
-                      ? "border-[var(--club-primary)] bg-[var(--club-primary)] text-[var(--club-primary-foreground)]"
-                      : "border-zinc-200 bg-white text-zinc-600 hover:border-zinc-300 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-300"
+                      ? "border-primary bg-primary text-primary-foreground"
+                      : "border-border bg-card text-muted-foreground hover:border-input"
                   }`}
                 >
                   {t(`day.${d}`)}
@@ -122,7 +122,7 @@ export function PeriodizationSettingsForm({
           className={`mt-3 text-sm ${
             msg.ok
               ? "text-emerald-700 dark:text-emerald-400"
-              : "text-red-600 dark:text-red-400"
+              : "text-destructive"
           }`}
         >
           {msg.text}

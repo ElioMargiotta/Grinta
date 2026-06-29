@@ -100,15 +100,15 @@ export function MobileNavigation({
             role="dialog"
             aria-modal="true"
             aria-label={t("more")}
-            className="absolute inset-x-3 bottom-[calc(4.5rem+env(safe-area-inset-bottom))] rounded-2xl border border-zinc-200 bg-white p-2 shadow-xl dark:border-zinc-800 dark:bg-zinc-900"
+            className="absolute inset-x-3 bottom-[calc(4.5rem+env(safe-area-inset-bottom))] rounded-2xl border border-border bg-card p-2 shadow-xl"
             onClick={(event) => event.stopPropagation()}
           >
             <div className="flex items-center justify-between px-2 py-1.5">
-              <span className="text-sm font-semibold text-zinc-950 dark:text-zinc-100">{t("more")}</span>
+              <span className="text-sm font-semibold text-foreground">{t("more")}</span>
               <button
                 type="button"
                 onClick={() => setMoreOpen(false)}
-                className="flex h-8 w-8 items-center justify-center rounded-lg text-zinc-500 hover:bg-zinc-100 dark:text-zinc-400 dark:hover:bg-zinc-800"
+                className="flex h-8 w-8 items-center justify-center rounded-lg text-muted-foreground hover:bg-accent hover:text-foreground"
                 aria-label={t("closeMenu")}
               >
                 <X className="h-4 w-4" />
@@ -124,8 +124,8 @@ export function MobileNavigation({
                     onClick={() => setMoreOpen(false)}
                     className={`flex items-center gap-2.5 rounded-xl px-3 py-3 text-sm font-medium ${
                       active
-                        ? "bg-[var(--club-primary)] text-[var(--club-primary-foreground)]"
-                        : "text-zinc-700 hover:bg-zinc-100 dark:text-zinc-300 dark:hover:bg-zinc-800"
+                        ? "bg-primary text-primary-foreground"
+                        : "text-foreground hover:bg-accent"
                     }`}
                   >
                     <Icon className="h-4 w-4 shrink-0" />
@@ -140,7 +140,7 @@ export function MobileNavigation({
 
       <nav
         aria-label={t("mobileNavigation")}
-        className="fixed inset-x-0 bottom-0 z-50 border-t border-zinc-200 bg-white/95 pb-[env(safe-area-inset-bottom)] backdrop-blur md:hidden dark:border-zinc-800 dark:bg-zinc-950/95"
+        className="fixed inset-x-0 bottom-0 z-50 border-t border-border bg-card/95 pb-[env(safe-area-inset-bottom)] backdrop-blur md:hidden"
       >
         <div className="mx-auto flex h-16 max-w-lg items-stretch justify-around px-1">
           {primary.map(({ href, key, icon: Icon }) => {
@@ -151,7 +151,7 @@ export function MobileNavigation({
                 href={href}
                 aria-current={active ? "page" : undefined}
                 className={`flex min-w-0 flex-1 flex-col items-center justify-center gap-1 px-1 text-[10px] font-medium ${
-                  active ? "text-[var(--club-primary)]" : "text-zinc-500"
+                  active ? "text-primary" : "text-muted-foreground"
                 }`}
               >
                 <Icon className="h-5 w-5" />
@@ -167,7 +167,7 @@ export function MobileNavigation({
               onClick={() => setMoreOpen((open) => !open)}
               aria-expanded={moreOpen}
               className={`flex min-w-0 flex-1 flex-col items-center justify-center gap-1 px-1 text-[10px] font-medium ${
-                moreOpen || moreActive ? "text-[var(--club-primary)]" : "text-zinc-500"
+                moreOpen || moreActive ? "text-primary" : "text-muted-foreground"
               }`}
             >
               <Menu className="h-5 w-5" />

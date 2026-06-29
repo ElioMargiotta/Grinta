@@ -33,7 +33,7 @@ export function NewTeamForm() {
     >
       <Input id="name" name="name" label={t("name")} required />
       <Input id="ageGroup" name="ageGroup" label={t("ageGroup")} placeholder={t("ageGroupPlaceholder")} />
-      {error && <p className="text-sm text-red-600">{error}</p>}
+      {error && <p className="text-sm text-destructive">{error}</p>}
       <Button type="submit" loading={isPending}>
         {t("submit")}
       </Button>

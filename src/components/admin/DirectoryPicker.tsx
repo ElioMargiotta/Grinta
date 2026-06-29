@@ -129,7 +129,7 @@ export function DirectoryPicker({
               setActive(0);
               setOpen(true);
             }}
-            className="h-full appearance-none rounded-lg border border-zinc-300 bg-white py-2 pl-3 pr-8 text-sm text-zinc-700 outline-none focus:border-zinc-500 dark:border-zinc-700 dark:bg-zinc-950 dark:text-zinc-200"
+            className="h-full appearance-none rounded-lg border border-border bg-card py-2 pl-3 pr-8 text-sm text-foreground focus:border-ring focus:outline-none focus:ring-2 focus:ring-ring/15"
             aria-label={t("clubs.directoryAllRegions")}
           >
             <option value="">{t("clubs.directoryAllRegions")}</option>
@@ -139,11 +139,11 @@ export function DirectoryPicker({
               </option>
             ))}
           </select>
-          <ChevronDown className="pointer-events-none absolute right-2 top-1/2 h-4 w-4 -translate-y-1/2 text-zinc-400" />
+          <ChevronDown className="pointer-events-none absolute right-2 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
         </div>
 
         <div className="relative flex-1">
-          <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-zinc-400" />
+          <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
           <input
             ref={inputRef}
             type="text"
@@ -160,14 +160,14 @@ export function DirectoryPicker({
               setOpen(true);
             }}
             onKeyDown={onKeyDown}
-            className="w-full rounded-lg border border-zinc-300 bg-white py-2 pl-9 pr-9 text-sm text-zinc-900 outline-none focus:border-zinc-500 dark:border-zinc-700 dark:bg-zinc-950 dark:text-zinc-100"
+            className="w-full rounded-lg border border-border bg-card py-2 pl-9 pr-9 text-sm text-foreground focus:border-ring focus:outline-none focus:ring-2 focus:ring-ring/15"
           />
           {selected && (
             <button
               type="button"
               onClick={clear}
               aria-label={t("clubs.directoryClear")}
-              className="absolute right-2 top-1/2 -translate-y-1/2 rounded p-0.5 text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-200"
+              className="absolute right-2 top-1/2 -translate-y-1/2 rounded p-0.5 text-muted-foreground hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
             >
               <X className="h-4 w-4" />
             </button>
@@ -179,16 +179,16 @@ export function DirectoryPicker({
         <ul
           id="directory-listbox"
           role="listbox"
-          className="absolute top-full z-20 mt-1 max-h-72 w-full overflow-auto rounded-lg border border-zinc-200 bg-white py-1 shadow-lg dark:border-zinc-700 dark:bg-zinc-900"
+          className="absolute top-full z-20 mt-1 max-h-72 w-full overflow-auto rounded-lg border border-border bg-card py-1 shadow-lg"
         >
           {groups.length === 0 && (
-            <li className="px-3 py-2 text-sm text-zinc-500 dark:text-zinc-400">
+            <li className="px-3 py-2 text-sm text-muted-foreground">
               {t("clubs.directoryNoResults")}
             </li>
           )}
           {groups.map(([association, items]) => (
             <li key={association}>
-              <div className="sticky top-0 bg-zinc-50 px-3 py-1 text-[11px] font-semibold uppercase tracking-wide text-zinc-400 dark:bg-zinc-800/80">
+              <div className="sticky top-0 bg-muted px-3 py-1 text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">
                 {association}
               </div>
               <ul>
@@ -200,7 +200,7 @@ export function DirectoryPicker({
                         role="option"
                         aria-disabled
                         aria-selected={false}
-                        className="flex cursor-not-allowed items-center justify-between px-3 py-1.5 text-sm text-zinc-300 dark:text-zinc-600"
+                        className="flex cursor-not-allowed items-center justify-between px-3 py-1.5 text-sm text-muted-foreground/50"
                       >
                         <span>
                           {c.name} <span className="tabular-nums">({c.asf_number})</span>
@@ -225,17 +225,15 @@ export function DirectoryPicker({
                         e.preventDefault();
                         choose(c);
                       }}
-                      className={`flex cursor-pointer items-center justify-between px-3 py-1.5 text-sm ${
-                        isActive
-                          ? "bg-zinc-100 dark:bg-zinc-800"
-                          : "text-zinc-800 dark:text-zinc-200"
+                      className={`flex cursor-pointer items-center justify-between px-3 py-1.5 text-sm text-foreground ${
+                        isActive ? "bg-accent" : ""
                       }`}
                     >
                       <span>
                         {c.name}{" "}
-                        <span className="tabular-nums text-zinc-400">({c.asf_number})</span>
+                        <span className="tabular-nums text-muted-foreground">({c.asf_number})</span>
                       </span>
-                      {isSelected && <Check className="h-4 w-4 text-zinc-500" />}
+                      {isSelected && <Check className="h-4 w-4 text-primary" />}
                     </li>
                   );
                 })}
@@ -243,7 +241,7 @@ export function DirectoryPicker({
             </li>
           ))}
           {total > MAX_RESULTS && (
-            <li className="px-3 py-1.5 text-[11px] text-zinc-400">
+            <li className="px-3 py-1.5 text-[11px] text-muted-foreground">
               {t("clubs.directoryMore", { count: total - MAX_RESULTS })}
             </li>
           )}

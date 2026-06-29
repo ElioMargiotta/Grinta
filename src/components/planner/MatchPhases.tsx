@@ -70,10 +70,10 @@ export function MatchPhases({
   const chosen = phases.filter((p) => selected.has(p.id));
 
   return (
-    <section className="flex flex-col gap-3 border-t border-[var(--club-line)] pt-5">
+    <section className="flex flex-col gap-3 border-t border-border pt-5">
       <div className="flex flex-wrap items-center justify-between gap-2">
-        <div className="flex items-center gap-2 text-base font-semibold text-zinc-900 dark:text-zinc-100">
-          <Shapes className="h-4 w-4 text-[var(--club-primary)]" />
+        <div className="flex items-center gap-2 text-base font-semibold text-foreground">
+          <Shapes className="h-4 w-4 text-primary" />
           {t("matchPhasesTitle")}
         </div>
         <Button type="button" size="sm" onClick={save} loading={isSaving}>
@@ -82,7 +82,7 @@ export function MatchPhases({
         </Button>
       </div>
 
-      <ul className="flex flex-col divide-y divide-[var(--club-line)] overflow-hidden rounded-lg border border-[var(--club-line)]">
+      <ul className="flex flex-col divide-y divide-border overflow-hidden rounded-lg border border-border">
         {phases.map((p) => (
           <li key={p.id} className="flex items-center gap-2.5 px-3 py-2">
             <label className="flex min-w-0 flex-1 cursor-pointer items-center gap-2.5">
@@ -90,16 +90,16 @@ export function MatchPhases({
                 type="checkbox"
                 checked={selected.has(p.id)}
                 onChange={() => toggle(p.id)}
-                className="h-4 w-4 accent-[var(--club-primary)]"
+                className="h-4 w-4 accent-primary"
               />
-              <span className="truncate text-sm text-zinc-900 dark:text-zinc-100">
+              <span className="truncate text-sm text-foreground">
                 {p.name || t(`phaseKind.${p.kind}`)}
               </span>
-              <span className="shrink-0 rounded bg-zinc-100 px-1.5 py-0.5 text-[11px] font-medium text-zinc-500 dark:bg-zinc-800 dark:text-zinc-400">
+              <span className="shrink-0 rounded bg-muted px-1.5 py-0.5 text-[11px] font-medium text-muted-foreground">
                 {t(`phaseKind.${p.kind}`)}
               </span>
             </label>
-            <span className="shrink-0 text-xs text-zinc-400">{p.systemName}</span>
+            <span className="shrink-0 text-xs text-muted-foreground">{p.systemName}</span>
           </li>
         ))}
       </ul>
@@ -114,7 +114,7 @@ export function MatchPhases({
         <div className="grid gap-4 sm:grid-cols-2">
           {chosen.map((p) => (
             <div key={p.id} className="flex flex-col gap-1.5">
-              <div className="text-sm font-medium text-zinc-700 dark:text-zinc-300">
+              <div className="text-sm font-medium text-foreground">
                 {p.name || t(`phaseKind.${p.kind}`)}
               </div>
               <PhaseBoard value={p.board} readOnly />

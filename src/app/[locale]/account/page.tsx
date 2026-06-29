@@ -85,7 +85,7 @@ export default async function AccountPage({
 
   return (
     <div
-      className="flex min-h-screen flex-1 flex-col bg-[var(--club-page-bg)] dark:bg-zinc-950"
+      className="flex min-h-screen min-h-dvh flex-1 flex-col bg-[var(--club-page-bg-light)] dark:bg-[var(--club-page-bg-dark)]"
       style={clubThemeStyle(membership)}
     >
       <Topbar
@@ -94,35 +94,36 @@ export default async function AccountPage({
         memberships={memberships}
         licenseUsage={licenseUsage}
         persona={persona}
+        contentClassName="mx-auto w-full max-w-5xl"
       />
-      <main className="flex-1 px-4 py-8 sm:py-12">
+      <main className="flex-1 p-4 pb-24 md:p-5 lg:p-6">
         <div className="mx-auto flex w-full max-w-2xl flex-col gap-6">
           <Link
             href={backHref}
-            className="inline-flex w-fit items-center gap-1.5 text-sm font-medium text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100"
+            className="inline-flex w-fit items-center gap-1.5 text-sm font-medium text-muted-foreground hover:text-foreground"
           >
             <ArrowLeft className="h-4 w-4" />
             {t("back")}
           </Link>
 
           <div>
-            <h1 className="text-2xl font-semibold text-zinc-900 dark:text-zinc-100">
+            <h1 className="text-2xl font-semibold text-foreground">
               {t("title")}
             </h1>
-            <p className="mt-1 text-sm text-zinc-600 dark:text-zinc-400">
+            <p className="mt-1 text-sm text-muted-foreground">
               {t("subtitle")}
             </p>
           </div>
 
-          <div className="rounded-xl border border-zinc-200 bg-white p-6 shadow-sm dark:border-zinc-800 dark:bg-zinc-900 sm:p-8">
+          <div className="rounded-xl border border-border bg-card p-6 shadow-sm sm:p-8">
             <div className="mb-5">
-              <div className="text-xs font-mono uppercase tracking-widest text-zinc-500 dark:text-zinc-400">
+              <div className="text-xs font-mono uppercase tracking-widest text-muted-foreground">
                 {t("identityLabel")}
               </div>
-              <div className="mt-1 text-base font-medium text-zinc-900 dark:text-zinc-100">
+              <div className="mt-1 text-base font-medium text-foreground">
                 {displayName || user.email}
               </div>
-              <div className="text-xs text-zinc-500 dark:text-zinc-400">
+              <div className="text-xs text-muted-foreground">
                 {user.email}
               </div>
             </div>
@@ -136,25 +137,25 @@ export default async function AccountPage({
               initialUsername={profile?.username ?? null}
             />
 
-            <div className="my-6 h-px bg-zinc-200 dark:bg-zinc-800" />
+            <div className="my-6 h-px bg-border" />
 
             <AccountPersonaForm initialCapabilities={capabilities} />
 
-            <div className="my-6 h-px bg-zinc-200 dark:bg-zinc-800" />
+            <div className="my-6 h-px bg-border" />
 
             <TwoFactorSection
               enrolled={!!totpFactor}
               recoveryRemaining={recoveryRemaining}
             />
 
-            <div className="my-6 h-px bg-zinc-200 dark:bg-zinc-800" />
+            <div className="my-6 h-px bg-border" />
 
             <ChangePasswordSection
               has2FA={!!totpFactor}
               factorId={totpFactor?.id ?? null}
             />
 
-            <div className="my-6 h-px bg-zinc-200 dark:bg-zinc-800" />
+            <div className="my-6 h-px bg-border" />
 
             <ChangeEmailSection
               currentEmail={user.email ?? ""}

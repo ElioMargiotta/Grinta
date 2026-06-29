@@ -83,7 +83,7 @@ export function TeamEditForm({ team }: { team: Team }) {
         defaultValue={team.description ?? ""}
       />
 
-      {error && <p className="text-sm text-red-600">{error}</p>}
+      {error && <p className="text-sm text-destructive">{error}</p>}
       {saved && !error && (
         <p className="text-sm text-emerald-700 dark:text-emerald-300">
           {t("saved")}

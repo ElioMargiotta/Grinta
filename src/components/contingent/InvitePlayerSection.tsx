@@ -170,14 +170,14 @@ export function InvitePlayerSection({
             type="button"
             onClick={handleUnlink}
             disabled={isPending}
-            className="inline-flex shrink-0 items-center gap-1 rounded-md px-2 py-1 text-[11px] font-medium text-red-600 hover:bg-red-50 dark:text-red-400 dark:hover:bg-red-950/40"
+            className="inline-flex shrink-0 items-center gap-1 rounded-md px-2 py-1 text-[11px] font-medium text-destructive hover:bg-destructive/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
           >
             <X className="h-3 w-3" />
             {t("unlink")}
           </button>
         </div>
       ) : (
-        <p className="mb-4 text-sm text-zinc-600 dark:text-zinc-400">
+        <p className="mb-4 text-sm text-muted-foreground">
           {target === "guardian" ? t("descriptionGuardian") : t("description")}
         </p>
       )}
@@ -198,10 +198,10 @@ export function InvitePlayerSection({
                   type="button"
                   onClick={() => setTarget(value)}
                   aria-pressed={active}
-                  className={`inline-flex items-center justify-center gap-1.5 rounded-md border px-3 py-2 text-sm font-medium transition-colors ${
+                  className={`inline-flex items-center justify-center gap-1.5 rounded-md border px-3 py-2 text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring ${
                     active
-                      ? "border-[var(--club-primary)] bg-[var(--club-primary-soft)] text-[var(--club-primary)]"
-                      : "border-zinc-200 bg-white text-zinc-600 hover:border-zinc-300 dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-300"
+                      ? "border-primary bg-primary/10 text-primary"
+                      : "border-border bg-card text-muted-foreground hover:border-input"
                   }`}
                 >
                   <Icon className="h-4 w-4" />
@@ -219,7 +219,7 @@ export function InvitePlayerSection({
               onValueChange={setEmail}
               placeholder={t("identifierPlaceholder")}
               hint={t("identifierHint")}
-              inputClassName="h-10 w-full rounded-md border border-zinc-300 bg-white px-3 text-sm text-zinc-900 placeholder:text-zinc-400 focus:border-zinc-900 focus:outline-none focus:ring-2 focus:ring-zinc-900/10 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100"
+              inputClassName="h-10 w-full rounded-md border border-border bg-card px-3 text-sm text-foreground placeholder:text-muted-foreground focus:border-ring focus:outline-none focus:ring-2 focus:ring-ring/15"
             />
             {teams.length > 0 && (
               <Select
@@ -237,7 +237,7 @@ export function InvitePlayerSection({
               </Select>
             )}
             {error && (
-              <p className="rounded-md bg-red-50 px-3 py-2 text-xs text-red-700 dark:bg-red-950/40 dark:text-red-300">
+              <p className="rounded-md bg-destructive/10 px-3 py-2 text-xs text-destructive">
                 {error}
               </p>
             )}
@@ -258,7 +258,7 @@ export function InvitePlayerSection({
           )}
 
           {lastUrl && (
-            <div className="mt-4 rounded-md border border-[var(--club-line)] bg-[var(--club-primary-soft)] p-3 text-xs">
+            <div className="mt-4 rounded-md border border-border bg-accent p-3 text-xs">
               {lastEmailSent && lastEmailTo ? (
                 <div className="mb-2 flex items-center gap-1 font-medium text-emerald-700 dark:text-emerald-300">
                   <Check className="h-3 w-3" />
@@ -269,10 +269,10 @@ export function InvitePlayerSection({
                   {t("emailFailed")}
                 </div>
               ) : null}
-              <div className="mb-1 font-medium text-zinc-700 dark:text-zinc-200">
+              <div className="mb-1 font-medium text-foreground">
                 {lastEmailSent ? t("linkFallback") : t("linkReady")}
               </div>
-              <div className="break-all font-mono text-[11px] text-zinc-700 dark:text-zinc-300">
+              <div className="break-all font-mono text-[11px] text-foreground">
                 {lastUrl}
               </div>
               <div className="mt-2 flex flex-wrap items-center gap-2">
@@ -292,7 +292,7 @@ export function InvitePlayerSection({
                     setCopied(true);
                     window.setTimeout(() => setCopied(false), 1500);
                   }}
-                  className="inline-flex items-center gap-1 rounded-md border border-[var(--club-line)] px-2.5 py-1.5 text-[11px] font-medium text-[var(--club-primary)] hover:bg-white/50"
+                  className="inline-flex items-center gap-1 rounded-md border border-border px-2.5 py-1.5 text-[11px] font-medium text-primary hover:bg-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
                 >
                   {copied ? <Check className="h-3.5 w-3.5" /> : <Copy className="h-3.5 w-3.5" />}
                   {copied ? t("copied") : t("copy")}
@@ -317,21 +317,21 @@ export function InvitePlayerSection({
       )}
 
       {pendingInvitations.length > 0 && (
-        <div className="mt-5 border-t border-[var(--club-line)] pt-4">
-          <h3 className="mb-2 text-sm font-medium text-zinc-700 dark:text-zinc-300">
+        <div className="mt-5 border-t border-border pt-4">
+          <h3 className="mb-2 text-sm font-medium text-foreground">
             {t("pendingTitle")}
           </h3>
           <ul className="flex flex-col gap-2">
             {pendingInvitations.map((inv) => (
               <li
                 key={inv.id}
-                className="flex items-center justify-between gap-3 rounded-md border border-zinc-200 bg-white px-3 py-2 text-xs dark:border-zinc-800 dark:bg-zinc-900"
+                className="flex items-center justify-between gap-3 rounded-md border border-border bg-card px-3 py-2 text-xs"
               >
                 <div className="min-w-0 flex-1">
-                  <div className="truncate font-medium text-zinc-900 dark:text-zinc-100">
+                  <div className="truncate font-medium text-foreground">
                     {inv.targetLabel ?? inv.email ?? t("claimLinkLabel")}
                   </div>
-                  <div className="truncate text-[11px] text-zinc-500">
+                  <div className="truncate text-[11px] text-muted-foreground">
                     {inv.email ? `${emailStatusLabel(inv.email_status)} · ` : ""}
                     {t("expiresAt", {
                       date: new Date(inv.expires_at).toLocaleDateString(locale),
@@ -344,7 +344,7 @@ export function InvitePlayerSection({
                       type="button"
                       onClick={() => handleResend(inv.id, inv.email!)}
                       disabled={isPending}
-                      className="inline-flex items-center gap-1 rounded-md px-2 py-1 text-[11px] font-medium text-zinc-600 hover:bg-zinc-100 dark:text-zinc-300 dark:hover:bg-zinc-800"
+                      className="inline-flex items-center gap-1 rounded-md px-2 py-1 text-[11px] font-medium text-muted-foreground hover:bg-accent hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
                     >
                       <Send className="h-3 w-3" />
                       {t("resend")}
@@ -354,7 +354,7 @@ export function InvitePlayerSection({
                     type="button"
                     onClick={() => handleRevoke(inv.id)}
                     disabled={isPending}
-                    className="inline-flex items-center gap-1 rounded-md px-2 py-1 text-[11px] font-medium text-red-600 hover:bg-red-50 dark:text-red-400 dark:hover:bg-red-950/40"
+                    className="inline-flex items-center gap-1 rounded-md px-2 py-1 text-[11px] font-medium text-destructive hover:bg-destructive/10"
                   >
                     <X className="h-3 w-3" />
                     {t("revoke")}

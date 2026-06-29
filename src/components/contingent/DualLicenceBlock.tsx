@@ -84,7 +84,7 @@ export function DualLicenceBlock({
         <div className="flex flex-col gap-3">
           <div className="rounded-lg border border-amber-200 bg-amber-50/60 p-3 dark:border-amber-500/30 dark:bg-amber-950/20">
             <div className="flex flex-wrap items-center gap-2">
-              <span className="text-sm font-medium text-zinc-900 dark:text-zinc-100">
+              <span className="text-sm font-medium text-foreground">
                 {licence.club}
               </span>
               {licence.level && (
@@ -94,7 +94,7 @@ export function DualLicenceBlock({
               )}
             </div>
             {licence.team && (
-              <p className="mt-1 text-xs text-zinc-600 dark:text-zinc-400">
+              <p className="mt-1 text-xs text-muted-foreground">
                 {t("teamPrefix")} {licence.team}
               </p>
             )}
@@ -124,7 +124,7 @@ export function DualLicenceBlock({
 
       {!editing && !hasLicence && (
         <div className="flex flex-col gap-2">
-          <p className="text-sm text-zinc-600 dark:text-zinc-400">
+          <p className="text-sm text-muted-foreground">
             {t("emptyHint")}
           </p>
           <div>
@@ -169,10 +169,10 @@ export function DualLicenceBlock({
               defaultValue={licence.team ?? ""}
             />
           </div>
-          <p className="text-xs text-zinc-500 dark:text-zinc-400">
+          <p className="text-xs text-muted-foreground">
             {t("helper")}
           </p>
-          {error && <p className="text-sm text-red-600">{error}</p>}
+          {error && <p className="text-sm text-destructive">{error}</p>}
           <div className="flex gap-2">
             <Button type="submit" loading={isPending} loadingLabel={t("saving")}>
               {t("save")}
