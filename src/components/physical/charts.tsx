@@ -34,15 +34,15 @@ export function trendOf(
 }
 
 export function TrendArrow({ trend, className }: { trend: Trend; className?: string }) {
-  if (trend === "flat") return <ArrowRight className={className ?? "h-3.5 w-3.5 text-zinc-400"} />;
+  if (trend === "flat") return <ArrowRight className={className ?? "h-3.5 w-3.5 text-muted-foreground"} />;
   if (trend === "up") return <ArrowUpRight className={className ?? "h-3.5 w-3.5 text-green-600"} />;
-  return <ArrowDownRight className={className ?? "h-3.5 w-3.5 text-red-600"} />;
+  return <ArrowDownRight className={className ?? "h-3.5 w-3.5 text-destructive"} />;
 }
 
 /** Petite courbe SVG maison (pas de lib de charting dans le repo). */
 export function Sparkline({ points, higherIsBetter }: { points: Point[]; higherIsBetter: boolean }) {
   if (points.length < 2) {
-    return <span className="text-[11px] text-zinc-400">—</span>;
+    return <span className="text-[11px] text-muted-foreground">—</span>;
   }
   const W = 96;
   const H = 28;
@@ -121,7 +121,7 @@ export function MetricChart({
         const yy = y(tv);
         return (
           <g key={i}>
-            <line x1={padL} y1={yy} x2={W - padR} y2={yy} stroke="currentColor" className="text-zinc-200 dark:text-zinc-700" strokeWidth={1} />
+            <line x1={padL} y1={yy} x2={W - padR} y2={yy} stroke="currentColor" className="text-border" strokeWidth={1} />
             <text x={padL - 6} y={yy + 3} textAnchor="end" className="fill-zinc-400 text-[10px]">
               {Number(tv.toFixed(2))}
             </text>
@@ -220,7 +220,7 @@ export function MultiSeriesChart({
         const yy = y(tv);
         return (
           <g key={i}>
-            <line x1={padL} y1={yy} x2={W - padR} y2={yy} stroke="currentColor" className="text-zinc-200 dark:text-zinc-700" strokeWidth={1} />
+            <line x1={padL} y1={yy} x2={W - padR} y2={yy} stroke="currentColor" className="text-border" strokeWidth={1} />
             <text x={padL - 6} y={yy + 3} textAnchor="end" className="fill-zinc-400 text-[10px]">
               {Number(tv.toFixed(2))}
             </text>
