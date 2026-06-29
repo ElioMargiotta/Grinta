@@ -22,8 +22,9 @@ export function NavBar() {
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
-  // Close the mobile menu whenever the route changes.
+  // Close the mobile menu whenever the route changes — setState volontaire ici.
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setOpen(false);
   }, [pathname]);
 

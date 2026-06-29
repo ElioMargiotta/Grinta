@@ -2,7 +2,7 @@
 
 import { useEffect, useState, useTransition } from "react";
 import { CheckCircle2 } from "lucide-react";
-import { useTranslations, useLocale } from "next-intl";
+import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/Button";
 import { AuthField } from "@/components/auth/AuthField";
 import { PasswordInput } from "@/components/auth/PasswordInput";
@@ -13,7 +13,6 @@ const REDIRECT_SECONDS = 4;
 
 export function ResetPasswordForm() {
   const t = useTranslations("auth");
-  const locale = useLocale();
   const router = useRouter();
   const [error, setError] = useState<string | null>(null);
   const [done, setDone] = useState(false);

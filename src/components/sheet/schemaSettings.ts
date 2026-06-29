@@ -82,6 +82,9 @@ export function useSchemaSettings(
   );
 
   useEffect(() => {
+    // Réhydratation depuis localStorage au montage (évite le mismatch SSR) —
+    // setState volontaire ici.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setSettings(readStoredSettings(key));
     const onChange = (e: Event) => {
       // Only re-read if the change targets our key (or storage event from
