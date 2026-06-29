@@ -49,6 +49,7 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
     ref,
   ) => {
     const isDisabled = disabled || loading;
+    const spinner = <Spinner size={size === "sm" ? "xs" : "sm"} tone="current" />;
     return (
       <button
         ref={ref}
@@ -57,10 +58,22 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
         className={cn(buttonVariants({ variant, size }), className)}
         {...props}
       >
-        {loading ? (
+        {loading && loadingLabel ? (
           <>
-            <Spinner size={size === "sm" ? "xs" : "sm"} tone="current" />
-            <span>{loadingLabel ?? children}</span>
+            {spinner}
+            <span>{loadingLabel}</span>
+          </>
+        ) : loading ? (
+          // Pas de libellé de chargement : on superpose le spinner et on garde
+          // le contenu (invisible) pour figer la largeur et préserver l'espacement
+          // icône/texte (sinon l'icône se colle au texte).
+          <>
+            <span className="absolute inset-0 flex items-center justify-center">
+              {spinner}
+            </span>
+            <span className="invisible inline-flex items-center gap-2">
+              {children}
+            </span>
           </>
         ) : (
           children
