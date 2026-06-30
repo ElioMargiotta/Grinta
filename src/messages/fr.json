@@ -5,11 +5,90 @@
     "description": "Planifiez votre saison de football."
   },
   "landing": {
+    "profils": {
+      "section": {
+        "eyebrow": "Comment ça marche",
+        "title": "Le club au centre.",
+        "body": "Une seule app, le club au centre. Autour, trois vues qui communiquent : le staff pilote, le joueur vit sa saison, le parent garde le fil.",
+        "more": "Plus d'info",
+        "back": "Accueil",
+        "cards": [
+          { "persona": "staff", "title": "Staff & club", "desc": "Pilote tes équipes, séances et planifications." },
+          { "persona": "player", "title": "Joueur", "desc": "Tes stats, convocations et progression." },
+          { "persona": "parent", "title": "Parents", "desc": "Suis le parcours de ton enfant au club." }
+        ],
+        "tabs": {
+          "staff": "Staff",
+          "player": "Joueur",
+          "parent": "Parent"
+        },
+        "fonctionnement": "Fonctionnement",
+        "cta": "En savoir plus",
+        "hint": "Fais défiler pour avancer"
+      },
+      "staff": {
+        "eyebrow": "Profil staff",
+        "title": "Tout le club, d'un seul geste.",
+        "intro": "De la pré-formation à la première : planifie la saison, construis tes séances et garde tout le club aligné.",
+        "summary": "Président, directeur sportif, entraîneurs : du contingent du club à la compo de mardi soir. Tu pilotes les équipes, montes tes séances et suis tes joueurs — au club comme sur le terrain.",
+        "panels": [
+          { "title": "Planifie la saison", "body": "Macro, méso et microcycles pilotés par tes matchs. Le calendrier devient un vrai plan." },
+          { "title": "Construis tes séances", "body": "Bloc par bloc, de l'échauffement au jeu final. Une fiche prête pour le terrain." },
+          { "title": "Suis tes joueurs", "body": "Contingent, présences et évaluations TIPS : tout le club aligné, dans la durée." }
+        ],
+        "scenes": [
+          { "kicker": "Club", "title": "Toutes tes équipes au même endroit", "body": "De la pré-formation à la première : chaque équipe du club dans un seul espace." },
+          { "kicker": "Saison", "title": "Planifie toute la saison", "body": "Macro, méso et microcycles, pilotés par tes matchs." },
+          { "kicker": "Semaine", "title": "Construis ta semaine", "body": "Chaque microcycle : thème, charge et séances en un coup d'œil." },
+          { "kicker": "Exercices", "title": "Une bibliothèque d'exercices", "body": "Pioche dans la base ou crée les tiens, schémas à l'appui." },
+          { "kicker": "Préparation", "title": "Prépare ta séance", "body": "Assemble la séance bloc par bloc, selon ton objectif du jour." },
+          { "kicker": "Séance", "title": "Un wizard qui te guide", "body": "Du brief d'ouverture au jeu final, étape par étape." },
+          { "kicker": "Export", "title": "La fiche prête pour le terrain", "body": "Un PDF A4 propre, exploitable par tout le staff." },
+          { "kicker": "Contingent", "title": "Gère ton contingent", "body": "Une base joueurs propre, rattachée à tes équipes." },
+          { "kicker": "Profil", "title": "Le profil de chaque joueur", "body": "Infos, poste, historique : tout est centralisé." },
+          { "kicker": "Suivi", "title": "Suis l'évolution", "body": "Présences, disponibilités et suivi TIPS dans la durée." },
+          { "kicker": "Jeu", "title": "Pose tes systèmes de jeu", "body": "Anime tes principes et tes schémas tactiques." },
+          { "kicker": "Compo", "title": "Prépare tes compositions", "body": "Aligne l'équipe selon ton système, match après match." }
+        ]
+      },
+      "player": {
+        "eyebrow": "Profil joueur",
+        "title": "Ta saison, à ta main.",
+        "intro": "Profil, convocations, suivi et progression : tout ce qui te concerne, au même endroit.",
+        "summary": "Ton planning, tes convocations, ta présence en un tap, tes stats de tests et de matchs. Tout ce qui te concerne, sans rien demander à personne.",
+        "panels": [
+          { "title": "Ton profil de joueur", "body": "Poste, infos et historique : ta fiche au club, toujours à jour." },
+          { "title": "Convocations & dispos", "body": "Indique tes disponibilités et vois quand tu joues. Fini le groupe qui déborde." },
+          { "title": "Ta progression", "body": "Suivi TIPS, présences et stats : mesure tes progrès saison après saison." }
+        ],
+        "scenes": [
+          { "kicker": "Profil", "title": "Ton profil de joueur", "body": "Poste, infos, historique : ta fiche au club, toujours à jour." },
+          { "kicker": "Convocations", "title": "Tes convocations & dispos", "body": "Indique tes disponibilités et vois quand tu es convoqué." },
+          { "kicker": "Suivi", "title": "Ton suivi TIPS", "body": "Tes évaluations technique, intelligence, perso et social, dans la durée." },
+          { "kicker": "Progression", "title": "Ta progression", "body": "Stats, présences et évolution : suis tes progrès saison après saison." }
+        ]
+      },
+      "parent": {
+        "eyebrow": "Profil parents",
+        "title": "Le club, en toute sérénité.",
+        "intro": "Suis le parcours de ton enfant, gère ses disponibilités et reste informé du club.",
+        "summary": "La vue sur ton enfant — ou tes enfants. Convocations, présences, parcours : tu suis tout et tu restes relié au club, sans courir après l'info.",
+        "panels": [
+          { "title": "La fiche de ton enfant", "body": "Poste, équipe et infos clés : tout ce qui le concerne, au même endroit." },
+          { "title": "Des convocations claires", "body": "Tu sais quand et où il joue, sans chasser l'information." },
+          { "title": "La vie du club", "body": "Annonces et suivi : tu restes connecté à son parcours au club." }
+        ],
+        "scenes": [
+          { "kicker": "Enfant", "title": "Le parcours de ton enfant", "body": "Suis son évolution sportive au club, en toute simplicité." },
+          { "kicker": "Convocations", "title": "Convocations & disponibilités", "body": "Renseigne ses disponibilités et garde un œil sur ses convocations." },
+          { "kicker": "Club", "title": "Reste informé du club", "body": "Annonces, événements et infos importantes au même endroit." }
+        ]
+      }
+    },
     "nav": {
       "login": "Se connecter",
       "cta": "Démarrer ma saison",
-      "method": "Méthode",
-      "how": "Comment ça marche",
+      "profils": "Les profils",
       "pricing": "Tarifs"
     },
     "hero": {
@@ -29,98 +108,6 @@
       "stat3Label": "Méthode",
       "stat3Value": "1 club",
       "tagline": "One club. One identity. One method."
-    },
-    "manifesto": {
-      "eyebrow": "Le manifeste",
-      "title": "Trois mots, gravés dans chaque écran.",
-      "body": "Grinta n'est pas un agenda partagé. C'est l'outil qui force l'alignement entre la philosophie du club, la planification de la saison et la séance de mardi soir.",
-      "pillars": [
-        {
-          "kicker": "01",
-          "title": "Un club",
-          "body": "De la pré-formation à l'équipe première, toutes les catégories partagent un seul espace de travail."
-        },
-        {
-          "kicker": "02",
-          "title": "Une identité",
-          "body": "Pose les principes de jeu du club. Chaque entraîneur les retrouve dans ses microcycles et ses séances."
-        },
-        {
-          "kicker": "03",
-          "title": "Une méthode",
-          "body": "Macro, méso, microcycles, séances : un seul fil conducteur. Tu planifies la saison une fois, puis tu la déclines."
-        }
-      ]
-    },
-    "flow": {
-      "eyebrow": "Comment ça marche",
-      "titlePrefix": "De l'identité du club à la fiche du",
-      "titleAccent": "mardi soir",
-      "titleSuffix": ".",
-      "steps": [
-        {
-          "kicker": "01",
-          "badge": "Identité",
-          "title": "L'identité du club",
-          "body": "Principes de jeu, objectifs, attentes. Une seule philosophie partagée par tout le staff."
-        },
-        {
-          "kicker": "02",
-          "badge": "Saison",
-          "title": "Planifier la saison",
-          "body": "Customise tes mésocycles selon tes besoins."
-        },
-        {
-          "kicker": "03",
-          "badge": "Microcycle",
-          "title": "Les microcycles",
-          "body": "Thème de la semaine, format, charge. Chaque microcycle prend la couleur que tu veux."
-        },
-        {
-          "kicker": "04",
-          "badge": "Séance",
-          "title": "Les séances",
-          "body": "Importe un exercice depuis notre bibliothèque ou crée-le directement."
-        },
-        {
-          "kicker": "05",
-          "badge": "PDF",
-          "title": "La fiche, prête pour le terrain",
-          "body": "Un PDF A4 propre, lisible pour le staff, exploitable sur le terrain."
-        }
-      ]
-    },
-    "playerFlow": {
-      "eyebrow": "Vision joueur",
-      "titlePrefix": "Du contingent au suivi",
-      "titleAccent": "individuel",
-      "titleSuffix": ".",
-      "steps": [
-        {
-          "kicker": "01",
-          "badge": "Présence",
-          "title": "Présences et disponibilité",
-          "body": "Suis les présences, absences et disponibilités des joueurs pour garder une vision claire de chaque effectif."
-        },
-        {
-          "kicker": "02",
-          "badge": "TIPS",
-          "title": "Suivi TIPS",
-          "body": "Centralise les observations techniques, intelligentes, personnelles et sociales pour accompagner chaque joueur dans la durée."
-        },
-        {
-          "kicker": "03",
-          "badge": "Contingent",
-          "title": "Gestion du contingent",
-          "body": "Garde une base joueurs propre, rattache les joueurs aux équipes et retrouve rapidement les informations importantes."
-        },
-        {
-          "kicker": "04",
-          "badge": "BDNS",
-          "title": "Export BDNS",
-          "body": "Prépare les données nécessaires aux démarches administratives et gagne du temps sur les exports récurrents."
-        }
-      ]
     },
     "pricing": {
       "eyebrow": "Tarifs",
@@ -182,52 +169,24 @@
         {
           "title": "Produit",
           "links": [
-            {
-              "label": "Méthode",
-              "href": "#methode"
-            },
-            {
-              "label": "Comment ça marche",
-              "href": "#flow"
-            },
-            {
-              "label": "Tarifs",
-              "href": "#tarifs"
-            },
-            {
-              "label": "Contact",
-              "href": "/contact"
-            }
+            { "label": "Les profils", "href": "#profils" },
+            { "label": "Tarifs", "href": "#tarifs" },
+            { "label": "Contact", "href": "/contact" }
           ]
         },
         {
           "title": "Compte",
           "links": [
-            {
-              "label": "Connexion",
-              "href": "/login"
-            },
-            {
-              "label": "Créer un compte",
-              "href": "/signup"
-            }
+            { "label": "Connexion", "href": "/login" },
+            { "label": "Créer un compte", "href": "/signup" }
           ]
         },
         {
           "title": "Légal",
           "links": [
-            {
-              "label": "Mentions légales",
-              "href": "/legal/mentions-legales"
-            },
-            {
-              "label": "CGV",
-              "href": "/legal/cgv"
-            },
-            {
-              "label": "Confidentialité",
-              "href": "/legal/confidentialite"
-            }
+            { "label": "Mentions légales", "href": "/legal/mentions-legales" },
+            { "label": "CGV", "href": "/legal/cgv" },
+            { "label": "Confidentialité", "href": "/legal/confidentialite" }
           ]
         }
       ]
@@ -1831,36 +1790,12 @@
       "importBtn": "Importer",
       "quickCheckTitle": "À vérifier rapidement",
       "steps": [
-        {
-          "label": "Brief de la séance",
-          "eyebrow": "Étape 1 sur 5",
-          "desc": "Définis la date, l'équipe et le ou les moments de jeu autour desquels la séance est construite."
-        },
-        {
-          "label": "Échauffement & prép.",
-          "eyebrow": "Étape 2 sur 5",
-          "desc": "Mobilité, échauffement TE/TA puis un court bloc explosif."
-        },
-        {
-          "label": "Bloc principal 1",
-          "eyebrow": "Étape 3 sur 5",
-          "desc": "Ton premier bloc central — forme jouée ou exercice."
-        },
-        {
-          "label": "Bloc principal 2",
-          "eyebrow": "Étape 4 sur 5",
-          "desc": "Second bloc central."
-        },
-        {
-          "label": "Jeu final & retour au calme",
-          "eyebrow": "Étape 5 sur 5",
-          "desc": "Jeu façon match, retour au calme et débrief."
-        },
-        {
-          "label": "Revue & export",
-          "eyebrow": "Revue finale",
-          "desc": "Vérifie chaque section, puis exporte la fiche de préparation officielle."
-        }
+        { "label": "Brief de la séance", "eyebrow": "Étape 1 sur 5", "desc": "Définis la date, l'équipe et le ou les moments de jeu autour desquels la séance est construite." },
+        { "label": "Échauffement & prép.", "eyebrow": "Étape 2 sur 5", "desc": "Mobilité, échauffement TE/TA puis un court bloc explosif." },
+        { "label": "Bloc principal 1", "eyebrow": "Étape 3 sur 5", "desc": "Ton premier bloc central — forme jouée ou exercice." },
+        { "label": "Bloc principal 2", "eyebrow": "Étape 4 sur 5", "desc": "Second bloc central." },
+        { "label": "Jeu final & retour au calme", "eyebrow": "Étape 5 sur 5", "desc": "Jeu façon match, retour au calme et débrief." },
+        { "label": "Revue & export", "eyebrow": "Revue finale", "desc": "Vérifie chaque section, puis exporte la fiche de préparation officielle." }
       ],
       "fits": "OK",
       "tooLong": "Trop long pour le PDF",
@@ -3174,21 +3109,9 @@
     "next": "Suivant",
     "scaleLegend": "Échelle",
     "steps": [
-      {
-        "label": "Identité & statistiques",
-        "eyebrow": "Étape 1",
-        "desc": "Saisissez l'identité du joueur, les statistiques de saison et les tests ASF par tour."
-      },
-      {
-        "label": "Notes TIPS",
-        "eyebrow": "Étape 2",
-        "desc": "Notez chaque critère de 1 à 5, ajoutez un commentaire si nécessaire."
-      },
-      {
-        "label": "Synthèse & appréciation",
-        "eyebrow": "Étape 3",
-        "desc": "Points forts, points à améliorer, appréciation et signatures."
-      }
+      { "label": "Identité & statistiques", "eyebrow": "Étape 1", "desc": "Saisissez l'identité du joueur, les statistiques de saison et les tests ASF par tour." },
+      { "label": "Notes TIPS", "eyebrow": "Étape 2", "desc": "Notez chaque critère de 1 à 5, ajoutez un commentaire si nécessaire." },
+      { "label": "Synthèse & appréciation", "eyebrow": "Étape 3", "desc": "Points forts, points à améliorer, appréciation et signatures." }
     ]
   },
   "season": {

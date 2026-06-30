@@ -67,7 +67,12 @@ export function Topbar({
   // Subtitle = licence usage. Shows the team count against its cap (or just the
   // count when unlimited), plus a read-only marker while in the grace window.
   let subtitle: string;
-  if (!currentMembership || !licenseUsage) {
+  if (persona?.active === "player") {
+    subtitle =
+      persona.activeProfile === "parent"
+        ? t(persona.profiles.includes("player") ? "parentChildren" : "parentChild")
+        : t("playerMe");
+  } else if (!currentMembership || !licenseUsage) {
     subtitle = tp("noLicense");
   } else {
     const teams = licenseUsage.teams;

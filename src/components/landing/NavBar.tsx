@@ -2,18 +2,25 @@
 
 import { useEffect, useState } from "react";
 import { useTranslations } from "next-intl";
-import { ArrowRight, Menu, X } from "lucide-react";
+import { ArrowRight, ChevronDown, Menu, X } from "lucide-react";
 import { Link, usePathname } from "@/i18n/navigation";
 import { GrintaLogoIcon, GrintaLogoType } from "./BrandSeal";
+import { PERSONAS } from "./profils/theme";
 import { LocaleSwitcher } from "@/components/layout/LocaleSwitcher";
 import { ThemeToggle } from "@/components/layout/ThemeToggle";
 
 export function NavBar() {
   const t = useTranslations("landing.nav");
+  const tp = useTranslations("landing.profils.section");
   const pathname = usePathname();
   const onHome = pathname === "/";
   const [open, setOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+
+  const profiles = PERSONAS.map((persona) => ({
+    persona,
+    label: tp(`tabs.${persona}`),
+  }));
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 8);
@@ -30,11 +37,7 @@ export function NavBar() {
 
   const solid = scrolled || open;
 
-  const links = [
-    { label: t("method"), hash: "methode" },
-    { label: t("how"), hash: "flow" },
-    { label: t("pricing"), hash: "tarifs" },
-  ];
+  const links = [{ label: t("pricing"), hash: "tarifs" }];
 
   const linkHref = (hash: string) =>
     onHome ? `#${hash}` : { pathname: "/" as const, hash };
@@ -71,6 +74,47 @@ export function NavBar() {
         </Link>
 
         <nav className="hidden items-center gap-7 md:flex">
+          {/* Comment ça marche — jumps to the "how it works" section. */}
+          {onHome ? (
+            <a
+              href="#profils"
+              className="text-[13px] font-medium text-[var(--ink-2)] transition-colors hover:text-[var(--ink)]"
+            >
+              {tp("eyebrow")}
+            </a>
+          ) : (
+            <Link
+              href={{ pathname: "/", hash: "profils" }}
+              className="text-[13px] font-medium text-[var(--ink-2)] transition-colors hover:text-[var(--ink)]"
+            >
+              {tp("eyebrow")}
+            </Link>
+          )}
+
+          {/* Profils — fanned dropdown straight to each profile page. */}
+          <div className="group relative">
+            <button
+              type="button"
+              aria-haspopup="true"
+              className="flex items-center gap-1 text-[13px] font-medium text-[var(--ink-2)] transition-colors hover:text-[var(--ink)] group-focus-within:text-[var(--ink)]"
+            >
+              {t("profils")}
+              <ChevronDown className="h-3.5 w-3.5 transition-transform group-hover:rotate-180 group-focus-within:rotate-180" />
+            </button>
+            <div className="invisible absolute left-1/2 top-full z-50 -translate-x-1/2 translate-y-1 pt-3 opacity-0 transition-all duration-200 group-hover:visible group-hover:translate-y-0 group-hover:opacity-100 group-focus-within:visible group-focus-within:translate-y-0 group-focus-within:opacity-100">
+              <div className="min-w-[180px] rounded-lg p-1 backdrop-blur-md">
+                {profiles.map((pr) => (
+                  <Link
+                    key={pr.persona}
+                    href={`/profil/${pr.persona}`}
+                    className="block rounded-md px-3 py-1.5 text-[13px] font-medium text-[var(--ink-2)] transition-colors hover:bg-[color-mix(in_oklch,var(--ink)_5%,transparent)] hover:text-[var(--ink)]"
+                  >
+                    {pr.label}
+                  </Link>
+                ))}
+              </div>
+            </div>
+          </div>
           {links.map((l) =>
             onHome ? (
               <a
@@ -127,7 +171,43 @@ export function NavBar() {
       {open && (
         <div className="border-t md:hidden" style={{ borderColor: "var(--line)" }}>
           <div className="mx-auto flex max-w-7xl flex-col px-6 py-3">
-            <nav className="flex flex-col">
+            {/* Comment ça marche — jumps to the "how it works" section. */}
+            {onHome ? (
+              <a
+                href="#profils"
+                onClick={() => setOpen(false)}
+                className="py-2.5 text-[15px] font-medium text-[var(--ink)]"
+              >
+                {tp("eyebrow")}
+              </a>
+            ) : (
+              <Link
+                href={{ pathname: "/", hash: "profils" }}
+                onClick={() => setOpen(false)}
+                className="py-2.5 text-[15px] font-medium text-[var(--ink)]"
+              >
+                {tp("eyebrow")}
+              </Link>
+            )}
+
+            {/* Profils — direct links to each profile page. */}
+            <div
+              className="pb-1 pt-2.5 font-mono text-[11px] uppercase tracking-widest"
+              style={{ color: "var(--ink-3)" }}
+            >
+              {t("profils")}
+            </div>
+            {profiles.map((pr) => (
+              <Link
+                key={pr.persona}
+                href={`/profil/${pr.persona}`}
+                onClick={() => setOpen(false)}
+                className="py-2.5 pl-1 text-[15px] font-medium text-[var(--ink)]"
+              >
+                {pr.label}
+              </Link>
+            ))}
+            <nav className="mt-1 flex flex-col">
               {links.map((l) =>
                 onHome ? (
                   <a

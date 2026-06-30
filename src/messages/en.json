@@ -5,11 +5,90 @@
     "description": "Plan your football season."
   },
   "landing": {
+    "profils": {
+      "section": {
+        "eyebrow": "How it works",
+        "title": "The club at the center.",
+        "body": "One app, the club at the center. Around it, three views that talk to each other: staff steers, the player lives their season, the parent keeps the thread.",
+        "more": "Learn more",
+        "back": "Home",
+        "cards": [
+          { "persona": "staff", "title": "Staff & club", "desc": "Run your teams, sessions and planning." },
+          { "persona": "player", "title": "Player", "desc": "Your stats, call-ups and progress." },
+          { "persona": "parent", "title": "Parents", "desc": "Follow your child's journey at the club." }
+        ],
+        "tabs": {
+          "staff": "Staff",
+          "player": "Player",
+          "parent": "Parent"
+        },
+        "fonctionnement": "How it works",
+        "cta": "Learn more",
+        "hint": "Scroll to move forward"
+      },
+      "staff": {
+        "eyebrow": "Staff profile",
+        "title": "The whole club, in one flow.",
+        "intro": "From the academy to the first team: plan the season, build your sessions and keep the whole club aligned.",
+        "summary": "President, sporting director, coaches: from the club's squad to Tuesday's line-up. You steer the teams, build your sessions and track your players — at the club and on the pitch.",
+        "panels": [
+          { "title": "Plan the season", "body": "Macro, meso and microcycles driven by your matches. The calendar becomes a real plan." },
+          { "title": "Build your sessions", "body": "Block by block, from warm-up to final game. A sheet ready for the pitch." },
+          { "title": "Track your players", "body": "Squad, attendance and TIPS evaluations: the whole club aligned, over time." }
+        ],
+        "scenes": [
+          { "kicker": "Club", "title": "All your teams in one place", "body": "From the youngest age groups to the first team: every squad in one space." },
+          { "kicker": "Season", "title": "Plan the whole season", "body": "Macro, meso and microcycles, driven by your matches." },
+          { "kicker": "Week", "title": "Build your week", "body": "Each microcycle: theme, load and sessions at a glance." },
+          { "kicker": "Exercises", "title": "A drill library", "body": "Pull from the library or build your own, schematics included." },
+          { "kicker": "Preparation", "title": "Prepare your session", "body": "Assemble the session block by block, around your goal of the day." },
+          { "kicker": "Session", "title": "A wizard that guides you", "body": "From the opening brief to the final game, step by step." },
+          { "kicker": "Export", "title": "A pitch-ready sheet", "body": "A clean A4 PDF, usable by the whole staff." },
+          { "kicker": "Squad", "title": "Manage your squad", "body": "A clean player base, tied to your teams." },
+          { "kicker": "Profile", "title": "Every player's profile", "body": "Info, position, history: all in one place." },
+          { "kicker": "Tracking", "title": "Follow the progress", "body": "Attendance, availability and TIPS tracking over time." },
+          { "kicker": "Play", "title": "Set your game systems", "body": "Bring your principles and tactical patterns to life." },
+          { "kicker": "Line-up", "title": "Prepare your line-ups", "body": "Set the team to your system, match after match." }
+        ]
+      },
+      "player": {
+        "eyebrow": "Player profile",
+        "title": "Your season, in your hands.",
+        "intro": "Profile, call-ups, follow-up and progress: everything about you, in one place.",
+        "summary": "Your schedule, your call-ups, your availability in one tap, your test and match stats. Everything about you, without asking anyone.",
+        "panels": [
+          { "title": "Your player profile", "body": "Position, info and history: your club record, always up to date." },
+          { "title": "Call-ups & availability", "body": "Set your availability and see when you play. No more overflowing group chat." },
+          { "title": "Your progress", "body": "TIPS tracking, attendance and stats: measure your progress season after season." }
+        ],
+        "scenes": [
+          { "kicker": "Profile", "title": "Your player profile", "body": "Position, info, history: your club record, always up to date." },
+          { "kicker": "Call-ups", "title": "Your call-ups & availability", "body": "Set your availability and see when you're called up." },
+          { "kicker": "Follow-up", "title": "Your TIPS follow-up", "body": "Your technical, intelligence, personal and social ratings over time." },
+          { "kicker": "Progress", "title": "Your progress", "body": "Stats, attendance and growth: track your progress season after season." }
+        ]
+      },
+      "parent": {
+        "eyebrow": "Parent profile",
+        "title": "The club, with peace of mind.",
+        "intro": "Follow your child's journey, manage their availability and stay up to date with the club.",
+        "summary": "The view on your child — or children. Call-ups, availability, progress: you follow it all and stay connected to the club, without chasing information.",
+        "panels": [
+          { "title": "Your child's record", "body": "Position, team and key info: everything about them, in one place." },
+          { "title": "Clear call-ups", "body": "You know when and where they play, without chasing the information." },
+          { "title": "Club life", "body": "Announcements and tracking: you stay connected to their journey at the club." }
+        ],
+        "scenes": [
+          { "kicker": "Child", "title": "Your child's journey", "body": "Follow their development at the club, the simple way." },
+          { "kicker": "Call-ups", "title": "Call-ups & availability", "body": "Set their availability and keep an eye on their call-ups." },
+          { "kicker": "Club", "title": "Stay up to date", "body": "Announcements, events and key info, all in one place." }
+        ]
+      }
+    },
     "nav": {
       "login": "Log in",
       "cta": "Start my season",
-      "method": "Method",
-      "how": "How it works",
+      "profils": "Profiles",
       "pricing": "Pricing"
     },
     "hero": {
@@ -29,98 +108,6 @@
       "stat3Label": "Method",
       "stat3Value": "1 club",
       "tagline": "One club. One identity. One method."
-    },
-    "manifesto": {
-      "eyebrow": "The manifesto",
-      "title": "Three words, etched on every screen.",
-      "body": "Grinta is not a shared calendar. It's the tool that forces alignment between the club's philosophy, the season plan, and Tuesday night's training.",
-      "pillars": [
-        {
-          "kicker": "01",
-          "title": "One club",
-          "body": "From youth academy to the first team, every category shares one single workspace."
-        },
-        {
-          "kicker": "02",
-          "title": "One identity",
-          "body": "Set the club's playing principles. Every coach finds them in their microcycles and sessions."
-        },
-        {
-          "kicker": "03",
-          "title": "One method",
-          "body": "Macro, meso, microcycles, sessions: one continuous thread. Plan the season once, then break it down."
-        }
-      ]
-    },
-    "flow": {
-      "eyebrow": "How it works",
-      "titlePrefix": "From the club's identity to",
-      "titleAccent": "Tuesday night",
-      "titleSuffix": "'s session.",
-      "steps": [
-        {
-          "kicker": "01",
-          "badge": "Identity",
-          "title": "The club's identity",
-          "body": "Playing principles, development, expectations. One philosophy shared across the whole staff."
-        },
-        {
-          "kicker": "02",
-          "badge": "Season",
-          "title": "The season, in 90 seconds",
-          "body": "Three dates are enough. Grinta anchors the macrocycle and numbers the weeks (-3, -2, -1, +1…) automatically."
-        },
-        {
-          "kicker": "03",
-          "badge": "Microcycle",
-          "title": "The microcycles",
-          "body": "Weekly theme, format, load. Every mesocycle takes whatever color you want."
-        },
-        {
-          "kicker": "04",
-          "badge": "Session",
-          "title": "The sessions",
-          "body": "Import an exercise from your library or build it right on the diagram. Blocks stack up."
-        },
-        {
-          "kicker": "05",
-          "badge": "PDF",
-          "title": "The sheet, pitch-ready",
-          "body": "A clean A4 PDF, readable for staff, usable on the pitch. That's it."
-        }
-      ]
-    },
-    "playerFlow": {
-      "eyebrow": "Player view",
-      "titlePrefix": "From roster to",
-      "titleAccent": "individual follow-up",
-      "titleSuffix": ".",
-      "steps": [
-        {
-          "kicker": "01",
-          "badge": "Attendance",
-          "title": "Attendance and availability",
-          "body": "Track attendance, absences and availability to keep a clear view of every squad."
-        },
-        {
-          "kicker": "02",
-          "badge": "TIPS",
-          "title": "TIPS follow-up",
-          "body": "Centralize technical, intelligent, personal and social observations to support each player over time."
-        },
-        {
-          "kicker": "03",
-          "badge": "Roster",
-          "title": "Roster management",
-          "body": "Keep clean player records, assign players to teams and quickly find important information."
-        },
-        {
-          "kicker": "04",
-          "badge": "BDNS",
-          "title": "BDNS export",
-          "body": "Prepare the data needed for administration and save time on recurring exports."
-        }
-      ]
     },
     "pricing": {
       "eyebrow": "Pricing",
@@ -182,52 +169,24 @@
         {
           "title": "Product",
           "links": [
-            {
-              "label": "Method",
-              "href": "#methode"
-            },
-            {
-              "label": "How it works",
-              "href": "#flow"
-            },
-            {
-              "label": "Pricing",
-              "href": "#tarifs"
-            },
-            {
-              "label": "Contact",
-              "href": "/contact"
-            }
+            { "label": "Profiles", "href": "#profils" },
+            { "label": "Pricing", "href": "#tarifs" },
+            { "label": "Contact", "href": "/contact" }
           ]
         },
         {
           "title": "Account",
           "links": [
-            {
-              "label": "Log in",
-              "href": "/login"
-            },
-            {
-              "label": "Create account",
-              "href": "/signup"
-            }
+            { "label": "Log in", "href": "/login" },
+            { "label": "Create account", "href": "/signup" }
           ]
         },
         {
           "title": "Legal",
           "links": [
-            {
-              "label": "Legal notice",
-              "href": "/legal/mentions-legales"
-            },
-            {
-              "label": "Terms of sale",
-              "href": "/legal/cgv"
-            },
-            {
-              "label": "Privacy",
-              "href": "/legal/confidentialite"
-            }
+            { "label": "Legal notice", "href": "/legal/mentions-legales" },
+            { "label": "Terms of sale", "href": "/legal/cgv" },
+            { "label": "Privacy", "href": "/legal/confidentialite" }
           ]
         }
       ]
@@ -1831,36 +1790,12 @@
       "importBtn": "Import",
       "quickCheckTitle": "Quick check",
       "steps": [
-        {
-          "label": "Session brief",
-          "eyebrow": "Step 1 of 5",
-          "desc": "Set the date, team and game moment(s) this session is built around."
-        },
-        {
-          "label": "Warm-up & prep",
-          "eyebrow": "Step 2 of 5",
-          "desc": "Mobility, technical / tactical warmup, then a short explosive block."
-        },
-        {
-          "label": "Main block 1",
-          "eyebrow": "Step 3 of 5",
-          "desc": "Your first central training block — play form or exercise."
-        },
-        {
-          "label": "Main block 2",
-          "eyebrow": "Step 4 of 5",
-          "desc": "Second central training block."
-        },
-        {
-          "label": "Final game & wrap-up",
-          "eyebrow": "Step 5 of 5",
-          "desc": "Match-style game, cool-down and post-session reflection."
-        },
-        {
-          "label": "Review & export",
-          "eyebrow": "Final review",
-          "desc": "Check each section, then export the official preparation sheet."
-        }
+        { "label": "Session brief", "eyebrow": "Step 1 of 5", "desc": "Set the date, team and game moment(s) this session is built around." },
+        { "label": "Warm-up & prep", "eyebrow": "Step 2 of 5", "desc": "Mobility, technical / tactical warmup, then a short explosive block." },
+        { "label": "Main block 1", "eyebrow": "Step 3 of 5", "desc": "Your first central training block — play form or exercise." },
+        { "label": "Main block 2", "eyebrow": "Step 4 of 5", "desc": "Second central training block." },
+        { "label": "Final game & wrap-up", "eyebrow": "Step 5 of 5", "desc": "Match-style game, cool-down and post-session reflection." },
+        { "label": "Review & export", "eyebrow": "Final review", "desc": "Check each section, then export the official preparation sheet." }
       ],
       "fits": "OK",
       "tooLong": "Too long for PDF",
@@ -3178,21 +3113,9 @@
     "next": "Next",
     "scaleLegend": "Scale",
     "steps": [
-      {
-        "label": "Identity & statistics",
-        "eyebrow": "Step 1",
-        "desc": "Player identity, season statistics, and ASF tests per tour."
-      },
-      {
-        "label": "TIPS scores",
-        "eyebrow": "Step 2",
-        "desc": "Score each criterion from 1 to 5; add a comment if needed."
-      },
-      {
-        "label": "Summary & appraisal",
-        "eyebrow": "Step 3",
-        "desc": "Strengths, growth areas, appraisal, and signatures."
-      }
+      { "label": "Identity & statistics", "eyebrow": "Step 1", "desc": "Player identity, season statistics, and ASF tests per tour." },
+      { "label": "TIPS scores", "eyebrow": "Step 2", "desc": "Score each criterion from 1 to 5; add a comment if needed." },
+      { "label": "Summary & appraisal", "eyebrow": "Step 3", "desc": "Strengths, growth areas, appraisal, and signatures." }
     ]
   },
   "season": {
