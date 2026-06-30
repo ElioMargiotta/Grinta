@@ -16,6 +16,7 @@ const PUBLIC_PATHS = new Set([
   "auth",
   "legal",
   "contact",
+  "profil",
 ]);
 
 export async function proxy(request: NextRequest) {
