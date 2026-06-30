@@ -5,11 +5,90 @@
     "description": "Plane deine Fußballsaison."
   },
   "landing": {
+    "profils": {
+      "section": {
+        "eyebrow": "So funktioniert's",
+        "title": "Der Verein im Zentrum.",
+        "body": "Eine App, der Verein im Zentrum. Drumherum drei Sichten, die miteinander sprechen: Der Staff steuert, der Spieler erlebt seine Saison, die Eltern behalten den Faden.",
+        "more": "Mehr erfahren",
+        "back": "Startseite",
+        "cards": [
+          { "persona": "staff", "title": "Staff & Verein", "desc": "Steuere Teams, Einheiten und Planung." },
+          { "persona": "player", "title": "Spieler", "desc": "Deine Stats, Aufgebote und Fortschritte." },
+          { "persona": "parent", "title": "Eltern", "desc": "Verfolge den Weg deines Kindes im Verein." }
+        ],
+        "tabs": {
+          "staff": "Staff",
+          "player": "Spieler",
+          "parent": "Eltern"
+        },
+        "fonctionnement": "So funktioniert's",
+        "cta": "Mehr erfahren",
+        "hint": "Scrolle, um voranzukommen"
+      },
+      "staff": {
+        "eyebrow": "Staff-Profil",
+        "title": "Der ganze Verein, in einem Fluss.",
+        "intro": "Vom Nachwuchs bis zur ersten Mannschaft: plane die Saison, baue deine Einheiten und halte den ganzen Verein im Einklang.",
+        "summary": "Präsident, Sportdirektor, Trainer: vom Kader des Vereins bis zur Aufstellung am Dienstag. Du steuerst die Teams, baust deine Einheiten und verfolgst deine Spieler — im Verein wie auf dem Platz.",
+        "panels": [
+          { "title": "Plane die Saison", "body": "Makro-, Meso- und Mikrozyklen, gesteuert von deinen Spielen. Der Kalender wird zum echten Plan." },
+          { "title": "Baue deine Einheiten", "body": "Block für Block, vom Aufwärmen bis zum Abschlussspiel. Ein Blatt, bereit fürs Feld." },
+          { "title": "Verfolge deine Spieler", "body": "Kader, Anwesenheit und TIPS-Bewertungen: der ganze Verein im Einklang, über die Zeit." }
+        ],
+        "scenes": [
+          { "kicker": "Verein", "title": "Alle Teams an einem Ort", "body": "Von den Jüngsten bis zur ersten Mannschaft: jedes Team in einem Raum." },
+          { "kicker": "Saison", "title": "Die ganze Saison planen", "body": "Makro-, Meso- und Mikrozyklen, gesteuert von deinen Spielen." },
+          { "kicker": "Woche", "title": "Baue deine Woche", "body": "Jeder Mikrozyklus: Thema, Belastung und Einheiten auf einen Blick." },
+          { "kicker": "Übungen", "title": "Eine Übungsbibliothek", "body": "Aus der Bibliothek wählen oder eigene erstellen – inklusive Schemata." },
+          { "kicker": "Vorbereitung", "title": "Bereite deine Einheit vor", "body": "Stelle die Einheit Block für Block zusammen, nach deinem Tagesziel." },
+          { "kicker": "Einheit", "title": "Ein Wizard, der dich führt", "body": "Vom Eröffnungs-Briefing bis zum Abschlussspiel, Schritt für Schritt." },
+          { "kicker": "Export", "title": "Plan bereit fürs Feld", "body": "Ein sauberes A4-PDF, nutzbar für das ganze Team." },
+          { "kicker": "Kader", "title": "Deinen Kader verwalten", "body": "Eine saubere Spielerbasis, mit deinen Teams verknüpft." },
+          { "kicker": "Profil", "title": "Das Profil jedes Spielers", "body": "Infos, Position, Historie: alles zentral." },
+          { "kicker": "Tracking", "title": "Verfolge die Entwicklung", "body": "Anwesenheit, Verfügbarkeit und TIPS-Tracking über die Zeit." },
+          { "kicker": "Spiel", "title": "Deine Spielsysteme festlegen", "body": "Bring deine Prinzipien und taktischen Muster zum Leben." },
+          { "kicker": "Aufstellung", "title": "Aufstellungen vorbereiten", "body": "Stelle das Team nach deinem System auf, Spiel für Spiel." }
+        ]
+      },
+      "player": {
+        "eyebrow": "Spieler-Profil",
+        "title": "Deine Saison, in deiner Hand.",
+        "intro": "Profil, Aufgebote, Begleitung und Fortschritt: alles über dich, an einem Ort.",
+        "summary": "Dein Plan, deine Aufgebote, deine Verfügbarkeit mit einem Tipp, deine Test- und Spielstatistiken. Alles, was dich betrifft, ohne jemanden zu fragen.",
+        "panels": [
+          { "title": "Dein Spielerprofil", "body": "Position, Infos und Verlauf: dein Vereinsprofil, immer aktuell." },
+          { "title": "Aufgebote & Verfügbarkeit", "body": "Gib deine Verfügbarkeit an und sieh, wann du spielst. Kein überlaufender Gruppenchat mehr." },
+          { "title": "Dein Fortschritt", "body": "TIPS-Tracking, Anwesenheit und Statistiken: miss deinen Fortschritt Saison für Saison." }
+        ],
+        "scenes": [
+          { "kicker": "Profil", "title": "Dein Spielerprofil", "body": "Position, Infos, Historie: deine Vereinsakte, stets aktuell." },
+          { "kicker": "Aufgebote", "title": "Deine Aufgebote & Verfügbarkeit", "body": "Gib deine Verfügbarkeit an und sieh, wann du aufgeboten wirst." },
+          { "kicker": "Begleitung", "title": "Deine TIPS-Begleitung", "body": "Deine technischen, intelligenten, persönlichen und sozialen Bewertungen über die Zeit." },
+          { "kicker": "Fortschritt", "title": "Dein Fortschritt", "body": "Stats, Anwesenheit und Entwicklung: verfolge deine Fortschritte Saison für Saison." }
+        ]
+      },
+      "parent": {
+        "eyebrow": "Eltern-Profil",
+        "title": "Der Verein, ganz entspannt.",
+        "intro": "Verfolge den Weg deines Kindes, verwalte seine Verfügbarkeiten und bleib über den Verein informiert.",
+        "summary": "Der Blick auf dein Kind — oder deine Kinder. Aufgebote, Verfügbarkeiten, Entwicklung: Du verfolgst alles und bleibst mit dem Verein verbunden, ohne Infos hinterherzulaufen.",
+        "panels": [
+          { "title": "Das Profil deines Kindes", "body": "Position, Team und Eckdaten: alles über dein Kind, an einem Ort." },
+          { "title": "Klare Aufgebote", "body": "Du weisst, wann und wo es spielt, ohne den Infos hinterherzulaufen." },
+          { "title": "Vereinsleben", "body": "Ankündigungen und Tracking: Du bleibst mit seinem Weg im Verein verbunden." }
+        ],
+        "scenes": [
+          { "kicker": "Kind", "title": "Der Weg deines Kindes", "body": "Verfolge seine sportliche Entwicklung im Verein, ganz einfach." },
+          { "kicker": "Aufgebote", "title": "Aufgebote & Verfügbarkeit", "body": "Gib seine Verfügbarkeiten an und behalte die Aufgebote im Blick." },
+          { "kicker": "Verein", "title": "Bleib informiert", "body": "Ankündigungen, Termine und wichtige Infos an einem Ort." }
+        ]
+      }
+    },
     "nav": {
       "login": "Anmelden",
       "cta": "Saison starten",
-      "method": "Methode",
-      "how": "Funktionsweise",
+      "profils": "Profile",
       "pricing": "Preise"
     },
     "hero": {
@@ -29,98 +108,6 @@
       "stat3Label": "Methode",
       "stat3Value": "1 Verein",
       "tagline": "One club. One identity. One method."
-    },
-    "manifesto": {
-      "eyebrow": "Das Manifest",
-      "title": "Drei Wörter, in jedem Bildschirm verankert.",
-      "body": "Grinta ist kein geteilter Kalender. Es ist das Werkzeug, das den Einklang zwischen Vereinsphilosophie, Saisonplanung und Dienstagabend-Training erzwingt.",
-      "pillars": [
-        {
-          "kicker": "01",
-          "title": "Ein Verein",
-          "body": "Vom Nachwuchs bis zur ersten Mannschaft teilen sich alle Kategorien einen einzigen Arbeitsbereich."
-        },
-        {
-          "kicker": "02",
-          "title": "Eine Identität",
-          "body": "Lege die Spielprinzipien des Vereins fest. Jeder Trainer findet sie in seinen Mikrozyklen und Einheiten wieder."
-        },
-        {
-          "kicker": "03",
-          "title": "Eine Methode",
-          "body": "Makro, Meso, Mikrozyklen, Einheiten: ein roter Faden. Plane die Saison einmal, dann brich sie herunter."
-        }
-      ]
-    },
-    "flow": {
-      "eyebrow": "Funktionsweise",
-      "titlePrefix": "Von der Vereinsidentität zur Karte vom",
-      "titleAccent": "Dienstagabend",
-      "titleSuffix": ".",
-      "steps": [
-        {
-          "kicker": "01",
-          "badge": "Identität",
-          "title": "Die Vereinsidentität",
-          "body": "Spielprinzipien, Ausbildung, Anforderungen. Eine Philosophie, geteilt vom gesamten Staff."
-        },
-        {
-          "kicker": "02",
-          "badge": "Saison",
-          "title": "Die Saison in 90 Sekunden",
-          "body": "Drei Daten genügen. Grinta verankert den Makrozyklus und nummeriert die Wochen automatisch (-3, -2, -1, +1…)."
-        },
-        {
-          "kicker": "03",
-          "badge": "Mikrozyklus",
-          "title": "Die Mikrozyklen",
-          "body": "Wochenthema, Format, Belastung. Jeder Mesozyklus bekommt die Farbe, die du willst."
-        },
-        {
-          "kicker": "04",
-          "badge": "Einheit",
-          "title": "Die Trainingseinheiten",
-          "body": "Importiere eine Übung aus deiner Bibliothek oder erstelle sie direkt auf dem Plan. Die Blöcke stapeln sich."
-        },
-        {
-          "kicker": "05",
-          "badge": "PDF",
-          "title": "Die Karte, platzbereit",
-          "body": "Ein sauberes A4-PDF, lesbar für den Staff, einsetzbar auf dem Platz. Fertig."
-        }
-      ]
-    },
-    "playerFlow": {
-      "eyebrow": "Spielerblick",
-      "titlePrefix": "Vom Kader zur",
-      "titleAccent": "individuellen Begleitung",
-      "titleSuffix": ".",
-      "steps": [
-        {
-          "kicker": "01",
-          "badge": "Präsenz",
-          "title": "Präsenzen und Verfügbarkeit",
-          "body": "Verfolge Präsenzen, Absenzen und Verfügbarkeiten, damit jeder Kader klar überschaubar bleibt."
-        },
-        {
-          "kicker": "02",
-          "badge": "TIPS",
-          "title": "TIPS-Begleitung",
-          "body": "Bündle technische, intelligente, persönliche und soziale Beobachtungen, um jeden Spieler langfristig zu begleiten."
-        },
-        {
-          "kicker": "03",
-          "badge": "Kader",
-          "title": "Kadermanagement",
-          "body": "Halte saubere Spielerprofile, ordne Spieler Teams zu und finde wichtige Informationen schnell wieder."
-        },
-        {
-          "kicker": "04",
-          "badge": "BDNS",
-          "title": "BDNS-Export",
-          "body": "Bereite administrative Daten vor und spare Zeit bei wiederkehrenden Exporten."
-        }
-      ]
     },
     "pricing": {
       "eyebrow": "Preise",
@@ -182,52 +169,24 @@
         {
           "title": "Produkt",
           "links": [
-            {
-              "label": "Methode",
-              "href": "#methode"
-            },
-            {
-              "label": "So funktioniert's",
-              "href": "#flow"
-            },
-            {
-              "label": "Preise",
-              "href": "#tarifs"
-            },
-            {
-              "label": "Kontakt",
-              "href": "/contact"
-            }
+            { "label": "Profile", "href": "#profils" },
+            { "label": "Preise", "href": "#tarifs" },
+            { "label": "Kontakt", "href": "/contact" }
           ]
         },
         {
           "title": "Konto",
           "links": [
-            {
-              "label": "Anmelden",
-              "href": "/login"
-            },
-            {
-              "label": "Konto erstellen",
-              "href": "/signup"
-            }
+            { "label": "Anmelden", "href": "/login" },
+            { "label": "Konto erstellen", "href": "/signup" }
           ]
         },
         {
           "title": "Rechtliches",
           "links": [
-            {
-              "label": "Impressum",
-              "href": "/legal/mentions-legales"
-            },
-            {
-              "label": "AGB",
-              "href": "/legal/cgv"
-            },
-            {
-              "label": "Datenschutz",
-              "href": "/legal/confidentialite"
-            }
+            { "label": "Impressum", "href": "/legal/mentions-legales" },
+            { "label": "AGB", "href": "/legal/cgv" },
+            { "label": "Datenschutz", "href": "/legal/confidentialite" }
           ]
         }
       ]
@@ -1825,36 +1784,12 @@
       "importBtn": "Importieren",
       "quickCheckTitle": "Schnellprüfung",
       "steps": [
-        {
-          "label": "Briefing der Einheit",
-          "eyebrow": "Schritt 1 von 5",
-          "desc": "Lege Datum, Mannschaft und die Spielmomente fest, um die diese Einheit gebaut ist."
-        },
-        {
-          "label": "Aufwärmen & Vorb.",
-          "eyebrow": "Schritt 2 von 5",
-          "desc": "Mobilität, TE-/TA-Aufwärmen und ein kurzer Explosivblock."
-        },
-        {
-          "label": "Hauptblock 1",
-          "eyebrow": "Schritt 3 von 5",
-          "desc": "Dein erster zentraler Trainingsblock — Spielform oder Übung."
-        },
-        {
-          "label": "Hauptblock 2",
-          "eyebrow": "Schritt 4 von 5",
-          "desc": "Zweiter zentraler Trainingsblock."
-        },
-        {
-          "label": "Abschlussspiel & Abschluss",
-          "eyebrow": "Schritt 5 von 5",
-          "desc": "Spielform, Auslaufen und Reflexion nach der Einheit."
-        },
-        {
-          "label": "Überprüfen & exportieren",
-          "eyebrow": "Endgültige Überprüfung",
-          "desc": "Prüfe jeden Abschnitt und exportiere die offizielle Vorbereitungskarte."
-        }
+        { "label": "Briefing der Einheit", "eyebrow": "Schritt 1 von 5", "desc": "Lege Datum, Mannschaft und die Spielmomente fest, um die diese Einheit gebaut ist." },
+        { "label": "Aufwärmen & Vorb.", "eyebrow": "Schritt 2 von 5", "desc": "Mobilität, TE-/TA-Aufwärmen und ein kurzer Explosivblock." },
+        { "label": "Hauptblock 1", "eyebrow": "Schritt 3 von 5", "desc": "Dein erster zentraler Trainingsblock — Spielform oder Übung." },
+        { "label": "Hauptblock 2", "eyebrow": "Schritt 4 von 5", "desc": "Zweiter zentraler Trainingsblock." },
+        { "label": "Abschlussspiel & Abschluss", "eyebrow": "Schritt 5 von 5", "desc": "Spielform, Auslaufen und Reflexion nach der Einheit." },
+        { "label": "Überprüfen & exportieren", "eyebrow": "Endgültige Überprüfung", "desc": "Prüfe jeden Abschnitt und exportiere die offizielle Vorbereitungskarte." }
       ],
       "fits": "OK",
       "tooLong": "Zu lang für PDF",
@@ -3167,21 +3102,9 @@
     "next": "Weiter",
     "scaleLegend": "Skala",
     "steps": [
-      {
-        "label": "Identität & Statistik",
-        "eyebrow": "Schritt 1",
-        "desc": "Spielerangaben, Saisonstatistik und ASF-Tests pro Tour."
-      },
-      {
-        "label": "TIPS-Bewertung",
-        "eyebrow": "Schritt 2",
-        "desc": "Bewerte jedes Kriterium von 1 bis 5 und füge bei Bedarf einen Kommentar hinzu."
-      },
-      {
-        "label": "Synthese & Beurteilung",
-        "eyebrow": "Schritt 3",
-        "desc": "Stärken, Entwicklungsfelder, Beurteilung und Unterschriften."
-      }
+      { "label": "Identität & Statistik", "eyebrow": "Schritt 1", "desc": "Spielerangaben, Saisonstatistik und ASF-Tests pro Tour." },
+      { "label": "TIPS-Bewertung", "eyebrow": "Schritt 2", "desc": "Bewerte jedes Kriterium von 1 bis 5 und füge bei Bedarf einen Kommentar hinzu." },
+      { "label": "Synthese & Beurteilung", "eyebrow": "Schritt 3", "desc": "Stärken, Entwicklungsfelder, Beurteilung und Unterschriften." }
     ]
   },
   "season": {
