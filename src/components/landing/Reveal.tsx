@@ -1,47 +1,51 @@
 "use client";
 
-import { useEffect, useRef, useState, type ReactNode } from "react";
+import { useRef, type ReactNode } from "react";
+import { gsap, useGSAP, prefersReducedMotion } from "./gsap/register";
 
+/**
+ * Scroll-triggered fade/slide-up wrapper, GSAP-powered. Drop-in replacement for
+ * the former IntersectionObserver version — same `delay` (ms) / `className` API.
+ */
 export function Reveal({
   children,
   delay = 0,
+  y = 20,
   className = "",
 }: {
   children: ReactNode;
   delay?: number;
+  y?: number;
   className?: string;
 }) {
   const ref = useRef<HTMLDivElement>(null);
-  const [shown, setShown] = useState(false);
 
-  useEffect(() => {
-    const el = ref.current;
-    if (!el) return;
-    const io = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((e) => {
-          if (e.isIntersecting) {
-            setShown(true);
-            io.disconnect();
-          }
-        });
-      },
-      { rootMargin: "0px 0px -10% 0px", threshold: 0.05 },
-    );
-    io.observe(el);
-    return () => io.disconnect();
-  }, []);
+  useGSAP(
+    () => {
+      const el = ref.current;
+      if (!el) return;
+      if (prefersReducedMotion()) {
+        gsap.set(el, { opacity: 1, y: 0 });
+        return;
+      }
+      gsap.fromTo(
+        el,
+        { opacity: 0, y },
+        {
+          opacity: 1,
+          y: 0,
+          duration: 0.9,
+          ease: "power3.out",
+          delay: delay / 1000,
+          scrollTrigger: { trigger: el, start: "top 88%", once: true },
+        },
+      );
+    },
+    { scope: ref },
+  );
 
   return (
-    <div
-      ref={ref}
-      className={className}
-      style={{
-        opacity: shown ? 1 : 0,
-        transform: shown ? "translateY(0)" : "translateY(18px)",
-        transition: `opacity 700ms cubic-bezier(.2,.7,.2,1) ${delay}ms, transform 700ms cubic-bezier(.2,.7,.2,1) ${delay}ms`,
-      }}
-    >
+    <div ref={ref} className={className} style={{ opacity: 0 }}>
       {children}
     </div>
   );
