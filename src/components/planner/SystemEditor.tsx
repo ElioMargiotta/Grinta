@@ -43,7 +43,7 @@ export function SystemEditor({
   initialLineup,
   initialTactics,
   initialPhases,
-  clubLogoUrl,
+  clubLogos = [],
 }: {
   teamId: string;
   roster: RosterPlayer[];
@@ -52,7 +52,7 @@ export function SystemEditor({
   initialLineup: LineupValue;
   initialTactics: TacticsValue;
   initialPhases: PhaseDraft[];
-  clubLogoUrl?: string | null;
+  clubLogos?: string[];
 }) {
   const t = useTranslations("planner.systems");
   const tMatch = useTranslations("planner.match.prematch");
@@ -302,7 +302,7 @@ export function SystemEditor({
         tactics={tactics}
         phases={printPhases}
         includeSquadPage={false}
-        clubLogoUrl={clubLogoUrl}
+        clubLogos={clubLogos}
         labels={{
           formation: tMatch("formation"),
           tactics: tMatch("tacticsTitle"),

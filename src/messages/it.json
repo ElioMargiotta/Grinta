@@ -1924,8 +1924,9 @@
         "secondaryColor": "Secondaria",
         "saveIdentity": "Salva l'identità",
         "uploadLogo": "Carica un logo",
+        "addLogo": "Aggiungi un logo",
         "removeLogo": "Rimuovi",
-        "logoHint": "PNG o JPEG, max 2 MB."
+        "logoHint": "PNG o JPEG, max 2 MB. Aggiungi un logo per club in caso di raggruppamento."
       },
       "invite": {
         "title": "Invita un membro",

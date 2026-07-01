@@ -69,6 +69,7 @@ export default async function PlayerLayout({
           role_name: activePlayer.relation === "guardian" ? "Parent" : "Joueur",
           access_level: "team_readonly",
           logo_url: null,
+          logos: [],
           theme_mode: "day",
           theme_primary_color: "#18181b",
           theme_secondary_color: "#f4f4f5",
@@ -81,7 +82,7 @@ export default async function PlayerLayout({
     const { data: club } = await supabase
       .from("clubs")
       .select(
-        "id, name, logo_url, theme_mode, theme_primary_color, theme_secondary_color, theme_night_primary_color, theme_night_secondary_color",
+        "id, name, logo_url, logos, theme_mode, theme_primary_color, theme_secondary_color, theme_night_primary_color, theme_night_secondary_color",
       )
       .eq("id", activePlayer.clubId)
       .maybeSingle();
@@ -94,6 +95,12 @@ export default async function PlayerLayout({
         role_name: activePlayer.relation === "guardian" ? "Parent" : "Joueur",
         access_level: "team_readonly",
         logo_url: (club.logo_url as string | null) ?? null,
+        logos:
+          (club.logos as string[] | null)?.length
+            ? (club.logos as string[])
+            : club.logo_url
+              ? [club.logo_url as string]
+              : [],
         theme_mode: (club.theme_mode as ClubMembership["theme_mode"]) ?? "day",
         theme_primary_color:
           (club.theme_primary_color as string | null) ?? "#18181b",

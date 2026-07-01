@@ -92,7 +92,7 @@ export default async function PlayerEvaluationPage({
       locale={locale}
       initial={initial}
       backHref={`/${locale}/contingent/${playerId}`}
-      teamLogoUrl={membership.logo_url}
+      teamLogos={membership.logos}
       sharedWithPlayer={Boolean(evaluation.shared_with_player)}
       sharingAvailable={sharingAvailable}
     />

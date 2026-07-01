@@ -56,7 +56,7 @@ export function MatchPrintSheet({
   phases,
   labels,
   includeSquadPage = true,
-  clubLogoUrl,
+  clubLogos = [],
 }: {
   title: string;
   subtitle: string;
@@ -79,7 +79,7 @@ export function MatchPrintSheet({
   phases: MatchPhase[];
   labels: PrintLabels;
   includeSquadPage?: boolean;
-  clubLogoUrl?: string | null;
+  clubLogos?: string[];
 }) {
   const tacticEntries = (
     [
@@ -130,14 +130,17 @@ export function MatchPrintSheet({
                 ) : null}
               </div>
             </div>
-            <div className="flex h-[22mm] w-[22mm] items-center justify-center bg-white">
-              {clubLogoUrl ? (
-                // eslint-disable-next-line @next/next/no-img-element
-                <img
-                  src={clubLogoUrl}
-                  alt=""
-                  className="max-h-full max-w-full object-contain"
-                />
+            <div className="flex h-[22mm] w-[22mm] items-center justify-center gap-[1mm] bg-white">
+              {clubLogos.length > 0 ? (
+                clubLogos.slice(0, 3).map((url, i) => (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img
+                    key={`${url}-${i}`}
+                    src={url}
+                    alt=""
+                    className="max-h-full min-w-0 flex-1 object-contain"
+                  />
+                ))
               ) : (
                 <span className="text-center text-[7px] font-black uppercase leading-tight text-zinc-500">
                   Logo

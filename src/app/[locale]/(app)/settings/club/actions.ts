@@ -49,38 +49,56 @@ export async function updateClubIdentityAction(formData: FormData) {
 
   const supabase = await createClient();
 
-  // Logo : import de fichier PNG/JPEG → bucket Storage `club-logos`. À défaut on
-  // garde l'existant, ou on le retire si l'utilisateur l'a demandé.
-  const logoUpdate: { logo_url?: string | null } = {};
-  const removeLogo = String(formData.get("removeLogo") ?? "") === "1";
-  const logoFile = formData.get("logoFile");
-  if (logoFile instanceof File && logoFile.size > 0) {
-    const allowedExt: Record<string, string> = {
-      "image/png": "png",
-      "image/jpeg": "jpg",
-      "image/jpg": "jpg",
-    };
-    const ext = allowedExt[logoFile.type];
+  // Logos du regroupement : liste ordonnée d'URLs publiques (bucket `club-logos`).
+  // Le formulaire envoie `existingLogos` (JSON des URLs conservées, dans l'ordre)
+  // et 0..N nouveaux fichiers `logoFile`. Le résultat = conservés + nouveaux
+  // uploadés, cappé à 6. `logo_url` reste le logo primaire (= logos[0]).
+  const MAX_LOGOS = 6;
+  const allowedExt: Record<string, string> = {
+    "image/png": "png",
+    "image/jpeg": "jpg",
+    "image/jpg": "jpg",
+  };
+
+  let keptLogos: string[] = [];
+  try {
+    const raw = String(formData.get("existingLogos") ?? "[]");
+    const parsed = JSON.parse(raw);
+    if (Array.isArray(parsed)) {
+      keptLogos = parsed.filter((u): u is string => typeof u === "string");
+    }
+  } catch {
+    keptLogos = [];
+  }
+
+  const newFiles = formData
+    .getAll("logoFile")
+    .filter((f): f is File => f instanceof File && f.size > 0);
+
+  const uploadedLogos: string[] = [];
+  for (const file of newFiles) {
+    const ext = allowedExt[file.type];
     if (!ext) return { error: "Le logo doit être un PNG ou un JPEG." };
-    if (logoFile.size > 2 * 1024 * 1024) {
+    if (file.size > 2 * 1024 * 1024) {
       return { error: "Le logo ne doit pas dépasser 2 Mo." };
     }
-    const path = `${membership.club_id}/logo-${Date.now()}.${ext}`;
+    const path = `${membership.club_id}/logo-${Date.now()}-${uploadedLogos.length}.${ext}`;
     const { error: uploadErr } = await supabase.storage
       .from("club-logos")
-      .upload(path, logoFile, { contentType: logoFile.type, upsert: true });
+      .upload(path, file, { contentType: file.type, upsert: true });
     if (uploadErr) return { error: uploadErr.message };
     const { data: pub } = supabase.storage.from("club-logos").getPublicUrl(path);
-    logoUpdate.logo_url = pub.publicUrl;
-  } else if (removeLogo) {
-    logoUpdate.logo_url = null;
+    uploadedLogos.push(pub.publicUrl);
   }
+
+  const logos = [...keptLogos, ...uploadedLogos].slice(0, MAX_LOGOS);
 
   const { error } = await supabase
     .from("clubs")
     .update({
       name,
-      ...logoUpdate,
+      logos,
+      logo_url: logos[0] ?? null,
       theme_mode: themeMode,
       theme_primary_color: cleanColor(
         formData.get("primaryColor"),
@@ -425,6 +443,7 @@ type RawInvitation = {
 type RawClub = {
   name: string;
   logo_url: string | null;
+  logos: string[] | null;
   theme_mode: ClubThemeMode;
   theme_primary_color: string;
   theme_secondary_color: string;
@@ -479,7 +498,7 @@ export async function loadClubSettingsData() {
   const { data: club } = await supabase
     .from("clubs")
     .select(
-      "name, logo_url, theme_mode, theme_primary_color, theme_secondary_color, theme_night_primary_color, theme_night_secondary_color",
+      "name, logo_url, logos, theme_mode, theme_primary_color, theme_secondary_color, theme_night_primary_color, theme_night_secondary_color",
     )
     .eq("id", membership.club_id)
     .single<RawClub>();
@@ -519,17 +538,23 @@ export async function loadClubSettingsData() {
     }),
   );
 
+  const normalizedLogos = (logo_url: string | null, logos: string[] | null) =>
+    logos && logos.length > 0 ? logos : logo_url ? [logo_url] : [];
+
   return {
     membership,
-    clubIdentity: club ?? {
-      name: membership.club_name,
-      logo_url: membership.logo_url,
-      theme_mode: membership.theme_mode,
-      theme_primary_color: membership.theme_primary_color,
-      theme_secondary_color: membership.theme_secondary_color,
-      theme_night_primary_color: membership.theme_night_primary_color,
-      theme_night_secondary_color: membership.theme_night_secondary_color,
-    },
+    clubIdentity: club
+      ? { ...club, logos: normalizedLogos(club.logo_url, club.logos) }
+      : {
+          name: membership.club_name,
+          logo_url: membership.logo_url,
+          logos: membership.logos,
+          theme_mode: membership.theme_mode,
+          theme_primary_color: membership.theme_primary_color,
+          theme_secondary_color: membership.theme_secondary_color,
+          theme_night_primary_color: membership.theme_night_primary_color,
+          theme_night_secondary_color: membership.theme_night_secondary_color,
+        },
     roles: (rolesRes.data ?? []) as {
       id: string;
       name: string;

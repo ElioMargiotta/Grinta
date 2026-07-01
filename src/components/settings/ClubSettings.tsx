@@ -8,10 +8,12 @@ import {
   ImageUp,
   MessageCircle,
   Pencil,
+  Plus,
   Shield,
   Trash2,
   UserMinus,
   Users,
+  X,
 } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { AccountDirectoryInput } from "@/components/account/AccountDirectoryInput";
@@ -95,9 +97,12 @@ export function ClubSettings({ data }: { data: Data }) {
   const [filterTeamId, setFilterTeamId] = useState<string>("");
   const [editingMemberId, setEditingMemberId] = useState<string | null>(null);
   const logoInputRef = useRef<HTMLInputElement>(null);
-  const [logoPreview, setLogoPreview] = useState<string | null>(null);
-  const [logoRemoved, setLogoRemoved] = useState(false);
-  const shownLogo = logoPreview ?? (logoRemoved ? null : data.clubIdentity.logo_url);
+  // Logos du regroupement : liste ordonnée. Les existants portent une `url` ; les
+  // nouveaux portent en plus un `file` (uploadé à l'enregistrement).
+  const MAX_LOGOS = 6;
+  const [logos, setLogos] = useState<{ id: string; url: string; file?: File }[]>(
+    () => data.clubIdentity.logos.map((url, i) => ({ id: `existing-${i}`, url })),
+  );
   const [invitedEmail, setInvitedEmail] = useState<string | null>(null);
   const [inviteEmailSent, setInviteEmailSent] = useState<boolean>(true);
   const [inviteDirect, setInviteDirect] = useState<boolean>(false);
@@ -170,70 +175,92 @@ export function ClubSettings({ data }: { data: Data }) {
       {tab === "general" && (
         <form
           className="flex flex-col gap-10"
-          action={(formData) =>
+          onSubmit={(e) => {
+            e.preventDefault();
+            const fd = new FormData(e.currentTarget);
+            fd.delete("logoFile");
+            fd.set(
+              "existingLogos",
+              JSON.stringify(logos.filter((l) => !l.file).map((l) => l.url)),
+            );
+            for (const item of logos) {
+              if (item.file) fd.append("logoFile", item.file);
+            }
             startTransition(async () => {
-              await updateClubIdentityAction(formData);
-            })
-          }
+              await updateClubIdentityAction(fd);
+            });
+          }}
         >
-          <input type="hidden" name="removeLogo" value={logoRemoved ? "1" : "0"} />
-
-          {/* Logo + nom */}
+          {/* Logos du regroupement + nom */}
           <section className="flex flex-col gap-5">
-            <div className="flex items-center gap-5">
-              {shownLogo ? (
-                // eslint-disable-next-line @next/next/no-img-element
-                <img
-                  src={shownLogo}
-                  alt={data.clubIdentity.name}
-                  className="h-20 w-20 rounded-2xl object-contain ring-1 ring-border"
-                />
-              ) : (
-                <div className="flex h-20 w-20 items-center justify-center rounded-2xl bg-primary text-2xl font-bold text-primary-foreground">
-                  {initials(data.clubIdentity.name)}
-                </div>
-              )}
-              <div className="flex flex-col gap-2">
-                <div className="flex flex-wrap items-center gap-2">
+            <div className="flex flex-col gap-3">
+              <div className="flex flex-wrap items-center gap-3">
+                {logos.length > 0 ? (
+                  logos.map((logo) => (
+                    <div key={logo.id} className="relative">
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img
+                        src={logo.url}
+                        alt=""
+                        className="h-20 w-20 rounded-2xl object-contain ring-1 ring-border"
+                      />
+                      <button
+                        type="button"
+                        aria-label={t("identity.removeLogo")}
+                        onClick={() =>
+                          setLogos((prev) => prev.filter((l) => l.id !== logo.id))
+                        }
+                        className="absolute -right-2 -top-2 flex h-6 w-6 items-center justify-center rounded-full bg-destructive text-white shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                      >
+                        <X className="h-3.5 w-3.5" />
+                      </button>
+                    </div>
+                  ))
+                ) : (
+                  <div className="flex h-20 w-20 items-center justify-center rounded-2xl bg-primary text-2xl font-bold text-primary-foreground">
+                    {initials(data.clubIdentity.name)}
+                  </div>
+                )}
+
+                {logos.length < MAX_LOGOS && (
                   <Button
                     type="button"
                     variant="secondary"
                     size="sm"
                     onClick={() => logoInputRef.current?.click()}
                   >
-                    <ImageUp className="h-4 w-4" />
-                    {t("identity.uploadLogo")}
+                    {logos.length === 0 ? (
+                      <ImageUp className="h-4 w-4" />
+                    ) : (
+                      <Plus className="h-4 w-4" />
+                    )}
+                    {logos.length === 0
+                      ? t("identity.uploadLogo")
+                      : t("identity.addLogo")}
                   </Button>
-                  {shownLogo && (
-                    <Button
-                      type="button"
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => {
-                        setLogoPreview(null);
-                        setLogoRemoved(true);
-                        if (logoInputRef.current) logoInputRef.current.value = "";
-                      }}
-                    >
-                      <Trash2 className="h-4 w-4" />
-                      {t("identity.removeLogo")}
-                    </Button>
-                  )}
-                </div>
-                <span className="text-xs text-muted-foreground">{t("identity.logoHint")}</span>
+                )}
               </div>
+              <span className="text-xs text-muted-foreground">{t("identity.logoHint")}</span>
               <input
                 ref={logoInputRef}
                 type="file"
-                name="logoFile"
                 accept="image/png,image/jpeg"
+                multiple
                 className="sr-only"
                 onChange={(e) => {
-                  const file = e.target.files?.[0];
-                  if (file) {
-                    setLogoPreview(URL.createObjectURL(file));
-                    setLogoRemoved(false);
+                  const files = Array.from(e.target.files ?? []);
+                  if (files.length > 0) {
+                    setLogos((prev) => {
+                      const room = Math.max(0, MAX_LOGOS - prev.length);
+                      const next = files.slice(0, room).map((file, i) => ({
+                        id: `new-${Date.now()}-${i}`,
+                        url: URL.createObjectURL(file),
+                        file,
+                      }));
+                      return [...prev, ...next];
+                    });
                   }
+                  e.target.value = "";
                 }}
               />
             </div>

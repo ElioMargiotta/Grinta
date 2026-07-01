@@ -5,21 +5,21 @@ import { useTranslations } from "next-intl";
 import { Check, ChevronDown, Building2 } from "lucide-react";
 import { switchClubAction } from "@/app/[locale]/(app)/club-actions";
 import { useLoading } from "@/components/ui/LoadingProvider";
+import { ClubLogos } from "@/components/club/ClubLogos";
 import type { ClubMembership } from "@/lib/club/types";
 
 function ClubMark({ membership }: { membership: ClubMembership }) {
-  if (membership.logo_url) {
-    return (
-      // eslint-disable-next-line @next/next/no-img-element
-      <img
-        src={membership.logo_url}
-        alt={membership.club_name}
-        className="h-6 w-6 shrink-0 rounded-sm object-contain"
-      />
-    );
-  }
-
-  return <Building2 className="h-4 w-4 shrink-0 text-[var(--club-primary)]" />;
+  return (
+    <ClubLogos
+      logos={membership.logos}
+      alt={membership.club_name}
+      imgClassName="h-6 w-6 rounded-sm"
+      max={3}
+      fallback={
+        <Building2 className="h-4 w-4 shrink-0 text-[var(--club-primary)]" />
+      }
+    />
+  );
 }
 
 export function ClubSwitcher({

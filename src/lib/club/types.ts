@@ -4,6 +4,8 @@ export type ClubThemeMode = "day" | "night";
 
 export type ClubIdentity = {
   logo_url: string | null;
+  // Logos du regroupement (liste ordonnée). `logo_url` = logos[0] (rétro-compat).
+  logos: string[];
   theme_mode: ClubThemeMode;
   theme_primary_color: string;
   theme_secondary_color: string;

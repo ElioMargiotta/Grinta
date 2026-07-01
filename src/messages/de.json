@@ -1924,8 +1924,9 @@
         "secondaryColor": "Sekundär",
         "saveIdentity": "Identität speichern",
         "uploadLogo": "Logo hochladen",
+        "addLogo": "Logo hinzufügen",
         "removeLogo": "Entfernen",
-        "logoHint": "PNG oder JPEG, max. 2 MB."
+        "logoHint": "PNG oder JPEG, max. 2 MB. Bei einer Spielgemeinschaft ein Logo pro Verein hinzufügen."
       },
       "invite": {
         "title": "Mitglied einladen",

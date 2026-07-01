@@ -1930,8 +1930,9 @@
         "secondaryColor": "Secondaire",
         "saveIdentity": "Enregistrer l'identité",
         "uploadLogo": "Importer un logo",
+        "addLogo": "Ajouter un logo",
         "removeLogo": "Retirer",
-        "logoHint": "PNG ou JPEG, 2 Mo max."
+        "logoHint": "PNG ou JPEG, 2 Mo max. Ajoute un logo par club en cas de regroupement."
       },
       "invite": {
         "title": "Inviter un membre",

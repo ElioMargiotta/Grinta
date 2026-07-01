@@ -4,6 +4,7 @@ import { CalendarDays, UserCircle, Users } from "lucide-react";
 import { useTranslations } from "next-intl";
 import Image from "next/image";
 import { Link, usePathname } from "@/i18n/navigation";
+import { ClubLogos } from "@/components/club/ClubLogos";
 import type { ClubMembership } from "@/lib/club/types";
 import type { PersonaProfile } from "@/lib/club/persona";
 
@@ -27,7 +28,7 @@ export function PlayerSidebar({
   const t = useTranslations("nav");
   const ts = useTranslations("sidebar");
   const pathname = usePathname();
-  const logoUrl = currentMembership?.logo_url;
+  const logos = currentMembership?.logos ?? [];
   const meKey =
     activeProfile === "parent"
       ? guardianCount === 1
@@ -42,23 +43,21 @@ export function PlayerSidebar({
           href="/me"
           className="flex min-w-0 items-center justify-center gap-2 overflow-hidden lg:justify-start"
         >
-          {logoUrl ? (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img
-              src={logoUrl}
-              alt={currentMembership?.club_name ?? ts("fallbackClubName")}
-              className="h-10 w-10 shrink-0 rounded-md object-contain"
-            />
-          ) : (
-            <Image
-              src="/documents/svg/grinta-icon.svg"
-              alt="Grinta"
-              width={36}
-              height={36}
-              priority
-              className="h-9 w-9 shrink-0"
-            />
-          )}
+          <ClubLogos
+            logos={logos}
+            alt={currentMembership?.club_name ?? ts("fallbackClubName")}
+            imgClassName="h-10 w-10 rounded-md"
+            fallback={
+              <Image
+                src="/documents/svg/grinta-icon.svg"
+                alt="Grinta"
+                width={36}
+                height={36}
+                priority
+                className="h-9 w-9 shrink-0"
+              />
+            }
+          />
           <div className="hidden min-w-0 lg:block">
             <div className="truncate text-sm font-semibold text-foreground">
               {currentMembership?.club_name ?? ts("fallbackOrgName")}

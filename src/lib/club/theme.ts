@@ -5,6 +5,7 @@ type ClubThemeStyle = CSSProperties & Record<`--${string}`, string>;
 
 const FALLBACK: ClubIdentity = {
   logo_url: null,
+  logos: [],
   theme_mode: "day",
   theme_primary_color: "#18181b",
   theme_secondary_color: "#f4f4f5",

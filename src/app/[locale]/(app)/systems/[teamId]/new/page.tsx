@@ -64,7 +64,7 @@ export default async function NewSystemPage({
           transition: "",
         }}
         initialPhases={[]}
-        clubLogoUrl={membership.logo_url}
+        clubLogos={membership.logos}
       />
     </div>
   );

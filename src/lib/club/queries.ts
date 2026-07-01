@@ -10,6 +10,7 @@ type Row = {
   clubs: {
     name: string;
     logo_url: string | null;
+    logos: string[] | null;
     theme_mode: ClubMembership["theme_mode"];
     theme_primary_color: string;
     theme_secondary_color: string;
@@ -31,7 +32,7 @@ export const getMyMemberships = cache(async (): Promise<ClubMembership[]> => {
     .from("club_memberships")
     .select(
       `club_id, role_id,
-       clubs!inner(name, logo_url, theme_mode, theme_primary_color, theme_secondary_color, theme_night_primary_color, theme_night_secondary_color),
+       clubs!inner(name, logo_url, logos, theme_mode, theme_primary_color, theme_secondary_color, theme_night_primary_color, theme_night_secondary_color),
        club_roles!inner(name, access_level)`,
     )
     .eq("user_id", user.id)
@@ -48,6 +49,12 @@ export const getMyMemberships = cache(async (): Promise<ClubMembership[]> => {
       role_name: r.club_roles.name,
       access_level: r.club_roles.access_level,
       logo_url: r.clubs.logo_url,
+      logos:
+        r.clubs.logos && r.clubs.logos.length > 0
+          ? r.clubs.logos
+          : r.clubs.logo_url
+            ? [r.clubs.logo_url]
+            : [],
       theme_mode: r.clubs.theme_mode,
       theme_primary_color: r.clubs.theme_primary_color,
       theme_secondary_color: r.clubs.theme_secondary_color,
