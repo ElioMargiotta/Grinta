@@ -8,7 +8,7 @@ export type AuthTone = "default" | "staff" | "player" | "parent";
 // que les classes .blob consomment déjà via color-mix.
 const TONE_BRAND: Record<AuthTone, string> = {
   default: "oklch(53.576% 0.19004 33.59)",
-  staff: "oklch(53.576% 0.19004 33.59)",
+  staff: "oklch(0.56 0.22 300)",
   player: "oklch(0.56 0.16 248)",
   parent: "oklch(0.62 0.14 156)",
 };

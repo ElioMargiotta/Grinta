@@ -8,14 +8,14 @@
     "profils": {
       "section": {
         "eyebrow": "Come funziona",
-        "title": "Il club al centro.",
-        "body": "Una sola app, il club al centro. Attorno, tre viste che si parlano: lo staff guida, il giocatore vive la sua stagione, il genitore tiene il filo.",
+        "title": "Uno spazio adatto a ogni ruolo del club",
+        "body": "Ogni utente accede solo a ciò che gli serve per avanzare più velocemente e collaborare meglio.",
         "more": "Più info",
         "back": "Home",
         "cards": [
-          { "persona": "staff", "title": "Staff e club", "desc": "Gestisci squadre, sedute e pianificazione." },
-          { "persona": "player", "title": "Giocatore", "desc": "Le tue statistiche, convocazioni e progressi." },
-          { "persona": "parent", "title": "Genitori", "desc": "Segui il percorso di tuo figlio nel club." }
+          { "persona": "staff", "title": "Staff e club", "desc": "Guida la tua squadra e struttura il club." },
+          { "persona": "player", "title": "Giocatore", "desc": "Le tue statistiche, i tuoi progressi, il tuo profilo giocatore." },
+          { "persona": "parent", "title": "Genitori", "desc": "Le informazioni giuste, al momento giusto." }
         ],
         "tabs": {
           "staff": "Staff",
@@ -28,9 +28,9 @@
       },
       "staff": {
         "eyebrow": "Profilo staff",
-        "title": "Tutto il club, in un solo flusso.",
+        "title": "Guida la tua squadra. Struttura il tuo club.",
         "intro": "Dalla pre-formazione alla prima squadra: pianifica la stagione, costruisci le sedute e mantieni allineato tutto il club.",
-        "summary": "Presidente, direttore sportivo, allenatori: dalla rosa del club alla formazione del martedì. Guidi le squadre, costruisci le tue sedute e segui i tuoi giocatori — nel club come in campo.",
+        "summary": "Prepara le sedute, organizza i microcicli, gestisci la rosa, convoca i giocatori e segui i loro progressi. Il club mantiene un metodo comune, anche quando cambiano gli allenatori.",
         "panels": [
           { "title": "Pianifica la stagione", "body": "Macro, meso e microcicli guidati dalle tue partite. Il calendario diventa un vero piano." },
           { "title": "Costruisci le sedute", "body": "Blocco per blocco, dal riscaldamento al gioco finale. Una scheda pronta per il campo." },
@@ -53,9 +53,9 @@
       },
       "player": {
         "eyebrow": "Profilo giocatore",
-        "title": "La tua stagione, in mano tua.",
+        "title": "Le tue statistiche. I tuoi progressi. Il tuo profilo giocatore.",
         "intro": "Profilo, convocazioni, monitoraggio e progressi: tutto ciò che ti riguarda, in un unico posto.",
-        "summary": "Il tuo calendario, le tue convocazioni, la tua presenza con un tap, le tue statistiche di test e partite. Tutto ciò che ti riguarda, senza chiedere a nessuno.",
+        "summary": "Segui i tuoi test, le tue partite, la tua presenza e la tua evoluzione durante la stagione. Grinta ti dà una vera visione dei tuoi progressi — e ti permette di condividerli con amici o compagni di squadra.",
         "panels": [
           { "title": "Il tuo profilo giocatore", "body": "Ruolo, info e storico: la tua scheda al club, sempre aggiornata." },
           { "title": "Convocazioni & disponibilità", "body": "Indica le tue disponibilità e vedi quando giochi. Basta gruppi che esplodono." },
@@ -70,9 +70,9 @@
       },
       "parent": {
         "eyebrow": "Profilo genitori",
-        "title": "Il club, in tutta serenità.",
+        "title": "Le informazioni giuste, al momento giusto.",
         "intro": "Segui il percorso di tuo figlio, gestisci le sue disponibilità e resta informato sul club.",
-        "summary": "La vista su tuo figlio — o sui tuoi figli. Convocazioni, presenze, percorso: segui tutto e resti connesso al club, senza rincorrere le informazioni.",
+        "summary": "Convocazioni, orari, presenze e monitoraggio del bambino: i genitori restano connessi al club senza dover rincorrere i messaggi.",
         "panels": [
           { "title": "La scheda di tuo figlio", "body": "Ruolo, squadra e info chiave: tutto ciò che lo riguarda, in un solo posto." },
           { "title": "Convocazioni chiare", "body": "Sai quando e dove gioca, senza rincorrere le informazioni." },
@@ -92,26 +92,26 @@
       "pricing": "Prezzi"
     },
     "hero": {
-      "eyebrow": "Per allenatori e club di calcio",
+      "eyebrow": "Per i club di calcio che vogliono organizzarsi meglio",
       "title1": "Un club.",
       "title2Prefix": "Un'",
       "title2Accent": "identità",
       "title2Suffix": ".",
       "title3": "Un metodo.",
-      "subtitle": "Grinta dà agli allenatori un unico strumento per pianificare la stagione, costruire i microcicli e preparare gli allenamenti — dalla pre-formazione alla prima squadra, sotto un solo metodo di gioco.",
-      "ctaHow": "Come funziona",
-      "ctaPricing": "Vedi i prezzi",
+      "subtitle": "Grinta aiuta i club a pianificare la stagione, preparare gli allenamenti, gestire le squadre e seguire i giocatori nel tempo.",
+      "ctaHow": "Avvia la mia stagione",
+      "ctaPricing": "Vedi come funziona",
       "stat1Label": "Categorie",
-      "stat1Value": "U7 → Pro",
-      "stat2Label": "Microcicli",
-      "stat2Value": "+1 / -3",
+      "stat1Value": "U7 → Attivi",
+      "stat2Label": "Organizzazione",
+      "stat2Value": "Stagione · microcicli · sedute",
       "stat3Label": "Metodo",
-      "stat3Value": "1 club",
+      "stat3Value": "Una visione comune per tutto il club",
       "tagline": "One club. One identity. One method."
     },
     "pricing": {
       "eyebrow": "Prezzi",
-      "title": "Gratis per un coach. Su preventivo per un club.",
+      "title": "Un prezzo pensato per i club",
       "recommended": "consigliato",
       "jsNote": "In Svizzera, Gioventù+Sport rimborsa 1,04 CHF per ora e per giocatore. Un solo allenamento giovanile sovvenzionato copre un mese intero di Grinta per la squadra.",
       "tiers": [
@@ -158,12 +158,12 @@
       "title1": "Dai al club una sola voce.",
       "title2Accent": "Posizionala",
       "title2Suffix": "con Grinta.",
-      "body": "Account in 30 secondi. Nessuna carta di credito. Puoi importare la stagione in corso e riprendere da dove ti sei fermato.",
+      "body": "Crea il tuo account, prepara la stagione e centralizza l’organizzazione sportiva del tuo club con Grinta.",
       "cta": "Crea il mio account",
       "ctaSecondary": "Come funziona →"
     },
     "footer": {
-      "tagline": "Lo strumento per allenatori e club di calcio per pianificare la stagione, costruire i microcicli e preparare gli allenamenti.",
+      "tagline": "La piattaforma per i club di calcio per centralizzare stagione, sedute, squadre, presenze e monitoraggio dei giocatori.",
       "copyright": "© 2026 Grinta · Made avec grinta.",
       "cols": [
         {
@@ -528,7 +528,7 @@
     "passwordPlaceholder": "••••••••",
     "personaChoiceLabel": "Sei un…",
     "personaChoiceHelp": "Puoi modificare questa scelta in qualsiasi momento nelle impostazioni del tuo account.",
-    "personaChoiceStaff": "Allenatore",
+    "personaChoiceStaff": "Staff",
     "personaChoicePlayer": "Giocatore",
     "personaChoiceDual": "Entrambi",
     "forgotPasswordLink": "Password dimenticata?",
@@ -577,9 +577,11 @@
     "accountTypeLabel": "Tipo di account",
     "accountTypeHelp": "Modificabile in seguito nelle impostazioni account.",
     "accountTypePrompt": "Ti unisci a Grinta come",
-    "authAsidePitch": "Sedute, valutazioni, convocazioni e monitoraggio — tutto il club in un unico posto.",
-    "accountTypeStaff": "Allenatore",
-    "accountTypeStaffDesc": "Allenatore, proprietario, direttore sportivo, preparatore — gestisci squadre, sedute e valutazioni.",
+    "authAsideEyebrow": "Spazio Grinta",
+    "authAsidePitch": "Ritrova la tua attività e le informazioni che ti riguardano.",
+    "authAsideTagline": "Stagione, squadre, convocazioni e monitoraggio in un unico posto.",
+    "accountTypeStaff": "Staff",
+    "accountTypeStaffDesc": "Allenatore, proprietario, direttore sportivo, preparatore — gestisci club, squadre, sedute e valutazioni.",
     "accountTypePlayer": "Giocatore",
     "accountTypePlayerDesc": "Consulta statistiche, valutazioni e convocazioni e segui i tuoi progressi.",
     "accountTypeParent": "Genitore",

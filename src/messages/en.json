@@ -8,14 +8,14 @@
     "profils": {
       "section": {
         "eyebrow": "How it works",
-        "title": "The club at the center.",
-        "body": "One app, the club at the center. Around it, three views that talk to each other: staff steers, the player lives their season, the parent keeps the thread.",
+        "title": "A space tailored to every role in the club",
+        "body": "Every user only sees what they need to move faster and collaborate better.",
         "more": "Learn more",
         "back": "Home",
         "cards": [
-          { "persona": "staff", "title": "Staff & club", "desc": "Run your teams, sessions and planning." },
-          { "persona": "player", "title": "Player", "desc": "Your stats, call-ups and progress." },
-          { "persona": "parent", "title": "Parents", "desc": "Follow your child's journey at the club." }
+          { "persona": "staff", "title": "Staff & club", "desc": "Run your team and structure your club." },
+          { "persona": "player", "title": "Player", "desc": "Your stats, your progress, your player profile." },
+          { "persona": "parent", "title": "Parents", "desc": "The right information, at the right time." }
         ],
         "tabs": {
           "staff": "Staff",
@@ -28,9 +28,9 @@
       },
       "staff": {
         "eyebrow": "Staff profile",
-        "title": "The whole club, in one flow.",
+        "title": "Run your team. Structure your club.",
         "intro": "From the academy to the first team: plan the season, build your sessions and keep the whole club aligned.",
-        "summary": "President, sporting director, coaches: from the club's squad to Tuesday's line-up. You steer the teams, build your sessions and track your players — at the club and on the pitch.",
+        "summary": "Prepare your sessions, organize your microcycles, manage your squad, call up your players and track their progress. The club keeps a shared method, even when coaches change.",
         "panels": [
           { "title": "Plan the season", "body": "Macro, meso and microcycles driven by your matches. The calendar becomes a real plan." },
           { "title": "Build your sessions", "body": "Block by block, from warm-up to final game. A sheet ready for the pitch." },
@@ -53,9 +53,9 @@
       },
       "player": {
         "eyebrow": "Player profile",
-        "title": "Your season, in your hands.",
+        "title": "Your stats. Your progress. Your player profile.",
         "intro": "Profile, call-ups, follow-up and progress: everything about you, in one place.",
-        "summary": "Your schedule, your call-ups, your availability in one tap, your test and match stats. Everything about you, without asking anyone.",
+        "summary": "Track your tests, your matches, your attendance and your development throughout the season. Grinta gives you a real view of your progress — and lets you share it with friends or teammates.",
         "panels": [
           { "title": "Your player profile", "body": "Position, info and history: your club record, always up to date." },
           { "title": "Call-ups & availability", "body": "Set your availability and see when you play. No more overflowing group chat." },
@@ -70,9 +70,9 @@
       },
       "parent": {
         "eyebrow": "Parent profile",
-        "title": "The club, with peace of mind.",
+        "title": "The right information, at the right time.",
         "intro": "Follow your child's journey, manage their availability and stay up to date with the club.",
-        "summary": "The view on your child — or children. Call-ups, availability, progress: you follow it all and stay connected to the club, without chasing information.",
+        "summary": "Call-ups, schedules, attendance and your child's follow-up: parents stay connected to the club without chasing messages.",
         "panels": [
           { "title": "Your child's record", "body": "Position, team and key info: everything about them, in one place." },
           { "title": "Clear call-ups", "body": "You know when and where they play, without chasing the information." },
@@ -92,26 +92,26 @@
       "pricing": "Pricing"
     },
     "hero": {
-      "eyebrow": "For football coaches and clubs",
+      "eyebrow": "For football clubs that want to organize better",
       "title1": "One club.",
       "title2Prefix": "One",
       "title2Accent": "identity",
       "title2Suffix": ".",
       "title3": "One method.",
-      "subtitle": "Grinta gives coaches a single tool to plan the season, build microcycles, and prepare training — from youth academy to the first team, under one playing method.",
-      "ctaHow": "How it works",
-      "ctaPricing": "See pricing",
+      "subtitle": "Grinta helps clubs plan their season, prepare training sessions, manage teams and track players over time.",
+      "ctaHow": "Start my season",
+      "ctaPricing": "See how it works",
       "stat1Label": "Categories",
-      "stat1Value": "U7 → Pro",
-      "stat2Label": "Microcycles",
-      "stat2Value": "+1 / -3",
+      "stat1Value": "U7 → Seniors",
+      "stat2Label": "Organization",
+      "stat2Value": "Season · microcycles · sessions",
       "stat3Label": "Method",
-      "stat3Value": "1 club",
+      "stat3Value": "A shared vision for the whole club",
       "tagline": "One club. One identity. One method."
     },
     "pricing": {
       "eyebrow": "Pricing",
-      "title": "Free for a coach. On quote for a club.",
+      "title": "Pricing designed for clubs",
       "recommended": "recommended",
       "jsNote": "In Switzerland, Youth+Sport pays back CHF 1.04 per hour per player. A single subsidized junior session covers a full month of Grinta for the team.",
       "tiers": [
@@ -158,12 +158,12 @@
       "title1": "Give the club one voice.",
       "title2Accent": "Set it",
       "title2Suffix": "with Grinta.",
-      "body": "Account in 30 seconds. No credit card. You can import the current season and pick up where you left off.",
+      "body": "Create your account, prepare your season and centralize your club's sporting organization with Grinta.",
       "cta": "Create my account",
       "ctaSecondary": "How it works →"
     },
     "footer": {
-      "tagline": "The tool for football coaches and clubs to plan the season, build microcycles, and prepare training.",
+      "tagline": "The platform for football clubs to centralize the season, sessions, teams, attendance and player tracking.",
       "copyright": "© 2026 Grinta · Made with grinta.",
       "cols": [
         {
@@ -534,7 +534,7 @@
     "confirmedCta": "Go to login now",
     "personaChoiceLabel": "I'm a…",
     "personaChoiceHelp": "You can change this anytime in account settings.",
-    "personaChoiceStaff": "Coach",
+    "personaChoiceStaff": "Staff",
     "personaChoicePlayer": "Player",
     "personaChoiceDual": "Both",
     "forgotPasswordLink": "Forgot your password?",
@@ -583,9 +583,11 @@
     "accountTypeLabel": "Account type",
     "accountTypeHelp": "You can adjust this later in your account settings.",
     "accountTypePrompt": "You're joining Grinta as",
-    "authAsidePitch": "Sessions, assessments, call-ups and fitness tracking — your whole club, in one place.",
-    "accountTypeStaff": "Coach",
-    "accountTypeStaffDesc": "Coach, owner, sporting director, fitness staff — run teams, sessions and assessments.",
+    "authAsideEyebrow": "Grinta space",
+    "authAsidePitch": "Find your activity and the information that matters to you.",
+    "authAsideTagline": "Season, teams, call-ups and tracking in one place.",
+    "accountTypeStaff": "Staff",
+    "accountTypeStaffDesc": "Coach, owner, sporting director, fitness staff — run the club, teams, sessions and assessments.",
     "accountTypePlayer": "Player",
     "accountTypePlayerDesc": "Track your stats, assessments and call-ups, and follow your progress.",
     "accountTypeParent": "Parent",

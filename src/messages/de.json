@@ -8,14 +8,14 @@
     "profils": {
       "section": {
         "eyebrow": "So funktioniert's",
-        "title": "Der Verein im Zentrum.",
-        "body": "Eine App, der Verein im Zentrum. Drumherum drei Sichten, die miteinander sprechen: Der Staff steuert, der Spieler erlebt seine Saison, die Eltern behalten den Faden.",
+        "title": "Ein Bereich für jede Rolle im Verein",
+        "body": "Jeder Nutzer sieht nur das, was er braucht, um schneller voranzukommen und besser zusammenzuarbeiten.",
         "more": "Mehr erfahren",
         "back": "Startseite",
         "cards": [
-          { "persona": "staff", "title": "Staff & Verein", "desc": "Steuere Teams, Einheiten und Planung." },
-          { "persona": "player", "title": "Spieler", "desc": "Deine Stats, Aufgebote und Fortschritte." },
-          { "persona": "parent", "title": "Eltern", "desc": "Verfolge den Weg deines Kindes im Verein." }
+          { "persona": "staff", "title": "Staff & Verein", "desc": "Steuere dein Team und strukturiere deinen Verein." },
+          { "persona": "player", "title": "Spieler", "desc": "Deine Stats, dein Fortschritt, dein Spielerprofil." },
+          { "persona": "parent", "title": "Eltern", "desc": "Die richtigen Infos zur richtigen Zeit." }
         ],
         "tabs": {
           "staff": "Staff",
@@ -28,9 +28,9 @@
       },
       "staff": {
         "eyebrow": "Staff-Profil",
-        "title": "Der ganze Verein, in einem Fluss.",
+        "title": "Steuere dein Team. Strukturiere deinen Verein.",
         "intro": "Vom Nachwuchs bis zur ersten Mannschaft: plane die Saison, baue deine Einheiten und halte den ganzen Verein im Einklang.",
-        "summary": "Präsident, Sportdirektor, Trainer: vom Kader des Vereins bis zur Aufstellung am Dienstag. Du steuerst die Teams, baust deine Einheiten und verfolgst deine Spieler — im Verein wie auf dem Platz.",
+        "summary": "Bereite deine Einheiten vor, organisiere deine Mikrozyklen, verwalte deinen Kader, biete Spieler auf und verfolge ihre Entwicklung. Der Verein behält eine gemeinsame Methode, auch wenn Trainer wechseln.",
         "panels": [
           { "title": "Plane die Saison", "body": "Makro-, Meso- und Mikrozyklen, gesteuert von deinen Spielen. Der Kalender wird zum echten Plan." },
           { "title": "Baue deine Einheiten", "body": "Block für Block, vom Aufwärmen bis zum Abschlussspiel. Ein Blatt, bereit fürs Feld." },
@@ -53,9 +53,9 @@
       },
       "player": {
         "eyebrow": "Spieler-Profil",
-        "title": "Deine Saison, in deiner Hand.",
+        "title": "Deine Stats. Dein Fortschritt. Dein Spielerprofil.",
         "intro": "Profil, Aufgebote, Begleitung und Fortschritt: alles über dich, an einem Ort.",
-        "summary": "Dein Plan, deine Aufgebote, deine Verfügbarkeit mit einem Tipp, deine Test- und Spielstatistiken. Alles, was dich betrifft, ohne jemanden zu fragen.",
+        "summary": "Verfolge deine Tests, deine Spiele, deine Anwesenheit und deine Entwicklung über die ganze Saison. Grinta gibt dir einen echten Blick auf deinen Fortschritt — und lässt dich deine Fortschritte mit Freunden oder Teamkollegen teilen.",
         "panels": [
           { "title": "Dein Spielerprofil", "body": "Position, Infos und Verlauf: dein Vereinsprofil, immer aktuell." },
           { "title": "Aufgebote & Verfügbarkeit", "body": "Gib deine Verfügbarkeit an und sieh, wann du spielst. Kein überlaufender Gruppenchat mehr." },
@@ -70,9 +70,9 @@
       },
       "parent": {
         "eyebrow": "Eltern-Profil",
-        "title": "Der Verein, ganz entspannt.",
+        "title": "Die richtigen Infos zur richtigen Zeit.",
         "intro": "Verfolge den Weg deines Kindes, verwalte seine Verfügbarkeiten und bleib über den Verein informiert.",
-        "summary": "Der Blick auf dein Kind — oder deine Kinder. Aufgebote, Verfügbarkeiten, Entwicklung: Du verfolgst alles und bleibst mit dem Verein verbunden, ohne Infos hinterherzulaufen.",
+        "summary": "Aufgebote, Zeiten, Anwesenheiten und die Begleitung des Kindes: Eltern bleiben mit dem Verein verbunden, ohne Nachrichten hinterherzulaufen.",
         "panels": [
           { "title": "Das Profil deines Kindes", "body": "Position, Team und Eckdaten: alles über dein Kind, an einem Ort." },
           { "title": "Klare Aufgebote", "body": "Du weisst, wann und wo es spielt, ohne den Infos hinterherzulaufen." },
@@ -92,26 +92,26 @@
       "pricing": "Preise"
     },
     "hero": {
-      "eyebrow": "Für Fussballtrainer und -vereine",
+      "eyebrow": "Für Fussballvereine, die sich besser organisieren wollen",
       "title1": "Ein Verein.",
       "title2Prefix": "Eine",
       "title2Accent": "Identität",
       "title2Suffix": ".",
       "title3": "Eine Methode.",
-      "subtitle": "Grinta gibt Trainern ein einziges Werkzeug, um die Saison zu planen, Mikrozyklen aufzubauen und Trainings vorzubereiten — vom Nachwuchs bis zur ersten Mannschaft, unter einer einzigen Spielmethode.",
-      "ctaHow": "Funktionsweise",
-      "ctaPricing": "Preise ansehen",
+      "subtitle": "Grinta hilft Vereinen, ihre Saison zu planen, Trainings vorzubereiten, Teams zu verwalten und Spieler über die Zeit zu begleiten.",
+      "ctaHow": "Meine Saison starten",
+      "ctaPricing": "So funktioniert es",
       "stat1Label": "Kategorien",
-      "stat1Value": "U7 → Pro",
-      "stat2Label": "Mikrozyklen",
-      "stat2Value": "+1 / -3",
+      "stat1Value": "U7 → Aktive",
+      "stat2Label": "Organisation",
+      "stat2Value": "Saison · Mikrozyklen · Einheiten",
       "stat3Label": "Methode",
-      "stat3Value": "1 Verein",
+      "stat3Value": "Eine gemeinsame Vision für den ganzen Verein",
       "tagline": "One club. One identity. One method."
     },
     "pricing": {
       "eyebrow": "Preise",
-      "title": "Gratis für einen Coach. Auf Anfrage für einen Verein.",
+      "title": "Ein Preis, der für Vereine gedacht ist",
       "recommended": "empfohlen",
       "jsNote": "In der Schweiz zahlt Jugend+Sport 1,04 CHF pro Stunde und Spieler zurück. Ein einziges subventioniertes Junioren-Training deckt einen ganzen Monat Grinta fürs Team.",
       "tiers": [
@@ -158,12 +158,12 @@
       "title1": "Gib dem Verein eine einzige Stimme.",
       "title2Accent": "Setze sie",
       "title2Suffix": "mit Grinta.",
-      "body": "Konto in 30 Sekunden. Keine Kreditkarte. Du kannst die laufende Saison importieren und dort weitermachen, wo du aufgehört hast.",
+      "body": "Erstelle dein Konto, bereite deine Saison vor und zentralisiere die sportliche Organisation deines Vereins mit Grinta.",
       "cta": "Konto erstellen",
       "ctaSecondary": "Funktionsweise →"
     },
     "footer": {
-      "tagline": "Das Werkzeug für Fussballtrainer und -vereine zur Saisonplanung, Mikrozyklenaufbau und Trainingsvorbereitung.",
+      "tagline": "Die Plattform für Fussballvereine, um Saison, Einheiten, Teams, Anwesenheiten und Spielerbegleitung zu zentralisieren.",
       "copyright": "© 2026 Grinta · Made avec grinta.",
       "cols": [
         {
@@ -528,7 +528,7 @@
     "passwordPlaceholder": "••••••••",
     "personaChoiceLabel": "Du bist…",
     "personaChoiceHelp": "Du kannst diese Auswahl jederzeit in den Kontoeinstellungen ändern.",
-    "personaChoiceStaff": "Trainer",
+    "personaChoiceStaff": "Staff",
     "personaChoicePlayer": "Spieler",
     "personaChoiceDual": "Beides",
     "forgotPasswordLink": "Passwort vergessen?",
@@ -577,9 +577,11 @@
     "accountTypeLabel": "Kontotyp",
     "accountTypeHelp": "Später in den Kontoeinstellungen änderbar.",
     "accountTypePrompt": "Du trittst Grinta bei als",
-    "authAsidePitch": "Trainings, Bewertungen, Aufgebote und Leistungstracking — dein ganzer Verein an einem Ort.",
-    "accountTypeStaff": "Trainer",
-    "accountTypeStaffDesc": "Trainer, Inhaber, Sportdirektor, Athletiktrainer — verwalte Teams, Trainings und Bewertungen.",
+    "authAsideEyebrow": "Grinta-Bereich",
+    "authAsidePitch": "Finde deine Aktivität und die Informationen, die dich betreffen.",
+    "authAsideTagline": "Saison, Teams, Aufgebote und Begleitung an einem Ort.",
+    "accountTypeStaff": "Staff",
+    "accountTypeStaffDesc": "Trainer, Inhaber, Sportdirektor, Athletiktrainer — verwalte Verein, Teams, Trainings und Bewertungen.",
     "accountTypePlayer": "Spieler",
     "accountTypePlayerDesc": "Sieh deine Statistiken, Bewertungen und Aufgebote und verfolge deinen Fortschritt.",
     "accountTypeParent": "Elternteil",

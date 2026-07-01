@@ -115,7 +115,10 @@ export function Hero() {
               >
                 {t(`${s}Label`)}
               </dt>
-              <dd className="mt-1 text-2xl font-semibold tracking-tight">
+              <dd
+                className="mt-1 text-[13px] font-semibold leading-snug tracking-tight sm:text-[15px]"
+                style={{ textWrap: "balance" }}
+              >
                 {t(`${s}Value`)}
               </dd>
             </div>

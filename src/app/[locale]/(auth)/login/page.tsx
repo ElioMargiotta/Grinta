@@ -20,7 +20,7 @@ export default async function LoginPage({
 
   const aside = (
     <div className="flex flex-col gap-5">
-      <p className="eyebrow-mono">{tApp("tagline")}</p>
+      <p className="eyebrow-mono">{t("authAsideEyebrow")}</p>
       <p className="h-display text-[clamp(1.6rem,4vw,2.5rem)] font-semibold">
         {t("authAsidePitch")}
       </p>
@@ -28,7 +28,7 @@ export default async function LoginPage({
   );
 
   return (
-    <AuthSplit name={tApp("name")} tagline={tApp("tagline")} aside={aside}>
+    <AuthSplit name={tApp("name")} tagline={t("authAsideTagline")} aside={aside}>
       <div className="flex flex-col gap-6">
         <AuthTabs />
         <div>

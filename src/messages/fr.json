@@ -8,14 +8,14 @@
     "profils": {
       "section": {
         "eyebrow": "Comment ça marche",
-        "title": "Le club au centre.",
-        "body": "Une seule app, le club au centre. Autour, trois vues qui communiquent : le staff pilote, le joueur vit sa saison, le parent garde le fil.",
+        "title": "Un espace adapté à chaque rôle du club",
+        "body": "Chaque utilisateur accède uniquement à ce dont il a besoin pour avancer plus vite et mieux collaborer.",
         "more": "Plus d'info",
         "back": "Accueil",
         "cards": [
-          { "persona": "staff", "title": "Staff & club", "desc": "Pilote tes équipes, séances et planifications." },
-          { "persona": "player", "title": "Joueur", "desc": "Tes stats, convocations et progression." },
-          { "persona": "parent", "title": "Parents", "desc": "Suis le parcours de ton enfant au club." }
+          { "persona": "staff", "title": "Staff & club", "desc": "Pilote ton équipe et structure ton club." },
+          { "persona": "player", "title": "Joueur", "desc": "Tes stats, ta progression, ton profil joueur." },
+          { "persona": "parent", "title": "Parents", "desc": "Les bonnes infos, au bon moment." }
         ],
         "tabs": {
           "staff": "Staff",
@@ -28,9 +28,9 @@
       },
       "staff": {
         "eyebrow": "Profil staff",
-        "title": "Tout le club, d'un seul geste.",
+        "title": "Pilote ton équipe. Structure ton club.",
         "intro": "De la pré-formation à la première : planifie la saison, construis tes séances et garde tout le club aligné.",
-        "summary": "Président, directeur sportif, entraîneurs : du contingent du club à la compo de mardi soir. Tu pilotes les équipes, montes tes séances et suis tes joueurs — au club comme sur le terrain.",
+        "summary": "Prépare tes séances, organise tes microcycles, gère ton contingent, convoque tes joueurs et suis leur progression. Le club garde une méthode commune, même quand les entraîneurs changent.",
         "panels": [
           { "title": "Planifie la saison", "body": "Macro, méso et microcycles pilotés par tes matchs. Le calendrier devient un vrai plan." },
           { "title": "Construis tes séances", "body": "Bloc par bloc, de l'échauffement au jeu final. Une fiche prête pour le terrain." },
@@ -53,9 +53,9 @@
       },
       "player": {
         "eyebrow": "Profil joueur",
-        "title": "Ta saison, à ta main.",
+        "title": "Tes stats. Ta progression. Ton profil joueur.",
         "intro": "Profil, convocations, suivi et progression : tout ce qui te concerne, au même endroit.",
-        "summary": "Ton planning, tes convocations, ta présence en un tap, tes stats de tests et de matchs. Tout ce qui te concerne, sans rien demander à personne.",
+        "summary": "Suis tes tests, tes matchs, ta présence et ton évolution au fil de la saison. Grinta te donne une vraie vue sur ta progression — et te permet de partager tes progrès avec tes amis ou tes coéquipiers.",
         "panels": [
           { "title": "Ton profil de joueur", "body": "Poste, infos et historique : ta fiche au club, toujours à jour." },
           { "title": "Convocations & dispos", "body": "Indique tes disponibilités et vois quand tu joues. Fini le groupe qui déborde." },
@@ -70,9 +70,9 @@
       },
       "parent": {
         "eyebrow": "Profil parents",
-        "title": "Le club, en toute sérénité.",
+        "title": "Les bonnes infos, au bon moment.",
         "intro": "Suis le parcours de ton enfant, gère ses disponibilités et reste informé du club.",
-        "summary": "La vue sur ton enfant — ou tes enfants. Convocations, présences, parcours : tu suis tout et tu restes relié au club, sans courir après l'info.",
+        "summary": "Convocations, horaires, présences et suivi de l’enfant : les parents restent connectés au club sans devoir courir après les messages.",
         "panels": [
           { "title": "La fiche de ton enfant", "body": "Poste, équipe et infos clés : tout ce qui le concerne, au même endroit." },
           { "title": "Des convocations claires", "body": "Tu sais quand et où il joue, sans chasser l'information." },
@@ -92,26 +92,26 @@
       "pricing": "Tarifs"
     },
     "hero": {
-      "eyebrow": "Pour les entraîneurs et les clubs de football",
+      "eyebrow": "Pour les clubs de football qui veulent mieux s’organiser",
       "title1": "Un club.",
       "title2Prefix": "Une",
       "title2Accent": "identité",
       "title2Suffix": ".",
       "title3": "Une méthode.",
-      "subtitle": "Grinta donne aux entraîneurs un outil unique pour planifier la saison, construire les microcycles et préparer les entraînements — de la pré-formation à l'équipe première, sous une seule méthode de jeu.",
-      "ctaHow": "Comment ça marche",
-      "ctaPricing": "Voir les tarifs",
+      "subtitle": "Grinta aide les clubs à planifier leur saison, préparer les entraînements, gérer les équipes et suivre les joueurs dans le temps.",
+      "ctaHow": "Démarrer ma saison",
+      "ctaPricing": "Voir comment ça marche",
       "stat1Label": "Catégories",
-      "stat1Value": "U7 → Pro",
-      "stat2Label": "Microcycles",
-      "stat2Value": "+1 / -3",
+      "stat1Value": "U7 → Actifs",
+      "stat2Label": "Organisation",
+      "stat2Value": "Saison · microcycles · séances",
       "stat3Label": "Méthode",
-      "stat3Value": "1 club",
+      "stat3Value": "Une vision commune pour tout le club",
       "tagline": "One club. One identity. One method."
     },
     "pricing": {
       "eyebrow": "Tarifs",
-      "title": "Gratuit pour un coach. Sur devis pour un club.",
+      "title": "Un prix pensé pour les clubs",
       "recommended": "recommandé",
       "jsNote": "En Suisse, Jeunesse+Sport reverse 1,04 CHF par heure et par joueur. Une seule séance junior subventionnée rembourse le mois entier de Grinta pour l’équipe.",
       "tiers": [
@@ -158,12 +158,12 @@
       "title1": "Donne au club une seule voix.",
       "title2Accent": "Pose-la",
       "title2Suffix": "avec Grinta.",
-      "body": "Création de compte en 30 secondes. Pas de carte bancaire. Tu peux importer la saison en cours et reprendre là où tu t'es arrêté.",
+      "body": "Crée ton compte, prépare ta saison et centralise l’organisation sportive de ton club avec Grinta.",
       "cta": "Créer mon compte",
       "ctaSecondary": "Comment ça marche →"
     },
     "footer": {
-      "tagline": "L'outil des entraîneurs et des clubs de football pour planifier la saison, construire les microcycles et préparer les entraînements.",
+      "tagline": "La plateforme des clubs de football pour centraliser la saison, les séances, les équipes, les présences et le suivi des joueurs.",
       "copyright": "© 2026 Grinta.",
       "cols": [
         {
@@ -496,22 +496,22 @@
       },
       "genericError": "Quelque chose s'est mal passé. Veuillez réessayer."
     },
-    "tabLogin": "S'identifier",
+    "tabLogin": "Se connecter",
     "tabSignup": "Créer un compte",
     "loginTitle": "Vous nous aviez manqué",
-    "loginSubtitle": "Identifiez-vous pour planifier les entraînements de votre équipe.",
+    "loginSubtitle": "Retrouve ta saison, ton club et tes informations au même endroit.",
     "signupTitle": "Créer un compte",
     "signupSubtitle": "Créez votre compte par e-mail, Google ou Apple — et lancez-vous.",
     "fullName": "Nom complet",
     "fullNameHelp": "Affiché dans l'application et sur les pages de votre équipe.",
-    "email": "Email",
+    "email": "Adresse e-mail",
     "emailHelp": "Nous utiliserons cet email pour vous connecter.",
     "password": "Mot de passe",
     "passwordHelpSignup": "Au moins 6 caractères.",
     "passwordHelpLogin": "Le mot de passe que vous avez choisi lors de la création du compte.",
     "showPassword": "Afficher le mot de passe",
     "hidePassword": "Cacher le mot de passe",
-    "submitLogin": "S'identifier",
+    "submitLogin": "Se connecter",
     "submittingLogin": "Identification…",
     "submitSignup": "Créer un compte",
     "submittingSignup": "Création du compte…",
@@ -534,7 +534,7 @@
     "confirmedCta": "Aller à la connexion",
     "personaChoiceLabel": "Tu es…",
     "personaChoiceHelp": "Tu pourras changer ce choix à tout moment dans les paramètres du compte.",
-    "personaChoiceStaff": "Entraîneur",
+    "personaChoiceStaff": "Staff",
     "personaChoicePlayer": "Joueur",
     "personaChoiceDual": "Les deux",
     "forgotPasswordLink": "Mot de passe oublié ?",
@@ -583,9 +583,11 @@
     "accountTypeLabel": "Type de compte",
     "accountTypeHelp": "Modifiable plus tard dans les réglages du compte.",
     "accountTypePrompt": "Vous rejoignez Grinta en tant que",
-    "authAsidePitch": "Séances, évaluations, convocations et suivi physique — tout votre club, au même endroit.",
-    "accountTypeStaff": "Entraîneur",
-    "accountTypeStaffDesc": "Coach, propriétaire, directeur sportif, préparateur — vous pilotez équipes, séances et évaluations.",
+    "authAsideEyebrow": "Espace Grinta",
+    "authAsidePitch": "Retrouve ton activité et les informations qui te concernent.",
+    "authAsideTagline": "Saison, équipes, convocations et suivi au même endroit.",
+    "accountTypeStaff": "Staff",
+    "accountTypeStaffDesc": "Coach, propriétaire, directeur sportif, préparateur — vous pilotez le club, les équipes, les séances et les évaluations.",
     "accountTypePlayer": "Joueur",
     "accountTypePlayerDesc": "Consultez vos stats, évaluations et convocations, et suivez votre progression.",
     "accountTypeParent": "Parent",
