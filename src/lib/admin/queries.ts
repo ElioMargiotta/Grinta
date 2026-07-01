@@ -116,6 +116,7 @@ export type ClubDetail = {
   members: ClubMemberRow[];
   activity: ClubActivity;
   events: LicenseEventRow[];
+  member_clubs: string[];
 };
 
 const ACTIVE_WINDOW_DAYS = 30;
@@ -143,7 +144,7 @@ export async function getClubDetail(clubId: string): Promise<ClubDetail | null> 
   const supabase = await createClient();
 
   const [clubRes, licenseRes, usageRes, membersRes, eventsRes] = await Promise.all([
-    supabase.from("clubs").select("id, name, created_at, archived_at").eq("id", clubId).maybeSingle(),
+    supabase.from("clubs").select("id, name, created_at, archived_at, member_clubs").eq("id", clubId).maybeSingle(),
     supabase
       .from("club_licenses")
       .select(
@@ -191,6 +192,7 @@ export async function getClubDetail(clubId: string): Promise<ClubDetail | null> 
     members,
     activity: computeActivity(members),
     events: (eventsRes.data ?? []) as LicenseEventRow[],
+    member_clubs: (clubRes.data.member_clubs as string[] | null) ?? [],
   };
 }
 

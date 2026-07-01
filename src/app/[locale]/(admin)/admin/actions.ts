@@ -24,6 +24,22 @@ function tsOrNull(formData: FormData, key: string): string | null {
   return Number.isNaN(d.getTime()) ? null : d.toISOString();
 }
 
+// Liste (JSON) des clubs composant le regroupement — noms libres, purement
+// informatifs. Nettoyée : trim, non vides, dédupliquée, cappée à 12.
+function memberClubsFromForm(formData: FormData): string[] {
+  try {
+    const parsed = JSON.parse(String(formData.get("memberClubs") ?? "[]"));
+    if (!Array.isArray(parsed)) return [];
+    const cleaned = parsed
+      .filter((v): v is string => typeof v === "string")
+      .map((v) => v.trim())
+      .filter(Boolean);
+    return [...new Set(cleaned)].slice(0, 12);
+  } catch {
+    return [];
+  }
+}
+
 async function guard(): Promise<boolean> {
   return isPlatformAdmin();
 }
@@ -69,6 +85,15 @@ export async function createClubAction(formData: FormData): Promise<ActionResult
     return { error: error?.message ?? "Échec de la création du club." };
   }
   const newClubId = clubId as string;
+
+  // Regroupement : liste informative des clubs composant ce club (best-effort).
+  const memberClubs = memberClubsFromForm(formData);
+  if (memberClubs.length > 0) {
+    await supabase.rpc("admin_set_club_member_clubs", {
+      p_club_id: newClubId,
+      p_member_clubs: memberClubs,
+    });
+  }
 
   // Send the owner invitation (best-effort: club is created regardless).
   if (ownerIdentifier) {
@@ -231,6 +256,28 @@ export async function updateLicenseAction(formData: FormData): Promise<ActionRes
   });
 
   if (error) return { error: error.message };
+  revalidatePath(`/${locale}/admin/clubs/${clubId}`);
+  return { ok: true };
+}
+
+/**
+ * Met à jour la liste (informative) des clubs composant le regroupement. Aucun
+ * effet fonctionnel — sert uniquement à s'y retrouver côté console admin.
+ */
+export async function updateClubMemberClubsAction(formData: FormData): Promise<ActionResult> {
+  if (!(await guard())) return { error: "forbidden" };
+
+  const clubId = String(formData.get("clubId") ?? "");
+  const locale = String(formData.get("locale") ?? "fr");
+  if (!clubId) return { error: "Club manquant." };
+
+  const supabase = await createClient();
+  const { error } = await supabase.rpc("admin_set_club_member_clubs", {
+    p_club_id: clubId,
+    p_member_clubs: memberClubsFromForm(formData),
+  });
+  if (error) return { error: error.message };
+
   revalidatePath(`/${locale}/admin/clubs/${clubId}`);
   return { ok: true };
 }

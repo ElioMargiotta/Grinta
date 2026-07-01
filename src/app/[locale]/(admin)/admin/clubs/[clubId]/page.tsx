@@ -2,9 +2,10 @@ import { getTranslations, setRequestLocale } from "next-intl/server";
 import { notFound } from "next/navigation";
 import { ArrowLeft } from "lucide-react";
 import { Link } from "@/i18n/navigation";
-import { getClubDetail } from "@/lib/admin/queries";
+import { getClubDetail, listClubDirectory } from "@/lib/admin/queries";
 import { LicenseForm } from "@/components/admin/LicenseForm";
 import { InviteOwnerForm } from "@/components/admin/InviteOwnerForm";
+import { ClubMemberClubsForm } from "@/components/admin/ClubMemberClubsForm";
 import { ClubDangerZone } from "@/components/admin/ClubDangerZone";
 import { StateBadge, StatCard, UsageMeter, formatDate, formatRelative } from "@/components/admin/ui";
 
@@ -17,7 +18,10 @@ export default async function AdminClubDetailPage({
   setRequestLocale(locale);
   const t = await getTranslations("admin");
 
-  const detail = await getClubDetail(clubId);
+  const [detail, directory] = await Promise.all([
+    getClubDetail(clubId),
+    listClubDirectory(),
+  ]);
   if (!detail) notFound();
 
   const lic = detail.license;
@@ -70,6 +74,24 @@ export default async function AdminClubDetailPage({
         <StatCard label={t("activity.active30d")} value={detail.activity.activeLast30d} />
         <StatCard label={t("activity.neverConnected")} value={detail.activity.neverConnected} />
       </div>
+
+      {/* Regroupement : clubs composant ce club (informatif) */}
+      <section className="mt-8">
+        <h2 className="mb-3 text-sm font-semibold text-zinc-900 dark:text-zinc-100">
+          {t("clubs.memberClubsLabel")}
+        </h2>
+        <div className="rounded-2xl border border-zinc-200 bg-white p-5 dark:border-zinc-800 dark:bg-zinc-900">
+          <p className="mb-3 text-xs text-zinc-500 dark:text-zinc-400">
+            {t("clubs.memberClubsHint")}
+          </p>
+          <ClubMemberClubsForm
+            clubId={clubId}
+            locale={locale}
+            directory={directory}
+            initial={detail.member_clubs}
+          />
+        </div>
+      </section>
 
       <div className="mt-8 grid gap-6 md:grid-cols-2">
         {/* License edit */}
