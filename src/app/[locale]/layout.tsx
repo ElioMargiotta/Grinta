@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
+import { cookies } from "next/headers";
 import { NextIntlClientProvider, hasLocale } from "next-intl";
 import { getMessages, setRequestLocale } from "next-intl/server";
 import { notFound } from "next/navigation";
@@ -34,19 +35,14 @@ export default async function LocaleLayout({
   const loadingLabel =
     (messages as { common?: { loading?: string } })?.common?.loading ?? "Loading";
 
+  const dark = (await cookies()).get("grinta-theme")?.value === "dark";
+
   return (
     <html
       lang={locale}
       suppressHydrationWarning
-      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
+      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased${dark ? " dark" : ""}`}
     >
-      <head>
-        <script
-          dangerouslySetInnerHTML={{
-            __html: `try{document.documentElement.classList.toggle('dark',localStorage.getItem('grinta-theme')==='dark')}catch(e){}`,
-          }}
-        />
-      </head>
       <body className="flex min-h-full flex-col font-sans">
         <NextIntlClientProvider locale={locale} messages={messages}>
           <LoadingProvider defaultLabel={loadingLabel}>

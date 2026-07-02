@@ -31,7 +31,9 @@ export function ThemeToggle() {
   function toggleTheme() {
     const next = !document.documentElement.classList.contains("dark");
     document.documentElement.classList.toggle("dark", next);
-    localStorage.setItem("grinta-theme", next ? "dark" : "light");
+    // Persisted as a cookie so the root layout can resolve the theme
+    // server-side (no anti-flash <script> needed). One year, all paths.
+    document.cookie = `grinta-theme=${next ? "dark" : "light"}; path=/; max-age=31536000; SameSite=Lax`;
     window.dispatchEvent(new Event(THEME_EVENT));
   }
 
