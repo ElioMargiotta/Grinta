@@ -109,6 +109,15 @@
       "stat3Value": "Eine gemeinsame Vision für den ganzen Verein",
       "tagline": "One club. One identity. One method."
     },
+    "trustedBy": {
+      "eyebrow": "Sie vertrauen uns",
+      "title": "Vereine testen Grinta bereits",
+      "clubs": [
+        { "name": "FC Colombier", "logo": "/landing/fc_colombier-black.png", "logoDark": "/landing/fc_colombier-white.png", "w": 1300, "h": 1300, "scale": 1.1 },
+        { "name": "FC Bôle", "logo": "/landing/fc_bole-black.png", "logoDark": "/landing/fc_bole-white.png", "w": 1342, "h": 1342, "scale": 1.05 },
+        { "name": "ANF", "logo": "/landing/anf.png", "logoDark": "/landing/anf-white.png", "w": 900, "h": 396 }
+      ]
+    },
     "pricing": {
       "eyebrow": "Preise",
       "title": "Ein Preis, der für Vereine gedacht ist",
@@ -1910,22 +1919,28 @@
     "club": {
       "identity": {
         "title": "Vereinsidentität",
+        "groupTitle": "Identität der Spielgemeinschaft",
         "description": "Die Vereinsfarbe wird für Buttons, aktive Links und visuelle Akzente verwendet.",
+        "groupDescription": "Die Farbe der Spielgemeinschaft wird für Buttons, aktive Links und visuelle Akzente verwendet.",
         "workspacePreview": "Workspace-Vorschau",
         "clubName": "Vereinsname",
+        "groupName": "Name der Spielgemeinschaft",
         "logoUrl": "Logo-URL",
         "logoUrlPlaceholder": "https://...",
         "dayMode": "Tag",
         "nightMode": "Nacht",
         "primaryColor": "Vereinsfarbe",
         "clubColor": "Vereinsfarbe",
+        "groupColor": "Farbe der Spielgemeinschaft",
         "lightBackground": "Heller Hintergrund",
         "darkBackground": "Dunkler Hintergrund",
         "secondaryColor": "Sekundär",
         "saveIdentity": "Identität speichern",
         "uploadLogo": "Logo hochladen",
+        "addLogo": "Logo hinzufügen",
         "removeLogo": "Entfernen",
-        "logoHint": "PNG oder JPEG, max. 2 MB."
+        "logoHint": "PNG oder JPEG, max. 2 MB.",
+        "groupLogoHint": "PNG oder JPEG, max. 2 MB. Füge bei Bedarf die Logos der Mitgliedsvereine hinzu."
       },
       "invite": {
         "title": "Mitglied einladen",
@@ -2001,7 +2016,17 @@
     },
     "clubPage": {
       "title": "Club-Einstellungen",
-      "subtitle": "Verwalte die Mitglieder, Rollen und Einladungen von {club}."
+      "subtitle": "Verwalte die Mitglieder, Rollen und Einladungen von {club}.",
+      "groupTitle": "Einstellungen der Spielgemeinschaft",
+      "groupSubtitle": "Verwalte die Mitglieder, Rollen und Einladungen der Spielgemeinschaft {club}.",
+      "groupSharing": {
+        "title": "Teilen mit der Spielgemeinschaft",
+        "description": "Lege fest, was dieser Verein der Spielgemeinschaft offenlegt. Standardmässig wird nichts geteilt. Aufstellungen und Planung werden nie geteilt.",
+        "suiviHint": "Spielerbetreuung (physische Messungen und Bewertungen), in beide Richtungen zwischen diesem Verein und der Spielgemeinschaft.",
+        "on": "Geteilt",
+        "off": "Teilen",
+        "privacyNote": "Sensible Daten (oft Minderjährige): Teilen auf die Spielgemeinschaft beschränkt, gemäss DSG/DSGVO."
+      }
     }
   },
   "invite": {
@@ -2247,14 +2272,70 @@
       "cancel": "Abbrechen",
       "archivedBadge": "Archiviert",
       "archivedTitle": "Archivierte Clubs",
-      "archivedOn": "archiviert am"
+      "archivedOn": "archiviert am",
+      "groupMemberBlock": "Dieser Club gehört zur Spielgemeinschaft „{group}“. Entferne ihn aus der Spielgemeinschaft, bevor du ihn archivierst oder löschst."
     },
     "nav": {
       "dashboard": "Dashboard",
       "clubs": "Clubs",
+      "regroupements": "Spielgemeinschaften",
       "admins": "Administratoren",
       "subtitle": "Lizenzverwaltung",
       "backToApp": "Zurück zur App"
+    },
+    "regroupements": {
+      "title": "Spielgemeinschaften",
+      "memberCount": "{count} Vereine",
+      "subtitle": "Eine Spielgemeinschaft ist ein eigener Kontext mit eigenen Teams, Spielern und Quoten. Sie verbindet 2 bis 6 bestehende Vereine, ohne automatische Abrechnung.",
+      "new": "Neue Spielgemeinschaft",
+      "newSubtitle": "Erstelle einen Kontext für die Spielgemeinschaft mit eigenen Quoten. Die Mitgliedsvereine bleiben separat verwaltet.",
+      "empty": "Noch keine Spielgemeinschaft.",
+      "name": "Name der Spielgemeinschaft",
+      "nameHint": "Z. B. „Groupement Juniors A - B“.",
+      "category": "Kategorie",
+      "categoryHint": "Bestimmt die Regeln (Grösse, Eindeutigkeit) und den Teamtyp der Spielgemeinschaft.",
+      "categoryPlaceholder": "Kategorie wählen",
+      "subcategory": "Unterkategorie",
+      "subcategoryPlaceholder": "Wählen",
+      "members": "Vereine der Spielgemeinschaft",
+      "membersHint": "2 bis 6 bestehende Vereine.",
+      "membersMaxHint": "Bis zu {max} bestehende Vereine.",
+      "responsible": "Administrativ verantwortlicher Verein",
+      "responsibleHint": "Trägt den Namen der Spielgemeinschaft (ASF).",
+      "responsiblePlaceholder": "Verein wählen",
+      "create": "Spielgemeinschaft erstellen",
+      "searchClub": "Verein suchen…",
+      "noClub": "Kein Verein",
+      "removeClub": "Entfernen",
+      "archiveTitle": "Spielgemeinschaft archivieren",
+      "archiveHint": "Die Spielgemeinschaft erscheint nicht mehr in der aktiven Liste.",
+      "archive": "Archivieren",
+      "managementTitle": "Verwaltung der Spielgemeinschaft",
+      "responsibleTitle": "Verantwortliche Person der Spielgemeinschaft",
+      "responsibleHint": "Lade die Person ein, die diesen Kontext der Spielgemeinschaft verwaltet.",
+      "ownersInheritedHint": "Die Eigentümer der Mitgliedsvereine haben automatisch Zugriff auf die Spielgemeinschaft. Lade hier zusätzliche Trainer oder technische Leiter ein.",
+      "scopeGroup": "Nur Spielgemeinschaft",
+      "scopeGroupHint": "Verantwortlichen-Zugriff nur im Kontext der Spielgemeinschaft.",
+      "scopeGroupAndMembers": "Spielgemeinschaft + Mitgliedsvereine",
+      "scopeGroupAndMembersHint": "Lädt diese Person auch als Verantwortliche in jeden Mitgliedsverein ein.",
+      "deleteTitle": "Endgültig löschen",
+      "deleteHint": "Löscht die Spielgemeinschaft und alle eigenen Daten (Teams, Spieler, Staff, Einheiten…). Die Mitgliedsvereine werden nicht gelöscht.",
+      "delete": "Löschen",
+      "deleteDataWarning": "Diese Spielgemeinschaft enthält {teams} Team(s), {players} Spieler und {staff} Staff-Mitglied(er).",
+      "confirmDataDeletion": "Ich bestätige die vollständige Löschung der eigenen Daten der Spielgemeinschaft.",
+      "categoryLabels": {
+        "hommes_actifs": "Aktive Männer",
+        "femmes": "Aktive Frauen",
+        "seniors": "Senioren",
+        "juniors": "Junioren"
+      },
+      "subcategoryLabels": {
+        "s30": "30+",
+        "s40": "40+",
+        "s50": "50+",
+        "jg": "Junioren",
+        "jf": "Juniorinnen"
+      }
     },
     "common": {
       "save": "Speichern",

@@ -109,6 +109,15 @@
       "stat3Value": "Una visione comune per tutto il club",
       "tagline": "One club. One identity. One method."
     },
+    "trustedBy": {
+      "eyebrow": "Si fidano di noi",
+      "title": "Alcuni club stanno già testando Grinta",
+      "clubs": [
+        { "name": "FC Colombier", "logo": "/landing/fc_colombier-black.png", "logoDark": "/landing/fc_colombier-white.png", "w": 1300, "h": 1300, "scale": 1.1 },
+        { "name": "FC Bôle", "logo": "/landing/fc_bole-black.png", "logoDark": "/landing/fc_bole-white.png", "w": 1342, "h": 1342, "scale": 1.05 },
+        { "name": "ANF", "logo": "/landing/anf.png", "logoDark": "/landing/anf-white.png", "w": 900, "h": 396 }
+      ]
+    },
     "pricing": {
       "eyebrow": "Prezzi",
       "title": "Un prezzo pensato per i club",
@@ -1910,22 +1919,28 @@
     "club": {
       "identity": {
         "title": "Identità del club",
+        "groupTitle": "Identità del raggruppamento",
         "description": "Il colore del club viene usato per pulsanti, link attivi e accenti visivi.",
+        "groupDescription": "Il colore del raggruppamento viene usato per pulsanti, link attivi e accenti visivi.",
         "workspacePreview": "Anteprima workspace",
         "clubName": "Nome del club",
+        "groupName": "Nome del raggruppamento",
         "logoUrl": "URL del logo",
         "logoUrlPlaceholder": "https://...",
         "dayMode": "Giorno",
         "nightMode": "Notte",
         "primaryColor": "Colore del club",
         "clubColor": "Colore del club",
+        "groupColor": "Colore del raggruppamento",
         "lightBackground": "Sfondo chiaro",
         "darkBackground": "Sfondo scuro",
         "secondaryColor": "Secondaria",
         "saveIdentity": "Salva l'identità",
         "uploadLogo": "Carica un logo",
+        "addLogo": "Aggiungi un logo",
         "removeLogo": "Rimuovi",
-        "logoHint": "PNG o JPEG, max 2 MB."
+        "logoHint": "PNG o JPEG, max 2 MB.",
+        "groupLogoHint": "PNG o JPEG, max 2 MB. Aggiungi i loghi dei club membri se necessario."
       },
       "invite": {
         "title": "Invita un membro",
@@ -2001,7 +2016,17 @@
     },
     "clubPage": {
       "title": "Impostazioni del club",
-      "subtitle": "Gestisci i membri, i ruoli e gli inviti di {club}."
+      "subtitle": "Gestisci i membri, i ruoli e gli inviti di {club}.",
+      "groupTitle": "Impostazioni del raggruppamento",
+      "groupSubtitle": "Gestisci i membri, i ruoli e gli inviti del raggruppamento {club}.",
+      "groupSharing": {
+        "title": "Condivisione con il raggruppamento",
+        "description": "Scegli cosa questo club rivela al raggruppamento. Per impostazione predefinita non si condivide nulla. Formazioni e pianificazione non vengono mai condivise.",
+        "suiviHint": "Monitoraggio del giocatore (misurazioni fisiche e valutazioni), in entrambe le direzioni tra questo club e il raggruppamento.",
+        "on": "Condiviso",
+        "off": "Condividi",
+        "privacyNote": "Dati sensibili (spesso minori): condivisione limitata al raggruppamento, nel rispetto di nLPD/GDPR."
+      }
     }
   },
   "invite": {
@@ -2247,14 +2272,70 @@
       "cancel": "Annulla",
       "archivedBadge": "Archiviato",
       "archivedTitle": "Club archiviati",
-      "archivedOn": "archiviato il"
+      "archivedOn": "archiviato il",
+      "groupMemberBlock": "Questo club appartiene al raggruppamento «{group}». Rimuovilo dal raggruppamento prima di archiviarlo o eliminarlo."
     },
     "nav": {
       "dashboard": "Dashboard",
       "clubs": "Club",
+      "regroupements": "Raggruppamenti",
       "admins": "Amministratori",
       "subtitle": "Gestione licenze",
       "backToApp": "Torna all'app"
+    },
+    "regroupements": {
+      "title": "Raggruppamenti",
+      "memberCount": "{count} club",
+      "subtitle": "Un raggruppamento è un contesto separato con squadre, giocatori e quote proprie. Collega da 2 a 6 club esistenti, senza fatturazione automatica.",
+      "new": "Nuovo raggruppamento",
+      "newSubtitle": "Crea un contesto di raggruppamento con quote proprie. I club membri restano gestiti separatamente.",
+      "empty": "Nessun raggruppamento per ora.",
+      "name": "Nome del raggruppamento",
+      "nameHint": "Es. « Groupement Juniors A - B ».",
+      "category": "Categoria",
+      "categoryHint": "Determina le regole (dimensione, unicità) e il tipo di squadre del raggruppamento.",
+      "categoryPlaceholder": "Scegli una categoria",
+      "subcategory": "Sottocategoria",
+      "subcategoryPlaceholder": "Scegli",
+      "members": "Club del raggruppamento",
+      "membersHint": "Da 2 a 6 club esistenti.",
+      "membersMaxHint": "Fino a {max} club esistenti.",
+      "responsible": "Club amministrativamente responsabile",
+      "responsibleHint": "Porta il nome del raggruppamento (ASF).",
+      "responsiblePlaceholder": "Scegli un club",
+      "create": "Crea raggruppamento",
+      "searchClub": "Cerca un club…",
+      "noClub": "Nessun club",
+      "removeClub": "Rimuovi",
+      "archiveTitle": "Archivia raggruppamento",
+      "archiveHint": "Il raggruppamento non apparirà più nell'elenco attivo.",
+      "archive": "Archivia",
+      "managementTitle": "Gestione del raggruppamento",
+      "responsibleTitle": "Responsabile del raggruppamento",
+      "responsibleHint": "Invita la persona che amministrerà questo contesto di raggruppamento.",
+      "ownersInheritedHint": "I proprietari dei club membri hanno automaticamente accesso al raggruppamento. Invita qui allenatori o direttori tecnici aggiuntivi.",
+      "scopeGroup": "Solo raggruppamento",
+      "scopeGroupHint": "Accesso responsabile solo nel contesto del raggruppamento.",
+      "scopeGroupAndMembers": "Raggruppamento + club membri",
+      "scopeGroupAndMembersHint": "Invita questa persona anche come responsabile in ogni club membro.",
+      "deleteTitle": "Elimina definitivamente",
+      "deleteHint": "Elimina il raggruppamento e tutti i suoi dati propri (squadre, giocatori, staff, sessioni…). I club membri non vengono eliminati.",
+      "delete": "Elimina",
+      "deleteDataWarning": "Questo raggruppamento contiene {teams} squadra/e, {players} giocatore/i e {staff} membro/i staff.",
+      "confirmDataDeletion": "Confermo l'eliminazione completa dei dati propri del raggruppamento.",
+      "categoryLabels": {
+        "hommes_actifs": "Uomini attivi",
+        "femmes": "Donne attive",
+        "seniors": "Seniori",
+        "juniors": "Juniores"
+      },
+      "subcategoryLabels": {
+        "s30": "30+",
+        "s40": "40+",
+        "s50": "50+",
+        "jg": "Juniores maschi",
+        "jf": "Juniores femmine"
+      }
     },
     "common": {
       "save": "Salva",

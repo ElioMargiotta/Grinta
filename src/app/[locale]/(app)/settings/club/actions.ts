@@ -30,11 +30,13 @@ function cleanColor(value: FormDataEntryValue | null, fallback: string): string 
 
 export async function updateClubIdentityAction(formData: FormData) {
   const name = String(formData.get("clubName") ?? "").trim();
+  const membership = await resolveCurrentMembership();
+  const entityLabel = membership?.is_group ? "regroupement" : "club";
   if (name.length < 2) {
-    return { error: "Le nom du club doit contenir au moins 2 caractères." };
+    return { error: `Le nom du ${entityLabel} doit contenir au moins 2 caractères.` };
   }
   if (name.length > 80) {
-    return { error: "Le nom du club est trop long." };
+    return { error: `Le nom du ${entityLabel} est trop long.` };
   }
 
   const themeMode = String(formData.get("themeMode") ?? "day") as ClubThemeMode;
@@ -42,45 +44,62 @@ export async function updateClubIdentityAction(formData: FormData) {
     return { error: "Mode invalide." };
   }
 
-  const membership = await resolveCurrentMembership();
   if (!membership || !canManageClub(membership.access_level)) {
     return { error: "Action interdite." };
   }
 
   const supabase = await createClient();
 
-  // Logo : import de fichier PNG/JPEG → bucket Storage `club-logos`. À défaut on
-  // garde l'existant, ou on le retire si l'utilisateur l'a demandé.
-  const logoUpdate: { logo_url?: string | null } = {};
-  const removeLogo = String(formData.get("removeLogo") ?? "") === "1";
-  const logoFile = formData.get("logoFile");
-  if (logoFile instanceof File && logoFile.size > 0) {
-    const allowedExt: Record<string, string> = {
-      "image/png": "png",
-      "image/jpeg": "jpg",
-      "image/jpg": "jpg",
-    };
-    const ext = allowedExt[logoFile.type];
+  // Logos du regroupement : liste ordonnée d'URLs publiques (bucket `club-logos`).
+  // Le formulaire envoie `existingLogos` (JSON des URLs conservées, dans l'ordre)
+  // et 0..N nouveaux fichiers `logoFile`. Le résultat = conservés + nouveaux
+  // uploadés, cappé à 6. `logo_url` reste le logo primaire (= logos[0]).
+  const MAX_LOGOS = 6;
+  const allowedExt: Record<string, string> = {
+    "image/png": "png",
+    "image/jpeg": "jpg",
+    "image/jpg": "jpg",
+  };
+
+  let keptLogos: string[] = [];
+  try {
+    const raw = String(formData.get("existingLogos") ?? "[]");
+    const parsed = JSON.parse(raw);
+    if (Array.isArray(parsed)) {
+      keptLogos = parsed.filter((u): u is string => typeof u === "string");
+    }
+  } catch {
+    keptLogos = [];
+  }
+
+  const newFiles = formData
+    .getAll("logoFile")
+    .filter((f): f is File => f instanceof File && f.size > 0);
+
+  const uploadedLogos: string[] = [];
+  for (const file of newFiles) {
+    const ext = allowedExt[file.type];
     if (!ext) return { error: "Le logo doit être un PNG ou un JPEG." };
-    if (logoFile.size > 2 * 1024 * 1024) {
+    if (file.size > 2 * 1024 * 1024) {
       return { error: "Le logo ne doit pas dépasser 2 Mo." };
     }
-    const path = `${membership.club_id}/logo-${Date.now()}.${ext}`;
+    const path = `${membership.club_id}/logo-${Date.now()}-${uploadedLogos.length}.${ext}`;
     const { error: uploadErr } = await supabase.storage
       .from("club-logos")
-      .upload(path, logoFile, { contentType: logoFile.type, upsert: true });
+      .upload(path, file, { contentType: file.type, upsert: true });
     if (uploadErr) return { error: uploadErr.message };
     const { data: pub } = supabase.storage.from("club-logos").getPublicUrl(path);
-    logoUpdate.logo_url = pub.publicUrl;
-  } else if (removeLogo) {
-    logoUpdate.logo_url = null;
+    uploadedLogos.push(pub.publicUrl);
   }
+
+  const logos = [...keptLogos, ...uploadedLogos].slice(0, MAX_LOGOS);
 
   const { error } = await supabase
     .from("clubs")
     .update({
       name,
-      ...logoUpdate,
+      logos,
+      logo_url: logos[0] ?? null,
       theme_mode: themeMode,
       theme_primary_color: cleanColor(
         formData.get("primaryColor"),
@@ -258,6 +277,29 @@ export async function inviteMemberAction(formData: FormData): Promise<InviteResu
   };
 }
 
+export async function setClubGroupShareAction(formData: FormData) {
+  const groupClubId = String(formData.get("groupClubId") ?? "");
+  const shareType = String(formData.get("shareType") ?? "suivi_joueur");
+  const enabled = String(formData.get("enabled") ?? "") === "true";
+  if (!groupClubId) return { error: "Regroupement manquant." };
+
+  const membership = await resolveCurrentMembership();
+  if (!membership || !canManageClub(membership.access_level)) {
+    return { error: "Action interdite." };
+  }
+
+  const supabase = await createClient();
+  const { error } = await supabase.rpc("set_club_group_share", {
+    p_group_club_id: groupClubId,
+    p_member_club_id: membership.club_id,
+    p_share_type: shareType,
+    p_enabled: enabled,
+  });
+  if (error) return { error: error.message };
+  revalidatePath("/settings/club");
+  return { ok: true as const };
+}
+
 export async function revokeInvitationAction(formData: FormData) {
   const invitationId = String(formData.get("invitationId") ?? "");
   if (!invitationId) return { error: "ID manquant." };
@@ -424,7 +466,9 @@ type RawInvitation = {
 
 type RawClub = {
   name: string;
+  is_group: boolean;
   logo_url: string | null;
+  logos: string[] | null;
   theme_mode: ClubThemeMode;
   theme_primary_color: string;
   theme_secondary_color: string;
@@ -479,7 +523,7 @@ export async function loadClubSettingsData() {
   const { data: club } = await supabase
     .from("clubs")
     .select(
-      "name, logo_url, theme_mode, theme_primary_color, theme_secondary_color, theme_night_primary_color, theme_night_secondary_color",
+      "name, is_group, logo_url, logos, theme_mode, theme_primary_color, theme_secondary_color, theme_night_primary_color, theme_night_secondary_color",
     )
     .eq("id", membership.club_id)
     .single<RawClub>();
@@ -519,17 +563,76 @@ export async function loadClubSettingsData() {
     }),
   );
 
+  // Regroupements dont ce club est membre + état du partage (suivi joueur). C'est
+  // le CLUB MEMBRE qui décide de ce qu'il dévoile (rivalité-aware). On n'affiche
+  // rien quand le contexte courant est lui-même un regroupement.
+  type GroupShare = {
+    groupClubId: string;
+    groupName: string;
+    category: string | null;
+    subcategory: string | null;
+    sharedSuivi: boolean;
+  };
+  let groupShares: GroupShare[] = [];
+  if (!membership.is_group) {
+    const { data: links } = await supabase
+      .from("club_group_members")
+      .select("group_club_id")
+      .eq("member_club_id", membership.club_id);
+    const groupIds = [...new Set((links ?? []).map((l) => l.group_club_id as string))];
+    if (groupIds.length > 0) {
+      const [{ data: groupClubs }, { data: shares }] = await Promise.all([
+        supabase
+          .from("clubs")
+          .select("id, name, group_category, group_subcategory")
+          .in("id", groupIds),
+        supabase
+          .from("club_group_shares")
+          .select("group_club_id, share_type")
+          .eq("member_club_id", membership.club_id)
+          .in("group_club_id", groupIds),
+      ]);
+      const sharedSet = new Set(
+        ((shares ?? []) as { group_club_id: string; share_type: string }[])
+          .filter((s) => s.share_type === "suivi_joueur")
+          .map((s) => s.group_club_id),
+      );
+      groupShares = (
+        (groupClubs ?? []) as {
+          id: string;
+          name: string;
+          group_category: string | null;
+          group_subcategory: string | null;
+        }[]
+      ).map((g) => ({
+        groupClubId: g.id,
+        groupName: g.name,
+        category: g.group_category,
+        subcategory: g.group_subcategory,
+        sharedSuivi: sharedSet.has(g.id),
+      }));
+    }
+  }
+
+  const normalizedLogos = (logo_url: string | null, logos: string[] | null) =>
+    logos && logos.length > 0 ? logos : logo_url ? [logo_url] : [];
+
   return {
+    groupShares,
     membership,
-    clubIdentity: club ?? {
-      name: membership.club_name,
-      logo_url: membership.logo_url,
-      theme_mode: membership.theme_mode,
-      theme_primary_color: membership.theme_primary_color,
-      theme_secondary_color: membership.theme_secondary_color,
-      theme_night_primary_color: membership.theme_night_primary_color,
-      theme_night_secondary_color: membership.theme_night_secondary_color,
-    },
+    clubIdentity: club
+      ? { ...club, logos: normalizedLogos(club.logo_url, club.logos) }
+      : {
+          name: membership.club_name,
+          is_group: membership.is_group,
+          logo_url: membership.logo_url,
+          logos: membership.logos,
+          theme_mode: membership.theme_mode,
+          theme_primary_color: membership.theme_primary_color,
+          theme_secondary_color: membership.theme_secondary_color,
+          theme_night_primary_color: membership.theme_night_primary_color,
+          theme_night_secondary_color: membership.theme_night_secondary_color,
+        },
     roles: (rolesRes.data ?? []) as {
       id: string;
       name: string;

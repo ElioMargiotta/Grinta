@@ -1,5 +1,5 @@
 import { setRequestLocale, getTranslations } from "next-intl/server";
-import { LayoutDashboard, Building2, ShieldCheck, ArrowLeft } from "lucide-react";
+import { LayoutDashboard, Building2, ShieldCheck, ArrowLeft, Users } from "lucide-react";
 import { Link } from "@/i18n/navigation";
 import { requirePlatformAdmin } from "@/lib/auth/getUser";
 
@@ -18,6 +18,7 @@ export default async function AdminLayout({
   const items = [
     { href: "/admin", label: t("dashboard"), icon: LayoutDashboard },
     { href: "/admin/clubs", label: t("clubs"), icon: Building2 },
+    { href: "/admin/regroupements", label: t("regroupements"), icon: Users },
     { href: "/admin/admins", label: t("admins"), icon: ShieldCheck },
   ];
 

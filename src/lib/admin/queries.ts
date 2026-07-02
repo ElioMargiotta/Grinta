@@ -2,11 +2,17 @@ import "server-only";
 import { createClient } from "@/lib/supabase/server";
 import type { LicenseState, LicenseStatus } from "@/lib/license/types";
 
+export type ClubGroupCategory = "hommes_actifs" | "femmes" | "seniors" | "juniors";
+export type ClubGroupSubcategory = "s30" | "s40" | "s50" | "jg" | "jf";
+
 export type ClubOverview = {
   club_id: string;
   name: string;
   created_at: string;
   archived_at: string | null;
+  is_group: boolean;
+  group_category: ClubGroupCategory | null;
+  group_subcategory: ClubGroupSubcategory | null;
   state: LicenseState;
   status: LicenseStatus | null;
   auto_renew: boolean | null;
@@ -38,6 +44,182 @@ export async function listClubsOverview(): Promise<ClubOverview[]> {
   const { data, error } = await supabase.rpc("admin_clubs_overview");
   if (error || !data) return [];
   return data as ClubOverview[];
+}
+
+// ---------------------------------------------------------------------------
+// Regroupements (groupements ASF) — clubs-contexte reliant 2 à 6 clubs tenants.
+// ---------------------------------------------------------------------------
+
+export type ClubGroupMember = {
+  club_id: string;
+  name: string;
+  logos: string[];
+};
+
+export type ClubGroup = {
+  id: string;
+  name: string;
+  category: ClubGroupCategory | null;
+  subcategory: ClubGroupSubcategory | null;
+  archived_at: string | null;
+  created_at: string;
+  teams: number;
+  players: number;
+  staff: number;
+  max_teams: number | null;
+  max_players: number | null;
+  max_staff: number | null;
+  members: ClubGroupMember[];
+};
+
+type ClubGroupRow = {
+  id: string;
+  name: string;
+  group_category: ClubGroupCategory | null;
+  group_subcategory: ClubGroupSubcategory | null;
+  archived_at: string | null;
+  created_at: string;
+};
+
+type ClubGroupMemberRow = {
+  group_club_id: string;
+  member_club_id: string;
+};
+
+type MemberClubRow = {
+  id: string;
+  name: string;
+  logos: string[] | null;
+  logo_url: string | null;
+};
+
+function logosForClub(c: MemberClubRow | undefined): string[] {
+  if (!c) return [];
+  if (c.logos && c.logos.length > 0) return c.logos;
+  return c.logo_url ? [c.logo_url] : [];
+}
+
+function mapClubGroup(
+  r: ClubGroupRow,
+  membersByGroup: Map<string, ClubGroupMemberRow[]>,
+  clubsById: Map<string, MemberClubRow>,
+  overviewById: Map<string, ClubOverview>,
+): ClubGroup {
+  const usage = overviewById.get(r.id);
+  return {
+    id: r.id,
+    name: r.name,
+    category: r.group_category,
+    subcategory: r.group_subcategory,
+    archived_at: r.archived_at,
+    created_at: r.created_at,
+    teams: usage?.teams ?? 0,
+    players: usage?.players ?? 0,
+    staff: usage?.staff ?? 0,
+    max_teams: usage?.max_teams ?? null,
+    max_players: usage?.max_players ?? null,
+    max_staff: usage?.max_staff ?? null,
+    members: (membersByGroup.get(r.id) ?? []).map((m) => {
+      const club = clubsById.get(m.member_club_id);
+      return {
+        club_id: m.member_club_id,
+        name: club?.name ?? "—",
+        logos: logosForClub(club),
+      };
+    }),
+  };
+}
+
+export async function listClubGroups(): Promise<ClubGroup[]> {
+  const supabase = await createClient();
+  const [groupsRes, overview] = await Promise.all([
+    supabase
+      .from("clubs")
+      .select("id, name, group_category, group_subcategory, archived_at, created_at")
+      .eq("is_group", true)
+      .order("created_at", { ascending: false })
+      .returns<ClubGroupRow[]>(),
+    listClubsOverview(),
+  ]);
+  if (groupsRes.error || !groupsRes.data) return [];
+
+  const groupIds = groupsRes.data.map((g) => g.id);
+  if (groupIds.length === 0) return [];
+
+  const membersRes = await supabase
+    .from("club_group_members")
+    .select("group_club_id, member_club_id")
+    .in("group_club_id", groupIds)
+    .returns<ClubGroupMemberRow[]>();
+  if (membersRes.error) return [];
+
+  const memberIds = [...new Set((membersRes.data ?? []).map((m) => m.member_club_id))];
+  const memberClubsRes =
+    memberIds.length > 0
+      ? await supabase
+          .from("clubs")
+          .select("id, name, logos, logo_url")
+          .in("id", memberIds)
+          .returns<MemberClubRow[]>()
+      : { data: [] as MemberClubRow[], error: null };
+  if (memberClubsRes.error) return [];
+
+  const membersByGroup = new Map<string, ClubGroupMemberRow[]>();
+  for (const m of membersRes.data ?? []) {
+    const rows = membersByGroup.get(m.group_club_id) ?? [];
+    rows.push(m);
+    membersByGroup.set(m.group_club_id, rows);
+  }
+
+  const clubsById = new Map((memberClubsRes.data ?? []).map((c) => [c.id, c]));
+  const overviewById = new Map(overview.map((c) => [c.club_id, c]));
+  return groupsRes.data.map((row) => mapClubGroup(row, membersByGroup, clubsById, overviewById));
+}
+
+export async function getClubGroupDetail(groupId: string): Promise<ClubGroup | null> {
+  const groups = await listClubGroups();
+  return groups.find((g) => g.id === groupId) ?? null;
+}
+
+export async function listClubGroupsForClub(clubId: string): Promise<ClubGroup[]> {
+  const groups = await listClubGroups();
+  return groups.filter((g) => g.members.some((m) => m.club_id === clubId));
+}
+
+export async function listTenantClubsOverview(): Promise<ClubOverview[]> {
+  return (await listClubsOverview()).filter((c) => !c.is_group);
+}
+
+export async function listGroupClubsOverview(): Promise<ClubOverview[]> {
+  return (await listClubsOverview()).filter((c) => c.is_group);
+}
+
+/**
+ * Clubs sélectionnables comme membres d'un regroupement. Un club peut appartenir
+ * à un regroupement par (catégorie, sous-catégorie) — on n'exclut donc que les
+ * clubs déjà pris dans un AUTRE groupe du MÊME couple (catégorie, sous-catégorie).
+ * Sans catégorie fournie (ex. création avant le choix), on retourne tous les clubs
+ * tenants ; la RPC valide l'unicité au moment de la création.
+ */
+export async function listAvailableClubGroupMembers(
+  groupId?: string,
+  category?: ClubGroupCategory | null,
+  subcategory?: ClubGroupSubcategory | null,
+): Promise<ClubOverview[]> {
+  const [clubs, groups] = await Promise.all([listTenantClubsOverview(), listClubGroups()]);
+  if (!category) return clubs;
+  const sub = subcategory ?? null;
+  const usedInSameBucket = new Set(
+    groups
+      .filter(
+        (g) =>
+          (!groupId || g.id !== groupId) &&
+          g.category === category &&
+          (g.subcategory ?? null) === sub,
+      )
+      .flatMap((g) => g.members.map((m) => m.club_id)),
+  );
+  return clubs.filter((c) => !usedInSameBucket.has(c.club_id));
 }
 
 export function computeDashboardStats(clubs: ClubOverview[]): DashboardStats {
@@ -99,6 +281,7 @@ export type ClubDetail = {
   name: string;
   created_at: string;
   archived_at: string | null;
+  is_group: boolean;
   license: {
     status: LicenseStatus;
     state: LicenseState;
@@ -143,7 +326,11 @@ export async function getClubDetail(clubId: string): Promise<ClubDetail | null> 
   const supabase = await createClient();
 
   const [clubRes, licenseRes, usageRes, membersRes, eventsRes] = await Promise.all([
-    supabase.from("clubs").select("id, name, created_at, archived_at").eq("id", clubId).maybeSingle(),
+    supabase
+      .from("clubs")
+      .select("id, name, created_at, archived_at, is_group")
+      .eq("id", clubId)
+      .maybeSingle(),
     supabase
       .from("club_licenses")
       .select(
@@ -180,6 +367,7 @@ export async function getClubDetail(clubId: string): Promise<ClubDetail | null> 
     name: clubRes.data.name,
     created_at: clubRes.data.created_at,
     archived_at: clubRes.data.archived_at ?? null,
+    is_group: Boolean(clubRes.data.is_group),
     license: lic
       ? { ...lic, state: usage?.state ?? "active" }
       : null,

@@ -1,11 +1,12 @@
 import { getTranslations, setRequestLocale } from "next-intl/server";
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import { ArrowLeft } from "lucide-react";
 import { Link } from "@/i18n/navigation";
-import { getClubDetail } from "@/lib/admin/queries";
+import { getClubDetail, listClubGroupsForClub } from "@/lib/admin/queries";
 import { LicenseForm } from "@/components/admin/LicenseForm";
 import { InviteOwnerForm } from "@/components/admin/InviteOwnerForm";
 import { ClubDangerZone } from "@/components/admin/ClubDangerZone";
+import { ClubLogos } from "@/components/club/ClubLogos";
 import { StateBadge, StatCard, UsageMeter, formatDate, formatRelative } from "@/components/admin/ui";
 
 export default async function AdminClubDetailPage({
@@ -17,8 +18,13 @@ export default async function AdminClubDetailPage({
   setRequestLocale(locale);
   const t = await getTranslations("admin");
 
-  const detail = await getClubDetail(clubId);
+  const [detail, groups] = await Promise.all([
+    getClubDetail(clubId),
+    listClubGroupsForClub(clubId),
+  ]);
   if (!detail) notFound();
+  if (detail.is_group) redirect(`/${locale}/admin/regroupements/${clubId}`);
+  const activeGroups = groups.filter((g) => !g.archived_at);
 
   const lic = detail.license;
 
@@ -70,6 +76,39 @@ export default async function AdminClubDetailPage({
         <StatCard label={t("activity.active30d")} value={detail.activity.activeLast30d} />
         <StatCard label={t("activity.neverConnected")} value={detail.activity.neverConnected} />
       </div>
+
+      {/* Regroupements (entité) auxquels ce club appartient */}
+      {activeGroups.length > 0 && (
+        <section className="mt-8">
+          <h2 className="mb-3 text-sm font-semibold text-zinc-900 dark:text-zinc-100">
+            {t("regroupements.title")}
+          </h2>
+          <ul className="grid gap-2 sm:grid-cols-2">
+            {activeGroups.map((g) => (
+              <li key={g.id}>
+                <Link
+                  href={`/admin/regroupements/${g.id}`}
+                  className="flex items-center gap-3 rounded-xl border border-zinc-200 bg-white p-3 transition-colors hover:border-zinc-300 dark:border-zinc-800 dark:bg-zinc-900 dark:hover:border-zinc-700"
+                >
+                  <ClubLogos
+                    logos={g.members.flatMap((m) => m.logos.slice(0, 1))}
+                    imgClassName="h-6 w-6 rounded-md ring-1 ring-zinc-200 dark:ring-zinc-700"
+                    max={6}
+                  />
+                  <span className="min-w-0">
+                    <span className="block truncate text-sm font-medium text-zinc-900 dark:text-zinc-100">
+                      {g.name}
+                    </span>
+                    <span className="block truncate text-[11px] text-zinc-500 dark:text-zinc-400">
+                      {g.members.map((m) => m.name).join(" · ")}
+                    </span>
+                  </span>
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </section>
+      )}
 
       <div className="mt-8 grid gap-6 md:grid-cols-2">
         {/* License edit */}
@@ -172,6 +211,7 @@ export default async function AdminClubDetailPage({
           clubName={detail.name}
           locale={locale}
           archived={detail.archived_at !== null}
+          blockingGroupName={activeGroups[0]?.name}
         />
       </div>
     </div>

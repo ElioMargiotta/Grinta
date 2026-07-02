@@ -102,7 +102,7 @@ export function MatchHub({
   derived,
   systems,
   selectedPhaseIds,
-  clubLogoUrl,
+  clubLogos = [],
 }: {
   teamId: string;
   match: MatchHubMatch;
@@ -117,7 +117,7 @@ export function MatchHub({
   eventsInitial: MatchEvent[];
   squadRecap: SquadRecapRow[];
   derived: Record<string, DerivedStat>;
-  clubLogoUrl?: string | null;
+  clubLogos?: string[];
 }) {
   const t = useTranslations("planner.match");
   const tCal = useTranslations("teams.calendar.match");
@@ -748,7 +748,7 @@ export function MatchHub({
         groups={printGroups}
         tactics={tactics}
         phases={printPhases}
-        clubLogoUrl={clubLogoUrl}
+        clubLogos={clubLogos}
         labels={{
           formation: t("prematch.formation"),
           tactics: t("prematch.tacticsTitle"),

@@ -404,7 +404,7 @@ export default async function MatchPage({
             (match.convocation_sent_at as string | null) ?? null,
         }}
         weekSessions={weekSessions}
-        clubLogoUrl={membership?.logo_url ?? null}
+        clubLogos={membership?.logos ?? []}
       />
     </div>
   );

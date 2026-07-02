@@ -109,6 +109,15 @@
       "stat3Value": "A shared vision for the whole club",
       "tagline": "One club. One identity. One method."
     },
+    "trustedBy": {
+      "eyebrow": "They trust us",
+      "title": "Clubs are already testing Grinta",
+      "clubs": [
+        { "name": "FC Colombier", "logo": "/landing/fc_colombier-black.png", "logoDark": "/landing/fc_colombier-white.png", "w": 1300, "h": 1300, "scale": 1.1 },
+        { "name": "FC Bôle", "logo": "/landing/fc_bole-black.png", "logoDark": "/landing/fc_bole-white.png", "w": 1342, "h": 1342, "scale": 1.05 },
+        { "name": "ANF", "logo": "/landing/anf.png", "logoDark": "/landing/anf-white.png", "w": 900, "h": 396 }
+      ]
+    },
     "pricing": {
       "eyebrow": "Pricing",
       "title": "Pricing designed for clubs",
@@ -1916,22 +1925,28 @@
     "club": {
       "identity": {
         "title": "Club identity",
+        "groupTitle": "Grouping identity",
         "description": "The club color is used for buttons, active links, and visual accents.",
+        "groupDescription": "The grouping color is used for buttons, active links, and visual accents.",
         "workspacePreview": "Workspace preview",
         "clubName": "Club name",
+        "groupName": "Grouping name",
         "logoUrl": "Logo URL",
         "logoUrlPlaceholder": "https://...",
         "dayMode": "Day",
         "nightMode": "Night",
         "primaryColor": "Club color",
         "clubColor": "Club color",
+        "groupColor": "Grouping color",
         "lightBackground": "Light background",
         "darkBackground": "Dark background",
         "secondaryColor": "Secondary",
         "saveIdentity": "Save identity",
         "uploadLogo": "Upload a logo",
+        "addLogo": "Add a logo",
         "removeLogo": "Remove",
-        "logoHint": "PNG or JPEG, 2 MB max."
+        "logoHint": "PNG or JPEG, 2 MB max.",
+        "groupLogoHint": "PNG or JPEG, 2 MB max. Add member club logos if needed."
       },
       "invite": {
         "title": "Invite a member",
@@ -2007,7 +2022,17 @@
     },
     "clubPage": {
       "title": "Club settings",
-      "subtitle": "Manage the members, roles and invitations of {club}."
+      "subtitle": "Manage the members, roles and invitations of {club}.",
+      "groupTitle": "Grouping settings",
+      "groupSubtitle": "Manage the members, roles and invitations of the {club} grouping.",
+      "groupSharing": {
+        "title": "Sharing with the grouping",
+        "description": "Choose what this club reveals to the grouping. Nothing is shared by default. Line-ups and planning are never shared.",
+        "suiviHint": "Player tracking (physical measurements and evaluations), both ways between this club and the grouping.",
+        "on": "Shared",
+        "off": "Share",
+        "privacyNote": "Sensitive data (often minors): sharing limited to the grouping, in line with nLPD/GDPR."
+      }
     }
   },
   "invite": {
@@ -2253,14 +2278,70 @@
       "cancel": "Cancel",
       "archivedBadge": "Archived",
       "archivedTitle": "Archived clubs",
-      "archivedOn": "archived on"
+      "archivedOn": "archived on",
+      "groupMemberBlock": "This club belongs to the grouping “{group}”. Remove it from the grouping before archiving or deleting it."
     },
     "nav": {
       "dashboard": "Dashboard",
       "clubs": "Clubs",
+      "regroupements": "Groupings",
       "admins": "Administrators",
       "subtitle": "Licence management",
       "backToApp": "Back to app"
+    },
+    "regroupements": {
+      "title": "Groupings",
+      "memberCount": "{count} clubs",
+      "subtitle": "A grouping is a separate context with its own teams, players and quotas. It links 2 to 6 existing clubs, without automatic billing.",
+      "new": "New grouping",
+      "newSubtitle": "Create a grouping context with its own quotas. Member clubs remain managed separately.",
+      "empty": "No grouping yet.",
+      "name": "Grouping name",
+      "nameHint": "E.g. “Groupement Juniors A - B”.",
+      "category": "Category",
+      "categoryHint": "Determines the rules (size, uniqueness) and the grouping's team type.",
+      "categoryPlaceholder": "Choose a category",
+      "subcategory": "Subcategory",
+      "subcategoryPlaceholder": "Choose",
+      "members": "Clubs in the grouping",
+      "membersHint": "2 to 6 existing clubs.",
+      "membersMaxHint": "Up to {max} existing clubs.",
+      "responsible": "Administratively responsible club",
+      "responsibleHint": "Carries the grouping's name (ASF).",
+      "responsiblePlaceholder": "Choose a club",
+      "create": "Create grouping",
+      "searchClub": "Search a club…",
+      "noClub": "No club",
+      "removeClub": "Remove",
+      "archiveTitle": "Archive grouping",
+      "archiveHint": "The grouping will no longer appear in the active list.",
+      "archive": "Archive",
+      "managementTitle": "Grouping management",
+      "responsibleTitle": "Grouping manager",
+      "responsibleHint": "Invite the person who will administer this grouping context.",
+      "ownersInheritedHint": "Owners of the member clubs automatically have access to the grouping. Invite additional coaches or technical directors here.",
+      "scopeGroup": "Grouping only",
+      "scopeGroupHint": "Manager access only in the grouping context.",
+      "scopeGroupAndMembers": "Grouping + member clubs",
+      "scopeGroupAndMembersHint": "Also invite this person as manager in each member club.",
+      "deleteTitle": "Delete permanently",
+      "deleteHint": "Deletes the grouping and all of its own data (teams, players, staff, sessions…). Member clubs are not deleted.",
+      "delete": "Delete",
+      "deleteDataWarning": "This grouping contains {teams} team(s), {players} player(s), and {staff} staff member(s).",
+      "confirmDataDeletion": "I confirm complete deletion of the grouping's own data.",
+      "categoryLabels": {
+        "hommes_actifs": "Active men",
+        "femmes": "Active women",
+        "seniors": "Seniors",
+        "juniors": "Juniors"
+      },
+      "subcategoryLabels": {
+        "s30": "30+",
+        "s40": "40+",
+        "s50": "50+",
+        "jg": "Junior boys",
+        "jf": "Junior girls"
+      }
     },
     "common": {
       "save": "Save",

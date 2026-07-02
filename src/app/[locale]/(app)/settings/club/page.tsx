@@ -4,6 +4,7 @@ import { requireMembership } from "@/lib/auth/getUser";
 import { canManageClub } from "@/lib/club/types";
 import { loadClubSettingsData } from "./actions";
 import { ClubSettings } from "@/components/settings/ClubSettings";
+import { ClubGroupSharing } from "@/components/settings/ClubGroupSharing";
 
 export default async function ClubSettingsPage({
   params,
@@ -21,15 +22,16 @@ export default async function ClubSettingsPage({
 
   const data = await loadClubSettingsData();
   if (!data) redirect(`/${locale}/dashboard`);
+  const isGroup = data.clubIdentity.is_group;
 
   return (
     <div className="mx-auto flex w-full max-w-5xl flex-col gap-8">
       <header>
         <h1 className="text-2xl font-semibold text-foreground">
-          {t("title")}
+          {t(isGroup ? "groupTitle" : "title")}
         </h1>
         <p className="mt-1 text-sm text-muted-foreground">
-          {t.rich("subtitle", {
+          {t.rich(isGroup ? "groupSubtitle" : "subtitle", {
             club: membership.club_name,
             strong: (chunks) => <strong>{chunks}</strong>,
           })}
@@ -37,6 +39,10 @@ export default async function ClubSettingsPage({
       </header>
 
       <ClubSettings data={data} />
+
+      {!isGroup && data.groupShares.length > 0 && (
+        <ClubGroupSharing groups={data.groupShares} />
+      )}
     </div>
   );
 }

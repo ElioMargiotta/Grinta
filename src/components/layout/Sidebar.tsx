@@ -4,6 +4,7 @@ import { Activity, CalendarDays, ContactRound, Dumbbell, LayoutDashboard, PenSqu
 import { useTranslations } from "next-intl";
 import Image from "next/image";
 import { Link, usePathname } from "@/i18n/navigation";
+import { ClubLogos } from "@/components/club/ClubLogos";
 import type { ClubMembership } from "@/lib/club/types";
 
 // Free-tier (no club) sees only dashboard + their solo session + library.
@@ -39,7 +40,7 @@ export function Sidebar({
   const ts = useTranslations("sidebar");
   const pathname = usePathname();
   const items = hasMembership ? CLUB_ITEMS : FREE_ITEMS;
-  const logoUrl = currentMembership?.logo_url;
+  const logos = currentMembership?.logos ?? [];
 
   return (
     <aside className="sticky top-0 hidden h-screen w-16 shrink-0 border-r border-border bg-card md:flex md:flex-col lg:w-60">
@@ -48,23 +49,21 @@ export function Sidebar({
           href="/dashboard"
           className="flex min-w-0 items-center justify-center gap-2 overflow-hidden lg:justify-start"
         >
-          {logoUrl ? (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img
-              src={logoUrl}
-              alt={currentMembership?.club_name ?? ts("fallbackClubName")}
-              className="h-10 w-10 shrink-0 rounded-md object-contain"
-            />
-          ) : (
-            <Image
-              src="/documents/svg/grinta-icon.svg"
-              alt="Grinta"
-              width={36}
-              height={36}
-              priority
-              className="h-9 w-9 shrink-0"
-            />
-          )}
+          <ClubLogos
+            logos={logos}
+            alt={currentMembership?.club_name ?? ts("fallbackClubName")}
+            imgClassName="h-10 w-10 rounded-md"
+            fallback={
+              <Image
+                src="/documents/svg/grinta-icon.svg"
+                alt="Grinta"
+                width={36}
+                height={36}
+                priority
+                className="h-9 w-9 shrink-0"
+              />
+            }
+          />
           <div className="hidden min-w-0 lg:block">
             <div className="truncate text-sm font-semibold text-foreground">
               {currentMembership?.club_name ?? ts("fallbackOrgName")}

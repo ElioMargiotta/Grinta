@@ -7,6 +7,7 @@ import { NavBar } from "@/components/landing/NavBar";
 import { Reveal } from "@/components/landing/Reveal";
 import { Hero } from "@/components/landing/Hero";
 import { ProfilSerpentin } from "@/components/landing/ProfilSerpentin";
+import { TrustedBy } from "@/components/landing/TrustedBy";
 import { Pricing } from "@/components/landing/Pricing";
 import { FooterBar } from "@/components/landing/Footer";
 
@@ -54,6 +55,7 @@ export default async function LocaleHome({
       <main>
         <Hero />
         <ProfilSerpentin />
+        <TrustedBy />
         <Pricing />
         <FinalCTA />
       </main>

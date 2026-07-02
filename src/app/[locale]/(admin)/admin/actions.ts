@@ -264,7 +264,12 @@ export async function archiveClubAction(formData: FormData): Promise<ActionResul
 
   const supabase = await createClient();
   const { error } = await supabase.rpc("admin_archive_club", { p_club_id: clubId });
-  if (error) return { error: error.message };
+  if (error) {
+    if (error.message.includes("club_is_group_member")) {
+      return { error: "Ce club appartient à un regroupement. Retire-le du regroupement avant de l'archiver." };
+    }
+    return { error: error.message };
+  }
 
   revalidatePath(`/${locale}/admin/clubs`);
   revalidatePath(`/${locale}/admin/clubs/${clubId}`);
@@ -306,6 +311,9 @@ export async function deleteClubAction(formData: FormData): Promise<ActionResult
     p_confirm_name: confirmName,
   });
   if (error) {
+    if (error.message.includes("club_is_group_member")) {
+      return { error: "Ce club appartient à un regroupement. Retire-le du regroupement avant de le supprimer." };
+    }
     if (error.message.includes("name_mismatch")) {
       return { error: "Le nom saisi ne correspond pas au club." };
     }
@@ -314,6 +322,194 @@ export async function deleteClubAction(formData: FormData): Promise<ActionResult
 
   revalidatePath(`/${locale}/admin/clubs`);
   redirect(`/${locale}/admin/clubs`);
+}
+
+// --- Regroupements (groupements) --------------------------------------------
+
+function clubIdsFromForm(formData: FormData): string[] {
+  try {
+    const parsed = JSON.parse(String(formData.get("memberClubIds") ?? "[]"));
+    if (!Array.isArray(parsed)) return [];
+    return [...new Set(parsed.filter((v): v is string => typeof v === "string"))];
+  } catch {
+    return [];
+  }
+}
+
+function clubGroupError(msg: string): string {
+  if (msg.includes("invalid_member_count")) return "Nombre de clubs invalide (2 max chez les hommes actifs, 6 sinon).";
+  if (msg.includes("member_already_in_group")) return "Un club sélectionné appartient déjà à un regroupement de cette catégorie.";
+  if (msg.includes("invalid_category")) return "Catégorie de regroupement invalide.";
+  if (msg.includes("subcategory_required")) return "Choisis une sous-catégorie (seniors ou juniors).";
+  return msg;
+}
+
+const GROUP_CATEGORIES = ["hommes_actifs", "femmes", "seniors", "juniors"] as const;
+
+function groupCategoryFromForm(formData: FormData): string {
+  return String(formData.get("category") ?? "");
+}
+
+function groupSubcategoryFromForm(formData: FormData, category: string): string | null {
+  if (category !== "seniors" && category !== "juniors") return null;
+  const sub = String(formData.get("subcategory") ?? "").trim();
+  return sub === "" ? null : sub;
+}
+
+export async function createClubGroupAction(formData: FormData): Promise<ActionResult> {
+  if (!(await guard())) return { error: "forbidden" };
+
+  const locale = String(formData.get("locale") ?? "fr");
+  const name = String(formData.get("name") ?? "").trim();
+  const memberClubIds = clubIdsFromForm(formData);
+  const category = groupCategoryFromForm(formData);
+  const subcategory = groupSubcategoryFromForm(formData, category);
+  if (name.length < 2) return { error: "Le nom du regroupement est requis." };
+  if (!GROUP_CATEGORIES.includes(category as (typeof GROUP_CATEGORIES)[number])) {
+    return { error: "Catégorie de regroupement invalide." };
+  }
+
+  const supabase = await createClient();
+  const { data: groupId, error } = await supabase.rpc("admin_create_club_group", {
+    p_name: name,
+    p_member_club_ids: memberClubIds,
+    p_category: category,
+    p_subcategory: subcategory,
+    p_max_teams: intOrNull(formData, "maxTeams"),
+    p_max_players: intOrNull(formData, "maxPlayers"),
+    p_max_staff: intOrNull(formData, "maxStaff"),
+  });
+  if (error || !groupId) return { error: clubGroupError(error?.message ?? "Échec de la création.") };
+
+  revalidatePath(`/${locale}/admin/regroupements`);
+  revalidatePath(`/${locale}/admin/clubs`);
+  redirect(`/${locale}/admin/regroupements/${groupId as string}`);
+}
+
+export async function updateClubGroupAction(formData: FormData): Promise<ActionResult> {
+  if (!(await guard())) return { error: "forbidden" };
+
+  const locale = String(formData.get("locale") ?? "fr");
+  const groupId = String(formData.get("groupId") ?? "");
+  const name = String(formData.get("name") ?? "").trim();
+  const memberClubIds = clubIdsFromForm(formData);
+  const category = groupCategoryFromForm(formData);
+  const subcategory = groupSubcategoryFromForm(formData, category);
+  if (!groupId) return { error: "Regroupement manquant." };
+  if (name.length < 2) return { error: "Le nom du regroupement est requis." };
+  if (!GROUP_CATEGORIES.includes(category as (typeof GROUP_CATEGORIES)[number])) {
+    return { error: "Catégorie de regroupement invalide." };
+  }
+
+  const supabase = await createClient();
+  const { error } = await supabase.rpc("admin_update_club_group", {
+    p_group_club_id: groupId,
+    p_name: name,
+    p_member_club_ids: memberClubIds,
+    p_category: category,
+    p_subcategory: subcategory,
+    p_max_teams: intOrNull(formData, "maxTeams"),
+    p_max_players: intOrNull(formData, "maxPlayers"),
+    p_max_staff: intOrNull(formData, "maxStaff"),
+  });
+  if (error) return { error: clubGroupError(error.message) };
+
+  revalidatePath(`/${locale}/admin/regroupements`);
+  revalidatePath(`/${locale}/admin/regroupements/${groupId}`);
+  revalidatePath(`/${locale}/admin/clubs`);
+  return { ok: true };
+}
+
+export async function archiveClubGroupAction(formData: FormData): Promise<ActionResult> {
+  if (!(await guard())) return { error: "forbidden" };
+
+  const locale = String(formData.get("locale") ?? "fr");
+  const groupId = String(formData.get("groupId") ?? "");
+  if (!groupId) return { error: "Regroupement manquant." };
+
+  const supabase = await createClient();
+  const { error } = await supabase.rpc("admin_archive_club_group", { p_group_club_id: groupId });
+  if (error) return { error: error.message };
+
+  revalidatePath(`/${locale}/admin/regroupements`);
+  revalidatePath(`/${locale}/admin/clubs`);
+  redirect(`/${locale}/admin/regroupements`);
+}
+
+export async function deleteClubGroupAction(formData: FormData): Promise<ActionResult> {
+  if (!(await guard())) return { error: "forbidden" };
+
+  const locale = String(formData.get("locale") ?? "fr");
+  const groupId = String(formData.get("groupId") ?? "");
+  const confirmName = String(formData.get("confirmName") ?? "");
+  if (!groupId) return { error: "Regroupement manquant." };
+
+  const supabase = await createClient();
+  const { error } = await supabase.rpc("admin_delete_club_group", {
+    p_group_club_id: groupId,
+    p_confirm_name: confirmName,
+    p_allow_data_delete: String(formData.get("confirmDataDeletion") ?? "") === "on",
+  });
+  if (error) {
+    if (error.message.includes("name_mismatch")) {
+      return { error: "Le nom saisi ne correspond pas au regroupement." };
+    }
+    if (error.message.includes("group_not_empty")) {
+      return { error: "Ce regroupement contient encore des données. Confirme la suppression complète pour continuer." };
+    }
+    return { error: error.message };
+  }
+
+  revalidatePath(`/${locale}/admin/regroupements`);
+  revalidatePath(`/${locale}/admin/clubs`);
+  redirect(`/${locale}/admin/regroupements`);
+}
+
+export async function inviteClubGroupResponsibleAction(formData: FormData): Promise<ActionResult> {
+  if (!(await guard())) return { error: "forbidden" };
+
+  const locale = String(formData.get("locale") ?? "fr");
+  const groupId = String(formData.get("groupId") ?? "");
+  const identifier = String(formData.get("identifier") ?? "").trim();
+  const scope = String(formData.get("scope") ?? "group");
+  if (!groupId) return { error: "Regroupement manquant." };
+  if (!identifier) return { error: "Compte ou email requis." };
+
+  const supabase = await createClient();
+  const { data: group } = await supabase
+    .from("clubs")
+    .select("id, name, is_group")
+    .eq("id", groupId)
+    .maybeSingle<{ id: string; name: string; is_group: boolean }>();
+  if (!group?.is_group) return { error: "Regroupement introuvable." };
+
+  const targets = [{ id: group.id, name: group.name }];
+  if (scope === "group_and_members") {
+    const { data: memberRows, error: membersError } = await supabase
+      .from("club_group_members")
+      .select("member_club_id")
+      .eq("group_club_id", groupId)
+      .returns<{ member_club_id: string }[]>();
+    if (membersError) return { error: membersError.message };
+    const memberIds = (memberRows ?? []).map((m) => m.member_club_id);
+    if (memberIds.length > 0) {
+      const { data: clubs, error: clubsError } = await supabase
+        .from("clubs")
+        .select("id, name")
+        .in("id", memberIds)
+        .returns<{ id: string; name: string }[]>();
+      if (clubsError) return { error: clubsError.message };
+      targets.push(...(clubs ?? []));
+    }
+  }
+
+  for (const target of targets) {
+    const result = await inviteOwner(supabase, target.id, target.name, identifier, locale);
+    if (result.error) return { error: `${target.name}: ${result.error}` };
+  }
+
+  revalidatePath(`/${locale}/admin/regroupements/${groupId}`);
+  return { ok: true };
 }
 
 export async function addPlatformAdminAction(formData: FormData): Promise<ActionResult> {

@@ -264,26 +264,46 @@ const Z2_SIGNATURES = {
 
 function PdfExport({
   data,
-  teamLogoUrl,
+  teamLogos = [],
 }: {
   data: EvaluationData;
-  teamLogoUrl?: string | null;
+  teamLogos?: string[];
 }) {
   const avg = overallAverage(data.tips);
+  const logo = Z1_HEADER.teamLogo;
   return (
     <div className="prep-export hidden print:block">
       <ExportPage bg="/documents/evaluation/page-1.png">
-        {teamLogoUrl ? (
-          <div style={box(Z1_HEADER.teamLogo)}>
-            <Image
-              src={teamLogoUrl}
-              alt=""
-              aria-hidden
-              fill
-              unoptimized
-              sizes="22mm"
-              className="object-contain"
-            />
+        {teamLogos.length > 0 ? (
+          // Logos du regroupement, ancrés au bord droit de l'emplacement d'origine
+          // et empilés vers la gauche (max 3 pour ne pas déborder de l'en-tête).
+          <div
+            style={{
+              position: "absolute",
+              top: `${logo.y}mm`,
+              height: `${logo.h}mm`,
+              right: `${PAGE_W - (logo.x + logo.w)}mm`,
+              display: "flex",
+              gap: "1mm",
+              alignItems: "center",
+            }}
+          >
+            {teamLogos.slice(0, 3).map((url, i) => (
+              <div
+                key={`${url}-${i}`}
+                style={{ position: "relative", height: `${logo.h}mm`, width: `${logo.w}mm` }}
+              >
+                <Image
+                  src={url}
+                  alt=""
+                  aria-hidden
+                  fill
+                  unoptimized
+                  sizes="22mm"
+                  className="object-contain"
+                />
+              </div>
+            ))}
           </div>
         ) : null}
 
@@ -1131,7 +1151,7 @@ export function EvaluationSheet({
   locale,
   initial,
   backHref,
-  teamLogoUrl,
+  teamLogos = [],
   sharedWithPlayer = false,
   sharingAvailable = true,
 }: {
@@ -1140,7 +1160,7 @@ export function EvaluationSheet({
   locale: string;
   initial: EvaluationData;
   backHref: string;
-  teamLogoUrl?: string | null;
+  teamLogos?: string[];
   sharedWithPlayer?: boolean;
   sharingAvailable?: boolean;
 }) {
@@ -1575,7 +1595,7 @@ export function EvaluationSheet({
         </div>
       </div>
 
-      <PdfExport data={data} teamLogoUrl={teamLogoUrl} />
+      <PdfExport data={data} teamLogos={teamLogos} />
     </>
   );
 }
