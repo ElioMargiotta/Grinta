@@ -16,6 +16,7 @@ export type ClubIdentity = {
 export type ClubMembership = {
   club_id: string;
   club_name: string;
+  is_group: boolean;
   role_id: string;
   role_name: string;
   access_level: AccessLevel;

@@ -8,7 +8,6 @@ import { cn } from "@/lib/utils";
 import { createClubAction } from "@/app/[locale]/(admin)/admin/actions";
 import { LicensePriceEstimate } from "@/components/admin/LicensePriceEstimate";
 import { DirectoryPicker } from "@/components/admin/DirectoryPicker";
-import { MemberClubsInput } from "@/components/admin/MemberClubsInput";
 import { AccountDirectoryInput } from "@/components/account/AccountDirectoryInput";
 import type { DirectoryClub } from "@/lib/admin/queries";
 
@@ -57,10 +56,6 @@ export function CreateClubForm({
           onChange={(e) => setName(e.target.value)}
           className={inputCls}
         />
-      </Field>
-
-      <Field label={t("clubs.memberClubsLabel")} hint={t("clubs.memberClubsHint")}>
-        <MemberClubsInput directory={directory} />
       </Field>
 
       <AccountDirectoryInput

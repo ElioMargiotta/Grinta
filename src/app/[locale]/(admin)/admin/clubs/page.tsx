@@ -1,7 +1,7 @@
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { Plus } from "lucide-react";
 import { Link } from "@/i18n/navigation";
-import { listClubsOverview } from "@/lib/admin/queries";
+import { listTenantClubsOverview } from "@/lib/admin/queries";
 import { StateBadge, formatDate } from "@/components/admin/ui";
 
 export default async function AdminClubsPage({
@@ -12,7 +12,7 @@ export default async function AdminClubsPage({
   const { locale } = await params;
   setRequestLocale(locale);
   const t = await getTranslations("admin");
-  const allClubs = await listClubsOverview();
+  const allClubs = await listTenantClubsOverview();
   const clubs = allClubs.filter((c) => !c.archived_at);
   const archived = allClubs.filter((c) => c.archived_at);
 

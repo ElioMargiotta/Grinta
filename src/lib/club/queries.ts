@@ -9,6 +9,7 @@ type Row = {
   role_id: string;
   clubs: {
     name: string;
+    is_group: boolean;
     logo_url: string | null;
     logos: string[] | null;
     theme_mode: ClubMembership["theme_mode"];
@@ -32,7 +33,7 @@ export const getMyMemberships = cache(async (): Promise<ClubMembership[]> => {
     .from("club_memberships")
     .select(
       `club_id, role_id,
-       clubs!inner(name, logo_url, logos, theme_mode, theme_primary_color, theme_secondary_color, theme_night_primary_color, theme_night_secondary_color),
+       clubs!inner(name, is_group, logo_url, logos, theme_mode, theme_primary_color, theme_secondary_color, theme_night_primary_color, theme_night_secondary_color),
        club_roles!inner(name, access_level)`,
     )
     .eq("user_id", user.id)
@@ -45,6 +46,7 @@ export const getMyMemberships = cache(async (): Promise<ClubMembership[]> => {
     .map((r) => ({
       club_id: r.club_id,
       club_name: r.clubs.name,
+      is_group: r.clubs.is_group,
       role_id: r.role_id,
       role_name: r.club_roles.name,
       access_level: r.club_roles.access_level,

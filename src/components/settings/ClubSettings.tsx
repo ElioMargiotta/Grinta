@@ -58,7 +58,7 @@ type Invitation = {
 
 type Data = {
   membership: { access_level: AccessLevel; club_id: string };
-  clubIdentity: ClubIdentity & { name: string };
+  clubIdentity: ClubIdentity & { name: string; is_group: boolean };
   roles: Role[];
   teams: Team[];
   members: Member[];
@@ -89,6 +89,7 @@ function initials(name: string | null): string {
 export function ClubSettings({ data }: { data: Data }) {
   const locale = useLocale();
   const t = useTranslations("settings.club");
+  const isGroup = data.clubIdentity.is_group;
   const accessLabel = (level: AccessLevel) => t(`access.${level}`);
   const accessHelp = (level: AccessLevel) => t(`access.${level}Help`);
 
@@ -240,7 +241,9 @@ export function ClubSettings({ data }: { data: Data }) {
                   </Button>
                 )}
               </div>
-              <span className="text-xs text-muted-foreground">{t("identity.logoHint")}</span>
+              <span className="text-xs text-muted-foreground">
+                {t(isGroup ? "identity.groupLogoHint" : "identity.logoHint")}
+              </span>
               <input
                 ref={logoInputRef}
                 type="file"
@@ -267,7 +270,7 @@ export function ClubSettings({ data }: { data: Data }) {
 
             <label className="flex max-w-md flex-col gap-1 text-sm">
               <span className="font-medium text-foreground">
-                {t("identity.clubName")}
+                {t(isGroup ? "identity.groupName" : "identity.clubName")}
               </span>
               <input
                 name="clubName"
@@ -284,16 +287,16 @@ export function ClubSettings({ data }: { data: Data }) {
           <section className="flex flex-col gap-5 border-t border-border pt-8">
             <div className="max-w-xl">
               <h2 className="text-lg font-semibold text-foreground">
-                {t("identity.title")}
+                {t(isGroup ? "identity.groupTitle" : "identity.title")}
               </h2>
               <p className="mt-1 text-sm text-muted-foreground">
-                {t("identity.description")}
+                {t(isGroup ? "identity.groupDescription" : "identity.description")}
               </p>
             </div>
 
             <div className="max-w-sm">
               <ColorField
-                label={t("identity.clubColor")}
+                label={t(isGroup ? "identity.groupColor" : "identity.clubColor")}
                 name="primaryColor"
                 defaultValue={data.clubIdentity.theme_primary_color}
               />

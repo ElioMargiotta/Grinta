@@ -1,7 +1,7 @@
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { Plus } from "lucide-react";
 import { Link } from "@/i18n/navigation";
-import { listClubsOverview, computeDashboardStats } from "@/lib/admin/queries";
+import { listTenantClubsOverview, computeDashboardStats } from "@/lib/admin/queries";
 import { StatCard, StateBadge, formatDate } from "@/components/admin/ui";
 
 export default async function AdminDashboardPage({
@@ -13,7 +13,7 @@ export default async function AdminDashboardPage({
   setRequestLocale(locale);
   const t = await getTranslations("admin");
 
-  const clubs = (await listClubsOverview()).filter((c) => !c.archived_at);
+  const clubs = (await listTenantClubsOverview()).filter((c) => !c.archived_at);
   const stats = computeDashboardStats(clubs);
   const recent = clubs.slice(0, 8);
 

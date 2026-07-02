@@ -65,6 +65,7 @@ export default async function PlayerLayout({
       ? {
           club_id: activePlayer.clubId,
           club_name: activePlayer.clubName,
+          is_group: false,
           role_id: activePlayer.relation,
           role_name: activePlayer.relation === "guardian" ? "Parent" : "Joueur",
           access_level: "team_readonly",
@@ -82,7 +83,7 @@ export default async function PlayerLayout({
     const { data: club } = await supabase
       .from("clubs")
       .select(
-        "id, name, logo_url, logos, theme_mode, theme_primary_color, theme_secondary_color, theme_night_primary_color, theme_night_secondary_color",
+        "id, name, is_group, logo_url, logos, theme_mode, theme_primary_color, theme_secondary_color, theme_night_primary_color, theme_night_secondary_color",
       )
       .eq("id", activePlayer.clubId)
       .maybeSingle();
@@ -91,6 +92,7 @@ export default async function PlayerLayout({
       portalClub = {
         club_id: club.id as string,
         club_name: (club.name as string | null) ?? activePlayer.clubName,
+        is_group: Boolean(club.is_group),
         role_id: activePlayer.relation,
         role_name: activePlayer.relation === "guardian" ? "Parent" : "Joueur",
         access_level: "team_readonly",

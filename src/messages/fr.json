@@ -109,6 +109,15 @@
       "stat3Value": "Une vision commune pour tout le club",
       "tagline": "One club. One identity. One method."
     },
+    "trustedBy": {
+      "eyebrow": "Ils nous font confiance",
+      "title": "Des clubs testent déjà Grinta",
+      "clubs": [
+        { "name": "FC Colombier", "logo": "/landing/fc_colombier-black.png", "logoDark": "/landing/fc_colombier-white.png", "w": 1300, "h": 1300, "scale": 1.1 },
+        { "name": "FC Bôle", "logo": "/landing/fc_bole-black.png", "logoDark": "/landing/fc_bole-white.png", "w": 1342, "h": 1342, "scale": 1.05 },
+        { "name": "ANF", "logo": "/landing/anf.png", "logoDark": "/landing/anf-white.png", "w": 900, "h": 396 }
+      ]
+    },
     "pricing": {
       "eyebrow": "Tarifs",
       "title": "Un prix pensé pour les clubs",
@@ -1916,15 +1925,19 @@
     "club": {
       "identity": {
         "title": "Identité du club",
+        "groupTitle": "Identité du regroupement",
         "description": "La couleur du club est utilisée pour les boutons, les liens actifs et les accents visuels.",
+        "groupDescription": "La couleur du regroupement est utilisée pour les boutons, les liens actifs et les accents visuels.",
         "workspacePreview": "Aperçu workspace",
         "clubName": "Nom du club",
+        "groupName": "Nom du regroupement",
         "logoUrl": "Logo URL",
         "logoUrlPlaceholder": "https://...",
         "dayMode": "Jour",
         "nightMode": "Nuit",
         "primaryColor": "Couleur du club",
         "clubColor": "Couleur du club",
+        "groupColor": "Couleur du regroupement",
         "lightBackground": "Fond clair",
         "darkBackground": "Fond sombre",
         "secondaryColor": "Secondaire",
@@ -1932,7 +1945,8 @@
         "uploadLogo": "Importer un logo",
         "addLogo": "Ajouter un logo",
         "removeLogo": "Retirer",
-        "logoHint": "PNG ou JPEG, 2 Mo max. Ajoute un logo par club en cas de regroupement."
+        "logoHint": "PNG ou JPEG, 2 Mo max.",
+        "groupLogoHint": "PNG ou JPEG, 2 Mo max. Ajoute les logos des clubs membres si nécessaire."
       },
       "invite": {
         "title": "Inviter un membre",
@@ -2008,7 +2022,17 @@
     },
     "clubPage": {
       "title": "Paramètres du club",
-      "subtitle": "Gère les membres, les rôles et les invitations de {club}."
+      "subtitle": "Gère les membres, les rôles et les invitations de {club}.",
+      "groupTitle": "Paramètres du regroupement",
+      "groupSubtitle": "Gère les membres, les rôles et les invitations du regroupement {club}.",
+      "groupSharing": {
+        "title": "Partage avec le regroupement",
+        "description": "Choisis ce que ce club dévoile au regroupement. Rien n'est partagé par défaut. La composition et la planification ne sont jamais partagées.",
+        "suiviHint": "Suivi joueur (mesures physiques et évaluations), dans les deux sens entre ce club et le regroupement.",
+        "on": "Partagé",
+        "off": "Partager",
+        "privacyNote": "Données sensibles (souvent des mineurs) : partage limité au regroupement, dans le respect de la nLPD/RGPD."
+      }
     }
   },
   "invite": {
@@ -2250,14 +2274,70 @@
       "cancel": "Annuler",
       "archivedBadge": "Archivé",
       "archivedTitle": "Clubs archivés",
-      "archivedOn": "archivé le"
+      "archivedOn": "archivé le",
+      "groupMemberBlock": "Ce club appartient au regroupement « {group} ». Retire-le du regroupement avant de l'archiver ou de le supprimer."
     },
     "nav": {
       "dashboard": "Tableau de bord",
       "clubs": "Clubs",
+      "regroupements": "Regroupements",
       "admins": "Administrateurs",
       "subtitle": "Gestion des licences",
       "backToApp": "Retour à l'app"
+    },
+    "regroupements": {
+      "title": "Regroupements",
+      "memberCount": "{count} clubs",
+      "subtitle": "Un regroupement est un contexte séparé avec ses propres équipes, joueurs et quotas. Il relie 2 à 6 clubs existants, sans facturation automatique.",
+      "new": "Nouveau regroupement",
+      "newSubtitle": "Crée un contexte de regroupement avec ses propres quotas. Les clubs membres restent gérés séparément.",
+      "empty": "Aucun regroupement pour l'instant.",
+      "name": "Nom du regroupement",
+      "nameHint": "Ex. « Groupement Juniors A - B ».",
+      "category": "Catégorie",
+      "categoryHint": "Détermine les règles (taille, unicité) et le type d'équipes du regroupement.",
+      "categoryPlaceholder": "Choisir une catégorie",
+      "subcategory": "Sous-catégorie",
+      "subcategoryPlaceholder": "Choisir",
+      "members": "Clubs du regroupement",
+      "membersHint": "2 à 6 clubs existants.",
+      "membersMaxHint": "Jusqu'à {max} clubs existants.",
+      "responsible": "Club administrativement responsable",
+      "responsibleHint": "Porte le nom du regroupement (ASF).",
+      "responsiblePlaceholder": "Choisir un club",
+      "create": "Créer le regroupement",
+      "searchClub": "Rechercher un club…",
+      "noClub": "Aucun club",
+      "removeClub": "Retirer",
+      "archiveTitle": "Archiver le regroupement",
+      "archiveHint": "Le regroupement n'apparaîtra plus dans la liste active.",
+      "archive": "Archiver",
+      "managementTitle": "Gestion du regroupement",
+      "responsibleTitle": "Responsable du regroupement",
+      "responsibleHint": "Invite la personne qui administrera ce contexte de regroupement.",
+      "ownersInheritedHint": "Les propriétaires des clubs membres ont automatiquement accès au regroupement. Invite ici les coachs ou directeurs techniques supplémentaires.",
+      "scopeGroup": "Regroupement seul",
+      "scopeGroupHint": "Accès responsable uniquement dans le contexte du regroupement.",
+      "scopeGroupAndMembers": "Regroupement + clubs membres",
+      "scopeGroupAndMembersHint": "Invite aussi cette personne comme responsable dans chaque club membre.",
+      "deleteTitle": "Supprimer définitivement",
+      "deleteHint": "Supprime le regroupement et toutes ses données propres (équipes, joueurs, staff, sessions…). Les clubs membres ne sont pas supprimés.",
+      "delete": "Supprimer",
+      "deleteDataWarning": "Ce regroupement contient {teams} équipe(s), {players} joueur(s) et {staff} membre(s) staff.",
+      "confirmDataDeletion": "Je confirme la suppression complète des données propres au regroupement.",
+      "categoryLabels": {
+        "hommes_actifs": "Hommes actifs",
+        "femmes": "Femmes",
+        "seniors": "Seniors",
+        "juniors": "Juniors"
+      },
+      "subcategoryLabels": {
+        "s30": "30+",
+        "s40": "40+",
+        "s50": "50+",
+        "jg": "Juniors garçons",
+        "jf": "Juniors filles"
+      }
     },
     "common": {
       "save": "Enregistrer",
@@ -2288,11 +2368,6 @@
       "newSubtitle": "Crée un club, définis sa licence et invite son propriétaire.",
       "directoryLabel": "Club (annuaire)",
       "directoryHint": "Choisis un club officiel ASF pour pré-remplir le nom, ou saisis-le à la main.",
-      "memberClubsLabel": "Clubs du regroupement",
-      "memberClubsHint": "Purement informatif : liste les clubs qui composent ce club. Ça ne change rien au fonctionnement (une seule licence, un seul contingent).",
-      "memberClubsPlaceholder": "Rechercher un club ASF ou saisir un nom…",
-      "memberClubsRemove": "Retirer",
-      "memberClubsAddFree": "Ajouter « {name} »",
       "directoryManual": "— Saisie manuelle —",
       "directoryLinked": "déjà créé",
       "directorySearchPlaceholder": "Rechercher un club par nom ou n° ASF…",

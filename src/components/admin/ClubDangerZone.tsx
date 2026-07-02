@@ -17,11 +17,13 @@ export function ClubDangerZone({
   clubName,
   locale,
   archived,
+  blockingGroupName,
 }: {
   clubId: string;
   clubName: string;
   locale: string;
   archived: boolean;
+  blockingGroupName?: string;
 }) {
   const t = useTranslations("admin");
 
@@ -37,6 +39,7 @@ export function ClubDangerZone({
 
   const [confirmOpen, setConfirmOpen] = useState(false);
   const [confirmName, setConfirmName] = useState("");
+  const blockedByGroup = Boolean(blockingGroupName);
   const nameMatches = confirmName.trim() === clubName;
 
   return (
@@ -45,6 +48,12 @@ export function ClubDangerZone({
         {t("danger.title")}
       </h2>
       <div className="flex flex-col gap-4 rounded-2xl border border-destructive/30 bg-destructive/5 p-5">
+        {blockedByGroup && (
+          <p className="rounded-lg border border-amber-300 bg-amber-50 px-3 py-2 text-xs text-amber-800 dark:border-amber-900/60 dark:bg-amber-950/30 dark:text-amber-300">
+            {t("danger.groupMemberBlock", { group: blockingGroupName ?? "" })}
+          </p>
+        )}
+
         {/* Archive / Restore */}
         <div className="flex items-start justify-between gap-4">
           <div>
@@ -58,7 +67,14 @@ export function ClubDangerZone({
           <form action={archiveSubmit}>
             <input type="hidden" name="clubId" value={clubId} />
             <input type="hidden" name="locale" value={locale} />
-            <Button type="submit" variant="secondary" size="sm" loading={archivePending} className="shrink-0">
+            <Button
+              type="submit"
+              variant="secondary"
+              size="sm"
+              loading={archivePending}
+              disabled={blockedByGroup}
+              className="shrink-0"
+            >
               {archived ? (
                 <ArchiveRestore className="h-4 w-4" />
               ) : (
@@ -98,6 +114,7 @@ export function ClubDangerZone({
                 variant="danger"
                 size="sm"
                 onClick={() => setConfirmOpen(true)}
+                disabled={blockedByGroup}
                 className="shrink-0"
               >
                 <Trash2 className="h-4 w-4" />
